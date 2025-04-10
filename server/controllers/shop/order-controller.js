@@ -1,4 +1,4 @@
-const paypal = require("../../helpers/paypal");
+const izyipay = require("../../helpers/iyzipay");
 const Order = require("../../models/Order");
 const Cart = require("../../models/Cart");
 const Product = require("../../models/Product");
@@ -23,11 +23,11 @@ const createOrder = async (req, res) => {
     const create_payment_json = {
       intent: "sale",
       payer: {
-        payment_method: "paypal",
+        payment_method: "iyzipay",
       },
       redirect_urls: {
-        return_url: "http://localhost:5173/shop/paypal-return",
-        cancel_url: "http://localhost:5173/shop/paypal-cancel",
+        return_url: "http://localhost:5173/shop/iyzipay-return",
+        cancel_url: "http://localhost:5173/shop/iyzipay-cancel",
       },
       transactions: [
         {
@@ -36,12 +36,12 @@ const createOrder = async (req, res) => {
               name: item.title,
               sku: item.productId,
               price: item.price.toFixed(2),
-              currency: "USD",
+              currency: "TRY",
               quantity: item.quantity,
             })),
           },
           amount: {
-            currency: "USD",
+            currency: "TRY",
             total: totalAmount.toFixed(2),
           },
           description: "description",
@@ -49,13 +49,13 @@ const createOrder = async (req, res) => {
       ],
     };
 
-    paypal.payment.create(create_payment_json, async (error, paymentInfo) => {
+    izyipay.payment.create(create_payment_json, async (error, paymentInfo) => {
       if (error) {
         console.log(error);
 
         return res.status(500).json({
           success: false,
-          message: "Error while creating paypal payment",
+          message: "Error while creating izyipay payment",
         });
       } else {
         const newlyCreatedOrder = new Order({
