@@ -22,7 +22,7 @@ function AdminHeader({ setOpen }) {
           className="inline-flex gap-2 items-center rounded-md px-4 py-2 text-sm font-medium shadow"
         >
           <LogOut />
-          Logout
+          Çıkış
         </Button>
       </div>
     </header>
@@ -30,3 +30,5 @@ function AdminHeader({ setOpen }) {
 }
 
 export default AdminHeader;
+
+// Bu sayfa, bir Admin Paneli üst menüsünü oluşturur. Menü butonu (AlignJustify) ile yan menüyü açar ve "Logout" butonu ile kullanıcı çıkışını (logoutUser) Redux üzerinden yönetir. 🚀

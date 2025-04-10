@@ -34,7 +34,7 @@ function Address({ setCurrentSelectedAddress, selectedId }) {
     if (addressList.length >= 3 && currentEditedId === null) {
       setFormData(initialAddressFormData);
       toast({
-        title: "You can add max 3 addresses",
+        title: "En fazla 3 adres ekleyebilirsiniz",
         variant: "destructive",
       });
 
@@ -54,7 +54,7 @@ function Address({ setCurrentSelectedAddress, selectedId }) {
             setCurrentEditedId(null);
             setFormData(initialAddressFormData);
             toast({
-              title: "Address updated successfully",
+              title: "Adres başarıyla güncellendi",
             });
           }
         })
@@ -68,7 +68,7 @@ function Address({ setCurrentSelectedAddress, selectedId }) {
             dispatch(fetchAllAddresses(user?.id));
             setFormData(initialAddressFormData);
             toast({
-              title: "Address added successfully",
+              title: "Adres başarıyla eklendi",
             });
           }
         });
@@ -81,7 +81,7 @@ function Address({ setCurrentSelectedAddress, selectedId }) {
       if (data?.payload?.success) {
         dispatch(fetchAllAddresses(user?.id));
         toast({
-          title: "Address deleted successfully",
+          title: "Adres başarıyla silindi",
         });
       }
     });
@@ -128,7 +128,7 @@ function Address({ setCurrentSelectedAddress, selectedId }) {
       </div>
       <CardHeader>
         <CardTitle>
-          {currentEditedId !== null ? "Edit Address" : "Add New Address"}
+          {currentEditedId !== null ? "Adresi Düzenle" : "Yeni Adres Ekle"}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -136,7 +136,7 @@ function Address({ setCurrentSelectedAddress, selectedId }) {
           formControls={addressFormControls}
           formData={formData}
           setFormData={setFormData}
-          buttonText={currentEditedId !== null ? "Edit" : "Add"}
+          buttonText={currentEditedId !== null ? "Düzenle" : "Ekle"}
           onSubmit={handleManageAddress}
           isBtnDisabled={!isFormValid()}
         />

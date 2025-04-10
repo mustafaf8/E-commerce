@@ -95,7 +95,7 @@ function ShoppingListing() {
         const getQuantity = getCartItems[indexOfCurrentItem].quantity;
         if (getQuantity + 1 > getTotalStock) {
           toast({
-            title: `Only ${getQuantity} quantity can be added for this item`,
+            title: `Bu üründen yalnızca ${getQuantity} adet eklenebilir`,
             variant: "destructive",
           });
 
@@ -114,7 +114,7 @@ function ShoppingListing() {
       if (data?.payload?.success) {
         dispatch(fetchCartItems(user?.id));
         toast({
-          title: "Product is added to cart",
+          title: "Ürün sepete eklendi",
         });
       }
     });
@@ -150,10 +150,10 @@ function ShoppingListing() {
       <ProductFilter filters={filters} handleFilter={handleFilter} />
       <div className="bg-background w-full rounded-lg shadow-sm">
         <div className="p-4 border-b flex items-center justify-between">
-          <h2 className="text-lg font-extrabold">All Products</h2>
+          <h2 className="text-lg font-extrabold">Tüm Ürünler</h2>
           <div className="flex items-center gap-3">
             <span className="text-muted-foreground">
-              {productList?.length} Products
+              {productList?.length} Ürünler
             </span>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

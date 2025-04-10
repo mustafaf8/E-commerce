@@ -9,13 +9,13 @@ function AdminProductTile({
   handleDelete,
 }) {
   return (
-    <Card className="w-full max-w-sm mx-auto">
+    <Card className="w-full max-w-xs mx-auto">
       <div>
         <div className="relative">
           <img
             src={product?.image}
             alt={product?.title}
-            className="w-full h-[300px] object-cover rounded-t-lg"
+            className="w-full h-[300px] object-contain rounded-t-lg"
           />
         </div>
         <CardContent>
@@ -23,13 +23,13 @@ function AdminProductTile({
           <div className="flex justify-between items-center mb-2">
             <span
               className={`${
-                product?.salePrice > 0 ? "line-through" : ""
-              } text-lg font-semibold text-primary`}
+                product?.salePrice > 0 ? "line-through-red" : ""
+              } text-lg font-semibold  text-muted-foreground`}
             >
-              ${product?.price}
+              {product?.price} TL
             </span>
             {product?.salePrice > 0 ? (
-              <span className="text-lg font-bold">${product?.salePrice}</span>
+              <span className="text-lg font-bold">{product?.salePrice} TL</span>
             ) : null}
           </div>
         </CardContent>
@@ -41,9 +41,9 @@ function AdminProductTile({
               setFormData(product);
             }}
           >
-            Edit
+            Düzenle
           </Button>
-          <Button onClick={() => handleDelete(product?._id)}>Delete</Button>
+          <Button onClick={() => handleDelete(product?._id)}>Sil</Button>
         </CardFooter>
       </div>
     </Card>

@@ -10,13 +10,13 @@ const addProductReview = async (req, res) => {
     const order = await Order.findOne({
       userId,
       "cartItems.productId": productId,
-      // orderStatus: "confirmed" || "delivered",
+      // orderStatus: { $in: ["confirmed", "delivered"] }
     });
 
     if (!order) {
       return res.status(403).json({
         success: false,
-        message: "You need to purchase product to review it.",
+        message: "Ürünü değerlendirmek için satın almanız gerekiyor.",
       });
     }
 
@@ -28,7 +28,7 @@ const addProductReview = async (req, res) => {
     if (checkExistinfReview) {
       return res.status(400).json({
         success: false,
-        message: "You already reviewed this product!",
+        message: "Bu ürünü zaten değerlendirdiniz!",
       });
     }
 

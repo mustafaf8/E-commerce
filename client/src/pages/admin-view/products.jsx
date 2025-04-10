@@ -75,7 +75,7 @@ function AdminProducts() {
             setImageFile(null);
             setFormData(initialFormData);
             toast({
-              title: "Product add successfully",
+              title: "Ürün başarıyla eklendi",
             });
           }
         });
@@ -106,7 +106,7 @@ function AdminProducts() {
     <Fragment>
       <div className="mb-5 w-full flex justify-end">
         <Button onClick={() => setOpenCreateProductsDialog(true)}>
-          Add New Product
+          Yeni Ürün Ekle
         </Button>
       </div>
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
@@ -133,7 +133,7 @@ function AdminProducts() {
         <SheetContent side="right" className="overflow-auto">
           <SheetHeader>
             <SheetTitle>
-              {currentEditedId !== null ? "Edit Product" : "Add New Product"}
+              {currentEditedId !== null ? "Ürünü Düzenle" : "Yen Ürün Ekle"}
             </SheetTitle>
           </SheetHeader>
           <ProductImageUpload
@@ -150,7 +150,7 @@ function AdminProducts() {
               onSubmit={onSubmit}
               formData={formData}
               setFormData={setFormData}
-              buttonText={currentEditedId !== null ? "Edit" : "Add"}
+              buttonText={currentEditedId !== null ? "Düzenle" : "Ekle"}
               formControls={addProductFormElements}
               isBtnDisabled={!isFormValid()}
             />

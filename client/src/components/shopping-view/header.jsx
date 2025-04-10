@@ -1,4 +1,5 @@
-import { HousePlug, LogOut, Menu, ShoppingCart, UserCog } from "lucide-react";
+import { Heart } from "lucide-react"; // <-- İkonu import et
+import { LogOut, Menu, ShoppingCart, UserCog } from "lucide-react";
 import {
   Link,
   useLocation,
@@ -79,22 +80,31 @@ function HeaderRightContent() {
     dispatch(fetchCartItems(user?.id));
   }, [dispatch]);
 
-  console.log(cartItems, "sangam");
+  console.log(cartItems, "mustafa");
 
   return (
     <div className="flex lg:items-center lg:flex-row flex-col gap-4">
       <Sheet open={openCartSheet} onOpenChange={() => setOpenCartSheet(false)}>
         <Button
-          onClick={() => setOpenCartSheet(true)}
+          onClick={() => navigate("/shop/account")}
           variant="outline"
-          size="icon"
+          size="mustafa"
           className="relative"
         >
-          <ShoppingCart className="w-6 h-6" />
+          <p className="">Siparişlerim</p>
+        </Button>
+        <Button
+          onClick={() => setOpenCartSheet(true)}
+          variant="outline"
+          size="mustafa"
+          className="relative"
+        >
+          <ShoppingCart className="w- h-8" />
           <span className="absolute top-[-5px] right-[2px] font-bold text-sm">
             {cartItems?.items?.length || 0}
           </span>
-          <span className="sr-only">User cart</span>
+          <p className="pl-3">Sepetim</p>
+          <span className="sr-only">Kullanıcı sepeti</span>
         </Button>
         <UserCartWrapper
           setOpenCartSheet={setOpenCartSheet}
@@ -115,16 +125,21 @@ function HeaderRightContent() {
           </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent side="right" className="w-56">
-          <DropdownMenuLabel>Logged in as {user?.userName}</DropdownMenuLabel>
+          <DropdownMenuLabel>Logged {user?.userName}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => navigate("/shop/account")}>
             <UserCog className="mr-2 h-4 w-4" />
-            Account
+            Hesap
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => navigate("/shop/wishlist")}>
+            <Heart className="mr-2 h-4 w-4" />
+            Favorilerim
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout}>
             <LogOut className="mr-2 h-4 w-4" />
-            Logout
+            Çıkış
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -133,15 +148,26 @@ function HeaderRightContent() {
 }
 
 function ShoppingHeader() {
+  const navigate = useNavigate();
   const { isAuthenticated } = useSelector((state) => state.auth);
-
+  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  function handleLogout() {
+    dispatch(logoutUser());
+  }
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
       <div className="flex h-16 items-center justify-between px-4 md:px-6">
         <Link to="/shop/home" className="flex items-center gap-2">
-          <HousePlug className="h-6 w-6" />
-          <span className="font-bold">Ecommerce</span>
+          <span className="">
+            <img
+              className="w-40 ml-8 max-[1000px]:ml-0"
+              src="../src/assets/dlogo2.png"
+              alt="logo"
+            />
+          </span>
         </Link>
+
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="outline" size="icon" className="lg:hidden">
@@ -162,6 +188,27 @@ function ShoppingHeader() {
           <HeaderRightContent />
         </div>
       </div>
+      {/* Kullanıcı Dropdown Menüsü */}
+      <DropdownMenu>
+        {/* ... (DropdownMenuTrigger) */}
+        <DropdownMenuContent side="right" className="w-56">
+          <DropdownMenuLabel>Giriş Yapıldı: {user?.userName}</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => navigate("/shop/account")}>
+            <UserCog className="mr-2 h-4 w-4" />
+            Hesap
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate("/shop/wishlist")}>
+            <Heart className="mr-2 h-4 w-4" />
+            Favorilerim
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleLogout}>
+            <LogOut className="mr-2 h-4 w-4" />
+            Çıkış
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </header>
   );
 }

@@ -11,6 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
+import NoSearchResults from "./NoSearchResults";
 
 function SearchProducts() {
   const [keyword, setKeyword] = useState("");
@@ -48,7 +49,7 @@ function SearchProducts() {
         const getQuantity = getCartItems[indexOfCurrentItem].quantity;
         if (getQuantity + 1 > getTotalStock) {
           toast({
-            title: `Only ${getQuantity} quantity can be added for this item`,
+            title: `Bu üründen yalnızca ${getQuantity} adet eklenebilir`,
             variant: "destructive",
           });
 
@@ -67,7 +68,7 @@ function SearchProducts() {
       if (data?.payload?.success) {
         dispatch(fetchCartItems(user?.id));
         toast({
-          title: "Product is added to cart",
+          title: "Ürün sepete eklendi",
         });
       }
     });
@@ -93,16 +94,15 @@ function SearchProducts() {
             name="keyword"
             onChange={(event) => setKeyword(event.target.value)}
             className="py-6"
-            placeholder="Search Products..."
+            placeholder="Ürün Ara..."
           />
         </div>
       </div>
-      {!searchResults.length ? (
-        <h1 className="text-5xl font-extrabold">No result found!</h1>
-      ) : null}
+      {!searchResults.length ? <NoSearchResults /> : null}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
         {searchResults.map((item) => (
           <ShoppingProductTile
+            key={item.id} // 'item.id' benzersiz bir tanımlayıcı olmalı
             handleAddtoCart={handleAddtoCart}
             product={item}
             handleGetProductDetails={handleGetProductDetails}

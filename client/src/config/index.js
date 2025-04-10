@@ -1,22 +1,22 @@
 export const registerFormControls = [
   {
     name: "userName",
-    label: "User Name",
-    placeholder: "Enter your user name",
+    label: "Kullanıcı Adı",
+    placeholder: "Kullanıcı adınızı girin",
     componentType: "input",
     type: "text",
   },
   {
     name: "email",
     label: "Email",
-    placeholder: "Enter your email",
+    placeholder: "Email adresinizi girin",
     componentType: "input",
     type: "email",
   },
   {
     name: "password",
-    label: "Password",
-    placeholder: "Enter your password",
+    label: "Şifre",
+    placeholder: "Şifrenizi girin",
     componentType: "input",
     type: "password",
   },
@@ -26,14 +26,14 @@ export const loginFormControls = [
   {
     name: "email",
     label: "Email",
-    placeholder: "Enter your email",
+    placeholder: "Email adresinizi girin",
     componentType: "input",
     type: "email",
   },
   {
     name: "password",
-    label: "Password",
-    placeholder: "Enter your password",
+    label: "Şifre",
+    placeholder: "Şifrenizi girin",
     componentType: "input",
     type: "password",
   },
@@ -41,20 +41,20 @@ export const loginFormControls = [
 
 export const addProductFormElements = [
   {
-    label: "Title",
+    label: "Başlık",
     name: "title",
     componentType: "input",
     type: "text",
-    placeholder: "Enter product title",
+    placeholder: "Ürün başlığını girin",
   },
   {
-    label: "Description",
+    label: "Açıklama",
     name: "description",
     componentType: "textarea",
-    placeholder: "Enter product description",
+    placeholder: "Ürün açıklamasını girin",
   },
   {
-    label: "Category",
+    label: "Kategori",
     name: "category",
     componentType: "select",
     options: [
@@ -66,7 +66,7 @@ export const addProductFormElements = [
     ],
   },
   {
-    label: "Brand",
+    label: "Marka",
     name: "brand",
     componentType: "select",
     options: [
@@ -79,25 +79,25 @@ export const addProductFormElements = [
     ],
   },
   {
-    label: "Price",
+    label: "Fiyat",
     name: "price",
     componentType: "input",
     type: "number",
-    placeholder: "Enter product price",
+    placeholder: "Fiyatı girin",
   },
   {
-    label: "Sale Price",
+    label: "Satış Fiyatı",
     name: "salePrice",
     componentType: "input",
     type: "number",
-    placeholder: "Enter sale price (optional)",
+    placeholder: "Satış fiyatını girin (opsiyonel)",
   },
   {
-    label: "Total Stock",
+    label: "Toplam Stok",
     name: "totalStock",
     componentType: "input",
     type: "number",
-    placeholder: "Enter total stock",
+    placeholder: "Toplam stok miktarını girin",
   },
 ];
 
@@ -188,37 +188,37 @@ export const sortOptions = [
 
 export const addressFormControls = [
   {
-    label: "Address",
-    name: "address",
-    componentType: "input",
-    type: "text",
-    placeholder: "Enter your address",
-  },
-  {
-    label: "City",
+    label: "İl",
     name: "city",
     componentType: "input",
     type: "text",
-    placeholder: "Enter your city",
+    placeholder: "İl adını girin",
   },
   {
-    label: "Pincode",
+    label: "Adres",
+    name: "address",
+    componentType: "input",
+    type: "text",
+    placeholder: "Adresinizi girin",
+  },
+  {
+    label: "Posta Kodu",
     name: "pincode",
     componentType: "input",
     type: "text",
-    placeholder: "Enter your pincode",
+    placeholder: "Posta kodunu girin",
   },
   {
-    label: "Phone",
+    label: "Telefon Numarası",
     name: "phone",
     componentType: "input",
     type: "text",
-    placeholder: "Enter your phone number",
+    placeholder: "Telefon numarasını girin",
   },
   {
-    label: "Notes",
+    label: "Not",
     name: "notes",
     componentType: "textarea",
-    placeholder: "Enter any additional notes",
+    placeholder: "Notunuzu girin",
   },
 ];

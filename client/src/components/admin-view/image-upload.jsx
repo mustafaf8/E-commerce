@@ -69,7 +69,7 @@ function ProductImageUpload({
     <div
       className={`w-full  mt-4 ${isCustomStyling ? "" : "max-w-md mx-auto"}`}
     >
-      <Label className="text-lg font-semibold mb-2 block">Upload Image</Label>
+      <Label className="text-lg font-semibold mb-2 block">Resim Yükle</Label>
       <div
         onDragOver={handleDragOver}
         onDrop={handleDrop}
@@ -93,7 +93,7 @@ function ProductImageUpload({
             } flex flex-col items-center justify-center h-32 cursor-pointer`}
           >
             <UploadCloudIcon className="w-10 h-10 text-muted-foreground mb-2" />
-            <span>Drag & drop or click to upload image</span>
+            <span>Sürükleyin veya tıklayarak resim yükleyin</span>
           </Label>
         ) : imageLoadingState ? (
           <Skeleton className="h-10 bg-gray-100" />
@@ -110,7 +110,7 @@ function ProductImageUpload({
               onClick={handleRemoveImage}
             >
               <XIcon className="w-4 h-4" />
-              <span className="sr-only">Remove File</span>
+              <span className="sr-only">Dosyayı Kaldır</span>
             </Button>
           </div>
         )}

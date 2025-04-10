@@ -7,8 +7,8 @@ import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 
 const initialState = {
-  email: "mustafa",
-  password: "123",
+  email: "",
+  password: "",
 };
 
 function AuthLogin() {
@@ -37,21 +37,21 @@ function AuthLogin() {
     <div className="mx-auto w-full max-w-md space-y-6">
       <div className="text-center">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          Sign in to your account
+          Hesabınıza giriş yapın
         </h1>
         <p className="mt-2">
-          Don't have an account
+          Hesabınız yok mu
           <Link
             className="font-medium ml-2 text-primary hover:underline"
             to="/auth/register"
           >
-            Register
+            Kayıt Ol
           </Link>
         </p>
       </div>
       <CommonForm
         formControls={loginFormControls}
-        buttonText={"Sign In"}
+        buttonText={"Giriş Yap"}
         formData={formData}
         setFormData={setFormData}
         onSubmit={onSubmit}
