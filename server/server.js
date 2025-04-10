@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
@@ -20,9 +21,7 @@ const shopWishlistRouter = require("./routes/shop/wishlist-routes");
 //create a separate file for this and then import/use that file here
 
 mongoose
-  .connect(
-    "mongodb+srv://mustafanahsan754:LYcf3ogVPWLPxzCV@cluster0.t4oyf.mongodb.net/"
-  )
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch((error) => console.log(error));
 
