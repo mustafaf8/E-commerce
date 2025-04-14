@@ -9,7 +9,9 @@ import shopOrderSlice from "./shop/order-slice";
 import shopSearchSlice from "./shop/search-slice";
 import shopReviewSlice from "./shop/review-slice";
 import commonFeatureSlice from "./common-slice";
+import promoCardReducer from "./common-slice/promo-card-slice";
 import wishlistReducer from "./shop/wishlist-slice";
+import sideBannerReducer from "./common-slice/side-banner-slice";
 
 const store = configureStore({
   reducer: {
@@ -23,7 +25,9 @@ const store = configureStore({
     shopSearch: shopSearchSlice,
     shopReview: shopReviewSlice,
     commonFeature: commonFeatureSlice,
+    promoCards: promoCardReducer,
     shopWishlist: wishlistReducer,
+    sideBanners: sideBannerReducer,
   },
 });
 

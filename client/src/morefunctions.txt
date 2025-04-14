@@ -1,0 +1,931 @@
+home icin 
+import { Button } from "@/components/ui/button";
+
+import {
+  Airplay,
+  BabyIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CloudLightning,
+  Heater,
+  Images,
+  Shirt,
+  ShirtIcon,
+  ShoppingBasket,
+  UmbrellaIcon,
+  WashingMachine,
+  WatchIcon,
+} from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchAllFilteredProducts,
+  fetchProductDetails,
+} from "@/store/shop/products-slice";
+import ShoppingProductTile from "@/components/shopping-view/product-tile";
+import { useNavigate } from "react-router-dom";
+import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
+import { useToast } from "@/components/ui/use-toast";
+import ProductDetailsDialog from "@/components/shopping-view/product-details";
+import { getFeatureImages } from "@/store/common-slice";
+
+const categoriesWithIcon = [
+  { id: "men", label: "Erkek", icon: ShirtIcon },
+  { id: "women", label: "Kadın", icon: CloudLightning },
+  { id: "kids", label: "Çocuk", icon: BabyIcon },
+  { id: "accessories", label: "Aksesuar", icon: WatchIcon },
+  { id: "footwear", label: "Ayakkbı", icon: UmbrellaIcon },
+  { id: "mustafa", label: "Genel", icon: UmbrellaIcon },
+];
+
+const brandsWithIcon = [
+  { id: "nike", label: "Nike", icon: Shirt },
+  { id: "adidas", label: "Adidas", icon: WashingMachine },
+  { id: "puma", label: "Puma", icon: ShoppingBasket },
+  { id: "levi", label: "Levi's", icon: Airplay },
+  { id: "zara", label: "Zara", icon: Images },
+  { id: "h&m", label: "H&M", icon: Heater },
+];
+function ShoppingHome() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const { productList, productDetails } = useSelector(
+    (state) => state.shopProducts
+  );
+  const { featureImageList } = useSelector((state) => state.commonFeature);
+
+  const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+
+  const { user } = useSelector((state) => state.auth);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  function handleNavigateToListingPage(getCurrentItem, section) {
+    sessionStorage.removeItem("filters");
+    const currentFilter = {
+      [section]: [getCurrentItem.id],
+    };
+
+    sessionStorage.setItem("filters", JSON.stringify(currentFilter));
+    navigate(`/shop/listing`);
+  }
+
+  function handleGetProductDetails(getCurrentProductId) {
+    dispatch(fetchProductDetails(getCurrentProductId));
+  }
+
+  function handleAddtoCart(getCurrentProductId) {
+    dispatch(
+      addToCart({
+        userId: user?.id,
+        productId: getCurrentProductId,
+        quantity: 1,
+      })
+    ).then((data) => {
+      if (data?.payload?.success) {
+        dispatch(fetchCartItems(user?.id));
+        toast({
+          title: "Ürün başarıyla sepete eklendi",
+        });
+      }
+    });
+  }
+
+  useEffect(() => {
+    if (productDetails !== null) setOpenDetailsDialog(true);
+  }, [productDetails]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prevSlide) => (prevSlide + 1) % featureImageList.length);
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [featureImageList]);
+
+  useEffect(() => {
+    dispatch(
+      fetchAllFilteredProducts({
+        filterParams: {},
+        sortParams: "price-lowtohigh",
+      })
+    );
+  }, [dispatch]);
+
+  console.log(productList, "productList");
+
+  useEffect(() => {
+    dispatch(getFeatureImages());
+  }, [dispatch]);
+
+  return (
+    <div className="flex flex-col min-h-screen">
+      <div className="relative w-full aspect-[16/4.5] overflow-hidden">
+        {featureImageList && featureImageList.length > 0
+          ? featureImageList.map((slide, index) => (
+              <img
+                src={slide?.image}
+                key={index}
+                className={`${
+                  index === currentSlide ? "opacity-100" : "opacity-0"
+                } absolute top-0 left-0 w-full h-full object-contain transition-opacity duration-1000`}
+              />
+            ))
+          : null}
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() =>
+            setCurrentSlide(
+              (prevSlide) =>
+                (prevSlide - 1 + featureImageList.length) %
+                featureImageList.length
+            )
+          }
+          className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-white/80"
+        >
+          <ChevronLeftIcon className="w-4 h-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() =>
+            setCurrentSlide(
+              (prevSlide) => (prevSlide + 1) % featureImageList.length
+            )
+          }
+          className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-white/80"
+        >
+          <ChevronRightIcon className="w-4 h-4" />
+        </Button>
+      </div>
+
+      {/* --------------------------------- */}
+      <section className="py-12 bg-gray-50">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mx-5">
+          {categoriesWithIcon.map((categoryItem) => (
+            <Card
+              onClick={() =>
+                handleNavigateToListingPage(categoryItem, "category")
+              }
+              className="cursor-pointer hover:shadow-lg transition-shadow"
+            >
+              <CardContent className="flex flex-col items-center justify-center p-6">
+                {/* <categoryItem.icon className="w-12 h-12 mb-4 text-primary" /> */}
+                <div>
+                  <img src="" alt="picture" />
+                </div>
+                <span className="font-bold">{categoryItem.label}</span>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      <section className="py-12 bg-gray-50">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mx-5">
+          {brandsWithIcon.map((brandItem) => (
+            <Card
+              onClick={() => handleNavigateToListingPage(brandItem, "brand")}
+              className="cursor-pointer hover:shadow-lg transition-shadow"
+            >
+              <CardContent className="flex flex-col items-center justify-center p-6">
+                {/* <brandItem.icon className="w-12 h-12 mb-4 text-primary" /> */}
+                <div>
+                  <img src="" alt="picture" />
+                </div>
+                <span className="font-bold">{brandItem.label}</span>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+      {/* --------------------------------- */}
+      <section className="py-12">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {productList && productList.length > 0
+              ? productList.map((productItem) => (
+                  <ShoppingProductTile
+                    handleGetProductDetails={handleGetProductDetails}
+                    product={productItem}
+                    handleAddtoCart={handleAddtoCart}
+                  />
+                ))
+              : null}
+          </div>
+        </div>
+      </section>
+      <ProductDetailsDialog
+        open={openDetailsDialog}
+        setOpen={setOpenDetailsDialog}
+        productDetails={productDetails}
+      />
+    </div>
+  );
+}
+
+export default ShoppingHome;
+
+
+
+import ProductImageUpload from "@/components/admin-view/image-upload";
+import { Button } from "@/components/ui/button";
+import { addFeatureImage, getFeatureImages } from "@/store/common-slice";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
+function AdminDashboard() {
+  const [imageFile, setImageFile] = useState(null);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
+  const [imageLoadingState, setImageLoadingState] = useState(false);
+  const dispatch = useDispatch();
+  const { featureImageList } = useSelector((state) => state.commonFeature);
+
+  console.log(uploadedImageUrl, "uploadedImageUrl");
+
+  function handleUploadFeatureImage() {
+    dispatch(addFeatureImage(uploadedImageUrl)).then((data) => {
+      if (data?.payload?.success) {
+        dispatch(getFeatureImages());
+        setImageFile(null);
+        setUploadedImageUrl("");
+      }
+    });
+  }
+
+  useEffect(() => {
+    dispatch(getFeatureImages());
+  }, [dispatch]);
+
+  console.log(featureImageList, "featureImageList");
+
+  return (
+    <div>
+      <ProductImageUpload
+        imageFile={imageFile}
+        setImageFile={setImageFile}
+        uploadedImageUrl={uploadedImageUrl}
+        setUploadedImageUrl={setUploadedImageUrl}
+        setImageLoadingState={setImageLoadingState}
+        imageLoadingState={imageLoadingState}
+        isCustomStyling={true}
+        // isEditMode={currentEditedId !== null}
+      />
+      <Button onClick={handleUploadFeatureImage} className="mt-5 w-full">
+        Resim Yükle
+      </Button>
+      <div className="flex flex-col gap-4 mt-5">
+        {featureImageList && featureImageList.length > 0
+          ? featureImageList.map((featureImgItem) => (
+              <div className="relative">
+                <img
+                  src={featureImgItem.image}
+                  className="w-full h-[300px] object-cover rounded-t-lg"
+                />
+              </div>
+            ))
+          : null}
+      </div>
+    </div>
+  );
+}
+
+export default AdminDashboard;
+
+
+
+
+
+
+// client/src/store/common-slice/side-banner-slice.js
+
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+
+const initialState = {
+  sideBannerList: [],
+  isLoading: false,
+  error: null,
+};
+
+// --- Async Thunks ---
+
+// Yan banner'ları getirme (Mevcut Thunk)
+export const fetchSideBanners = createAsyncThunk(
+  "sideBanners/fetchSideBanners",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/common/side-banners/get` // Endpoint'i kontrol edin
+      );
+      if (response.data && response.data.success) {
+          return response.data;
+      } else {
+          return rejectWithValue(response.data || { message: "Yan banner verisi alınamadı." });
+      }
+    } catch (error) {
+      console.error("fetchSideBanners API Hatası:", error.response?.data || error.message);
+      return rejectWithValue(error.response?.data || { message: "Yan bannerlar getirilemedi." });
+    }
+  }
+);
+
+// !!! YENİ THUNK: Yan banner ekleme !!!
+export const addSideBanner = createAsyncThunk(
+  "sideBanners/addSideBanner",
+  async (bannerData, { rejectWithValue }) => { // bannerData = { image: 'url', title: '...', link: '...' }
+    try {
+      // !!! BURAYI DEĞİŞTİRİN: Backend API endpoint'inizin doğru adresini yazın !!!
+      const response = await axios.post(
+        `http://localhost:5000/api/common/side-banners/add`,
+        bannerData
+        // Gerekirse admin yetkilendirmesi için header ekleyin
+        // { headers: { Authorization: `Bearer ${adminToken}` } }
+      );
+      // Başarılı yanıt: { success: true, data: { ...yeni banner... } }
+      if (response.data && response.data.success) {
+          return response.data;
+      } else {
+          return rejectWithValue(response.data || { message: "Yan banner eklenemedi." });
+      }
+    } catch (error) {
+      console.error("addSideBanner API Hatası:", error.response?.data || error.message);
+      return rejectWithValue(error.response?.data || { message: "Yan banner eklenemedi." });
+    }
+  }
+);
+
+// !!! YENİ THUNK: Yan banner silme !!!
+export const deleteSideBanner = createAsyncThunk(
+  "sideBanners/deleteSideBanner",
+  async (bannerId, { rejectWithValue }) => {
+    try {
+       // !!! BURAYI DEĞİŞTİRİN: Backend API endpoint'inizin doğru adresini yazın !!!
+      const response = await axios.delete(
+        `http://localhost:5000/api/common/side-banners/delete/${bannerId}`
+         // { headers: { Authorization: `Bearer ${adminToken}` } }
+      );
+       // Başarılı yanıt: { success: true } (veya silinen ID'yi dönebilir)
+       if (response.data && response.data.success) {
+           // Başarılı silme sonrası ID'yi döndürelim ki state'den çıkarabilelim
+           return { success: true, data: { _id: bannerId } };
+       } else {
+            return rejectWithValue(response.data || { message: "Yan banner silinemedi." });
+       }
+    } catch (error) {
+      console.error("deleteSideBanner API Hatası:", error.response?.data || error.message);
+      return rejectWithValue(error.response?.data || { message: "Yan banner silinemedi." });
+    }
+  }
+);
+
+
+// --- Slice Definition ---
+const sideBannerSlice = createSlice({
+  name: "sideBanners",
+  initialState,
+  reducers: { /* ... */ },
+  extraReducers: (builder) => {
+    builder
+      // fetchSideBanners Cases (Mevcut)
+      .addCase(fetchSideBanners.pending, (state) => { state.isLoading = true; state.error = null; })
+      .addCase(fetchSideBanners.fulfilled, (state, action) => { state.isLoading = false; state.sideBannerList = action.payload?.data || []; })
+      .addCase(fetchSideBanners.rejected, (state, action) => { state.isLoading = false; state.error = action.payload?.message || action.error.message; state.sideBannerList = []; })
+
+      // !!! YENİ CASE'LER: addSideBanner !!!
+      .addCase(addSideBanner.fulfilled, (state, action) => {
+          // Başarılı eklemede gelen yeni banner'ı listeye ekle
+          if (action.payload?.success && action.payload?.data) {
+              state.sideBannerList.push(action.payload.data);
+              state.error = null; // Hata varsa temizle
+          }
+          // Pending/rejected durumları isteğe bağlı olarak eklenebilir (UI'da loading göstermek için)
+      })
+       .addCase(addSideBanner.rejected, (state, action) => {
+           state.error = action.payload?.message || action.error.message; // Hata mesajını state'e yaz
+           console.error("Yan banner ekleme hatası:", state.error);
+      })
+
+      // !!! YENİ CASE'LER: deleteSideBanner !!!
+      .addCase(deleteSideBanner.fulfilled, (state, action) => {
+           // Başarılı silme sonrası ilgili banner'ı listeden çıkar
+           if (action.payload?.success && action.payload?.data?._id) {
+               state.sideBannerList = state.sideBannerList.filter(
+                   (banner) => banner._id !== action.payload.data._id
+               );
+               state.error = null; // Hata varsa temizle
+           }
+      })
+       .addCase(deleteSideBanner.rejected, (state, action) => {
+            state.error = action.payload?.message || action.error.message;
+            console.error("Yan banner silme hatası:", state.error);
+       });
+  },
+});
+
+export default sideBannerSlice.reducer;
+
+// Thunk'ları da export edebilirsiniz (opsiyonel)
+// export { fetchSideBanners, addSideBanner, deleteSideBanner };
+
+
+
+------------------------------------------------------
+// client/src/pages/admin-view/dashboard.jsx
+import ProductImageUpload from "@/components/admin-view/image-upload";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input"; // Input eklendi
+import { Label } from "@/components/ui/label"; // Label eklendi
+import { useToast } from "@/components/ui/use-toast"; // Toast eklendi
+import { addFeatureImage, getFeatureImages } from "@/store/common-slice";
+import {
+  addPromoCard,
+  deletePromoCard,
+  fetchPromoCards,
+} from "@/store/common-slice/promo-card-slice";
+import {
+  addSideBanner,
+  deleteSideBanner,
+  fetchSideBanners,
+} from "@/store/common-slice/side-banner-slice";
+import { Trash } from "lucide-react"; // Silme ikonu
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios"; // axios'u burada kullanacağız
+import { Skeleton } from "@/components/ui/skeleton"; // Skeleton
+
+function AdminDashboard() {
+  // --- Feature Image State ve Fonksiyonları ---
+  const [featureImageFile, setFeatureImageFile] = useState(null);
+
+  const [featureImageLoadingState, setFeatureImageLoadingState] =
+    useState(false);
+  const { featureImageList } = useSelector((state) => state.commonFeature);
+  // --- ---
+  // --- Promo Card State ---
+  const [promoCardImageFile, setPromoCardImageFile] = useState(null); // Sadece File nesnesini tutar
+  // const [uploadedPromoCardImageUrl, setUploadedPromoCardImageUrl] = useState(""); // Buna gerek kalmadı
+  const [promoCardImageLoadingState, setPromoCardImageLoadingState] =
+    useState(false); // Yükleme durumunu burada yöneteceğiz
+  const [promoCardTitle, setPromoCardTitle] = useState("");
+  const [promoCardLink, setPromoCardLink] = useState("");
+  const {
+    promoCardList,
+    isLoading: promoLoading, // Listeyi çekerken yüklenme durumu
+    error: promoError,
+  } = useSelector((state) => state.promoCards);
+  // --- ---
+  const [sideBannerImageFile, setSideBannerImageFile] = useState(null);
+  const [uploadedSideBannerImageUrl, setUploadedSideBannerImageUrl] =
+    useState("");
+  const [sideBannerImageLoadingState, setSideBannerImageLoadingState] =
+    useState(false);
+  const [sideBannerTitle, setSideBannerTitle] = useState(""); // İsteğe bağlı
+  const [sideBannerLink, setSideBannerLink] = useState(""); // İsteğe bağlı
+  const {
+    sideBannerList,
+    isLoading: sideBannerLoading,
+    error: sideBannerError,
+  } = useSelector(
+    (state) =>
+      state.sideBanners || { sideBannerList: [], isLoading: false, error: null } // Slice yoksa varsayılan
+  );
+  const dispatch = useDispatch();
+  const { toast } = useToast();
+
+  // --- GENEL RESİM YÜKLEME FONKSİYONU ---
+  // Bu fonksiyon, verilen dosyayı backend'e gönderir ve URL'i döndürür.
+  const uploadImage = async (file) => {
+    if (!file) return null;
+    console.log("--- [uploadImage] Yüklenecek dosya:", file.name); // Ekle
+    const data = new FormData();
+    data.append("my_file", file);
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/admin/products/upload-image", // Genel yükleme endpoint'i
+        data
+      );
+      if (response?.data?.success) {
+        console.log(
+          "--- [uploadImage] Başarılı. Dönen URL:",
+          response.data.result.url
+        ); // Ekle
+        return response.data.result.url; // Sadece URL'i döndür
+      } else {
+        throw new Error(response?.data?.message || "Resim yüklenemedi.");
+      }
+    } catch (error) {
+      console.error("Resim yükleme hatası:", error);
+      toast({
+        variant: "destructive",
+        title: "Resim Yükleme Hatası",
+        description:
+          error?.response?.data?.message ||
+          error.message ||
+          "Bilinmeyen bir hata oluştu.",
+      });
+      return null; // Hata durumunda null döndür
+    }
+  };
+
+  // --- Feature Image Ekleme İşleyici ---
+  async function handleUploadFeatureImage() {
+    if (!featureImageFile) {
+      toast({
+        variant: "destructive",
+        title: "Lütfen önce bir banner resmi seçin.",
+      });
+      return;
+    }
+    setFeatureImageLoadingState(true); // Yüklemeyi başlat
+
+    const uploadedUrl = await uploadImage(featureImageFile); // Resmi yükle ve URL'i al
+
+    if (uploadedUrl) {
+      // URL alındıysa Redux action'ını dispatch et
+      dispatch(addFeatureImage(uploadedUrl))
+        .then((data) => {
+          if (data?.payload?.success) {
+            dispatch(getFeatureImages());
+            setFeatureImageFile(null); // Seçili dosyayı temizle
+            toast({ title: "Banner resmi başarıyla eklendi." });
+          } else {
+            toast({
+              variant: "destructive",
+              title: data.payload?.message || "Banner resmi eklenemedi.",
+            });
+          }
+        })
+        .finally(() => {
+          setFeatureImageLoadingState(false); // Yüklemeyi bitir (başarılı/başarısız)
+        });
+    } else {
+      // URL alınamadıysa (uploadImage içinde hata gösterildi)
+      setFeatureImageLoadingState(false); // Yüklemeyi bitir
+    }
+  }
+
+  // --- Promo Card Ekleme İşleyici ---
+  async function handleUploadPromoCard() {
+    if (!promoCardImageFile) {
+      toast({
+        variant: "destructive",
+        title: "Lütfen bir fırsat kartı resmi seçin.",
+      });
+      return;
+    }
+    setPromoCardImageLoadingState(true); // Yüklemeyi başlat
+
+    const uploadedUrl = await uploadImage(promoCardImageFile); // Resmi yükle ve URL'i al
+
+    if (uploadedUrl) {
+      // URL alındıysa promo kart verisini hazırla ve dispatch et
+      const promoData = {
+        image: uploadedUrl,
+        title: promoCardTitle,
+        link: promoCardLink,
+      };
+      dispatch(addPromoCard(promoData))
+        .then((data) => {
+          console.log(
+            "--- [handleUploadPromoCard] addPromoCard dispatch sonucu:",
+            data.payload
+          ); // Ekle
+          if (data?.payload?.success) {
+            // dispatch(fetchPromoCards()); // Gerek yok, slice güncelliyor
+            setPromoCardImageFile(null); // Seçili dosyayı temizle
+            setPromoCardTitle("");
+            setPromoCardLink("");
+            toast({ title: "Fırsat kartı başarıyla eklendi." });
+          } else {
+            toast({
+              variant: "destructive",
+              title: data.payload?.message || "Fırsat kartı eklenemedi.",
+            });
+          }
+        })
+        .finally(() => {
+          setPromoCardImageLoadingState(false); // Yüklemeyi bitir
+        });
+    } else {
+      // URL alınamadıysa
+      setPromoCardImageLoadingState(false); // Yüklemeyi bitir
+    }
+  }
+
+  // --- Promo Card Silme ---
+  function handleDeletePromoCard(cardId) {
+    if (
+      window.confirm("Bu promosyon kartını silmek istediğinizden emin misiniz?")
+    ) {
+      dispatch(deletePromoCard(cardId)).then((data) => {
+        if (data?.payload?.success) {
+          toast({ title: "Promosyon kartı silindi." });
+          // Fetch etmeye gerek yok, slice güncelliyor.
+          // dispatch(fetchPromoCards());
+        } else {
+          toast({
+            variant: "destructive",
+            title: data.payload?.message || "Promosyon kartı silinemedi.",
+          });
+        }
+      });
+    }
+  }
+
+  // !!! YENİ FONKSİYON: Yan Banner Yükleme !!!
+  function handleUploadSideBanner() {
+    if (!uploadedSideBannerImageUrl) {
+      toast({
+        variant: "destructive",
+        title: "Lütfen yan banner için bir resim yükleyin.",
+      });
+      return;
+    }
+    const bannerData = {
+      image: uploadedSideBannerImageUrl,
+      title: sideBannerTitle,
+      link: sideBannerLink,
+    };
+    dispatch(addSideBanner(bannerData)).then((data) => {
+      if (data?.payload?.success) {
+        setSideBannerImageFile(null);
+        setUploadedSideBannerImageUrl("");
+        setSideBannerTitle("");
+        setSideBannerLink("");
+        toast({ title: "Yan banner başarıyla eklendi." });
+      } else {
+        toast({
+          variant: "destructive",
+          title: data.payload?.message || "Yan banner eklenemedi.",
+        });
+      }
+    });
+  }
+
+  // !!! YENİ FONKSİYON: Yan Banner Silme !!!
+  function handleDeleteSideBanner(bannerId) {
+    if (window.confirm("Bu yan banner'ı silmek istediğinizden emin misiniz?")) {
+      dispatch(deleteSideBanner(bannerId)).then((data) => {
+        if (data?.payload?.success) {
+          toast({ title: "Yan banner silindi." });
+        } else {
+          toast({
+            variant: "destructive",
+            title: data.payload?.message || "Yan banner silinemedi.",
+          });
+        }
+      });
+    }
+  }
+  // --- ---
+
+  // İlk yüklemede verileri getir
+  useEffect(() => {
+    dispatch(getFeatureImages());
+    dispatch(fetchPromoCards());
+    dispatch(fetchSideBanners());
+  }, [dispatch]);
+
+  console.log("--- RENDER ÖNCESİ STATE'LER ---", {
+    featureImageFile: featureImageFile?.name, // Sadece dosya adını logla
+    featureImageLoadingState,
+    promoCardImageFile: promoCardImageFile?.name, // Sadece dosya adını logla
+    promoCardImageLoadingState,
+    promoCardTitle,
+    promoCardLink,
+  });
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {/* Bölüm 1: Banner (Feature Images) Yönetimi */}
+      <div className="border p-6 rounded-lg shadow-sm bg-white">
+        <h2 className="text-xl font-semibold mb-4 border-b pb-2">
+          Ana Sayfa Banner Yönetimi
+        </h2>
+        <ProductImageUpload
+          id="feature-image-upload"
+          imageFile={featureImageFile}
+          setImageFile={setFeatureImageFile}
+          isCustomStyling={true} // Daha kompakt görünüm için
+        />
+        <Button onClick={handleUploadFeatureImage} className="mt-4 w-full">
+          {featureImageLoadingState ? "Yükleniyor..." : "Yeni Banner Ekle"}
+        </Button>
+        <div className="mt-6 space-y-3 max-h-96 overflow-y-auto">
+          <h3 className="text-md font-medium">Mevcut Bannerlar:</h3>
+          {featureImageList && featureImageList.length > 0 ? (
+            featureImageList.map((featureImgItem) => (
+              <div
+                key={featureImgItem._id}
+                className="relative group border rounded overflow-hidden"
+              >
+                <img
+                  src={featureImgItem.image}
+                  alt="Banner"
+                  className="w-full h-auto object-cover" // aspect ratio korunabilir
+                />
+                {/* Silme butonu eklenebilir (backend ve slice'a deleteFeatureImage eklenmeli) */}
+                {/* <Button variant="destructive" size="icon" className="absolute top-1 right-1 opacity-0 group-hover:opacity-100"> <Trash size={16}/> </Button> */}
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-gray-500">Henüz banner eklenmemiş.</p>
+          )}
+        </div>
+      </div>
+
+      {/* Bölüm 2: Promosyon Kartları Yönetimi */}
+      <div className="border p-6 rounded-lg shadow-sm bg-white">
+        <h2 className="text-xl font-semibold mb-4 border-b pb-2">
+          Fırsat Kartları Yönetimi
+        </h2>
+        {/* Resim Yükleme */}
+        <ProductImageUpload
+          id="promo-card-image-upload"
+          imageFile={promoCardImageFile}
+          setImageFile={setPromoCardImageFile}
+          isCustomStyling={true} // Kompakt görünüm
+        />
+        {/* Başlık (Opsiyonel) */}
+        <div className="mt-4 space-y-1">
+          <Label htmlFor="promoTitle">Kart Başlığı (Opsiyonel)</Label>
+          <Input
+            id="promoTitle"
+            type="text"
+            value={promoCardTitle}
+            onChange={(e) => setPromoCardTitle(e.target.value)}
+            placeholder="Örn: %10 İndirim"
+          />
+        </div>
+        {/* Link (Opsiyonel) */}
+        <div className="mt-4 space-y-1">
+          <Label htmlFor="promoLink">Kart Linki (Opsiyonel)</Label>
+          <Input
+            id="promoLink"
+            type="text"
+            value={promoCardLink}
+            onChange={(e) => setPromoCardLink(e.target.value)}
+            placeholder="Örn: /shop/listing?category=men veya https://..."
+          />
+        </div>
+
+        <Button onClick={handleUploadPromoCard} className="mt-4 w-full">
+          {promoCardImageLoadingState
+            ? "Yükleniyor..."
+            : "Yeni Fırsat Kartı Ekle"}
+        </Button>
+
+        {/* Mevcut Kartlar Listesi */}
+        <div className="mt-6 space-y-3 max-h-96 overflow-y-auto">
+          <h3 className="text-md font-medium">Mevcut Fırsat Kartları:</h3>
+          {promoLoading ? (
+            <p className="text-sm text-gray-500">Yükleniyor...</p>
+          ) : promoError ? (
+            <p className="text-sm text-red-500">Hata: {promoError}</p>
+          ) : promoCardList && promoCardList.length > 0 ? (
+            promoCardList.map((card) => (
+              <div
+                key={card._id}
+                className="relative group flex items-center border rounded p-2 space-x-3"
+              >
+                <img
+                  src={card.image}
+                  alt={card.title || "Promo Card"}
+                  className="w-16 h-20 object-cover rounded flex-shrink-0" // Boyut ayarlandı
+                />
+                <div className="flex-grow overflow-hidden">
+                  <p
+                    className="text-sm font-medium truncate"
+                    title={card.title}
+                  >
+                    {card.title || "Başlık Yok"}
+                  </p>
+                  <p
+                    className="text-xs text-gray-500 truncate"
+                    title={card.link}
+                  >
+                    {card.link || "Link Yok"}
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-red-500 hover:bg-red-100 h-7 w-7 flex-shrink-0"
+                  onClick={() => handleDeletePromoCard(card._id)}
+                >
+                  <Trash size={16} />
+                </Button>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-gray-500">
+              Henüz fırsat kartı eklenmemiş.
+            </p>
+          )}
+        </div>
+      </div>
+      {/* !!! YENİ BÖLÜM: Yan Banner Yönetimi !!! */}
+      <div className="border p-6 rounded-lg shadow-sm bg-white">
+        <h2 className="text-xl font-semibold mb-4 border-b pb-2">
+          Yan Banner Yönetimi (Manuel Slider)
+        </h2>
+        {/* Resim Yükleme */}
+        <ProductImageUpload
+          imageFile={sideBannerImageFile} // <-- Yeni state
+          setImageFile={setSideBannerImageFile} // <-- Yeni state
+          uploadedImageUrl={uploadedSideBannerImageUrl} // <-- Yeni state
+          setUploadedImageUrl={setUploadedSideBannerImageUrl} // <-- Yeni state
+          setImageLoadingState={setSideBannerImageLoadingState} // <-- Yeni state
+          imageLoadingState={sideBannerImageLoadingState} // <-- Yeni state
+          isCustomStyling={true} // Kompakt görünüm
+        />
+        {/* Başlık (Opsiyonel) */}
+        <div className="mt-4 space-y-1">
+          <Label htmlFor="sideBannerTitle">Banner Başlığı (Opsiyonel)</Label>
+          <Input
+            id="sideBannerTitle"
+            type="text"
+            value={sideBannerTitle} // <-- Yeni state
+            onChange={(e) => setSideBannerTitle(e.target.value)} // <-- Yeni state
+            placeholder="Örn: Özel Koleksiyon"
+          />
+        </div>
+        {/* Link (Opsiyonel) */}
+        <div className="mt-4 space-y-1">
+          <Label htmlFor="sideBannerLink">Banner Linki (Opsiyonel)</Label>
+          <Input
+            id="sideBannerLink"
+            type="text"
+            value={sideBannerLink} // <-- Yeni state
+            onChange={(e) => setSideBannerLink(e.target.value)} // <-- Yeni state
+            placeholder="Örn: /shop/listing?tag=new"
+          />
+        </div>
+
+        <Button
+          onClick={handleUploadSideBanner} // <-- Yeni fonksiyon
+          className="mt-4 w-full"
+          disabled={sideBannerImageLoadingState || !uploadedSideBannerImageUrl} // <-- Yeni state
+        >
+          {sideBannerImageLoadingState
+            ? "Yükleniyor..."
+            : "Yeni Yan Banner Ekle"}
+        </Button>
+
+        {/* Mevcut Yan Bannerlar Listesi */}
+        <div className="mt-6 space-y-3 max-h-96 overflow-y-auto">
+          <h3 className="text-md font-medium">Mevcut Yan Bannerlar:</h3>
+          {sideBannerLoading ? (
+            <p className="text-sm text-gray-500">Yükleniyor...</p>
+          ) : sideBannerError ? (
+            <p className="text-sm text-red-500">Hata: {sideBannerError}</p>
+          ) : sideBannerList && sideBannerList.length > 0 ? (
+            sideBannerList.map((banner) => (
+              <div
+                key={banner._id}
+                className="relative group flex items-center border rounded p-2 space-x-3"
+              >
+                <img
+                  src={banner.image}
+                  alt={banner.title || "Side Banner"}
+                  className="w-16 h-20 object-cover rounded flex-shrink-0"
+                />
+                <div className="flex-grow overflow-hidden">
+                  <p
+                    className="text-sm font-medium truncate"
+                    title={banner.title}
+                  >
+                    {banner.title || "Başlık Yok"}
+                  </p>
+                  <p
+                    className="text-xs text-gray-500 truncate"
+                    title={banner.link}
+                  >
+                    {banner.link || "Link Yok"}
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-red-500 hover:bg-red-100 h-7 w-7 flex-shrink-0"
+                  onClick={() => handleDeleteSideBanner(banner._id)} // <-- Yeni fonksiyon
+                >
+                  <Trash size={16} />
+                </Button>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-gray-500">
+              Henüz yan banner eklenmemiş.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default AdminDashboard;
