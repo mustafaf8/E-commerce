@@ -11,7 +11,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 const adminSidebarMenuItems = [
   {
     id: "dashboard",
-    label: "Panel",
+    label: "Ana Panel",
     path: "/admin/dashboard",
     icon: <LayoutDashboard />,
   },

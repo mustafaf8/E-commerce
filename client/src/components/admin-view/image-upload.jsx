@@ -247,11 +247,6 @@ function ProductImageUpload({
   isEditMode, // Düzenleme modunda mı?
   isCustomStyling = false,
   id,
-  // Kaldırılan Prop'lar:
-  // imageLoadingState,
-  // uploadedImageUrl,
-  // setUploadedImageUrl,
-  // setImageLoadingState,
 }) {
   const inputRef = useRef(null);
 

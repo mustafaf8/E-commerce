@@ -12,39 +12,30 @@ import {
 } from "@/store/shop/wishlist-slice"; // <-- Wishlist action'larını import et
 import { useEffect } from "react"; // <-- useEffect import et (isteğe bağlı, ilk yüklemede fetch için)
 import { useToast } from "../ui/use-toast"; // <-- Toast import et (isteğe bağlı, bildirim için)
+import { useNavigate, useLocation } from "react-router-dom";
 
 function ShoppingProductTile({
   product,
   handleGetProductDetails,
-  handleAddtoCart, // handleAddtoCart prop'u artık burada yönetilmeyecek gibi duruyor, kaldırılabilir veya korunabilir.
+  handleAddtoCart,
 }) {
   const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector((state) => state.auth); // isAuthenticated'ı al
+  const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast(); // İsteğe bağlı bildirim için
   const { user } = useSelector((state) => state.auth);
   const { wishlistItems, isLoading: wishlistLoading } = useSelector(
     (state) => state.shopWishlist
   );
 
-  // Ürünün favorilerde olup olmadığını kontrol et
   const isWishlisted = product?._id && wishlistItems.includes(product._id);
 
-  // --- İsteğe Bağlı: Sayfa yüklendiğinde favorileri getir ---
-  // Bu genellikle sayfanın en üst bileşeninde (örn: ShoppingHome, ShoppingListing) yapılır
-  // useEffect(() => {
-  //   if (user?.id) {
-  //     dispatch(fetchWishlist(user.id));
-  //   }
-  // }, [dispatch, user?.id]);
-  // --- ---
-
-  // Kalp ikonuna tıklama işleyicisi
   const handleWishlistToggle = (event) => {
     event.stopPropagation(); // Kartın tıklanmasını engelle (detaylara gitmeyi)
 
     if (!user?.id) {
       toast({ variant: "destructive", title: "Lütfen önce giriş yapın." });
-      // İsterseniz login sayfasına yönlendirme de yapabilirsiniz
-      // navigate('/auth/login');
       return;
     }
 
@@ -79,8 +70,6 @@ function ShoppingProductTile({
 
   return (
     <Card className="w-full max-w-sm mx-auto relative group">
-      {" "}
-      {/* <-- relative ve group eklendi */}
       {/* Favori Butonu - Sağ Üst Köşe */}
       <Button
         variant="ghost"
@@ -120,11 +109,11 @@ function ShoppingProductTile({
           ) : null}
         </div>
 
-        <CardContent className="p-4 pb-2">
+        <CardContent className="p-4 pb-1">
           <div className="flex justify-between items-center">
-            <h2 className="text-md font-semibold mb-2">{product?.title}</h2>
+            <h2 className="text-md font-semibold mb-1">{product?.title}</h2>
           </div>
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center pr-4">
             <span
               className={`${
                 product?.salePrice > 0 ? "line-through-red" : ""
@@ -133,7 +122,7 @@ function ShoppingProductTile({
               {product?.price}TL
             </span>
             {product?.salePrice > 0 ? (
-              <span className="text-lg font-semibold text-primary">
+              <span className="text-lg font-semibold text-green-600">
                 {product?.salePrice}TL
               </span>
             ) : null}
@@ -142,9 +131,9 @@ function ShoppingProductTile({
         {/* Rating gösterimi */}
         <div className="flex justify-between items-center px-4 pb-4">
           {product?.averageReview !== undefined && (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center justify-center ">
               <StarRatingComponent rating={product.averageReview} />
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm text-muted-foreground font-semibold ">
                 ({product.averageReview.toFixed(1)})
               </span>
             </div>

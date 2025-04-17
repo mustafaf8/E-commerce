@@ -7,7 +7,15 @@ function AdminHeader({ setOpen }) {
   const dispatch = useDispatch();
 
   function handleLogout() {
-    dispatch(logoutUser());
+    // Bu fonksiyon şimdilik çağrılmayacak
+    console.log("[handleLogout] Function called. Dispatching logoutUser...");
+    dispatch(logoutUser())
+      .then(() => {
+        console.log("[handleLogout] logoutUser dispatch finished.");
+      })
+      .catch((error) => {
+        console.error("[handleLogout] Error during dispatch:", error);
+      });
   }
 
   return (

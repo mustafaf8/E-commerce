@@ -2,7 +2,18 @@ const mongoose = require("mongoose");
 
 const FeatureSchema = new mongoose.Schema(
   {
-    image: String,
+    image: {
+      type: String,
+      required: [true, "Resim URL'si gereklidir."],
+    },
+    title: {
+      type: String,
+      trim: true,
+    },
+    link: {
+      type: String,
+      trim: true,
+    },
   },
   { timestamps: true }
 );

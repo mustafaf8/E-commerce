@@ -9,9 +9,11 @@ const PromoCardSchema = new mongoose.Schema(
     },
     title: {
       type: String, // Başlık opsiyonel
+      trim: true,
     },
     link: {
       type: String, // Link opsiyonel
+      trim: true,
     },
     // İsteğe bağlı olarak ekleyebileceğiniz alanlar:
     // order: { type: Number, default: 0 }, // Sıralama için

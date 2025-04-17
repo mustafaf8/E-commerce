@@ -24,20 +24,20 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios"; // axios'u burada kullanacağız
 import { Skeleton } from "@/components/ui/skeleton"; // Skeleton
+import ConfirmationModal from "@/components/admin-view/ConfirmationModal";
 
 function AdminDashboard() {
   // --- Feature Image State ve Fonksiyonları ---
   const [featureImageFile, setFeatureImageFile] = useState(null);
   const [featureImageLoadingState, setFeatureImageLoadingState] =
     useState(false);
-  const [featureImageTitle, setFeatureImageTitle] = useState(""); // <-- YENİ
-  const [featureImageLink, setFeatureImageLink] = useState(""); // <-- YENİ
+  const [featureImageTitle, setFeatureImageTitle] = useState("");
+  const [featureImageLink, setFeatureImageLink] = useState("");
   const {
     featureImageList,
     isLoading: featureListLoading,
     error: featureListError,
   } = useSelector(
-    // Loading ve error state'leri eklendi/güncellendi
     (state) =>
       state.commonFeature || {
         featureImageList: [],
@@ -47,10 +47,9 @@ function AdminDashboard() {
   );
 
   // --- Promo Card State ---
-  const [promoCardImageFile, setPromoCardImageFile] = useState(null); // Sadece File nesnesini tutar
-  // const [uploadedPromoCardImageUrl, setUploadedPromoCardImageUrl] = useState(""); // Buna gerek kalmadı
+  const [promoCardImageFile, setPromoCardImageFile] = useState(null);
   const [promoCardImageLoadingState, setPromoCardImageLoadingState] =
-    useState(false); // Yükleme durumunu burada yöneteceğiz
+    useState(false);
   const [promoCardTitle, setPromoCardTitle] = useState("");
   const [promoCardLink, setPromoCardLink] = useState("");
   const {
@@ -59,6 +58,7 @@ function AdminDashboard() {
     error: promoError,
   } = useSelector((state) => state.promoCards);
   // --- ---
+
   const [sideBannerImageFile, setSideBannerImageFile] = useState(null);
   const [sideBannerImageLoadingState, setSideBannerImageLoadingState] =
     useState(false); // Added loading state
@@ -78,8 +78,23 @@ function AdminDashboard() {
   const dispatch = useDispatch();
   const { toast } = useToast();
 
+  // confirmModal nesnesi: { isOpen, message, onConfirm }
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    message: "",
+    onConfirm: null,
+  });
+
+  // Ortak modalı kapatma fonksiyonu
+  const closeModal = () =>
+    setConfirmModal({ isOpen: false, message: "", onConfirm: null });
+
+  // Ortak modalı açma fonksiyonu
+  const openModal = (message, onConfirm) => {
+    setConfirmModal({ isOpen: true, message, onConfirm });
+  };
+
   // --- GENEL RESİM YÜKLEME FONKSİYONU ---
-  // Bu fonksiyon, verilen dosyayı backend'e gönderir ve URL'i döndürür.
   const uploadImage = async (file) => {
     if (!file) return null;
     console.log("--- [uploadImage] Yüklenecek dosya:", file.name); // Ekle
@@ -126,24 +141,23 @@ function AdminDashboard() {
     const uploadedUrl = await uploadImage(featureImageFile);
 
     if (uploadedUrl) {
-      // Veri objesi oluşturuluyor (title ve link ile)
       const bannerData = {
         image: uploadedUrl,
-        title: featureImageTitle, // <-- Yeni state kullanıldı
-        link: featureImageLink, // <-- Yeni state kullanıldı
+        title: featureImageTitle,
+        link: featureImageLink,
       };
       console.log(
         ">>> addFeatureImage dispatch ediliyor, gönderilen veri:",
         bannerData
-      ); // Log eklendi
+      );
       // Güncellenmiş Redux action'ı çağırılıyor
       dispatch(addFeatureImage(bannerData))
         .then((data) => {
           if (data?.payload?.success) {
-            // dispatch(getFeatureImages()); // Gerek yok, slice güncelliyor
-            setFeatureImageFile(null); // Formu temizle
-            setFeatureImageTitle(""); // Formu temizle
-            setFeatureImageLink(""); // Formu temizle
+            // dispatch(getFeatureImages()); yok, slice güncelliyor
+            setFeatureImageFile(null);
+            setFeatureImageTitle("");
+            setFeatureImageLink("");
             toast({ title: "Banner resmi başarıyla eklendi." });
           } else {
             toast({
@@ -153,7 +167,6 @@ function AdminDashboard() {
           }
         })
         .catch((err) => {
-          // Hata yakalama eklendi
           console.error("addFeatureImage dispatch hatası:", err);
           toast({
             variant: "destructive",
@@ -170,7 +183,7 @@ function AdminDashboard() {
 
   // --- YENİ FONKSİYON: Banner Silme İşleyici ---
   function handleDeleteFeatureImage(bannerId) {
-    if (window.confirm("Bu banner'ı silmek istediğinizden emin misiniz?")) {
+    openModal("Bu banner'ı silmek istediğinizden emin misiniz?", () => {
       dispatch(deleteFeatureImage(bannerId)).then((data) => {
         if (data?.payload?.success) {
           toast({ title: "Banner silindi." });
@@ -180,8 +193,9 @@ function AdminDashboard() {
             title: data.payload?.message || "Banner silinemedi.",
           });
         }
+        closeModal();
       });
-    }
+    });
   }
   // --- Promo Card Ekleme İşleyici ---
   async function handleUploadPromoCard() {
@@ -197,7 +211,6 @@ function AdminDashboard() {
     const uploadedUrl = await uploadImage(promoCardImageFile); // Resmi yükle ve URL'i al
 
     if (uploadedUrl) {
-      // URL alındıysa promo kart verisini hazırla ve dispatch et
       const promoData = {
         image: uploadedUrl,
         title: promoCardTitle,
@@ -231,24 +244,24 @@ function AdminDashboard() {
     }
   }
 
-  // --- Promo Card Silme ---
+  // --- Onaylı Promo Card Silme İşleyici ---
   function handleDeletePromoCard(cardId) {
-    if (
-      window.confirm("Bu promosyon kartını silmek istediğinizden emin misiniz?")
-    ) {
-      dispatch(deletePromoCard(cardId)).then((data) => {
-        if (data?.payload?.success) {
-          toast({ title: "Promosyon kartı silindi." });
-          // Fetch etmeye gerek yok, slice güncelliyor.
-          // dispatch(fetchPromoCards());
-        } else {
-          toast({
-            variant: "destructive",
-            title: data.payload?.message || "Promosyon kartı silinemedi.",
-          });
-        }
-      });
-    }
+    openModal(
+      "Bu promosyon kartını silmek istediğinizden emin misiniz?",
+      () => {
+        dispatch(deletePromoCard(cardId)).then((data) => {
+          if (data?.payload?.success) {
+            toast({ title: "Promosyon kartı silindi." });
+          } else {
+            toast({
+              variant: "destructive",
+              title: data.payload?.message || "Promosyon kartı silinemedi.",
+            });
+          }
+          closeModal();
+        });
+      }
+    );
   }
 
   // !!! YENİ FONKSİYON: Yan Banner Yükleme !!!
@@ -304,9 +317,9 @@ function AdminDashboard() {
     }
   }
 
-  // !!! YENİ FONKSİYON: Yan Banner Silme !!!
+  // --- Onaylı Yan Banner Silme İşleyici ---
   function handleDeleteSideBanner(bannerId) {
-    if (window.confirm("Bu yan banner'ı silmek istediğinizden emin misiniz?")) {
+    openModal("Bu küçük banner'ı silmek istediğinizden emin misiniz?", () => {
       dispatch(deleteSideBanner(bannerId)).then((data) => {
         if (data?.payload?.success) {
           toast({ title: "Yan banner silindi." });
@@ -316,11 +329,10 @@ function AdminDashboard() {
             title: data.payload?.message || "Yan banner silinemedi.",
           });
         }
+        closeModal();
       });
-    }
+    });
   }
-  // --- ---
-
   // İlk yüklemede verileri getir
   useEffect(() => {
     dispatch(getFeatureImages());
@@ -328,120 +340,34 @@ function AdminDashboard() {
     dispatch(fetchSideBanners());
   }, [dispatch]);
 
-  console.log("--- RENDER ÖNCESİ STATE'LER ---", {
-    featureImageFile: featureImageFile?.name, // Sadece dosya adını logla
-    featureImageLoadingState,
-    promoCardImageFile: promoCardImageFile?.name, // Sadece dosya adını logla
-    promoCardImageLoadingState,
-    promoCardTitle,
-    promoCardLink,
-
-    // Sağ Banner için eklenenler
-    sideBannerImageFile: sideBannerImageFile?.name, // Sadece dosya adını logla
-    uploadedSideBannerImageUrl, // Yüklenen URL'yi de ekleyelim
-    sideBannerImageLoadingState,
-    sideBannerTitle,
-    sideBannerLink,
-  });
+  // console.log("--- RENDER ÖNCESİ STATE'LER ---", {
+  //   featureImageFile: featureImageFile?.name, // Sadece dosya adını logla
+  //   featureImageLoadingState,
+  //   featureImageTitle,
+  //   featureImageLink,
+  //   promoCardImageFile: promoCardImageFile?.name, // Sadece dosya adını logla
+  //   promoCardImageLoadingState,
+  //   promoCardTitle,
+  //   promoCardLink,
+  //   sideBannerImageFile: sideBannerImageFile?.name, // Sadece dosya adını logla
+  //   sideBannerImageLoadingState,
+  //   uploadedSideBannerImageUrl, // Yüklenen URL'yi de ekleyelim
+  //   sideBannerTitle,
+  //   sideBannerLink,
+  // });
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-      {/* Bölüm 1: Banner (Feature Images) Yönetimi */}
-      <div className="border p-6 rounded-lg shadow-sm bg-white">
-        <h2 className="text-xl font-semibold mb-4 border-b pb-2">
-          Ana Sayfa Banner Yönetimi
-        </h2>
-        <ProductImageUpload
-          id="feature-image-upload"
-          imageFile={featureImageFile}
-          setImageFile={setFeatureImageFile}
-        />
-        {/* Başlık Inputu */}
-        <div className="mt-4 space-y-1">
-          <Label htmlFor="featureTitle">Banner Başlığı (Opsiyonel)</Label>
-          <Input
-            id="featureTitle"
-            type="text"
-            value={featureImageTitle} // <-- Yeni state
-            onChange={(e) => setFeatureImageTitle(e.target.value)} // <-- Yeni state
-            placeholder="Örn: Yaz İndirimleri"
-          />
-        </div>
-        {/* Link Inputu */}
-        <div className="mt-4 space-y-1">
-          <Label htmlFor="featureLink">Banner Linki (Opsiyonel)</Label>
-          <Input
-            id="featureLink"
-            type="text"
-            value={featureImageLink} // <-- Yeni state
-            onChange={(e) => setFeatureImageLink(e.target.value)} // <-- Yeni state
-            placeholder="Örn: /shop/listing?discount=true"
-          />
-        </div>
-        <Button
-          onClick={handleUploadFeatureImage}
-          className="mt-4 w-full"
-          // Disable koşulu güncellendi
-          disabled={featureImageLoadingState || !featureImageFile}
-        >
-          {featureImageLoadingState ? "Yükleniyor..." : "Yeni Banner Ekle"}
-        </Button>
-        <div className="mt-6 space-y-3 max-h-96 overflow-y-auto">
-          <h3 className="text-md font-medium">Mevcut Bannerlar:</h3>
-          {featureImageList && featureImageList.length > 0 ? (
-            featureImageList.map((featureImgItem) => (
-              <div
-                key={featureImgItem._id}
-                className="relative group border rounded overflow-hidden"
-              >
-                <img
-                  src={featureImgItem.image}
-                  alt="Banner"
-                  className="w-full h-auto object-cover" // aspect ratio korunabilir
-                />
-                <div className="flex-grow overflow-hidden">
-                  <p
-                    className="text-sm font-medium truncate"
-                    title={featureImgItem.title}
-                  >
-                    {featureImgItem.title || "Başlık Yok"}
-                  </p>
-                  <p
-                    className="text-xs text-gray-500 truncate"
-                    title={featureImgItem.link}
-                  >
-                    {featureImgItem.link || "Link Yok"}
-                  </p>
-                </div>
-                {/* Silme Butonu */}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-red-500 hover:bg-red-100 h-7 w-7 flex-shrink-0"
-                  onClick={() => handleDeleteFeatureImage(featureImgItem._id)} // <-- Yeni silme fonksiyonu
-                >
-                  <Trash size={16} />
-                </Button>
-              </div>
-            ))
-          ) : (
-            <p className="text-sm text-gray-500">Henüz banner eklenmemiş.</p>
-          )}
-        </div>
-      </div>
-
       {/* Bölüm 2: Promosyon Kartları Yönetimi */}
       <div className="border p-6 rounded-lg shadow-sm bg-white">
         <h2 className="text-xl font-semibold mb-4 border-b pb-2">
           Fırsat Kartları Yönetimi
         </h2>
-        {/* Resim Yükleme */}
         <ProductImageUpload
           id="promo-card-image-upload"
           imageFile={promoCardImageFile}
           setImageFile={setPromoCardImageFile}
           isCustomStyling={true} // Kompakt görünüm
         />
-        {/* Başlık (Opsiyonel) */}
         <div className="mt-4 space-y-1">
           <Label htmlFor="promoTitle">Kart Başlığı (Opsiyonel)</Label>
           <Input
@@ -452,7 +378,6 @@ function AdminDashboard() {
             placeholder="Örn: %10 İndirim"
           />
         </div>
-        {/* Link (Opsiyonel) */}
         <div className="mt-4 space-y-1">
           <Label htmlFor="promoLink">Kart Linki (Opsiyonel)</Label>
           <Input
@@ -464,7 +389,11 @@ function AdminDashboard() {
           />
         </div>
 
-        <Button onClick={handleUploadPromoCard} className="mt-4 w-full">
+        <Button
+          onClick={handleUploadPromoCard}
+          className="mt-4 w-full"
+          disabled={promoCardImageLoadingState || !promoCardImageFile}
+        >
           {promoCardImageLoadingState
             ? "Yükleniyor..."
             : "Yeni Fırsat Kartı Ekle"}
@@ -486,7 +415,7 @@ function AdminDashboard() {
                 <img
                   src={card.image}
                   alt={card.title || "Promo Card"}
-                  className="w-16 h-20 object-cover rounded flex-shrink-0" // Boyut ayarlandı
+                  className="w-40 h-20 object-cover rounded flex-shrink-0" // Boyut ayarlandı
                 />
                 <div className="flex-grow overflow-hidden">
                   <p
@@ -519,10 +448,92 @@ function AdminDashboard() {
           )}
         </div>
       </div>
+      {/* Bölüm 1: Banner (Feature Images) Yönetimi */}
+      <div className="border p-6 rounded-lg shadow-sm bg-white">
+        <h2 className="text-xl font-semibold mb-4 border-b pb-2">
+          Ana Banner Yönetimi
+        </h2>
+        <ProductImageUpload
+          id="feature-image-upload"
+          imageFile={featureImageFile}
+          setImageFile={setFeatureImageFile}
+        />
+        <div className="mt-4 space-y-1">
+          <Label htmlFor="featureTitle">Banner Başlığı (Opsiyonel)</Label>
+          <Input
+            id="featureTitle"
+            type="text"
+            value={featureImageTitle} // <-- Yeni state
+            onChange={(e) => setFeatureImageTitle(e.target.value)} // <-- Yeni state
+            placeholder="Örn: Yaz İndirimleri"
+          />
+        </div>
+        <div className="mt-4 space-y-1">
+          <Label htmlFor="featureLink">Banner Linki (Opsiyonel)</Label>
+          <Input
+            id="featureLink"
+            type="text"
+            value={featureImageLink} // <-- Yeni state
+            onChange={(e) => setFeatureImageLink(e.target.value)} // <-- Yeni state
+            placeholder="Örn: /shop/listing?discount=true"
+          />
+        </div>
+        <Button
+          onClick={handleUploadFeatureImage}
+          className="mt-4 w-full"
+          disabled={featureImageLoadingState || !featureImageFile}
+        >
+          {featureImageLoadingState ? "Yükleniyor..." : "Yeni Banner Ekle"}
+        </Button>
+        <div className="mt-6 space-y-3 max-h-96 overflow-y-auto">
+          <h3 className="text-md font-medium">Mevcut Bannerlar:</h3>
+          {featureImageList && featureImageList.length > 0 ? (
+            featureImageList.map((featureImgItem) => (
+              <div
+                key={featureImgItem._id}
+                className="relative flex p-2 space-x-3 items-center group border rounded overflow-hidden"
+              >
+                <img
+                  src={featureImgItem.image}
+                  alt="Banner"
+                  className="w-64 h-20 object-cover rounded flex-shrink-0" // aspect ratio korunabilir
+                />
+                <div className="">
+                  <div className="flex-grow overflow-hidden">
+                    <p
+                      className="text-sm font-medium truncate"
+                      title={featureImgItem.title}
+                    >
+                      {featureImgItem.title || "Başlık Yok"}
+                    </p>
+                    <p
+                      className="text-xs text-gray-500 truncate"
+                      title={featureImgItem.link}
+                    >
+                      {featureImgItem.link || "Link Yok"}
+                    </p>
+                  </div>
+                  {/* Silme Butonu */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-red-500 hover:bg-red-100 h-7 w-7 flex-shrink-0"
+                    onClick={() => handleDeleteFeatureImage(featureImgItem._id)} // <-- Yeni silme fonksiyonu
+                  >
+                    <Trash size={16} />
+                  </Button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-gray-500">Henüz banner eklenmemiş.</p>
+          )}
+        </div>
+      </div>
       {/* !!! YENİ BÖLÜM: Yan Banner Yönetimi !!! */}
       <div className="border p-6 rounded-lg shadow-sm bg-white">
         <h2 className="text-xl font-semibold mb-4 border-b pb-2">
-          Yan Banner Yönetimi (Manuel Slider)
+          Küçük Banner Yönetimi (Manuel Slider)
         </h2>
         {/* Resim Yükleme */}
         <ProductImageUpload
@@ -557,7 +568,7 @@ function AdminDashboard() {
         <Button
           onClick={handleUploadSideBanner} // <-- Yeni fonksiyon
           className="mt-4 w-full"
-          // <-- Yeni state
+          disabled={sideBannerImageLoadingState || !sideBannerImageFile}
         >
           {sideBannerImageLoadingState
             ? "Yükleniyor..."
@@ -566,7 +577,7 @@ function AdminDashboard() {
 
         {/* Mevcut Yan Bannerlar Listesi */}
         <div className="mt-6 space-y-3 max-h-96 overflow-y-auto">
-          <h3 className="text-md font-medium">Mevcut Yan Bannerlar:</h3>
+          <h3 className="text-md font-medium">Mevcut Küçük Bannerlar:</h3>
           {sideBannerLoading ? (
             <p className="text-sm text-gray-500">Yükleniyor...</p>
           ) : sideBannerError ? (
@@ -580,7 +591,7 @@ function AdminDashboard() {
                 <img
                   src={banner.image}
                   alt={banner.title || "Side Banner"}
-                  className="w-16 h-20 object-cover rounded flex-shrink-0"
+                  className="w-48 h-20 object-cover rounded flex-shrink-0"
                 />
                 <div className="flex-grow overflow-hidden">
                   <p
@@ -613,6 +624,13 @@ function AdminDashboard() {
           )}
         </div>
       </div>
+      {/* Ortak Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={confirmModal.isOpen}
+        message={confirmModal.message}
+        onConfirm={confirmModal.onConfirm}
+        onCancel={closeModal}
+      />
     </div>
   );
 }
