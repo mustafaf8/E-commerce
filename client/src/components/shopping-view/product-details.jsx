@@ -345,7 +345,9 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
         removeFromWishlist({ userId: user.id, productId: productDetails._id })
       )
         .unwrap()
-        .then(() => toast({ title: "Favorilerden çıkarıldı." }))
+        .then(() =>
+          toast({ title: "Favorilerden çıkarıldı.", variant: "success" })
+        )
         .catch((error) =>
           toast({
             variant: "destructive",

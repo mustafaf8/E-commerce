@@ -133,7 +133,8 @@ const registerUser = async (req, res) => {
     if (checkUser)
       return res.json({
         success: false,
-        message: "User Already exists with the same email! Please try again",
+        message:
+          "Aynı e-posta ile zaten bir kullanıcı mevcut! Lütfen tekrar deneyin.",
       });
 
     const hashPassword = await bcrypt.hash(password, 12);
@@ -146,13 +147,13 @@ const registerUser = async (req, res) => {
     await newUser.save();
     res.status(200).json({
       success: true,
-      message: "Registration successful",
+      message: "Kayıt işlemi başarılı",
     });
   } catch (e) {
     console.log(e);
     res.status(500).json({
       success: false,
-      message: "Some error occured",
+      message: "Bir hata oluştu",
     });
   }
 };
@@ -166,7 +167,7 @@ const loginUser = async (req, res) => {
     if (!checkUser)
       return res.json({
         success: false,
-        message: "User doesn't exists! Please register first",
+        message: "Kullanıcı mevcut değil! Lütfen önce kayıt olun.",
       });
 
     const checkPasswordMatch = await bcrypt.compare(
@@ -176,7 +177,7 @@ const loginUser = async (req, res) => {
     if (!checkPasswordMatch)
       return res.json({
         success: false,
-        message: "Incorrect password! Please try again",
+        message: "Şifre yanlış! Lütfen tekrar deneyin.",
       });
 
     const token = jwt.sign(
@@ -194,13 +195,13 @@ const loginUser = async (req, res) => {
       .cookie("token", token, {
         httpOnly: true, // JavaScript erişimini engeller (Güvenlik için iyi)
         secure: process.env.NODE_ENV === "production", // Sadece HTTPS'te (production) true yap
-        sameSite: "Lax", // Cross-site isteklerde çerezin nasıl gönderileceğini kontrol eder (Lax genellikle iyi bir başlangıç)
+        sameSite: "Lax", // Çerezlerin cross-site isteklerde nasıl gönderileceğini kontrol eder (Lax genellikle iyi bir başlangıç)
         // maxAge: 60 * 60 * 1000 // Opsiyonel: 1 saat (milisaniye cinsinden)
         path: "/",
       })
       .json({
         success: true,
-        message: "Logged in successfully",
+        message: "Başarıyla giriş yapıldı",
         user: {
           email: checkUser.email,
           role: checkUser.role,
@@ -213,7 +214,7 @@ const loginUser = async (req, res) => {
     console.log(e);
     res.status(500).json({
       success: false,
-      message: "Some error occured",
+      message: "Bir hata oluştu",
     });
   }
 };
@@ -229,7 +230,7 @@ const logoutUser = (req, res) => {
     })
     .json({
       success: true,
-      message: "Logged out successfully!",
+      message: "Başarıyla çıkış yapıldı!",
     });
 };
 
@@ -240,7 +241,7 @@ const authMiddleware = async (req, res, next) => {
   if (!token)
     return res.status(401).json({
       success: false,
-      message: "Unauthorised user! No token found.", // Mesajı biraz daha açıklayıcı yap
+      message: "Yetkisiz kullanıcı! Token bulunamadı.", // Mesajı biraz daha açıklayıcı yap
     });
 
   try {
@@ -264,10 +265,9 @@ const authMiddleware = async (req, res, next) => {
     });
     res.status(401).json({
       success: false,
-      message: "Unauthorised user! Invalid or expired token.", // Mesajı biraz daha açıklayıcı yap
+      message: "Yetkisiz kullanıcı! Geçersiz veya süresi dolmuş token.", // Mesajı biraz daha açıklayıcı yap
     });
   }
 };
 
 module.exports = { registerUser, loginUser, logoutUser, authMiddleware };
-//http://localhost:5173/shop/home
