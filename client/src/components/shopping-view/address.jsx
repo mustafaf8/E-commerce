@@ -11,6 +11,8 @@ import {
 } from "@/store/shop/address-slice";
 import AddressCard from "./address-card";
 import { useToast } from "../ui/use-toast";
+import { Separator } from "../ui/separator"; // Görsel ayırıcı için
+import ConfirmationModal from "../admin-view/ConfirmationModal";
 
 const initialAddressFormData = {
   address: "",
@@ -20,12 +22,14 @@ const initialAddressFormData = {
   notes: "",
 };
 
-function Address({ setCurrentSelectedAddress, selectedId }) {
+function Address({ setCurrentSelectedAddress, seciliAdresProp }) {
   const [formData, setFormData] = useState(initialAddressFormData);
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { addressList } = useSelector((state) => state.shopAddress);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [addressIdToDelete, setAddressIdToDelete] = useState(null);
   const { toast } = useToast();
 
   function handleManageAddress(event) {
@@ -55,6 +59,7 @@ function Address({ setCurrentSelectedAddress, selectedId }) {
             setFormData(initialAddressFormData);
             toast({
               title: "Adres başarıyla güncellendi",
+              variant: "success",
             });
           }
         })
@@ -69,22 +74,24 @@ function Address({ setCurrentSelectedAddress, selectedId }) {
             setFormData(initialAddressFormData);
             toast({
               title: "Adres başarıyla eklendi",
+              variant: "success",
             });
           }
         });
   }
 
   function handleDeleteAddress(getCurrentAddress) {
-    dispatch(
-      deleteAddress({ userId: user?.id, addressId: getCurrentAddress._id })
-    ).then((data) => {
-      if (data?.payload?.success) {
-        dispatch(fetchAllAddresses(user?.id));
-        toast({
-          title: "Adres başarıyla silindi",
-        });
-      }
-    });
+    if (getCurrentAddress?._id) {
+      setAddressIdToDelete(getCurrentAddress._id); // Silinecek ID'yi state'e ata
+      setShowConfirmModal(true); // Modalı göster
+    } else {
+      console.error("Silinecek adres ID'si bulunamadı.");
+      toast({
+        variant: "destructive",
+        title: "Hata",
+        description: "Silinecek adres bulunamadı.",
+      });
+    }
   }
 
   function handleEditAddress(getCuurentAddress) {
@@ -100,16 +107,56 @@ function Address({ setCurrentSelectedAddress, selectedId }) {
   }
 
   function isFormValid() {
-    return Object.keys(formData)
-      .map((key) => formData[key].trim() !== "")
-      .every((item) => item);
+    // Yalnızca zorunlu alanları tanımla
+    const requiredFields = ["address", "city", "phone", "pincode"];
+
+    // Bu zorunlu alanların HER BİRİNİN formData içinde olup olmadığını
+    // ve değerlerinin boşlukları temizlendikten sonra boş olmadığını kontrol et
+    return requiredFields.every(
+      (field) =>
+        Object.prototype.hasOwnProperty.call(formData, field) && // Alan formData'da var mı?
+        typeof formData[field] === "string" && // Değer string mi? (trim hatasını önler)
+        formData[field].trim() !== "" // Değer boş değil mi?
+    );
+  }
+  function confirmDeleteHandler() {
+    if (addressIdToDelete) {
+      dispatch(
+        deleteAddress({ userId: user?.id, addressId: addressIdToDelete })
+      ).then((data) => {
+        if (data?.payload?.success) {
+          dispatch(fetchAllAddresses(user?.id));
+          if (seciliAdresProp?._id === addressIdToDelete) {
+            setCurrentSelectedAddress(null);
+          }
+          toast({ title: "Adres başarıyla silindi", variant: "success" });
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Silme Başarısız",
+            description: data.payload?.message || "Bir hata oluştu.",
+          });
+        }
+        closeConfirmationModal(); // İşlem sonrası modalı kapat
+      });
+    }
+  }
+
+  function closeConfirmationModal() {
+    setShowConfirmModal(false);
+    setAddressIdToDelete(null);
   }
 
   useEffect(() => {
     dispatch(fetchAllAddresses(user?.id));
-  }, [dispatch]);
+  }, [dispatch, user?.id]);
 
-  console.log(addressList, "addressList");
+  console.log(
+    "Address Component Render - Received selectedId:",
+    seciliAdresProp
+  );
+
+  console.log(addressList, "addressList prop in Address component");
 
   return (
     <Card>
@@ -117,7 +164,8 @@ function Address({ setCurrentSelectedAddress, selectedId }) {
         {addressList && addressList.length > 0
           ? addressList.map((singleAddressItem) => (
               <AddressCard
-                selectedId={selectedId}
+                key={singleAddressItem._id} // Add a unique key prop
+                selectedId={seciliAdresProp}
                 handleDeleteAddress={handleDeleteAddress}
                 addressInfo={singleAddressItem}
                 handleEditAddress={handleEditAddress}
@@ -141,6 +189,16 @@ function Address({ setCurrentSelectedAddress, selectedId }) {
           isBtnDisabled={!isFormValid()}
         />
       </CardContent>
+      <ConfirmationModal
+        isOpen={showConfirmModal}
+        onClose={closeConfirmationModal} // Dialog onClose ile de kapanabilir
+        title="Adresi Silme Onayı"
+        message="Bu adresi kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz."
+        onConfirm={confirmDeleteHandler}
+        onCancel={closeConfirmationModal}
+        confirmText="Sil"
+        cancelText="İptal"
+      />
     </Card>
   );
 }

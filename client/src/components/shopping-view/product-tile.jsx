@@ -44,7 +44,7 @@ function ShoppingProductTile({
       dispatch(removeFromWishlist({ userId: user.id, productId: product._id }))
         .unwrap() // Hata yakalamak için unwrap kullanabiliriz
         .then(() => {
-          toast({ title: "Favorilerden çıkarıldı." });
+          toast({ title: "Favorilerden çıkarıldı.", variant: "success" });
         })
         .catch((error) => {
           toast({
@@ -57,7 +57,7 @@ function ShoppingProductTile({
       dispatch(addToWishlist({ userId: user.id, productId: product._id }))
         .unwrap()
         .then(() => {
-          toast({ title: "Favorilere eklendi." });
+          toast({ title: "Favorilere eklendi.", variant: "success" });
         })
         .catch((error) => {
           toast({

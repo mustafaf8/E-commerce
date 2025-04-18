@@ -65,7 +65,7 @@ function ShoppingHome() {
     ).then((data) => {
       if (data?.payload?.success) {
         dispatch(fetchCartItems(user?.id));
-        toast({ title: "Ürün başarıyla sepete eklendi" });
+        toast({ title: "Ürün başarıyla sepete eklendi", variant: "success" });
       } else {
         toast({
           variant: "destructive",
@@ -77,7 +77,7 @@ function ShoppingHome() {
   const handlePromoCardClick = (link) => {
     if (link) {
       if (link.startsWith("http")) {
-        window.open(link, "_blank");
+        window.open(link, "");
       } else {
         navigate(link);
       }

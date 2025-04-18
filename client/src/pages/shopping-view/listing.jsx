@@ -96,7 +96,7 @@ function ShoppingListing() {
         if (getQuantity + 1 > getTotalStock) {
           toast({
             title: `Bu üründen yalnızca ${getQuantity} adet eklenebilir`,
-            variant: "destructive",
+            variant: "info",
           });
 
           return;
@@ -115,6 +115,7 @@ function ShoppingListing() {
         dispatch(fetchCartItems(user?.id));
         toast({
           title: "Ürün sepete eklendi",
+          variant: "success",
         });
       }
     });

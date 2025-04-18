@@ -104,7 +104,7 @@ function AdminProducts() {
       // 2. Yeni ürün eklerken resim URL'si zorunlu mu kontrol et
       if (!finalImageUrl && currentEditedId === null) {
         toast({
-          variant: "destructive",
+          variant: "warning",
           title: "Lütfen ürün için bir resim seçin.",
         });
         setProductImageLoadingState(false);
@@ -131,7 +131,7 @@ function AdminProducts() {
         setProductImageFile(null);
         setOpenCreateProductsDialog(false);
         setCurrentEditedId(null);
-        toast({ title: "Ürün başarıyla güncellendi." });
+        toast({ title: "Ürün başarıyla güncellendi.", variant: "success" });
       } else {
         // Ekleme
         await dispatch(addNewProduct(dataToSend)).unwrap(); // unwrap ile sonucu yakala
@@ -140,7 +140,7 @@ function AdminProducts() {
         setOpenCreateProductsDialog(false);
         setProductImageFile(null);
         setFormData(initialFormData);
-        toast({ title: "Ürün başarıyla eklendi." });
+        toast({ title: "Ürün başarıyla eklendi.", variant: "success" });
       }
     } catch (error) {
       // Dispatch işlemi veya yükleme sonrası hata olursa
@@ -174,7 +174,7 @@ function AdminProducts() {
       dispatch(deleteProduct(productIdToDelete)).then((data) => {
         if (data?.payload?.success) {
           dispatch(fetchAllProducts());
-          toast({ title: "Ürün başarıyla silindi." });
+          toast({ title: "Ürün başarıyla silindi.", variant: "success" });
         } else {
           toast({
             variant: "destructive",
@@ -332,12 +332,13 @@ function AdminProducts() {
       </Sheet>
       <ConfirmationModal
         isOpen={showConfirmModal} // Modalı kontrol eden state
-        onClose={closeConfirmationModal} // Modalı kapatan fonksiyon
-        onConfirm={confirmDeleteHandler} // Onaylandığında silme işlemini başlatan fonksiyon
-        title="Ürünü Silme Onayı" // Modal başlığı
-        message="Bu ürünü kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz." // Onay mesajı
-        confirmText="Sil" // Onay butonu metni
-        cancelText="İptal" // İptal butonu metni
+        onClose={closeConfirmationModal}
+        onConfirm={confirmDeleteHandler}
+        onCancel={closeConfirmationModal}
+        title="Ürünü Silme Onayı"
+        message="Bu ürünü kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz."
+        confirmText="Sil"
+        cancelText="İptal"
       />
     </Fragment>
   );

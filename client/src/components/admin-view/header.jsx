@@ -2,19 +2,33 @@ import { AlignJustify, LogOut } from "lucide-react";
 import { Button } from "../ui/button";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "@/store/auth-slice";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 
 function AdminHeader({ setOpen }) {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   function handleLogout() {
-    // Bu fonksiyon şimdilik çağrılmayacak
     console.log("[handleLogout] Function called. Dispatching logoutUser...");
     dispatch(logoutUser())
+      .unwrap() // .unwrap() kullanmak promise'in sonucunu (fulfilled/rejected) yakalamayı kolaylaştırır
       .then(() => {
-        console.log("[handleLogout] logoutUser dispatch finished.");
+        // Dispatch başarılı olduğunda (Redux state güncellendiğinde) çalışır
+        console.log(
+          "[handleLogout] logoutUser dispatch successful. Navigating..."
+        );
+        navigate("/shop/home"); // <-- 3. Başarılı çıkış sonrası yönlendir
       })
       .catch((error) => {
-        console.error("[handleLogout] Error during dispatch:", error);
+        // Eğer logoutUser thunk'ı reject olursa veya ağ hatası olursa burası çalışır
+        console.error(
+          "[handleLogout] Error during dispatch or logout failed:",
+          error
+        );
+
+        toast({ variant: "destructive", title: "Çıkış yapılamadı." });
       });
   }
 
@@ -39,4 +53,4 @@ function AdminHeader({ setOpen }) {
 
 export default AdminHeader;
 
-// Bu sayfa, bir Admin Paneli üst menüsünü oluşturur. Menü butonu (AlignJustify) ile yan menüyü açar ve "Logout" butonu ile kullanıcı çıkışını (logoutUser) Redux üzerinden yönetir. 🚀
+// bir Admin Paneli üst menüsünü oluşturur. Menü butonu (AlignJustify) ile yan menüyü açar ve "Logout" butonu ile kullanıcı çıkışını (logoutUser) Redux üzerinden yönetir. 🚀

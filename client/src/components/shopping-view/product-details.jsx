@@ -305,6 +305,8 @@ import { useEffect, useState } from "react";
 import { addReview, getReviews } from "@/store/shop/review-slice";
 import { addToWishlist, removeFromWishlist } from "@/store/shop/wishlist-slice";
 
+import PropTypes from "prop-types";
+
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const [reviewMsg, setReviewMsg] = useState("");
   const [rating, setRating] = useState(0);
@@ -355,7 +357,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
         addToWishlist({ userId: user.id, productId: productDetails._id })
       )
         .unwrap()
-        .then(() => toast({ title: "Favorilere eklendi." }))
+        .then(() => toast({ title: "Favorilere eklendi.", variant: "success" }))
         .catch((error) =>
           toast({
             variant: "destructive",
@@ -395,7 +397,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
         if (getQuantity + 1 > getTotalStock) {
           toast({
             title: `Bu ürün için yalnızca ${getQuantity} adet eklenebilir`,
-            variant: "destructive",
+            variant: "info",
           });
 
           return;
@@ -413,6 +415,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
         dispatch(fetchCartItems(user?.id));
         toast({
           title: "Ürün sepete eklendi",
+          variant: "success",
         });
       }
     });
@@ -425,8 +428,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
     setReviewMsg("");
   }
 
-  function handleAddReview() {
-    // *** YENİ KONTROL ***
+  async function handleAddReview() {
     if (!isAuthenticated) {
       toast({
         title: "Lütfen giriş yapın",
@@ -436,35 +438,41 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
       navigate("/auth/login", { state: { from: location } });
       return;
     }
-    // *** KONTROL SONU ***
-
-    // --- Var olan yorum ekleme dispatch ---
-    dispatch(
-      addReview({
+    try {
+      const reviewData = {
         productId: productDetails?._id,
         userId: user?.id,
         userName: user?.userName,
         reviewMessage: reviewMsg,
         reviewValue: rating,
-      })
-    ).then((data) => {
-      if (data.payload.success) {
-        setRating(0);
-        setReviewMsg("");
-        dispatch(getReviews(productDetails?._id));
-        toast({
-          title: "Yorum başarıyla eklendi!",
-        });
-      }
-      // Hata durumu (Opsiyonel: backend hata döndürüyorsa)
-      else {
-        toast({
-          title: "Yorum Eklenemedi",
-          description: data.payload?.message || "Bir hata oluştu.",
-          variant: "destructive",
-        });
-      }
-    });
+      };
+
+      // 3. dispatch işlemini await ile bekle ve .unwrap() kullan
+      //    Başarılı olursa devam eder, başarısız olursa catch bloğuna düşer.
+      await dispatch(addReview(reviewData)).unwrap();
+
+      // 4. Başarı Durumu (Sadece try bloğunda çalışır)
+      setRating(0);
+      setReviewMsg("");
+      dispatch(getReviews(productDetails?._id)); // Yorumları yeniden çek
+      toast({
+        variant: "success", // Başarı varyantı
+        title: "Yorum Başarıyla Eklendi!",
+        // description: "Yorumunuz için teşekkürler." // Opsiyonel açıklama
+      });
+    } catch (error) {
+      // 5. Hata Durumu (catch bloğunda çalışır)
+      console.error("Yorum ekleme hatası yakalandı:", error);
+
+      // `error` objesi genellikle thunk'tan rejectWithValue ile dönen değeri içerir
+      // Bu değer backend'den gelen { success: false, message: "..." } objesi olmalı
+      toast({
+        variant: "destructive",
+        title: "Yorum Eklenemedi", // Genel bir başlık
+        // Açıklama olarak backend'den gelen spesifik hata mesajını kullan
+        description: error?.message || "Beklenmedik bir hata oluştu.",
+      });
+    }
   }
 
   useEffect(() => {
@@ -648,5 +656,18 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
     </Dialog>
   );
 }
+ProductDetailsDialog.propTypes = {
+  open: PropTypes.bool.isRequired,
+  setOpen: PropTypes.func.isRequired,
+  productDetails: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    image: PropTypes.string,
+    title: PropTypes.string,
+    description: PropTypes.string,
+    price: PropTypes.number,
+    salePrice: PropTypes.number,
+    totalStock: PropTypes.number,
+  }),
+};
 
 export default ProductDetailsDialog;

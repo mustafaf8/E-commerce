@@ -6,6 +6,14 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { createNewOrder } from "@/store/shop/order-slice";
 import { useToast } from "@/components/ui/use-toast"; // Shadcn toast hook import
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 function ShoppingCheckout() {
   const { cartItems } = useSelector((state) => state.shopCart);
@@ -13,23 +21,26 @@ function ShoppingCheckout() {
   const { loading: orderLoading, error: orderError } = useSelector(
     (state) => state.shopOrder
   );
-
   const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
+
+  console.log(
+    "Checkout Render - currentSelectedAddress:",
+    currentSelectedAddress
+  );
+
+  const seciliAdresNesnesi = currentSelectedAddress;
   const dispatch = useDispatch();
   const { toast } = useToast(); // <<< Hook'u burada çağırıp toast fonksiyonunu alıyoruz
 
   // Hata mesajını göstermek için (opsiyonel)
   useEffect(() => {
     if (orderError) {
-      // toast fonksiyonunu kullanarak hata göster
       toast({
         variant: "destructive",
         title: "Sipariş Hatası",
         description:
           orderError.message || "Sipariş oluşturulurken bir hata oluştu.",
       });
-      // Burada Redux state'indeki hatayı temizlemek gerekebilir.
-      // dispatch(clearOrderError()); // Eğer slice'da varsa
     }
   }, [orderError, toast]); // toast'ı dependency array'e ekle
 
@@ -51,7 +62,7 @@ function ShoppingCheckout() {
     if (!cartItems || !cartItems.items || cartItems.items.length === 0) {
       // toast fonksiyonunu kullan
       toast({
-        variant: "destructive",
+        variant: "warning",
         title: "Sepetiniz boş",
         description: "Lütfen devam etmek için ürün ekleyin.",
       });
@@ -62,7 +73,7 @@ function ShoppingCheckout() {
     if (currentSelectedAddress === null) {
       // toast fonksiyonunu kullan
       toast({
-        variant: "destructive",
+        variant: "warning",
         title: "Adres Seçilmedi",
         description: "Lütfen devam etmek için bir adres seçin.",
       });
@@ -88,6 +99,7 @@ function ShoppingCheckout() {
           // toast fonksiyonunu kullan (title yeterli olabilir)
           toast({
             title: "Ödeme sayfasına yönlendiriliyorsunuz...",
+            variant: "success",
             // description: "Lütfen bekleyin...", // Opsiyonel
           });
           // Yönlendirme burada gerçekleşecek
@@ -122,72 +134,172 @@ function ShoppingCheckout() {
       });
   }
 
+  // return (
+  //   <div className="flex flex-col">
+  //     <div className="relative h-[300px] w-full overflow-hidden">
+  //       <img
+  //         src={img}
+  //         className="h-full w-full object-cover"
+  //         alt="Checkout Banner"
+  //       />
+  //     </div>
+  //     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8 p-4 md:p-8">
+  //       <Address
+  //         seciliAdresProp={seciliAdresNesnesi}
+  //         setCurrentSelectedAddress={setCurrentSelectedAddress}
+  //       />
+  //       <div className="flex flex-col gap-4 bg-gray-50 p-6 rounded-lg shadow">
+  //         <h2 className="text-xl font-semibold border-b pb-2 mb-4">
+  //           Sipariş Özeti
+  //         </h2>
+  //         {cartItems && cartItems.items && cartItems.items.length > 0 ? (
+  //           <div className="max-h-60 overflow-y-auto pr-2 space-y-3">
+  //             {cartItems.items.map((item) => (
+  //               <UserCartItemsContent
+  //                 key={item.productId}
+  //                 cartItem={item}
+  //                 readOnly={true}
+  //               />
+  //             ))}
+  //           </div>
+  //         ) : (
+  //           <p className="text-gray-500">Sepetinizde ürün bulunmamaktadır.</p>
+  //         )}
+  //         {cartItems && cartItems.items && cartItems.items.length > 0 && (
+  //           <>
+  //             <div className="mt-6 pt-4 border-t space-y-2">
+  //               <div className="flex justify-between">
+  //                 <span>Ara Toplam</span>
+  //                 <span>{totalCartAmount.toFixed(2)} TL</span>
+  //               </div>
+  //               <div className="flex justify-between">
+  //                 <span>Kargo</span>
+  //                 <span>Hesaplanacak</span>
+  //               </div>
+  //               <div className="flex justify-between text-lg font-bold pt-2">
+  //                 <span>Toplam</span>
+  //                 <span>{totalCartAmount.toFixed(2)} TL</span>
+  //               </div>
+  //             </div>
+  //             <div className="mt-6 w-full">
+  //               <Button
+  //                 onClick={handleInitiateIyzicoPayment}
+  //                 className="w-full"
+  //                 disabled={orderLoading || !currentSelectedAddress}
+  //               >
+  //                 {orderLoading
+  //                   ? "Ödeme İşleniyor..."
+  //                   : "Iyzico ile Güvenli Öde"}
+  //               </Button>
+  //               {!currentSelectedAddress && (
+  //                 <p className="text-xs text-red-500 text-center mt-1">
+  //                   Lütfen bir teslimat adresi seçin.
+  //                 </p>
+  //               )}
+  //             </div>
+  //           </>
+  //         )}
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
+
   return (
     <div className="flex flex-col">
-      <div className="relative h-[300px] w-full overflow-hidden">
+      {/* Banner kısmı aynı kalabilir */}
+      <div className="relative h-[200px] md:h-[300px] w-full overflow-hidden">
         <img
           src={img}
           className="h-full w-full object-cover"
           alt="Checkout Banner"
         />
+        {/* Başlık eklendi */}
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+          <h1 className="text-3xl md:text-4xl font-bold text-white">Ödeme</h1>
+        </div>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8 p-4 md:p-8">
+
+      {/* Ana içerik grid'i */}
+      <div className="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8 px-4 py-8">
+        {/* Sol Taraf: Adres Seçimi */}
         <Address
-          selectedAddress={currentSelectedAddress}
+          seciliAdresProp={currentSelectedAddress} // İsmi değiştirdim (prop adı vs state adı)
           setCurrentSelectedAddress={setCurrentSelectedAddress}
         />
-        <div className="flex flex-col gap-4 bg-gray-50 p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold border-b pb-2 mb-4">
-            Sipariş Özeti
-          </h2>
-          {cartItems && cartItems.items && cartItems.items.length > 0 ? (
-            <div className="max-h-60 overflow-y-auto pr-2 space-y-3">
-              {cartItems.items.map((item) => (
-                <UserCartItemsContent
-                  key={item.productId}
-                  cartItem={item}
-                  readOnly={true}
-                />
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500">Sepetinizde ürün bulunmamaktadır.</p>
-          )}
-          {cartItems && cartItems.items && cartItems.items.length > 0 && (
-            <>
-              <div className="mt-6 pt-4 border-t space-y-2">
-                <div className="flex justify-between">
+
+        {/* Sağ Taraf: Sipariş Özeti (Yeniden Düzenlendi) */}
+        <Card className="shadow-md">
+          {" "}
+          {/* Daha belirgin gölge */}
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">
+              {" "}
+              {/* Font boyutu ayarlandı */}
+              Sipariş Özeti
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            {" "}
+            {/* Dikey boşluk artırıldı */}
+            {/* Ürün Listesi */}
+            {cartItems?.items?.length > 0 ? (
+              <div className="max-h-60 overflow-y-auto pr-2 space-y-4 border rounded-md p-3 bg-gray-50">
+                {" "}
+                {/* Padding ve arka plan eklendi */}
+                {cartItems.items.map((item) => (
+                  <UserCartItemsContent
+                    key={item.productId?._id || item.productId} // Daha sağlam key
+                    cartItem={item}
+                    readOnly={true} // Sadece gösterim
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-center py-4">
+                Sepetinizde ürün bulunmamaktadır.
+              </p>
+            )}
+            {/* Toplamlar Bölümü */}
+            {cartItems?.items?.length > 0 && (
+              <div className="space-y-2 pt-4">
+                <Separator className="my-3" />{" "}
+                {/* Ara toplamdan önce ayırıcı */}
+                <div className="flex justify-between text-sm text-muted-foreground">
                   <span>Ara Toplam</span>
                   <span>{totalCartAmount.toFixed(2)} TL</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between text-sm text-muted-foreground">
                   <span>Kargo</span>
-                  <span>Hesaplanacak</span>
+                  <span>Hesaplanacak</span> {/* Veya sabit bir değer */}
                 </div>
-                <div className="flex justify-between text-lg font-bold pt-2">
+                <Separator className="my-3" /> {/* Toplamdan önce ayırıcı */}
+                <div className="flex justify-between text-lg font-bold">
                   <span>Toplam</span>
                   <span>{totalCartAmount.toFixed(2)} TL</span>
                 </div>
               </div>
-              <div className="mt-6 w-full">
-                <Button
-                  onClick={handleInitiateIyzicoPayment}
-                  className="w-full"
-                  disabled={orderLoading || !currentSelectedAddress}
-                >
-                  {orderLoading
-                    ? "Ödeme İşleniyor..."
-                    : "Iyzico ile Güvenli Öde"}
-                </Button>
-                {!currentSelectedAddress && (
-                  <p className="text-xs text-red-500 text-center mt-1">
-                    Lütfen bir teslimat adresi seçin.
-                  </p>
-                )}
-              </div>
-            </>
+            )}
+          </CardContent>
+          {/* Ödeme Butonu */}
+          {cartItems?.items?.length > 0 && (
+            <CardFooter className="flex flex-col items-stretch gap-2 pt-5">
+              {" "}
+              {/* Yukarı boşluk */}
+              <Button
+                onClick={handleInitiateIyzicoPayment}
+                className="w-full text-base py-3" // Daha büyük buton
+                disabled={orderLoading || !currentSelectedAddress}
+              >
+                {orderLoading ? "İşleniyor..." : "Iyzico ile Güvenli Öde"}
+              </Button>
+              {!currentSelectedAddress && (
+                <p className="text-xs text-red-600 text-center">
+                  Lütfen bir teslimat adresi seçin.
+                </p>
+              )}
+            </CardFooter>
           )}
-        </div>
+        </Card>
       </div>
     </div>
   );

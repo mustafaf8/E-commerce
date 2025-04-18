@@ -270,3 +270,4 @@ const authMiddleware = async (req, res, next) => {
 };
 
 module.exports = { registerUser, loginUser, logoutUser, authMiddleware };
+//http://localhost:5173/shop/home

@@ -23,6 +23,7 @@ function AuthLogin() {
       if (data?.payload?.success) {
         toast({
           title: data?.payload?.message,
+          variant: "success",
         });
       } else {
         toast({

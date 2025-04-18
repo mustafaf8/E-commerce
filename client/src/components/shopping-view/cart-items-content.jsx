@@ -157,7 +157,6 @@ function UserCartItemsContent({ cartItem, readOnly = false }) {
       navigate("/auth/login", { state: { from: location } });
       return;
     }
-    // *** KONTROL SONU ***
 
     // --- Var olan miktar kontrolü ve dispatch ---
     if (typeOfAction === "plus") {
@@ -192,7 +191,7 @@ function UserCartItemsContent({ cartItem, readOnly = false }) {
           if (getQuantity + 1 > getTotalStock) {
             toast({
               title: `Bu üründen yalnızca ${getQuantity} adet eklenebilir`,
-              variant: "destructive",
+              variant: "info",
             });
             return;
           }
@@ -212,7 +211,8 @@ function UserCartItemsContent({ cartItem, readOnly = false }) {
     ).then((data) => {
       if (data?.payload?.success) {
         toast({
-          title: "Sepet güncellendi", // Mesaj güncellendi
+          title: "Sepet güncellendi",
+          variant: "success", // Başarı mesajı için yeşil tema
         });
       }
       // Hata durumu
@@ -232,7 +232,7 @@ function UserCartItemsContent({ cartItem, readOnly = false }) {
       toast({
         title: "Lütfen giriş yapın",
         description: "Sepetten ürün silmek için giriş yapmanız gerekmektedir.",
-        variant: "destructive",
+        variant: "warning",
       });
       navigate("/auth/login", { state: { from: location } });
       return;
@@ -245,11 +245,10 @@ function UserCartItemsContent({ cartItem, readOnly = false }) {
     ).then((data) => {
       if (data?.payload?.success) {
         toast({
-          title: "Ürün sepetten silindi", // Mesaj güncellendi
+          title: "Ürün sepetten silindi",
+          variant: "success", // Kırmızı tema
         });
-      }
-      // Hata durumu
-      else {
+      } else {
         toast({
           title: "Silme Başarısız",
           description: data.payload?.message || "Bir hata oluştu.",

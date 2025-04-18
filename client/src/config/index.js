@@ -186,39 +186,83 @@ export const sortOptions = [
   { id: "title-ztoa", label: "Title: Z to A" },
 ];
 
+// export const addressFormControls = [
+//   {
+//     label: "İl",
+//     name: "city",
+//     componentType: "input",
+//     type: "text",
+//     placeholder: "İl adını girin",
+//   },
+//   {
+//     label: "Adres",
+//     name: "address",
+//     componentType: "input",
+//     type: "text",
+//     placeholder: "Adresinizi girin",
+//   },
+//   {
+//     label: "Posta Kodu",
+//     name: "pincode",
+//     componentType: "input",
+//     type: "text",
+//     placeholder: "Posta kodunu girin",
+//   },
+//   {
+//     label: "Telefon Numarası",
+//     name: "phone",
+//     componentType: "input",
+//     type: "text",
+//     placeholder: "Telefon numarasını girin",
+//   },
+//   {
+//     label: "Not",
+//     name: "notes",
+//     componentType: "textarea",
+//     placeholder: "Notunuzu girin",
+//   },
+// ];
+
+// client/src/config/index.js
 export const addressFormControls = [
   {
-    label: "İl",
-    name: "city",
-    componentType: "input",
-    type: "text",
-    placeholder: "İl adını girin",
-  },
-  {
-    label: "Adres",
     name: "address",
-    componentType: "input",
-    type: "text",
-    placeholder: "Adresinizi girin",
+    label: "Tam Adres",
+    placeholder: "Mahalle, sokak, bina no, daire no, ilçe/şehir...", // Daha açıklayıcı
+    componentType: "textarea", // Textarea olduğundan emin ol
+    rows: 3, // Önerilen satır sayısı
+    layout: "full", // Tam genişlik kaplasın
   },
   {
-    label: "Posta Kodu",
+    name: "city",
+    label: "Şehir / İlçe",
+    placeholder: "Örn: Selçuklu", // Yerel örnek
+    componentType: "input",
+    type: "text",
+    // layout: 'col' // Grid'de yan yana gelmesi için işaretleyebiliriz (CommonForm'da yöneteceğiz)
+  },
+  {
     name: "pincode",
+    label: "Posta Kodu",
+    placeholder: "Örn: 42100",
     componentType: "input",
-    type: "text",
-    placeholder: "Posta kodunu girin",
+    type: "text", // Farklı formatlara izin vermek için text kalsın
+    // layout: 'col'
   },
   {
-    label: "Telefon Numarası",
     name: "phone",
+    label: "Telefon Numarası",
+    placeholder: "5xxxxxxxxx (Başında 0 olmadan)", // Daha belirgin placeholder
     componentType: "input",
-    type: "text",
-    placeholder: "Telefon numarasını girin",
+    type: "tel", // Telefon için 'tel' tipi
+    // layout: 'col'
   },
   {
-    label: "Not",
     name: "notes",
-    componentType: "textarea",
-    placeholder: "Notunuzu girin",
+    label: "Adres Notları (İsteğe Bağlı)",
+    placeholder: "Teslimatla ilgili notlarınız...",
+    componentType: "textarea", // Textarea olduğundan emin ol
+    rows: 2,
+    layout: "full", // Tam genişlik kaplasın
   },
 ];

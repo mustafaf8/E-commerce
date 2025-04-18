@@ -132,7 +132,7 @@ function AdminDashboard() {
   async function handleUploadFeatureImage() {
     if (!featureImageFile) {
       toast({
-        variant: "destructive",
+        variant: "warning",
         title: "Lütfen önce bir banner resmi seçin.",
       });
       return;
@@ -158,7 +158,10 @@ function AdminDashboard() {
             setFeatureImageFile(null);
             setFeatureImageTitle("");
             setFeatureImageLink("");
-            toast({ title: "Banner resmi başarıyla eklendi." });
+            toast({
+              title: "Banner resmi başarıyla eklendi.",
+              variant: "success",
+            });
           } else {
             toast({
               variant: "destructive",
@@ -186,7 +189,7 @@ function AdminDashboard() {
     openModal("Bu banner'ı silmek istediğinizden emin misiniz?", () => {
       dispatch(deleteFeatureImage(bannerId)).then((data) => {
         if (data?.payload?.success) {
-          toast({ title: "Banner silindi." });
+          toast({ title: "Banner silindi.", variant: "success" });
         } else {
           toast({
             variant: "destructive",
@@ -201,7 +204,7 @@ function AdminDashboard() {
   async function handleUploadPromoCard() {
     if (!promoCardImageFile) {
       toast({
-        variant: "destructive",
+        variant: "warning",
         title: "Lütfen bir fırsat kartı resmi seçin.",
       });
       return;
@@ -227,7 +230,10 @@ function AdminDashboard() {
             setPromoCardImageFile(null); // Seçili dosyayı temizle
             setPromoCardTitle("");
             setPromoCardLink("");
-            toast({ title: "Fırsat kartı başarıyla eklendi." });
+            toast({
+              title: "Fırsat kartı başarıyla eklendi.",
+              variant: "success",
+            });
           } else {
             toast({
               variant: "destructive",
@@ -251,7 +257,7 @@ function AdminDashboard() {
       () => {
         dispatch(deletePromoCard(cardId)).then((data) => {
           if (data?.payload?.success) {
-            toast({ title: "Promosyon kartı silindi." });
+            toast({ title: "Promosyon kartı silindi.", variant: "success" });
           } else {
             toast({
               variant: "destructive",
@@ -268,7 +274,7 @@ function AdminDashboard() {
   async function handleUploadSideBanner() {
     if (!sideBannerImageFile) {
       toast({
-        variant: "destructive",
+        variant: "warning",
         title: "Lütfen yan banner için bir resim yükleyin.",
       });
       return;
@@ -292,7 +298,10 @@ function AdminDashboard() {
             setSideBannerImageFile(null);
             setSideBannerTitle("");
             setSideBannerLink("");
-            toast({ title: "Yan banner başarıyla eklendi." });
+            toast({
+              title: "Yan banner başarıyla eklendi.",
+              variant: "success",
+            });
           } else {
             toast({
               variant: "destructive",
@@ -322,7 +331,7 @@ function AdminDashboard() {
     openModal("Bu küçük banner'ı silmek istediğinizden emin misiniz?", () => {
       dispatch(deleteSideBanner(bannerId)).then((data) => {
         if (data?.payload?.success) {
-          toast({ title: "Yan banner silindi." });
+          toast({ title: "Yan banner silindi.", variant: "success" });
         } else {
           toast({
             variant: "destructive",

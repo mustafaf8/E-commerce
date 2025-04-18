@@ -37,6 +37,7 @@ function AdminOrderDetailsView({ orderDetails }) {
         setFormData(initialFormData);
         toast({
           title: data?.payload?.message,
+          variant: "info",
         });
       }
     });
