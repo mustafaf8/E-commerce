@@ -1,14 +1,41 @@
+// import { Outlet } from "react-router-dom";
+// import ShoppingHeader from "./header";
+
+// function ShoppingLayout() {
+//   return (
+//     <div className="flex flex-col bg-white overflow-hidden">
+//       {/* common header */}
+//       <ShoppingHeader />
+//       <main className="flex flex-col w-full">
+//         <Outlet />
+//       </main>
+//     </div>
+//   );
+// }
+
+// export default ShoppingLayout;
+
+// client/src/components/shopping-view/layout.jsx
 import { Outlet } from "react-router-dom";
 import ShoppingHeader from "./header";
+import Footer from "../common/footer"; // Footer'ı import et
 
 function ShoppingLayout() {
   return (
-    <div className="flex flex-col bg-white overflow-hidden">
-      {/* common header */}
+    // flex-col ve min-h-screen ekleyerek footer'ın sayfa içeriği kısa olsa bile altta kalmasını sağlayın
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
+      {" "}
+      {/* Arka plan rengi eklendi */}
+      {/* Header */}
       <ShoppingHeader />
-      <main className="flex flex-col w-full">
+      {/* Ana İçerik Alanı (esneyebilir) */}
+      <main className="flex-grow w-full">
+        {" "}
+        {/* flex-grow ile içeriğin alanı doldurmasını sağla */}
         <Outlet />
       </main>
+      {/* Footer */}
+      <Footer /> {/* Footer'ı main'in dışına ekle */}
     </div>
   );
 }

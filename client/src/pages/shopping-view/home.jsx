@@ -16,9 +16,10 @@ import { getFeatureImages } from "@/store/common-slice";
 import { fetchPromoCards } from "@/store/common-slice/promo-card-slice";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchSideBanners } from "@/store/common-slice/side-banner-slice";
+import ProductTileSkeleton from "@/components/shopping-view/product-tile-skeleton.jsx";
 
 function ShoppingHome() {
-  const [currentSlide, setCurrentSlide] = useState(0); // Slider için state
+  const [currentSlide, setCurrentSlide] = useState(0);
   const [currentSideBannerIndex, setCurrentSideBannerIndex] = useState(0);
   const {
     productList,
@@ -33,26 +34,22 @@ function ShoppingHome() {
     (state) => state.promoCards
   );
   const { sideBannerList, isLoading: sideBannersLoading } = useSelector(
-    // Slice yoksa hata vermemesi için varsayılan değer atandı
     (state) => state.sideBanners || { sideBannerList: [], isLoading: false }
   );
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
-  const { user } = useSelector((state) => state.auth);
+  //..
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  //..
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  function handleNavigateToListingPage(getCurrentItem, section) {
-    sessionStorage.removeItem("filters");
-    const currentFilter = { [section]: [getCurrentItem.id] };
-    sessionStorage.setItem("filters", JSON.stringify(currentFilter));
-    navigate(`/shop/listing`);
-  }
   function handleGetProductDetails(getCurrentProductId) {
     dispatch(fetchProductDetails(getCurrentProductId));
   }
   function handleAddtoCart(getCurrentProductId) {
-    if (!user?.id) {
+    if (!isAuthenticated) {
+      // isAuthenticated kontrolü eklendi
       toast({ variant: "destructive", title: "Lütfen önce giriş yapın." });
       return;
     }
@@ -76,8 +73,8 @@ function ShoppingHome() {
   }
   const handlePromoCardClick = (link) => {
     if (link) {
-      if (link.startsWith("http")) {
-        window.open(link, "");
+      if (link.startsWith("http") || link.startsWith("https")) {
+        window.open(link, "noopener,noreferrer");
       } else {
         navigate(link);
       }
@@ -106,7 +103,7 @@ function ShoppingHome() {
 
   // Otomatik Slider Geçişi için useEffect (Doğru çalışıyor)
   useEffect(() => {
-    if (featureImageList?.length > 1) {
+    if (featureImageList && featureImageList?.length > 1) {
       const timer = setInterval(() => {
         setCurrentSlide(
           (prevSlide) => (prevSlide + 1) % featureImageList.length
@@ -137,10 +134,18 @@ function ShoppingHome() {
           <div className="flex space-x-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-thin scrollbar-thumb-gray-100 scrollbar-track-gray-100">
             {promoCardsLoading ? (
               Array.from({ length: 10 }).map((_, index) => (
-                <Skeleton
-                  key={index}
-                  className="flex-shrink-0 w-[125px] h-[125px] rounded-lg bg-gray-300"
-                />
+                <Card
+                  key={`promo-skel-${index}`}
+                  // Gerçek kartla aynı temel boyut ve stil özellikleri
+                  className="relative flex-shrink-0 w-[110px] h-[110px] md:w-[125px] md:h-[125px] rounded-lg overflow-hidden border bg-gray-100"
+                >
+                  <Skeleton className="w-full h-full" />
+
+                  <div className="absolute bottom-0 left-0 right-0 p-1.5 pt-4">
+                    <Skeleton className="h-3 w-4/5 mb-1" />
+                    <Skeleton className="h-3 w-3/5" />
+                  </div>
+                </Card>
               ))
             ) : promoCardList && promoCardList.length > 0 ? (
               promoCardList.map((promoCard) => (
@@ -179,10 +184,11 @@ function ShoppingHome() {
 
       {/* BÖLÜM 2: ORTADAKİ BANNER ALANI (SOL SLIDER, SAĞ STATİK) */}
       <section className="my-4 md:my-4 container mx-auto px-4">
-        {featuresLoading ? (
-          <div className="flex flex-col md:flex-row gap-4 h-[220px] md:h-[220px]">
-            <Skeleton className="w-full md:w-[65%] h-full rounded-3xl border-20-white bg-gray-300" />
-            <Skeleton className="w-full md:w-[35%] h-full rounded-3xl border-20-white bg-gray-300" />
+        {featuresLoading || sideBannersLoading ? (
+          <div className="flex flex-col md:flex-row gap-4 h-[200px] md:h-[220px]">
+            {/* Daha belirgin bir gri tonu veya hafif bir animasyon eklenebilir */}
+            <Skeleton className="w-full md:w-[65%] h-full rounded-2xl bg-gray-200 animate-pulse" />
+            <Skeleton className="w-full md:w-[35%] h-full rounded-2xl bg-gray-200 animate-pulse" />
           </div>
         ) : (
           <div className="flex flex-col md:flex-row gap-4 items-stretch">
@@ -327,15 +333,7 @@ function ShoppingHome() {
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
             {productsLoading ? (
               Array.from({ length: 10 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="w-full space-y-2 bg-white p-2 rounded-lg border"
-                >
-                  <Skeleton className="h-40 md:h-56 w-full rounded-md" />
-                  <Skeleton className="h-5 w-4/5" />
-                  <Skeleton className="h-4 w-1/2" />
-                  <Skeleton className="h-9 w-full" />
-                </div>
+                <ProductTileSkeleton key={`product-skel-${index}`} />
               ))
             ) : productList && productList.length > 0 ? (
               productList.map((productItem) => (
@@ -343,12 +341,14 @@ function ShoppingHome() {
                   key={productItem._id}
                   product={productItem}
                   handleGetProductDetails={handleGetProductDetails}
-                  handleAddtoCart={handleAddtoCart}
+                  handleAddtoCart={() =>
+                    handleAddtoCart(productItem._id, productItem.totalStock)
+                  } // totalStock iletildi
                 />
               ))
             ) : (
               <p className="col-span-full text-center py-10 text-gray-500">
-                Gösterilecek ürün bulunamadı.
+                Gösterilecek öne çıkan ürün bulunamadı.
               </p>
             )}
           </div>

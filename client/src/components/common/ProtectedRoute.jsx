@@ -59,13 +59,19 @@ function ProtectedRoute({ children, adminOnly = false }) {
     console.log(
       `ProtectedRoute (Admin) -> Not an admin (role: ${user?.role}), redirecting to home from ${location.pathname}`
     );
-    // Yetkisiz erişim sayfasına veya direkt ana sayfaya yönlendirebilirsiniz
-    // return <Navigate to="/unauth-page" replace />;
+
     return <Navigate to="/shop/home" replace />;
   }
 
   // Tüm kontrollerden geçtiyse, istenen sayfayı (children) göster.
   return children;
 }
+
+import PropTypes from "prop-types";
+
+ProtectedRoute.propTypes = {
+  children: PropTypes.node.isRequired,
+  adminOnly: PropTypes.bool,
+};
 
 export default ProtectedRoute;

@@ -70,8 +70,7 @@ function ShoppingProductTile({
 
   return (
     // 1. Ana Card'a flex column ve tam yükseklik ekle
-    <Card className="w-full max-w-sm mx-auto relative group flex flex-col h-full overflow-hidden">
-      {/* Favori Butonu (Aynı kalır) */}
+    <Card className="w-[90%] max-w-sm mx-auto relative group flex flex-col h-full overflow-hidden">
       <Button
         variant="ghost"
         size="icon"
@@ -89,7 +88,6 @@ function ShoppingProductTile({
         </span>
       </Button>
 
-      {/* 2. İçerik div'ine flex-grow ekle */}
       <div
         onClick={() => handleGetProductDetails(product?._id)}
         className="flex flex-col flex-grow cursor-pointer" // flex-grow eklendi
@@ -98,7 +96,8 @@ function ShoppingProductTile({
           <img
             src={product?.image}
             alt={product?.title}
-            className="w-full h-[250px] sm:h-[300px] object-contain rounded-t-lg p-2" // Yüksekliği biraz ayarladık ve padding ekledik
+            className="w-full h-[250px] sm:h-[300px] object-contain rounded-t-lg p-2"
+            ekledik
           />
           {/* Badge'ler (Aynı kalır) */}
           {product?.totalStock === 0 ? (
@@ -124,6 +123,12 @@ function ShoppingProductTile({
 
         {/* İçerik kısmı (Başlık, Rating, Fiyat) */}
         <CardContent className="px-4 pt-2 pb-2 flex flex-col flex-grow">
+          <h2
+            className="text-md font-semibold mb-1 truncate"
+            title={product?.title}
+          >
+            {product?.title}
+          </h2>
           {/* Rating gösterimi (Aynı kalır) */}
           {product?.averageReview !== undefined && (
             <div className="flex items-center mb-1">
@@ -134,12 +139,6 @@ function ShoppingProductTile({
               </span>
             </div>
           )}
-          <h2
-            className="text-md font-semibold mb-1 truncate"
-            title={product?.title}
-          >
-            {product?.title}
-          </h2>
           {/* Fiyatlar Bölümü */}
           <div className="mt-auto pt-1">
             {/* Fiyat Konteyneri: İçeriğe göre hizalamayı ayarlar */}

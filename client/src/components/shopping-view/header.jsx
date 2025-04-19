@@ -24,6 +24,7 @@ import UserCartWrapper from "./cart-wrapper";
 import { useEffect, useState } from "react";
 import { fetchCartItems } from "@/store/shop/cart-slice";
 import { Label } from "../ui/label";
+import { toast } from "../ui/use-toast";
 
 function MenuItems() {
   const navigate = useNavigate();
@@ -77,7 +78,11 @@ function HeaderRightContent() {
       .unwrap()
       .then(() => {
         navigate("/shop/home");
-        console.log("Shop logout successful");
+        toast({
+          title: "Çıkış yapıldı",
+          description: "Başka bir zaman görüşmek üzere!",
+          variant: "success",
+        });
       })
       .catch((error) => {
         console.error("Shop logout failed:", error);

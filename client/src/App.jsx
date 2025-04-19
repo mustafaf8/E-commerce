@@ -267,7 +267,8 @@ import PaymentSuccessPage from "./pages/shopping-view/payment-success";
 import SearchProducts from "./pages/shopping-view/search";
 import PaymentFailurePage from "./pages/shopping-view/PaymentFailurePage";
 import ShoppingWishlist from "./pages/shopping-view/wishlist";
-import ProtectedRoute from "./components/common/ProtectedRoute"; // ProtectedRoute import edilmiş olmalı
+import ProtectedRoute from "./components/common/ProtectedRoute";
+import AboutUs from "./components/shopping-view/about-us";
 
 function App() {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -316,7 +317,6 @@ function App() {
         <Route
           path="/admin"
           element={
-            // Bu rota ve altındaki tüm rotalar için giriş yapmış olmayı VE admin rolünü zorunlu kıl
             <ProtectedRoute adminOnly={true}>
               <AdminLayout />
             </ProtectedRoute>
@@ -337,10 +337,27 @@ function App() {
           <Route path="home" element={<ShoppingHome />} />
           <Route path="listing" element={<ShoppingListing />} />
           <Route path="search" element={<SearchProducts />} />
-          <Route path="payment-success" element={<PaymentSuccessPage />} />
-          <Route path="payment-failure" element={<PaymentFailurePage />} />
+
+          {/* YENİ HAKKIMIZDA ROTASI */}
+          <Route path="hakkimizda" element={<AboutUs />} />
 
           {/* === GİRİŞ GEREKTİREN Mağaza Rotaları === */}
+          <Route
+            path="payment-success"
+            element={
+              <ProtectedRoute>
+                <PaymentSuccessPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="payment-failure"
+            element={
+              <ProtectedRoute>
+                <PaymentFailurePage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="checkout"
             element={
