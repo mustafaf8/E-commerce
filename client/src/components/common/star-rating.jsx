@@ -10,14 +10,20 @@ function StarRatingComponent({ rating, handleRatingChange }) {
       className={` rounded-full transition-colors ${
         star <= rating
           ? "text-yellow-500"
-          : "text-black  hover:bg-yellow-500 hover:text-white"
+          : "text-gray-400 hover:bg-yellow-500 hover:text-white"
       }`}
       variant="ghost"
       size="icon"
       onClick={handleRatingChange ? () => handleRatingChange(star) : null}
     >
       <StarIcon
-        className={`w-5 h-5 ${star <= rating ? "fill-yellow-500" : ""}`}
+        className={`w-5 h-5 ${
+          // Boyut
+          star <= rating
+            ? "fill-yellow-500 stroke-yellow-500" // Seçiliyse: içi ve kenarlığı sarı
+            : "fill-transparent" // Seçili değilse: içi transparan (sadece kenarlık görünür)
+        }`}
+        strokeWidth={1.7} // Kenarlık kalınlığını ayarla (1, 1.5, 2 gibi değerler deneyebilirsin)
       />
     </Button>
   ));

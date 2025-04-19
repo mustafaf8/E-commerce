@@ -270,7 +270,6 @@ function AdminDashboard() {
     );
   }
 
-  // !!! YENİ FONKSİYON: Yan Banner Yükleme !!!
   async function handleUploadSideBanner() {
     if (!sideBannerImageFile) {
       toast({
