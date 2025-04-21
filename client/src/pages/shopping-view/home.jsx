@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchAllFilteredProducts,
@@ -17,6 +17,7 @@ import { fetchPromoCards } from "@/store/common-slice/promo-card-slice";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchSideBanners } from "@/store/common-slice/side-banner-slice";
 import ProductTileSkeleton from "@/components/shopping-view/product-tile-skeleton.jsx";
+import ProductCarousel from "@/components/shopping-view/ProductCarousel";
 
 function ShoppingHome() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -26,6 +27,7 @@ function ShoppingHome() {
     productDetails,
     isLoading: productsLoading,
   } = useSelector((state) => state.shopProducts);
+  console.log(productList, "productList"); // Debugging için
   // featureImageList ve loading state'ini alıyoruz
   const { featureImageList, isLoading: featuresLoading } = useSelector(
     (state) => state.commonFeature
@@ -126,14 +128,64 @@ function ShoppingHome() {
     dispatch(fetchSideBanners());
   }, [dispatch]);
 
+  // --- YENİ: Kadın ürünlerini filtreleme ---
+  const womenProducts = useMemo(() => {
+    if (!productList || productList.length === 0) {
+      return [];
+    }
+    return productList.filter(
+      (product) =>
+        product.category &&
+        (product.category.toLowerCase() === "women" ||
+          product.category.toLowerCase() === "kadın")
+    );
+  }, [productList]);
+  const womenProductsLoading = productsLoading;
+
+  // --- YENİ: Erkek ürünlerini filtreleme ---
+  const menProducts = useMemo(() => {
+    if (!productList || productList.length === 0) return [];
+    return productList.filter(
+      (product) =>
+        product.category &&
+        (product.category.toLowerCase() === "men" ||
+          product.category.toLowerCase() === "erkek")
+    );
+  }, [productList]);
+  const menProductsLoading = productsLoading;
+
+  // --- YENİ: Çocuk ürünlerini filtreleme ---
+  const kidsProducts = useMemo(() => {
+    if (!productList || productList.length === 0) return [];
+    return productList.filter(
+      (product) =>
+        product.category &&
+        (product.category.toLowerCase() === "kids" ||
+          product.category.toLowerCase() === "Çocuk")
+    );
+  }, [productList]);
+  const kidsProductsLoading = productsLoading;
+
+  // --- YENİ: Çocuk ürünlerini filtreleme ---
+  const accesProducts = useMemo(() => {
+    if (!productList || productList.length === 0) return [];
+    return productList.filter(
+      (product) =>
+        product.category &&
+        (product.category.toLowerCase() === "kids" ||
+          product.category.toLowerCase() === "Çocuk")
+    );
+  }, [productList]);
+  const accesProductsLoading = productsLoading;
+
   return (
     <div className="flex flex-col min-h-screen ">
       {/* BÖLÜM 1: PROMOSYON KARTLARI (Değişiklik yok) */}
-      <section className="bg-white pt-8 pb-2">
-        <div className="container mx-auto px-4">
-          <div className="flex space-x-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-thin scrollbar-thumb-gray-100 scrollbar-track-gray-100">
+      <section className="bg-white pt-8 pb-2 no-scrollbar">
+        <div className="container mx-auto px-20 max-[1024px]:px-2">
+          <div className="flex space-x-3 overflow-x-auto pb-2 max-mx-4 px-4 no-scrollbar">
             {promoCardsLoading ? (
-              Array.from({ length: 10 }).map((_, index) => (
+              Array.from({ length: 9 }).map((_, index) => (
                 <Card
                   key={`promo-skel-${index}`}
                   // Gerçek kartla aynı temel boyut ve stil özellikleri
@@ -183,7 +235,7 @@ function ShoppingHome() {
       </section>
 
       {/* BÖLÜM 2: ORTADAKİ BANNER ALANI (SOL SLIDER, SAĞ STATİK) */}
-      <section className="my-4 md:my-4 container mx-auto px-4">
+      <section className="my-4 md:my-4 container mx-auto px-20 max-[1024px]:px-2">
         {featuresLoading || sideBannersLoading ? (
           <div className="flex flex-col md:flex-row gap-4 h-[200px] md:h-[220px]">
             {/* Daha belirgin bir gri tonu veya hafif bir animasyon eklenebilir */}
@@ -259,7 +311,7 @@ function ShoppingHome() {
             {/* Sağ Yan Banner (Statik) */}
             {/* Sağ Yan Banner (Manuel Slider) */}
             <div
-              className={`relative w-full md:w-[35%] rounded-3xl overflow-hidden shadow-sm group bg-gray-200 min-h-[200px]`}
+              className={`relative w-full md:w-[35%] rounded-3xl overflow-hidden shadow-sm group bg-gray-200 min-h-[200px] `}
             >
               {/* sideBannerList'i map et ve currentSideBannerIndex'e göre göster */}
               {sideBannerList && sideBannerList.length > 0 ? (
@@ -323,14 +375,14 @@ function ShoppingHome() {
       </section>
 
       {/* BÖLÜM 3: ÜRÜN LİSTELEME (Değişiklik yok) */}
-      <section className="py-8 bg-transparent">
+      {/* <section className="py-8 bg-transparent">
         <div className="container mx-auto px-4">
-          {/* <h2 className="text-xl md:text-2xl font-semibold mb-5 text-gray-800 text-left">
+          <h2 className="text-xl md:text-2xl font-semibold mb-5 text-gray-800 text-left">
             {user?.userName
               ? `${user.userName}, sana özel öneriler`
               : "Öne Çıkan Ürünler"}
-          </h2> */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5">
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-5">
             {productsLoading ? (
               Array.from({ length: 10 }).map((_, index) => (
                 <ProductTileSkeleton key={`product-skel-${index}`} />
@@ -353,7 +405,65 @@ function ShoppingHome() {
             )}
           </div>
         </div>
-      </section>
+      </section> */}
+
+      {/* BÖLÜM 3: YATAY KAYDIRILABİLİR ÜRÜNLER */}
+      <ProductCarousel
+        title={
+          user?.userName
+            ? `${user.userName}, sana özel öneriler`
+            : "Öne Çıkan Ürünler"
+        }
+        products={productList} // Mevcut productList'i kullanıyoruz
+        isLoading={productsLoading} // Yüklenme durumunu iletiyoruz
+        handleGetProductDetails={handleGetProductDetails}
+        handleAddtoCart={handleAddtoCart} // Fonksiyonu doğru iletiyoruz
+      />
+
+      {/* Örnek 1: Statik Başlık */}
+      {/* --- YENİ: KADIN KATEGORİSİ CAROUSEL'I --- */}
+      {/* Sadece kadın ürünleri varsa veya yüklenmiyorsa göster */}
+      {(womenProducts.length > 0 || womenProductsLoading) && (
+        <ProductCarousel
+          title="Kadın" // Başlığı güncelle
+          products={womenProducts} // Filtrelenmiş kadın ürünlerini ver
+          isLoading={womenProductsLoading} // İlgili yüklenme durumunu ver
+          handleGetProductDetails={handleGetProductDetails}
+          handleAddtoCart={handleAddtoCart}
+        />
+      )}
+      {/* Örnek 2: Başka bir kategori (veri backend'den gelmeli) */}
+
+      {/* --- YENİ: ERKEK KATEGORİSİ CAROUSEL'I --- */}
+      {/* Sadece erkek ürünleri varsa veya yüklenmiyorsa göster */}
+      {(menProducts.length > 0 || menProductsLoading) && (
+        <ProductCarousel
+          title="Erkek" // Başlığı güncelle
+          products={menProducts} // Filtrelenmiş erkek ürünlerini ver
+          isLoading={menProductsLoading} // İlgili yüklenme durumunu ver
+          handleGetProductDetails={handleGetProductDetails}
+          handleAddtoCart={handleAddtoCart}
+        />
+      )}
+
+      {(menProducts.length > 0 || menProductsLoading) && (
+        <ProductCarousel
+          title="Çocuk" // Başlığı güncelle
+          products={kidsProducts} // Filtrelenmiş erkek ürünlerini ver
+          isLoading={kidsProductsLoading} // İlgili yüklenme durumunu ver
+          handleGetProductDetails={handleGetProductDetails}
+          handleAddtoCart={handleAddtoCart}
+        />
+      )}
+      {(accesProducts.length > 0 || accesProductsLoading) && (
+        <ProductCarousel
+          title="Aksesuar" // Başlığı güncelle
+          products={accesProducts} // Filtrelenmiş erkek ürünlerini ver
+          isLoading={accesProductsLoading} // İlgili yüklenme durumunu ver
+          handleGetProductDetails={handleGetProductDetails}
+          handleAddtoCart={handleAddtoCart}
+        />
+      )}
 
       {/* Ürün Detay Dialog (Değişiklik yok) */}
       <ProductDetailsDialog

@@ -1,7 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* Scrollbar'ı gizlemek için */
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Safari ve Chrome */
+}
 
+.no-scrollbar {
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+}
 @layer base {
   :root {
     --background: 0 0% 100%;

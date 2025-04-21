@@ -70,7 +70,7 @@ function ShoppingProductTile({
 
   return (
     // 1. Ana Card'a flex column ve tam yükseklik ekle
-    <Card className="w-[90%] max-w-sm mx-auto relative group flex flex-col h-full overflow-hidden">
+    <Card className="w-[100%] max-w-sm mx-auto relative group flex flex-col h-full overflow-hidden">
       <Button
         variant="ghost"
         size="icon"
@@ -96,8 +96,7 @@ function ShoppingProductTile({
           <img
             src={product?.image}
             alt={product?.title}
-            className="w-full h-[250px] sm:h-[300px] object-contain rounded-t-lg p-2"
-            ekledik
+            className="w-full h-[230px] sm:h-[230px] object-contain rounded-t-lg p-2"
           />
           {/* Badge'ler (Aynı kalır) */}
           {product?.totalStock === 0 ? (
@@ -122,67 +121,72 @@ function ShoppingProductTile({
         </div>
 
         {/* İçerik kısmı (Başlık, Rating, Fiyat) */}
-        <CardContent className="px-4 pt-2 pb-2 flex flex-col flex-grow">
+        <CardContent className="px-4 pt-0 pb-0 flex flex-col flex-grow">
           <h2
             className="text-md font-semibold mb-1 truncate"
             title={product?.title}
           >
             {product?.title}
           </h2>
-          {/* Rating gösterimi (Aynı kalır) */}
+
           {product?.averageReview !== undefined && (
             <div className="flex items-center mb-1">
-              {/* Rating ve başlık arasını biraz açtık */}
               <StarRatingComponent rating={product.averageReview} />
               <span className="ml-1 text-xs text-muted-foreground font-semibold">
-                {/* Boyut küçültüldü */}({product.averageReview.toFixed(1)})
+                ({product.averageReview.toFixed(1)})
               </span>
             </div>
           )}
-          {/* Fiyatlar Bölümü */}
-          <div className="mt-auto pt-1">
-            {/* Fiyat Konteyneri: İçeriğe göre hizalamayı ayarlar */}
-            <div
-              className={`flex items-center ${
-                // Eğer hem price hem de salePrice (0'dan büyük) varsa, iki uca yasla
-                product?.price &&
-                product.price > 0 &&
-                product?.salePrice &&
-                product.salePrice > 0
-                  ? "justify-between"
-                  : // Diğer durumlarda (sadece biri varsa veya hiç yoksa) sola yasla
-                    "justify-start"
-              }`}
-            >
-              {/* Orijinal Fiyatı Göster (Eğer varsa VE indirim yoksa VEYA indirim varsa) */}
-              {product?.price && product.price > 0 && (
+
+          <div className=" py-2">
+            {product?.salePrice !== undefined && product.salePrice !== null ? (
+              <div
+                className={`flex flex-col items-baseline ${
+                  product?.price &&
+                  product.price > 0 &&
+                  product.price > product.salePrice
+                    ? "justify-between"
+                    : "justify-start"
+                } gap-x-2`}
+              >
+                {/* Eski Fiyatı (price) SADECE indirim varsa göster */}
+                {product?.price &&
+                  product.price > 0 &&
+                  product.price > product.salePrice && (
+                    <p className="line-through text-sm text-gray-400 font-medium">
+                      {`${product.price.toFixed(2)} TL`}
+                    </p>
+                  )}
+
                 <p
-                  className={`${
-                    // Sadece indirim varsa üstünü çiz, küçük ve soluk yap
-                    product?.salePrice && product.salePrice > 0
-                      ? "line-through-red text-sm text-muted-foreground"
-                      : // İndirim yoksa normal stilde göster
-                        "text-lg text-foreground font-semibold"
+                  className={`font-semibold ${
+                    // Her durumda yarı kalın
+                    // Gerçek indirim varsa yeşil ve biraz daha büyük
+                    product?.price &&
+                    product.price > 0 &&
+                    product.price > product.salePrice
+                      ? "text-lg text-green-600" // İndirimli fiyat stili
+                      : "text-lg text-black" // Normal (indirim olmayan) fiyat stili - SİYAH
                   }`}
                 >
+                  {`${product.salePrice.toFixed(2)} TL`}
+                </p>
+              </div>
+            ) : // salePrice yoksa (beklenmedik durum ama fallback)
+            product?.price && product.price > 0 ? (
+              <div className="flex justify-start">
+                <p className="text-lg font-semibold text-black">
                   {`${product.price.toFixed(2)} TL`}
                 </p>
-              )}
-
-              {/* İndirimli Fiyatı Göster (Eğer varsa) */}
-              {product?.salePrice && product.salePrice > 0 && (
-                <span className="text-lg font-bold text-green-600">
-                  {`${product.salePrice.toFixed(2)} TL`}
-                </span>
-              )}
-
-              {/* HİÇ FİYAT YOKSA (Opsiyonel: Bir mesaj gösterebilirsiniz) */}
-              {!product?.price && !product?.salePrice && (
+              </div>
+            ) : (
+              // Hiç fiyat yoksa
+              <div className="flex justify-start">
                 <span className="text-sm text-muted-foreground">
                   Fiyat Bilgisi Yok
                 </span>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </CardContent>
       </div>
