@@ -179,7 +179,7 @@ function ShoppingHome() {
   const accesProductsLoading = productsLoading;
 
   return (
-    <div className="flex flex-col min-h-screen ">
+    <div className="flex flex-col min-h-screen outline: 2px solid red;">
       {/* BÖLÜM 1: PROMOSYON KARTLARI (Değişiklik yok) */}
       <section className="bg-white pt-8 pb-2 no-scrollbar">
         <div className="container mx-auto px-20 max-[1024px]:px-2">
