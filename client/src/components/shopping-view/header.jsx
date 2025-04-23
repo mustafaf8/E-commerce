@@ -90,52 +90,16 @@ function HeaderRightContent() {
   }
 
   useEffect(() => {
-    // Sepeti sadece giriş yapmış kullanıcılar için çek
     if (isAuthenticated && user?.id) {
       dispatch(fetchCartItems(user.id));
     }
-    // Kullanıcı çıkış yaparsa Redux state'i (ve muhtemelen sepet) zaten sıfırlanacaktır.
-  }, [dispatch, user?.id, isAuthenticated]); // isAuthenticated bağımlılıklara eklendi
+  }, [dispatch, user?.id, isAuthenticated]);
 
-  console.log(cartItems, "mustafa");
+  // console.log(cartItems, "mustafa");
 
   return (
     <div className="flex lg:items-center lg:flex-row flex-col gap-4">
-      {/* <Sheet open={openCartSheet} onOpenChange={() => setOpenCartSheet(false)}>
-        <Button
-          onClick={() => navigate("/shop/account")}
-          variant="outline"
-          size="mustafa"
-          className="relative"
-        >
-          <p className="">Siparişlerim</p>
-        </Button>
-        <Button
-          onClick={() => setOpenCartSheet(true)}
-          variant="outline"
-          size="mustafa"
-          className="relative"
-        >
-          <ShoppingCart className="w- h-8" />
-          <span className="absolute top-[-5px] right-[2px] font-bold text-sm">
-            {cartItems?.items?.length || 0}
-          </span>
-          <p className="pl-3">Sepetim</p>
-          <span className="sr-only">Kullanıcı sepeti</span>
-        </Button>
-        <UserCartWrapper
-          setOpenCartSheet={setOpenCartSheet}
-          cartItems={
-            cartItems && cartItems.items && cartItems.items.length > 0
-              ? cartItems.items
-              : []
-          }
-        />
-      </Sheet> */}
-
-      {/* --- Sepet Kısmı --- */}
       <Sheet open={openCartSheet} onOpenChange={() => setOpenCartSheet(false)}>
-        {/* Siparişlerim butonu - Sadece giriş yapmışsa göster */}
         {isAuthenticated && (
           <Button
             onClick={() => navigate("/shop/account")}
@@ -162,7 +126,6 @@ function HeaderRightContent() {
           )}
           {/* Küçük ekranlarda "Sepetim" yazısı gizlenebilir */}
           <p className="pl-2 hidden sm:block">Sepetim</p>
-          <span className="sr-only">Kullanıcı sepeti</span>
         </Button>
         <UserCartWrapper
           setOpenCartSheet={setOpenCartSheet}
@@ -177,36 +140,6 @@ function HeaderRightContent() {
           }
         />
       </Sheet>
-
-      {/* <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Avatar className="bg-black">
-            <AvatarFallback className="bg-black text-white font-extrabold">
-              {user?.userName[0].toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent side="right" className="w-56">
-          <DropdownMenuLabel>Logged {user?.userName}</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => navigate("/shop/account")}>
-            <UserCog className="mr-2 h-4 w-4" />
-            Hesap
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => navigate("/shop/wishlist")}>
-            <Heart className="mr-2 h-4 w-4" />
-            Favorilerim
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogout}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Çıkış
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu> */}
-
-      {/* --- Avatar veya Giriş Butonu (Koşullu Render) --- */}
       {isAuthenticated && user ? (
         // ** Kullanıcı GİRİŞ YAPMIŞ ise: Avatar ve Dropdown **
         <DropdownMenu>
@@ -258,86 +191,17 @@ function HeaderRightContent() {
   );
 }
 
-// function ShoppingHeader() {
-//   const navigate = useNavigate();
-//   const { isAuthenticated } = useSelector((state) => state.auth);
-//   const { user } = useSelector((state) => state.auth);
-//   const dispatch = useDispatch();
-//   function handleLogout() {
-//     dispatch(logoutUser());
-//   }
-//   return (
-//     <header className="sticky top-0 z-40 w-full border-b bg-background">
-//       <div className="flex h-16 items-center justify-between px-4 md:px-6">
-//         <Link to="/shop/home" className="flex items-center gap-2">
-//           <span className="">
-//             <img
-//               className="w-40 ml-8 max-[1000px]:ml-0"
-//               src="../src/assets/dlogo2.png"
-//               alt="logo"
-//             />
-//           </span>
-//         </Link>
-
-//         <Sheet>
-//           <SheetTrigger asChild>
-//             <Button variant="outline" size="icon" className="lg:hidden">
-//               <Menu className="h-6 w-6" />
-//               <span className="sr-only">Toggle header menu</span>
-//             </Button>
-//           </SheetTrigger>
-//           <SheetContent side="left" className="w-full max-w-xs">
-//             <MenuItems />
-//             <HeaderRightContent />
-//           </SheetContent>
-//         </Sheet>
-//         <div className="hidden lg:block">
-//           <MenuItems />
-//         </div>
-
-//         <div className="hidden lg:block">
-//           <HeaderRightContent />
-//         </div>
-//       </div>
-//       {/* Kullanıcı Dropdown Menüsü */}
-//       <DropdownMenu>
-//         {/* ... (DropdownMenuTrigger) */}
-//         <DropdownMenuContent side="right" className="w-56">
-//           <DropdownMenuLabel>Giriş Yapıldı: {user?.userName}</DropdownMenuLabel>
-//           <DropdownMenuSeparator />
-//           <DropdownMenuItem onClick={() => navigate("/shop/account")}>
-//             <UserCog className="mr-2 h-4 w-4" />
-//             Hesap
-//           </DropdownMenuItem>
-//           <DropdownMenuItem onClick={() => navigate("/shop/wishlist")}>
-//             <Heart className="mr-2 h-4 w-4" />
-//             Favorilerim
-//           </DropdownMenuItem>
-//           <DropdownMenuSeparator />
-//           <DropdownMenuItem onClick={handleLogout}>
-//             <LogOut className="mr-2 h-4 w-4" />
-//             Çıkış
-//           </DropdownMenuItem>
-//         </DropdownMenuContent>
-//       </DropdownMenu>
-//     </header>
-//   );
-// }
-
-// export default ShoppingHeader;
-
-// ShoppingHeader fonksiyonu dağınık görünüyordu, düzenlendi
 function ShoppingHeader() {
   const navigate = useNavigate();
-  // Artık burada auth state'ine doğrudan gerek yok, HeaderRightContent hallediyor
+  const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { cartItems } = useSelector((state) => state.shopCart);
+  const { isCartOpen } = useSelector((state) => state.shopCart);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
       <div className="flex h-16 items-center justify-between px-4 md:px-6">
-        {/* Logo */}
         <Link to="/shop/home" className="flex items-center gap-2 mr-4">
-          {" "}
-          {/* Sağ tarafa boşluk için mr-4 eklendi */}
           <span className="">
             <img
               className="w-32 md:w-40" // Boyut biraz ayarlandı
@@ -347,10 +211,7 @@ function ShoppingHeader() {
           </span>
         </Link>
 
-        {/* Desktop Menu Items (Ortada) */}
         <div className="hidden lg:flex flex-1 justify-center">
-          {" "}
-          {/* flex-1 ve justify-center ile ortala */}
           <MenuItems />
         </div>
 
@@ -379,7 +240,6 @@ function ShoppingHeader() {
           <HeaderRightContent />
         </div>
       </div>
-      {/* HeaderRightContent içine taşındığı için buradaki DropdownMenu kaldırıldı */}
     </header>
   );
 }

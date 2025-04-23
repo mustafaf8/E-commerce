@@ -27,8 +27,7 @@ function ShoppingHome() {
     productDetails,
     isLoading: productsLoading,
   } = useSelector((state) => state.shopProducts);
-  console.log(productList, "productList"); // Debugging için
-  // featureImageList ve loading state'ini alıyoruz
+
   const { featureImageList, isLoading: featuresLoading } = useSelector(
     (state) => state.commonFeature
   );
@@ -179,10 +178,10 @@ function ShoppingHome() {
   const accesProductsLoading = productsLoading;
 
   return (
-    <div className="flex flex-col min-h-screen outline: 2px solid red;">
+    <div className="flex flex-col min-h-screen outline: 2px solid red">
       {/* BÖLÜM 1: PROMOSYON KARTLARI (Değişiklik yok) */}
       <section className="bg-white pt-8 pb-2 no-scrollbar">
-        <div className="container mx-auto px-20 max-[1024px]:px-2">
+        <div className="container mx-auto px-20 max-[1024px]:px-0">
           <div className="flex space-x-3 overflow-x-auto pb-2 max-mx-4 px-4 no-scrollbar">
             {promoCardsLoading ? (
               Array.from({ length: 9 }).map((_, index) => (
@@ -235,9 +234,9 @@ function ShoppingHome() {
       </section>
 
       {/* BÖLÜM 2: ORTADAKİ BANNER ALANI (SOL SLIDER, SAĞ STATİK) */}
-      <section className="my-4 md:my-4 container mx-auto px-20 max-[1024px]:px-2">
+      <section className="my-4 md:my-4 container mx-auto px-20 max-[1024px]:px-1">
         {featuresLoading || sideBannersLoading ? (
-          <div className="flex flex-col md:flex-row gap-4 h-[200px] md:h-[220px]">
+          <div className="flex flex-col md:flex-row gap-4 h-[200px] max-sm:h-[100px] max-md:h-[120px]">
             {/* Daha belirgin bir gri tonu veya hafif bir animasyon eklenebilir */}
             <Skeleton className="w-full md:w-[65%] h-full rounded-2xl bg-gray-200 animate-pulse" />
             <Skeleton className="w-full md:w-[35%] h-full rounded-2xl bg-gray-200 animate-pulse" />
@@ -246,7 +245,7 @@ function ShoppingHome() {
           <div className="flex flex-col md:flex-row gap-4 items-stretch">
             {/* Sol Ana Banner (Artık Slider) */}
             <div
-              className={`relative w-full md:w-[65%] rounded-3xl overflow-hidden shadow-sm group min-h-[220px]`}
+              className={`relative w-full md:w-[65%] rounded-3xl overflow-hidden shadow-sm group max-sm:h-32 max-md:h-48`}
             >
               {featureImageList && featureImageList.length > 0 ? (
                 featureImageList.map((slide, index) => (
@@ -308,7 +307,6 @@ function ShoppingHome() {
               )}
             </div>
 
-            {/* Sağ Yan Banner (Statik) */}
             {/* Sağ Yan Banner (Manuel Slider) */}
             <div
               className={`relative w-full md:w-[35%] rounded-3xl overflow-hidden shadow-sm group bg-gray-200 min-h-[200px] `}
@@ -374,55 +372,17 @@ function ShoppingHome() {
         )}
       </section>
 
-      {/* BÖLÜM 3: ÜRÜN LİSTELEME (Değişiklik yok) */}
-      {/* <section className="py-8 bg-transparent">
-        <div className="container mx-auto px-4">
-          <h2 className="text-xl md:text-2xl font-semibold mb-5 text-gray-800 text-left">
-            {user?.userName
-              ? `${user.userName}, sana özel öneriler`
-              : "Öne Çıkan Ürünler"}
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-5">
-            {productsLoading ? (
-              Array.from({ length: 10 }).map((_, index) => (
-                <ProductTileSkeleton key={`product-skel-${index}`} />
-              ))
-            ) : productList && productList.length > 0 ? (
-              productList.map((productItem) => (
-                <ShoppingProductTile
-                  key={productItem._id}
-                  product={productItem}
-                  handleGetProductDetails={handleGetProductDetails}
-                  handleAddtoCart={() =>
-                    handleAddtoCart(productItem._id, productItem.totalStock)
-                  } // totalStock iletildi
-                />
-              ))
-            ) : (
-              <p className="col-span-full text-center py-10 text-gray-500">
-                Gösterilecek öne çıkan ürün bulunamadı.
-              </p>
-            )}
-          </div>
-        </div>
-      </section> */}
-
       {/* BÖLÜM 3: YATAY KAYDIRILABİLİR ÜRÜNLER */}
       <ProductCarousel
-        title={
-          user?.userName
-            ? `${user.userName}, sana özel öneriler`
-            : "Öne Çıkan Ürünler"
-        }
+        // ${user.userName},
+        title={user?.userName ? `Sana özel öneriler` : "Öne Çıkan Ürünler"}
         products={productList} // Mevcut productList'i kullanıyoruz
         isLoading={productsLoading} // Yüklenme durumunu iletiyoruz
         handleGetProductDetails={handleGetProductDetails}
         handleAddtoCart={handleAddtoCart} // Fonksiyonu doğru iletiyoruz
       />
 
-      {/* Örnek 1: Statik Başlık */}
       {/* --- YENİ: KADIN KATEGORİSİ CAROUSEL'I --- */}
-      {/* Sadece kadın ürünleri varsa veya yüklenmiyorsa göster */}
       {(womenProducts.length > 0 || womenProductsLoading) && (
         <ProductCarousel
           title="Kadın" // Başlığı güncelle
@@ -432,10 +392,8 @@ function ShoppingHome() {
           handleAddtoCart={handleAddtoCart}
         />
       )}
-      {/* Örnek 2: Başka bir kategori (veri backend'den gelmeli) */}
 
       {/* --- YENİ: ERKEK KATEGORİSİ CAROUSEL'I --- */}
-      {/* Sadece erkek ürünleri varsa veya yüklenmiyorsa göster */}
       {(menProducts.length > 0 || menProductsLoading) && (
         <ProductCarousel
           title="Erkek" // Başlığı güncelle

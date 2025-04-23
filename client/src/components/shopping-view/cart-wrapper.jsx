@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
+import PropTypes from "prop-types";
 
 import UserCartItemsContent from "./cart-items-content";
 import {
   SheetContent,
   SheetDescription, // Açıklama için eklenebilir
-  SheetFooter, // Footer için eklenebilir (opsiyonel, manuel div de olur)
   SheetHeader,
   SheetTitle,
 } from "../ui/sheet";
@@ -34,40 +34,12 @@ function UserCartWrapper({ cartItems, setOpenCartSheet }) {
     setOpenCartSheet(false); // Sheet'i kapat
   };
 
-  // return (
-  //   <SheetContent className="sm:max-w-md">
-  //     <SheetHeader>
-  //       <SheetTitle>Sepetiniz</SheetTitle>
-  //     </SheetHeader>
-  //     <div className="mt-8 space-y-4">
-  //       {cartItems && cartItems.length > 0
-  //         ? cartItems.map((item) => <UserCartItemsContent cartItem={item} />)
-  //         : null}
-  //     </div>
-  //     <div className="mt-8 space-y-4">
-  //       <div className="flex justify-between">
-  //         <span className="font-bold">Toplam</span>
-  //         <span className="font-bold">{totalCartAmount} TL</span>
-  //       </div>
-  //     </div>
-  //     <Button
-  //       onClick={() => {
-  //         navigate("/shop/checkout");
-  //         setOpenCartSheet(false);
-  //       }}
-  //       className="w-full mt-6"
-  //     >
-  //       Ödeme Sayfasına Git
-  //     </Button>
-  //   </SheetContent>
-  // );
-
   return (
     // sm:max-w-lg daha geniş bir panel için
     <SheetContent className="sm:max-w-lg flex flex-col">
       <SheetHeader className="px-6 pt-6 pb-4 border-b">
         <SheetTitle className="text-lg font-semibold">Sepetiniz</SheetTitle>
-        {/* İsteğe bağlı: Sepette kaç ürün olduğunu belirten bir açıklama */}
+
         {cartItems && cartItems.length > 0 && (
           <SheetDescription>
             {cartItems.length} ürün sepetinizde bulunuyor.
@@ -75,20 +47,13 @@ function UserCartWrapper({ cartItems, setOpenCartSheet }) {
         )}
       </SheetHeader>
 
-      {/* Ürün Listesi (Kaydırılabilir Alan) */}
       <div className="flex-1 overflow-y-auto">
-        {" "}
-        {/* flex-1 ile genişleyip kalan alanı doldurur */}
         <div className="p-6 space-y-4">
-          {" "}
-          {/* Padding ve ürünler arası boşluk */}
           {cartItems && cartItems.length > 0 ? (
             cartItems.map((item) => (
               <UserCartItemsContent
-                // Key olarak productId'yi kullanmak daha güvenli
                 key={item.productId?._id || item.productId}
                 cartItem={item}
-                // cart-wrapper içinde miktar değiştirme/silme işlemleri olacak
                 readOnly={false}
               />
             ))
@@ -120,12 +85,7 @@ function UserCartWrapper({ cartItems, setOpenCartSheet }) {
               {totalCartAmount.toFixed(2)} TL
             </span>
           </div>
-          <Button
-            onClick={handleCheckout}
-            className="w-full text-base py-3" // Daha belirgin buton
-            // Sepet boşsa butonu devre dışı bırakmaya gerek yok, çünkü bu bölüm zaten gösterilmeyecek
-            // disabled={!cartItems || cartItems.length === 0}
-          >
+          <Button onClick={handleCheckout} className="w-full text-base py-3">
             Ödeme Sayfasına Git
           </Button>
         </div>
@@ -133,5 +93,16 @@ function UserCartWrapper({ cartItems, setOpenCartSheet }) {
     </SheetContent>
   );
 }
+UserCartWrapper.propTypes = {
+  cartItems: PropTypes.arrayOf(
+    PropTypes.shape({
+      productId: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+      salePrice: PropTypes.number,
+      price: PropTypes.number,
+      quantity: PropTypes.number,
+    })
+  ),
+  setOpenCartSheet: PropTypes.func.isRequired,
+};
 
 export default UserCartWrapper;

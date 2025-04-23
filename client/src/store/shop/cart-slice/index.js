@@ -4,6 +4,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 const initialState = {
   cartItems: [],
   isLoading: false,
+  isCartOpen: false,
 };
 
 export const addToCart = createAsyncThunk(
@@ -63,7 +64,11 @@ export const updateCartQuantity = createAsyncThunk(
 const shoppingCartSlice = createSlice({
   name: "shoppingCart",
   initialState,
-  reducers: {},
+  reducers: {
+    setIsCartOpen: (state, action) => {
+      state.isCartOpen = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(addToCart.pending, (state) => {
@@ -113,4 +118,5 @@ const shoppingCartSlice = createSlice({
   },
 });
 
+export const { setIsCartOpen } = shoppingCartSlice.actions;
 export default shoppingCartSlice.reducer;

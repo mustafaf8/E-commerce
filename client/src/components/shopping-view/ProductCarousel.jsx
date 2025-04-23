@@ -78,13 +78,13 @@ function ProductCarousel({
   };
 
   return (
-    <section className=" bg-transparent relative group/carousel">
-      <div className="container mx-auto px-20 max-[1024px]:px-2">
+    <section className=" bg-transparent relative group/carousel pl-1">
+      <div className="container mx-auto px-20 max-[1024px]:px-0 ">
         <div className="flex items-center justify-between mb-0">
-          <h2 className="text-xl md:text-2xl font-semibold mb-5 text-gray-800 text-left">
+          <h1 className="text-xl md:text-lg font-semibold mb-0 text-gray-800 ">
             {title}
-          </h2>
-          <h1 className="flex items-center text-sm md:text-base font-semibold text-red-600 cursor-pointer hover:text-gray-700 transition duration-200 ease-in-out">
+          </h1>
+          <h1 className="flex items-center text-sm font-semibold text-red-600 cursor-pointer hover:text-gray-700 transition duration-200 ease-in-out">
             Tüm Ürünler <ChevronRightIcon className="w-5 h-5 text-gray-500" />
           </h1>
         </div>
@@ -106,7 +106,10 @@ function ProductCarousel({
             ))
           ) : products && products.length > 0 ? (
             products.map((productItem) => (
-              <div key={productItem._id} className="flex-shrink-0 w-60 md:w-64">
+              <div
+                key={productItem._id}
+                className="flex-shrink-0 w-60 max-sm:w-48 max-md:w-48"
+              >
                 <ShoppingProductTile
                   product={productItem}
                   handleGetProductDetails={handleGetProductDetails}
@@ -127,7 +130,7 @@ function ProductCarousel({
       <Button
         size="icon"
         className={cn(
-          "absolute top-1/2 left-0 md:left-28 z-20 transform -translate-y-[60%] bg-white/70 hover:bg-white border-2 border-gray-400 rounded-full h-8 w-8 shadow-xl transition-opacity duration-300",
+          "absolute top-1/2 left-0 md:left-28 z-20 transform -translate-y-[60%] bg-white/70 hover:bg-white border-2 border-gray-400 rounded-full h-8 w-8 shadow-xl transition-opacity duration-300 max-[1024px]:hidden",
 
           !isLoading && canScrollLeft
             ? "opacity-100"
@@ -142,7 +145,7 @@ function ProductCarousel({
       <Button
         size="icon"
         className={cn(
-          "absolute top-1/2 right-0 md:right-28 z-20 transform -translate-y-[60%] bg-white/70 hover:bg-white border-2 border-gray-400 rounded-full h-8 w-8 shadow-lg transition-opacity duration-300",
+          "absolute top-1/2 right-0 md:right-28 z-20 transform -translate-y-[60%] bg-white/70 hover:bg-white border-2 border-gray-400 rounded-full h-8 w-8 shadow-lg transition-opacity duration-300 max-[1024px]:hidden",
           !isLoading && canScrollRight
             ? "opacity-100"
             : "opacity-0 pointer-events-none" // Kaydırma mümkünse göster, değilse gizle ve tıklamayı engelle

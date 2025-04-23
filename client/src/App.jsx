@@ -269,6 +269,7 @@ import PaymentFailurePage from "./pages/shopping-view/PaymentFailurePage";
 import ShoppingWishlist from "./pages/shopping-view/wishlist";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import AboutUs from "./components/shopping-view/about-us";
+import BottomNavBar from "./components/common/BottomNavBar";
 
 function App() {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -391,6 +392,9 @@ function App() {
         {/* Bulunamayan Sayfalar */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <div className="bottom-nav-container">
+        <BottomNavBar />
+      </div>
     </div>
   );
 }

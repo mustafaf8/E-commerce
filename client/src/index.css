@@ -81,8 +81,76 @@
     text-decoration-color: red;
   }
 }
+
+/* Mevcut stiller */
+/* ... */
+
+/* Alt navigasyon çubuğu stilleri */
+.bottom-nav {
+  display: none; /* Varsayılan olarak gizle */
+}
+
+/* Küçük ekranlarda göster */
+@media (max-width: 2024px) {
+  .bottom-nav {
+    display: flex; /* Küçük ekranlarda göster */
+  }
+}
+
+/* Ekran görüntüsündeki gibi görünmesi için */
+.bottom-nav-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 50; /* Diğer içeriklerin üzerinde olsun */
+}
+
+/* İkon boyutları ve renkleri gerekirse ayarlanabilir */
+.bottom-nav svg {
+  height: 24px;
+  width: 24px;
+}
+
+.bottom-nav a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-decoration: none;
+  color: #6b7280; /* Varsayılan renk */
+}
+
+.bottom-nav a.active {
+  color: #e67e22; /* Seçili ikonun rengi (örneğin turuncu) */
+}
+
+.bottom-nav span {
+  font-size: 0.75rem; /* Etiket boyutunu küçült */
+  margin-top: 0.25rem;
+}
+
+/* ... Diğer stiller ... */
+
+.cart-count-badge {
+  position: absolute;
+  top: -8px; /* İkonun üstüne konumlandır */
+  right: -8px;
+  background-color: red;
+  color: white;
+  border-radius: 50%; /* Daire şekli */
+  padding: 0.2rem 0.4rem; /* İç boşluk */
+  font-size: 0.75rem; /* Yazı boyutu */
+  font-weight: bold;
+  z-index: 10; /* İkonun üzerinde görünsün */
+  min-width: 1rem; /* Minimum genişlik */
+  text-align: center;
+}
 * {
-  outline: 3px solid rgba(255, 0, 0, 0.3) !important; /* İnce, yarı saydam kırmızı outline */
+  /* outline: 3px solid rgba(255, 0, 0, 0.3) !important; */
   /* VEYA Farklı bir stil deneyebilirsin: */
   /* outline: 1px dotted blue !important; */
 }
