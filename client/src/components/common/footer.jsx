@@ -7,8 +7,6 @@ import {
   Twitter, // X ikonu yerine Twitter kullanabiliriz
   Facebook,
   Linkedin,
-  Smartphone, // Mobil uygulama ikonu
-  PhoneCall, // Telefon ikonu
   MessageSquare, // WhatsApp/Destek ikonu
   ArrowUpCircle, // Başa dön ikonu
 } from "lucide-react";
@@ -17,11 +15,6 @@ import {
 // import visaLogo from '@/assets/payment/visa.png';
 // import mastercardLogo from '@/assets/payment/mastercard.png';
 // ... diğer logolar
-
-// Uygulama mağazası logoları (bunlar da muhtemelen resim olacak)
-// import appStoreBadge from '@/assets/badges/appstore.png';
-// import googlePlayBadge from '@/assets/badges/googleplay.png';
-// import appGalleryBadge from '@/assets/badges/appgallery.png';
 
 const Footer = () => {
   const scrollToTop = () => {
@@ -47,12 +40,11 @@ const Footer = () => {
 
   // Örnek Uygulama Mağazası Rozetleri
   const appBadges = [
-    { store: "App Store", url: "/placeholder-appstore.png", link: "#" },
     { store: "Google Play", url: "/placeholder-googleplay.png", link: "#" },
   ];
 
   return (
-    <footer className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 pt-10 pb-4">
+    <footer className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 pt-10 pb-4 max-[1024px]:pb-16">
       <div className="container mx-auto px-4">
         {/* Üst Kısım: Linkler, Sosyal Medya, Uygulamalar, Müşteri Hizmetleri */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-8">
@@ -78,30 +70,7 @@ const Footer = () => {
                   İş Ortaklarımız
                 </Link>
               </li>
-              <li>
-                <Link
-                  to="/yatirimci-iliskileri"
-                  className="hover:text-primary dark:hover:text-secondary"
-                >
-                  Yatırımcı İlişkileri
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/musteri-hizmetleri"
-                  className="hover:text-primary dark:hover:text-secondary"
-                >
-                  Müşteri Hizmetleri
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/kariyer"
-                  className="hover:text-primary dark:hover:text-secondary"
-                >
-                  Kariyer
-                </Link>
-              </li>
+
               <li>
                 <Link
                   to="/kvkk"
@@ -138,7 +107,7 @@ const Footer = () => {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
-                  to="/siparislerim"
+                  to="/shop/account"
                   className="hover:text-primary dark:hover:text-secondary"
                 >
                   Siparişlerim
@@ -146,20 +115,13 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/hesabim"
+                  to="/shop/account"
                   className="hover:text-primary dark:hover:text-secondary"
                 >
                   Hesabım
                 </Link>
               </li>
-              <li>
-                <Link
-                  to="/yardim"
-                  className="hover:text-primary dark:hover:text-secondary"
-                >
-                  Yardım
-                </Link>
-              </li>
+
               {/* ... diğer linkler */}
               <li>
                 <Link
@@ -180,7 +142,7 @@ const Footer = () => {
             <ul className="space-y-2 text-sm">
               <li>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/rmrenerjisistemleri/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center hover:text-primary dark:hover:text-secondary"
@@ -188,63 +150,16 @@ const Footer = () => {
                   <Instagram size={16} className="mr-2" /> Instagram
                 </a>
               </li>
-              <li>
-                <a
-                  href="#"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center hover:text-primary dark:hover:text-secondary"
-                >
-                  <Youtube size={16} className="mr-2" /> Youtube
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center hover:text-primary dark:hover:text-secondary"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 mr-2"
-                    fill="currentColor"
-                    viewBox="0 0 16 16"
-                  >
-                    <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z" />
-                  </svg>{" "}
-                  TikTok
-                </a>
-              </li>{" "}
+
               {/* TikTok ikonu için SVG */}
               <li>
                 <a
-                  href="#"
+                  href="https://www.facebook.com/rmr.enerji/?locale=tr_TR"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center hover:text-primary dark:hover:text-secondary"
                 >
                   <Facebook size={16} className="mr-2" /> Facebook
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center hover:text-primary dark:hover:text-secondary"
-                >
-                  <Twitter size={16} className="mr-2" /> X (Twitter)
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center hover:text-primary dark:hover:text-secondary"
-                >
-                  <Linkedin size={16} className="mr-2" /> LinkedIn
                 </a>
               </li>
             </ul>
@@ -281,12 +196,6 @@ const Footer = () => {
               Aklınıza takılan bir soru mu var?
             </h5>
             <div className="space-y-3">
-              <button className="w-full bg-gray-200 dark:bg-gray-700 px-4 py-2 rounded text-left text-xs font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
-                Çözüm Merkezine bağlanın
-              </button>
-              <p className="text-center text-xs text-gray-500 dark:text-gray-400">
-                veya
-              </p>
               <p className="font-medium">Çağrı Merkezimizi arayın</p>
               <a
                 href="tel:08502524000"
@@ -295,10 +204,10 @@ const Footer = () => {
                 0000 000 00 00
               </a>
               <a
-                href="https://wa.me/"
+                href="https://wa.me/+905347168754"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center text-green-600 hover:text-green-700 font-medium"
+                className="flex items-center justify-start text-green-600 hover:text-green-700 font-medium"
               >
                 <MessageSquare size={16} className="mr-1" /> WhatsApp Destek
               </a>

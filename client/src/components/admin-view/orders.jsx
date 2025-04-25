@@ -72,7 +72,7 @@ function AdminOrdersView() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Tüm Siparişler</CardTitle>
+        <CardTitle>Tüm Siparişler admin icin</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
@@ -113,35 +113,6 @@ function AdminOrdersView() {
                     <TableCell>{formattedDate}</TableCell>{" "}
                     {/* Formatlanmış tarih */}
                     <TableCell>
-                      {/* <Badge
-                        variant={
-                          // Duruma göre variant
-                          orderItem?.orderStatus === "confirmed"
-                            ? "default"
-                            : orderItem?.orderStatus === "pending"
-                            ? "secondary"
-                            : orderItem?.orderStatus === "failed" ||
-                              orderItem?.orderStatus === "rejected"
-                            ? "destructive"
-                            : "outline"
-                        }
-                      >
-                        {orderItem?.orderStatus || "Bilinmiyor"}
-                      </Badge> */}
-                      {/* <Badge
-                        className={`p-1 px-3 w-20 justify-center ${
-                          orderItem?.orderStatus === "confirmed"
-                            ? "bg-green-500" // Onaylandı -> Yeşil
-                            : orderItem?.orderStatus === "rejected"
-                            ? "bg-red-600" // Reddedildi -> Kırmızı
-                            : orderItem?.orderStatus === "inProcess" ||
-                              orderItem?.orderStatus === "inShipping"
-                            ? "bg-orange-300" // Hazırlanıyor veya Kargoda -> Turuncu
-                            : "bg-black" // Diğer tüm durumlar -> Siyah
-                        }`}
-                      >
-                        {orderItem?.orderStatus}
-                      </Badge> */}
                       <Badge
                         className={`p-1 px-3 w-24 justify-center ${
                           statusMapping[orderItem?.orderStatus]?.color ||
@@ -169,7 +140,6 @@ function AdminOrdersView() {
                 );
               })
             ) : (
-              // Sipariş yoksa gösterilecek mesaj
               <TableRow>
                 <TableCell colSpan={5} className="text-center">
                   Gösterilecek sipariş bulunamadı.

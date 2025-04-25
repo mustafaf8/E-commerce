@@ -145,7 +145,7 @@ function ProductCarousel({
       <Button
         size="icon"
         className={cn(
-          "absolute top-1/2 right-0 md:right-28 z-20 transform -translate-y-[60%] bg-white/70 hover:bg-white border-2 border-gray-400 rounded-full h-8 w-8 shadow-lg transition-opacity duration-300 max-[1024px]:hidden",
+          "absolute top-1/2 right-0 md:right-28 z-20 transform -translate-y-[60%] bg-white/70 hover:bg-white border-2 border-gray-400 rounded-full h-8 w-8 shadow-lg transition-opacity duration-300 max-sm:h-6 max-md:h-6 max-sm:w-6 max-md:w-6",
           !isLoading && canScrollRight
             ? "opacity-100"
             : "opacity-0 pointer-events-none" // Kaydırma mümkünse göster, değilse gizle ve tıklamayı engelle

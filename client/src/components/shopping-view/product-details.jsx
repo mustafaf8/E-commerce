@@ -868,36 +868,22 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
   return (
     <Dialog open={open} onOpenChange={handleDialogClose}>
       <DialogContent className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 p-6 sm:p-8 lg:p-10 max-w-[90vw] sm:max-w-3xl lg:max-w-4xl max-h-[90vh] overflow-hidden">
-        {" "}
-        {/* Padding ve gap ayarlandı, max-w artırıldı */}
-        {/* Sol Taraf: Resim */}
         <div className="relative overflow-hidden rounded-lg aspect-w-1 aspect-h-1 flex items-center justify-center bg-gray-100 border">
-          {" "}
-          {/* Aspect ratio ve border eklendi */}
           {productDetails?.image ? (
             <img
               src={productDetails.image}
               alt={productDetails.title}
-              className="w-full h-full object-contain" // Contain ile resmin tamamı görünür
+              className="w-full h-full object-contain"
             />
           ) : (
             <span className="text-gray-400">Resim Yok</span>
           )}
         </div>
-        {/* Sağ Taraf: Detaylar ve Yorumlar */}
+
         <div className="flex flex-col max-h-[calc(90vh-4rem)]">
-          {" "}
-          {/* Sağ tarafın yüksekliği dialog yüksekliğine göre ayarlandı */}
-          {/* Üst Kısım: Ürün Bilgileri ve Butonlar */}
           <div className="flex-shrink-0 pb-4 mb-4 border-b">
-            {" "}
-            {/* Daha fazla alt boşluk */}
             <div className="flex justify-between items-start mb-2">
-              {" "}
-              {/* Alt boşluk azaltıldı */}
               <h1 className="text-xl sm:text-2xl font-bold pr-2 text-gray-900">
-                {" "}
-                {/* Daha belirgin başlık */}
                 {productDetails.title}
               </h1>
               <Button
@@ -909,7 +895,6 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
               >
                 <Heart
                   className={`w-5 h-5 ${
-                    // İkon boyutu küçültüldü
                     isWishlisted ? "fill-red-500 text-red-500" : ""
                   }`}
                 />
@@ -919,64 +904,64 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
               </Button>
             </div>
             <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-              {" "}
-              {/* Daha küçük font, satır aralığı */}
               {productDetails.description}
             </p>
-            {/* ------- FİYAT GÖSTERİMİ BAŞLANGIÇ (product-tile.jsx'ten uyarlandı) ------- */}
-            <div
-              className={`flex items-baseline gap-x-2 mb-2 ${
-                // items-baseline ve gap-x-2 eklendi
-                productDetails.price &&
-                productDetails.price > 0 &&
-                productDetails.salePrice &&
-                productDetails.salePrice > 0
-                  ? "justify-start" // Detay sayfasında sola yaslı daha iyi görünebilir
-                  : "justify-start"
-              }`}
-            >
-              {/* Orijinal Fiyat */}
-              {productDetails.price && productDetails.price > 0 && (
-                <p
-                  className={`font-semibold ${
-                    // Kalınlık ayarlandı
-                    productDetails.salePrice && productDetails.salePrice > 0
-                      ? "line-through text-gray-400 text-lg" // Üstü çizili, soluk ve biraz daha büyük
-                      : "text-gray-900 text-2xl" // İndirim yoksa ana fiyat, daha büyük
-                  }`}
+            {/* ------- FİYAT GÖSTERİMİ BAŞLANGIÇ*/}
+            <div className="py-2">
+              {productDetails?.salePrice !== undefined &&
+              productDetails.salePrice !== null ? (
+                <div
+                  className={`flex items-center ${
+                    productDetails?.price &&
+                    productDetails.price > 0 &&
+                    productDetails.price > productDetails.salePrice
+                      ? "justify-between"
+                      : "justify-start"
+                  } gap-x-2`}
                 >
-                  {`${productDetails.price.toFixed(2)} TL`}{" "}
-                  {/* toFixed(2) eklendi */}
-                </p>
-              )}
+                  {productDetails?.price &&
+                    productDetails.price > 0 &&
+                    productDetails.price > productDetails.salePrice && (
+                      <p className="line-through text-lg text-gray-400 ">
+                        {`${productDetails.price.toFixed(2)} TL`}
+                      </p>
+                    )}
 
-              {/* İndirimli Fiyat */}
-              {productDetails.salePrice && productDetails.salePrice > 0 && (
-                <span className="text-2xl font-bold text-green-600">
-                  {" "}
-                  {/* Boyut büyütüldü */}
-                  {`${productDetails.salePrice.toFixed(2)} TL`}{" "}
-                  {/* toFixed(2) eklendi */}
-                </span>
-              )}
-
-              {/* HİÇ FİYAT YOKSA */}
-              {!productDetails.price && !productDetails.salePrice && (
-                <span className="text-sm text-gray-500">Fiyat Bilgisi Yok</span>
+                  <p
+                    className={`font-bold ${
+                      productDetails?.price &&
+                      productDetails.price > 0 &&
+                      productDetails.price > productDetails.salePrice
+                        ? "text-2xl text-green-600"
+                        : "text-2xl text-black"
+                    }`}
+                  >
+                    {`${productDetails.salePrice.toFixed(2)} TL`}
+                  </p>
+                </div>
+              ) : productDetails?.price && productDetails.price > 0 ? (
+                <div className="flex justify-start">
+                  <p className="text-lg font-semibold text-black">
+                    {`${productDetails.price.toFixed(2)} TL`}
+                  </p>
+                </div>
+              ) : (
+                <div className="flex justify-start">
+                  <span className="text-lg text-muted-foreground">
+                    Fiyat Bilgisi Yok
+                  </span>
+                </div>
               )}
             </div>
             {/* ------- FİYAT GÖSTERİMİ SON ------- */}
             <div className="flex items-center mt-1 mb-3">
-              {" "}
-              {/* Boşluk ayarları */}
               <div className="flex items-center gap-0.5">
                 <StarRatingComponent rating={averageReview} />
               </div>
               <span className="text-xs text-gray-500 font-medium ml-1.5">
-                {" "}
-                {/* Font ve renk ayarı */}({averageReview.toFixed(1)}){" "}
-                {/* toFixed(1) eklendi */}
+                ({averageReview.toFixed(1)})
               </span>
+
               {/* Yorum sayısını gösterme (opsiyonel) */}
               {reviews && reviews.length > 0 && (
                 <span className="ml-2 text-xs text-gray-400">

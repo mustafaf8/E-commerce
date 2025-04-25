@@ -59,7 +59,7 @@ export const checkAuth = createAsyncThunk(
   "/auth/checkauth",
 
   async () => {
-    console.log("logoutUser fulfilled. Clearing auth state.");
+    // console.log("logoutUser fulfilled. Clearing auth state.");
     const response = await axios.get(
       "http://localhost:5000/api/auth/check-auth",
       {
@@ -72,6 +72,26 @@ export const checkAuth = createAsyncThunk(
     );
 
     return response.data;
+  }
+);
+
+export const updateUserDetails = createAsyncThunk(
+  "/auth/update",
+  async (formData, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        "http://localhost:5000/api/auth/update",
+        formData,
+        { withCredentials: true }
+      );
+      if (response.data.success) {
+        return response.data;
+      } else {
+        return rejectWithValue(response.data);
+      }
+    } catch (error) {
+      return rejectWithValue({ message: "Güncelleme sırasında hata oluştu" });
+    }
   }
 );
 

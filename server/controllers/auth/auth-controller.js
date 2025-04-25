@@ -270,4 +270,60 @@ const authMiddleware = async (req, res, next) => {
   }
 };
 
-module.exports = { registerUser, loginUser, logoutUser, authMiddleware };
+const updateUserDetails = async (req, res) => {
+  try {
+    const { userId } = req.user; // authMiddleware'den gelen kullanıcı ID'si
+    const { userName, email } = req.body;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Kullanıcı bulunamadı",
+      });
+    }
+
+    // Güncellenecek alanları kontrol et ve güncelle
+    if (userName) {
+      user.userName = userName;
+    }
+    if (email && email !== user.email) {
+      // E-posta değiştiriliyorsa, benzersizliğini kontrol et
+      const emailExists = await User.findOne({ email });
+      if (emailExists && emailExists._id.toString() !== userId) {
+        return res.status(400).json({
+          success: false,
+          message: "Bu e-posta adresi zaten kullanımda.",
+        });
+      }
+      user.email = email;
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Kullanıcı bilgileri güncellendi",
+      user: {
+        id: user._id,
+        userName: user.userName,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.error("Kullanıcı güncelleme hatası:", error);
+    res.status(500).json({
+      success: false,
+      message: "Kullanıcı bilgileri güncellenirken hata oluştu.",
+    });
+  }
+};
+
+module.exports = {
+  registerUser,
+  loginUser,
+  logoutUser,
+  authMiddleware,
+  updateUserDetails,
+};

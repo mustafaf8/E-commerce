@@ -266,3 +266,20 @@ export const addressFormControls = [
     layout: "full", // Tam genişlik kaplasın
   },
 ];
+
+export const userInfoFormControls = [
+  {
+    name: "userName",
+    label: "Kullanıcı Adı",
+    componentType: "input",
+    type: "text",
+  },
+  {
+    name: "email",
+    label: "E-posta",
+    componentType: "input",
+    type: "email",
+    // disabled: true, // E-posta düzenlenemezse bu satırı ekleyin
+  },
+  // Diğer alanlar eklenebilir (örneğin, profil fotoğrafı, telefon numarası vb.)
+];

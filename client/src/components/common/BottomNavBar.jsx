@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Home, List, ShoppingCart, User, LayoutGrid } from "lucide-react";
+import { Home, ShoppingCart, User, LayoutGrid, Heart } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet"; // Sheet bileşenlerini import edin
 import UserCartWrapper from "../shopping-view/cart-wrapper";
@@ -9,31 +9,32 @@ const BottomNavBar = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [openCartSheet, setOpenCartSheet] = useState(false); // Sheet durumunu kontrol etmek için state ekleyin
-
+  const [openCartSheet, setOpenCartSheet] = useState(false); // Sheet
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.shopCart);
 
   const navItems = [
     { to: "/shop/home", label: "Keşfet", icon: <Home size={24} /> },
-    { to: "/shop/listing", label: "Listelerim", icon: <List size={24} /> },
+    { to: "/shop/wishlist", label: "Beğendiklerim", icon: <Heart size={24} /> },
     { to: "/shop/cart", label: "Sepetim", icon: <ShoppingCart size={24} /> },
-    { to: "/shop/account", label: "Hesabım", icon: <User size={24} /> },
     {
-      to: "/shop/categories",
+      to: "/shop/listing",
       label: "Kategoriler",
       icon: <LayoutGrid size={24} />,
     },
+    { to: "/shop/account", label: "Hesabım", icon: <User size={24} /> },
   ];
+
+  const uniqueProductCount = cartItems?.items
+    ? new Set(cartItems.items.map((item) => item.productId)).size
+    : 0;
 
   return (
     <>
-      {/* Sheet bileşenini ekleyin */}
       <Sheet open={openCartSheet} onOpenChange={setOpenCartSheet}>
         <UserCartWrapper
           setOpenCartSheet={setOpenCartSheet}
           cartItems={
-            // Sepet içeriğini sadece giriş yapmışsa gönder
             isAuthenticated &&
             cartItems &&
             cartItems.items &&
@@ -45,7 +46,7 @@ const BottomNavBar = () => {
       </Sheet>
 
       {/* Navbar */}
-      <nav className="fixed bottom-0 left-0 w-full bg-white shadow-md z-50 bottom-nav">
+      <nav className="fixed bottom-0 left-0 w-full bg-white shadow-md z-50 bottom-nav ">
         <ul className="flex w-full justify-around items-center h-16">
           {navItems.map((item) => (
             <li
@@ -55,7 +56,6 @@ const BottomNavBar = () => {
               <div
                 onClick={() => {
                   if (item.to === "/shop/cart") {
-                    // Sepet butonu için Sheet'i aç
                     setOpenCartSheet(true);
                   } else {
                     navigate(item.to);
@@ -68,10 +68,7 @@ const BottomNavBar = () => {
                 {item.icon}
                 {item.to === "/shop/cart" && cartItems?.items?.length > 0 && (
                   <span className="absolute top-0 right-0 transform translate-x-2 -translate-y-2 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5 font-bold">
-                    {cartItems.items.reduce(
-                      (total, item) => total + item.quantity,
-                      0
-                    )}
+                    {uniqueProductCount}
                   </span>
                 )}
                 <span className="text-xs">{item.label}</span>

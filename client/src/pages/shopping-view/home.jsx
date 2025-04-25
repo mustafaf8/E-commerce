@@ -178,11 +178,11 @@ function ShoppingHome() {
   const accesProductsLoading = productsLoading;
 
   return (
-    <div className="flex flex-col min-h-screen outline: 2px solid red">
+    <div className="flex flex-col min-h-screen">
       {/* BÖLÜM 1: PROMOSYON KARTLARI (Değişiklik yok) */}
-      <section className="bg-white pt-8 pb-2 no-scrollbar">
+      {/* <section className="bg-white pt-8 pb-2 no-scrollbar">
         <div className="container mx-auto px-20 max-[1024px]:px-0">
-          <div className="flex space-x-3 overflow-x-auto pb-2 max-mx-4 px-4 no-scrollbar">
+          <div className="flex justify-center items-center pb-2 px-4 no-scrollbar promo-card-container">
             {promoCardsLoading ? (
               Array.from({ length: 9 }).map((_, index) => (
                 <Card
@@ -203,7 +203,7 @@ function ShoppingHome() {
                 <Card
                   key={promoCard._id}
                   onClick={() => handlePromoCardClick(promoCard.link)}
-                  className={`relative flex-shrink-0 w-[125px] h-[125px] rounded-lg overflow-hidden ${
+                  className={`relative flex-shrink-0 w-[125px] h-[125px] w-h1400 w-h1200  rounded-lg overflow-hidden ${
                     promoCard.link ? "cursor-pointer" : ""
                   } `}
                 >
@@ -231,21 +231,67 @@ function ShoppingHome() {
             )}
           </div>
         </div>
+      </section> */}
+
+      {/* BÖLÜM 1: PROMOSYON KARTLARI */}
+      <section className="bg-white pt-8 pb-2">
+        <div className="container mx-auto px-4 lg:px-20">
+          <div className="promo-card-container">
+            {promoCardsLoading ? (
+              // Yükleme durumu için iskelet gösterimi
+              Array.from({ length: 8 }).map((_, index) => (
+                <Card
+                  key={`promo-skel-${index}`}
+                  className="promo-card relative flex-shrink-0 rounded-lg overflow-hidden bg-gray-100"
+                >
+                  <Skeleton className="w-full h-full" />
+                  <div className="absolute bottom-0 left-0 right-0 p-1.5 pt-4">
+                    <Skeleton className="h-3 w-4/5 mb-1" />
+                    <Skeleton className="h-3 w-3/5" />
+                  </div>
+                </Card>
+              ))
+            ) : promoCardList && promoCardList.length > 0 ? (
+              promoCardList.slice(0, 8).map((promoCard) => (
+                <Card
+                  key={promoCard._id}
+                  onClick={() => handlePromoCardClick(promoCard.link)}
+                  className={`promo-card relative flex-shrink-0 rounded-lg overflow-hidden ${
+                    promoCard.link ? "cursor-pointer" : ""
+                  }`}
+                >
+                  <CardContent className="p-0 h-full">
+                    <img
+                      src={promoCard.image}
+                      alt={promoCard.title || "Promosyon"}
+                      className="w-full h-full object-contain transition-transform duration-300"
+                      loading="lazy"
+                    />
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <div className="w-full text-center py-5 text-gray-500">
+                Deposunda Aktif fırsat yok.
+              </div>
+            )}
+          </div>
+        </div>
       </section>
 
       {/* BÖLÜM 2: ORTADAKİ BANNER ALANI (SOL SLIDER, SAĞ STATİK) */}
       <section className="my-4 md:my-4 container mx-auto px-20 max-[1024px]:px-1">
         {featuresLoading || sideBannersLoading ? (
-          <div className="flex flex-col md:flex-row gap-4 h-[200px] max-sm:h-[100px] max-md:h-[120px]">
+          <div className="flex flex-col md:flex-row gap-4 h-60 max-sm:h-[100px] max-md:h-[120px]">
             {/* Daha belirgin bir gri tonu veya hafif bir animasyon eklenebilir */}
-            <Skeleton className="w-full md:w-[65%] h-full rounded-2xl bg-gray-200 animate-pulse" />
-            <Skeleton className="w-full md:w-[35%] h-full rounded-2xl bg-gray-200 animate-pulse" />
+            <Skeleton className="w-full md:w-[65%] h-full rounded-3xl bg-gray-200 animate-pulse" />
+            <Skeleton className="w-full md:w-[35%] h-full rounded-3xl bg-gray-200 animate-pulse" />
           </div>
         ) : (
-          <div className="flex flex-col md:flex-row gap-4 items-stretch">
+          <div className="flex flex-col md:flex-row gap-4 ">
             {/* Sol Ana Banner (Artık Slider) */}
             <div
-              className={`relative w-full md:w-[65%] rounded-3xl overflow-hidden shadow-sm group max-sm:h-32 max-md:h-48`}
+              className={`relative w-full md:w-[65%] rounded-3xl overflow-hidden shadow-sm group max-sm:h-32 max-md:h-48 h-60`}
             >
               {featureImageList && featureImageList.length > 0 ? (
                 featureImageList.map((slide, index) => (
@@ -286,7 +332,7 @@ function ShoppingHome() {
                           featureImageList.length
                       );
                     }}
-                    className="absolute top-1/2 left-3 z-20 transform -translate-y-1/2 bg-white/60 hover:bg-white rounded-full h-8 w-8 shadow-md" // z-index ve stil
+                    className="absolute top-1/2 left-3 z-20 transform -translate-y-1/2 bg-white/60 hover:bg-white rounded-full h-8 w-8 max-sm:h-6 max-md:h-6 max-sm:w-6 max-md:w-6" // z-index ve stil
                   >
                     <ChevronLeftIcon className="w-5 h-5 text-gray-700" />
                   </Button>
@@ -299,7 +345,7 @@ function ShoppingHome() {
                         (prev) => (prev + 1) % featureImageList.length
                       );
                     }}
-                    className="absolute top-1/2 right-3 z-20 transform -translate-y-1/2 bg-white/60 hover:bg-white rounded-full h-8 w-8 shadow-md" // z-index ve stil
+                    className="absolute top-1/2 right-3 z-20 transform -translate-y-1/2 bg-white/60 hover:bg-white rounded-full h-8 w-8 shadow-md max-sm:h-6 max-md:h-6 max-sm:w-6 max-md:w-6" // z-index ve stil
                   >
                     <ChevronRightIcon className="w-5 h-5 text-gray-700" />
                   </Button>
@@ -309,7 +355,7 @@ function ShoppingHome() {
 
             {/* Sağ Yan Banner (Manuel Slider) */}
             <div
-              className={`relative w-full md:w-[35%] rounded-3xl overflow-hidden shadow-sm group bg-gray-200 min-h-[200px] `}
+              className={`relative w-full md:w-[35%] rounded-3xl overflow-hidden shadow-sm group bg-gray-200 max-sm:h-32 max-md:h-48 h-60 max-[768px]:hidden`}
             >
               {/* sideBannerList'i map et ve currentSideBannerIndex'e göre göster */}
               {sideBannerList && sideBannerList.length > 0 ? (
@@ -349,7 +395,7 @@ function ShoppingHome() {
                       e.stopPropagation();
                       handleSideBannerNav(-1);
                     }} // YENİ handler'ı çağırır
-                    className="absolute top-1/2 left-3 z-20 transform -translate-y-1/2 bg-white/60 hover:bg-white rounded-full h-8 w-8 shadow-md"
+                    className="absolute top-1/2 left-3 z-20 transform -translate-y-1/2 bg-white/60 hover:bg-white rounded-full h-8 w-8 shadow-md max-sm:h-6 max-md:h-6 max-sm:w-6 max-md:w-6"
                   >
                     <ChevronLeftIcon className="w-5 h-5 text-gray-700" />
                   </Button>
@@ -361,7 +407,7 @@ function ShoppingHome() {
                       e.stopPropagation();
                       handleSideBannerNav(1);
                     }} // YENİ handler'ı çağırır
-                    className="absolute top-1/2 right-3 z-20 transform -translate-y-1/2 bg-white/60 hover:bg-white rounded-full h-8 w-8 shadow-md"
+                    className="absolute top-1/2 right-3 z-20 transform -translate-y-1/2 bg-white/60 hover:bg-white rounded-full h-8 w-8 shadow-md max-sm:h-6 max-md:h-6 max-sm:w-6 max-md:w-6"
                   >
                     <ChevronRightIcon className="w-5 h-5 text-gray-700" />
                   </Button>

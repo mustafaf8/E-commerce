@@ -332,9 +332,7 @@ function App() {
         {/* === ADMİN KORUMASI SONU === */}
 
         {/* Mağaza Rotaları */}
-        {/* ShoppingLayout herkes tarafından görülebilir */}
         <Route path="/shop" element={<ShoppingLayout />}>
-          {/* Herkese Açık Mağaza Rotaları */}
           <Route path="home" element={<ShoppingHome />} />
           <Route path="listing" element={<ShoppingListing />} />
           <Route path="search" element={<SearchProducts />} />

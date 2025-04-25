@@ -115,7 +115,7 @@ function HeaderRightContent() {
           onClick={() => setOpenCartSheet(true)}
           variant="outline"
           size="mustafa" // Özel boyutun uygun göründüğünden emin ol
-          className="relative inline-flex items-center" // Hizalama için
+          className="relative inline-flex items-center" //
         >
           <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
           {/* Sepet ürün sayısını sadece giriş yapmışsa ve ürün varsa göster */}
@@ -216,7 +216,7 @@ function ShoppingHeader() {
         </div>
 
         {/* Mobile Menu Sheet (Sağda) */}
-        <Sheet>
+        {/* <Sheet>
           <SheetTrigger asChild>
             <Button variant="outline" size="icon" className="lg:hidden">
               <Menu className="h-6 w-6" />
@@ -224,16 +224,14 @@ function ShoppingHeader() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-full max-w-xs">
-            {/* Önce menü itemleri */}
             <div className="mb-6">
               <MenuItems />
             </div>
-            {/* Sonra sağ içerik (login/avatar, sepet vs.) */}
             <div className="border-t pt-4">
               <HeaderRightContent />
             </div>
           </SheetContent>
-        </Sheet>
+        </Sheet> */}
 
         {/* Desktop Right Content (Avatar/Login) (Sağda) */}
         <div className="hidden lg:block">

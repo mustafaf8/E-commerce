@@ -36,7 +36,7 @@ function UserCartWrapper({ cartItems, setOpenCartSheet }) {
 
   return (
     // sm:max-w-lg daha geniş bir panel için
-    <SheetContent className="sm:max-w-lg flex flex-col">
+    <SheetContent className="sm:max-w-lg flex flex-col max-[500px]:px-0">
       <SheetHeader className="px-6 pt-6 pb-4 border-b">
         <SheetTitle className="text-lg font-semibold">Sepetiniz</SheetTitle>
 

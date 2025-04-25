@@ -12,20 +12,20 @@ function AdminHeader({ setOpen }) {
   const { toast } = useToast();
 
   function handleLogout() {
-    console.log("[handleLogout] Function called. Dispatching logoutUser...");
+    // console.log("[handleLogout] Function called. Dispatching logoutUser...");
     dispatch(logoutUser())
       .unwrap() // .unwrap() kullanmak promise'in sonucunu (fulfilled/rejected) yakalamayı kolaylaştırır
       .then(() => {
         // Dispatch başarılı olduğunda (Redux state güncellendiğinde) çalışır
-        console.log(
-          "[handleLogout] logoutUser dispatch successful. Navigating..."
-        );
+        // console.log(
+        //   "[handleLogout] logoutUser dispatch successful. Navigating..."
+        // );
         navigate("/shop/home"); // <-- 3. Başarılı çıkış sonrası yönlendir
       })
       .catch((error) => {
         // Eğer logoutUser thunk'ı reject olursa veya ağ hatası olursa burası çalışır
         console.error(
-          "[handleLogout] Error during dispatch or logout failed:",
+          "[handleLogout] Dispatch sırasında hata oluştu veya çıkış başarısız oldu:",
           error
         );
 

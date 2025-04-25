@@ -91,7 +91,7 @@
 }
 
 /* Küçük ekranlarda göster */
-@media (max-width: 2024px) {
+@media (max-width: 1024px) {
   .bottom-nav {
     display: flex; /* Küçük ekranlarda göster */
   }
@@ -149,8 +149,76 @@
   min-width: 1rem; /* Minimum genişlik */
   text-align: center;
 }
+
 * {
-  /* outline: 3px solid rgba(255, 0, 0, 0.3) !important; */
-  /* VEYA Farklı bir stil deneyebilirsin: */
-  /* outline: 1px dotted blue !important; */
+  /* outline: 3px solid rgba(255, 0, 0, 0.3);
+  outline: 1px dotted blue; */
+}
+
+/* Promosyon kartları için grid yapısı */
+.promo-card-container {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -ms-overflow-style: none; /* IE ve Edge için */
+  scrollbar-width: none; /* Firefox için */
+}
+
+.promo-card-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari ve Opera için */
+}
+
+/* Tüm kartların kenarlarını kaldır */
+.promo-card {
+  border: none !important; /* Border'ı tamamen kaldır */
+  box-shadow: none !important; /* Varsa gölgeyi de kaldır */
+}
+
+/* Card komponenti için border özelliğini geçersiz kıl */
+.promo-card-container .MuiCard-root,
+.promo-card-container .Card {
+  border: none !important;
+  border-width: 0 !important;
+  outline: none !important;
+}
+
+/* 800px'den küçük ekranlar için: 4 sütun 2 satır */
+@media (max-width: 699px) {
+  .promo-card-container {
+    grid-template-columns: repeat(4, 1fr); /* 4 sütun */
+    grid-template-rows: repeat(2, auto); /* 2 satır */
+    grid-auto-flow: row; /* Elemanları satır satır yerleştir */
+    max-height: none; /* Yükseklik sınırını kaldır */
+    gap: 5px;
+  }
+
+  /* Kart boyutları küçük ekranlar için */
+  .promo-card {
+    width: 100%;
+    height: 90px;
+  }
+}
+
+/* 800px ve üstü ekranlar için: 8 sütun 1 satır */
+@media (min-width: 700px) {
+  .promo-card-container {
+    grid-template-columns: repeat(8, 1fr); /* 8 sütun */
+    grid-template-rows: auto; /* 1 satır */
+    grid-auto-flow: column; /* Elemanları sütun sütun yerleştir */
+  }
+
+  /* Kart boyutları orta ekranlar için */
+  .promo-card {
+    width: 100%;
+    height: 110px;
+  }
+}
+
+/* Ekstra büyük ekranlar için kart boyutlarını artır */
+@media (min-width: 1200px) {
+  .promo-card {
+    height: 125px;
+  }
 }
