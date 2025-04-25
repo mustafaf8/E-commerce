@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import PropTypes from "prop-types";
 import { cn } from "@/lib/utils"; // cn utility'sini import et
+import { useMemo } from "react"; // useMemo eklendi
 
 function ProductCarousel({
   title,

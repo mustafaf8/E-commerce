@@ -35,8 +35,15 @@ const getFilteredProducts = async (req, res) => {
 
         break;
 
+      // --- YENİ CASE ---
+      case "salesCount-desc": // "En Çok Satanlar" için belirleyici (frontend'de de bu kullanılacak)
+        sort.salesCount = -1; // salesCount alanına göre azalan sırada (en çok satandan en aza)
+        break;
+      // --- ---
       default:
-        sort.price = 1;
+        // Varsayılan sıralama (isteğe bağlı, belki en çok satana çekilebilir?)
+        sort.salesCount = -1; // Varsayılanı en çok satana ayarlayabiliriz
+        // sort.price = 1; // Veya fiyata göre kalsın
         break;
     }
 

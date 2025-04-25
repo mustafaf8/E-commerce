@@ -564,13 +564,17 @@ const handleIyzicoCallback = async (req, res) => {
           order.paymentId = result.paymentId; // Iyzico'dan gelen ID
           order.orderUpdateDate = new Date();
 
-          // Stok Güncelle & Sepeti Sil (Hata yönetimi eklenebilir)
           try {
             for (let item of order.cartItems) {
               await Product.findByIdAndUpdate(item.productId, {
-                $inc: { totalStock: -item.quantity },
+                $inc: { totalStock: -item.quantity, salesCount: item.quantity },
               });
             }
+            // Tüm ürün güncellemelerinin bitmesini bekle (paralel çalıştır)
+            await Promise.all(productUpdatePromises);
+            console.log(
+              `Stok ve satış sayıları güncellendi (Order ID: ${orderId})`
+            );
             if (order.cartId) {
               await Cart.findByIdAndDelete(order.cartId);
             }

@@ -38,9 +38,13 @@ function ShoppingHome() {
     (state) => state.sideBanners || { sideBannerList: [], isLoading: false }
   );
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
-  //..
+
   const { user, isAuthenticated } = useSelector((state) => state.auth);
-  //..
+
+  // --- YENİ STATE'LER: En Çok Satanlar için ---
+  const [bestSellingProducts, setBestSellingProducts] = useState([]);
+  const [bestSellingLoading, setBestSellingLoading] = useState(true); // Başlangıçta yükleniyor
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -115,13 +119,43 @@ function ShoppingHome() {
   }, [featureImageList]); // Sadece liste değiştiğinde veya dolduğunda çalışsın
 
   // İlk yüklemede verileri fetch et
+  // --- Ana Veri Çekme useEffect'i (En Çok Satanlar Eklendi) ---
   useEffect(() => {
+    // Öne çıkan ürünleri (varsa) veya genel ürünleri çek (bu kısım aynı kalabilir)
+    // dispatch(fetchAllFilteredProducts({ filterParams: { isFeatured: true }, sortParams: "price-lowtohigh" })); // Veya filtre olmadan
+
+    // --- YENİ: En Çok Satanları Çek ---
+    setBestSellingLoading(true); // Yüklemeyi başlat
     dispatch(
       fetchAllFilteredProducts({
-        filterParams: { isFeatured: true },
-        sortParams: "price-lowtohigh",
+        filterParams: {},
+        sortParams: "salesCount-desc",
       })
-    );
+    )
+      .unwrap() // Thunk'ın sonucunu yakala
+      .then((payload) => {
+        // Thunk'tan dönen payload içindeki data'yı kontrol et
+        if (payload && payload.success && payload.data) {
+          setBestSellingProducts(payload.data); // State'i güncelle
+        } else {
+          // Başarısız olursa veya data yoksa boş dizi ata
+          setBestSellingProducts([]);
+          console.error("En çok satanlar alınamadı:", payload?.message);
+          // İsteğe bağlı: Kullanıcıya hata mesajı göster
+          // toast({ variant: "warning", title: "En çok satanlar yüklenemedi." });
+        }
+      })
+      .catch((error) => {
+        // Thunk reject olursa hatayı yakala
+        console.error("En çok satanlar alınırken hata:", error);
+        setBestSellingProducts([]);
+        // İsteğe bağlı: Kullanıcıya hata mesajı göster
+        // toast({ variant: "destructive", title: "En çok satanlar yüklenirken hata oluştu." });
+      })
+      .finally(() => {
+        setBestSellingLoading(false); // Yüklemeyi bitir
+      });
+    // --- ---
     dispatch(getFeatureImages());
     dispatch(fetchPromoCards());
     dispatch(fetchSideBanners());
@@ -242,7 +276,7 @@ function ShoppingHome() {
               Array.from({ length: 8 }).map((_, index) => (
                 <Card
                   key={`promo-skel-${index}`}
-                  className="promo-card relative flex-shrink-0 rounded-lg overflow-hidden bg-gray-100"
+                  className="promo-card relative flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 "
                 >
                   <Skeleton className="w-full h-full" />
                   <div className="absolute bottom-0 left-0 right-0 p-1.5 pt-4">
@@ -264,7 +298,7 @@ function ShoppingHome() {
                     <img
                       src={promoCard.image}
                       alt={promoCard.title || "Promosyon"}
-                      className="w-full h-full object-contain transition-transform duration-300"
+                      className="w-full h-full object-contain transition-transform duration-300 max-[850px]:p-0"
                       loading="lazy"
                     />
                   </CardContent>
@@ -420,12 +454,11 @@ function ShoppingHome() {
 
       {/* BÖLÜM 3: YATAY KAYDIRILABİLİR ÜRÜNLER */}
       <ProductCarousel
-        // ${user.userName},
-        title={user?.userName ? `Sana özel öneriler` : "Öne Çıkan Ürünler"}
-        products={productList} // Mevcut productList'i kullanıyoruz
-        isLoading={productsLoading} // Yüklenme durumunu iletiyoruz
+        title="En Çok Satanlar"
+        products={bestSellingProducts} // Yeni state'i kullan
+        isLoading={bestSellingLoading} // Yeni loading state'ini kullan
         handleGetProductDetails={handleGetProductDetails}
-        handleAddtoCart={handleAddtoCart} // Fonksiyonu doğru iletiyoruz
+        handleAddtoCart={handleAddtoCart}
       />
 
       {/* --- YENİ: KADIN KATEGORİSİ CAROUSEL'I --- */}

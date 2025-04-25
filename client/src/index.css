@@ -191,10 +191,16 @@
     grid-template-rows: repeat(2, auto); /* 2 satır */
     grid-auto-flow: row; /* Elemanları satır satır yerleştir */
     max-height: none; /* Yükseklik sınırını kaldır */
-    gap: 5px;
+    gap: 1px;
   }
 
   /* Kart boyutları küçük ekranlar için */
+  .promo-card {
+    width: 100%;
+    height: 90px;
+  }
+}
+@media (max-width: 699px) {
   .promo-card {
     width: 100%;
     height: 90px;
