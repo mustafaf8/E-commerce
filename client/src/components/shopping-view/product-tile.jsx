@@ -94,11 +94,8 @@ function ShoppingProductTile({
             <Badge variant="destructive" className="absolute top-2 left-2">
               {`Sadece ${product?.totalStock} ürün kaldı`}
             </Badge>
-          ) : product?.salePrice > 0 ? (
-            <Badge
-              variant="secondary"
-              className="absolute top-2 left-2 bg-primary/80 text-primary-foreground hover:bg-primary/90"
-            >
+          ) : product?.salePrice < product.price ? (
+            <Badge variant="destructive" className="absolute top-2 left-2">
               İndirim
             </Badge>
           ) : null}

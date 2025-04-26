@@ -1,3 +1,485 @@
+// import { Button } from "@/components/ui/button";
+// import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+// import { Card, CardContent } from "@/components/ui/card";
+// import { useEffect, useState, useMemo } from "react";
+// import { useDispatch, useSelector } from "react-redux";
+// import {
+//   fetchAllFilteredProducts,
+//   fetchProductDetails,
+// } from "@/store/shop/products-slice";
+// import ShoppingProductTile from "@/components/shopping-view/product-tile";
+// import { useNavigate } from "react-router-dom";
+// import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
+// import { useToast } from "@/components/ui/use-toast";
+// import ProductDetailsDialog from "@/components/shopping-view/product-details";
+// import { getFeatureImages } from "@/store/common-slice";
+// import { fetchPromoCards } from "@/store/common-slice/promo-card-slice";
+// import { Skeleton } from "@/components/ui/skeleton";
+// import { fetchSideBanners } from "@/store/common-slice/side-banner-slice";
+// import ProductTileSkeleton from "@/components/shopping-view/product-tile-skeleton.jsx";
+// import ProductCarousel from "@/components/shopping-view/ProductCarousel";
+
+// function ShoppingHome() {
+//   const [currentSlide, setCurrentSlide] = useState(0);
+//   const [currentSideBannerIndex, setCurrentSideBannerIndex] = useState(0);
+//   const {
+//     productList,
+//     productDetails,
+//     isLoading: productsLoading,
+//   } = useSelector((state) => state.shopProducts);
+
+//   const { featureImageList, isLoading: featuresLoading } = useSelector(
+//     (state) => state.commonFeature
+//   );
+//   const { promoCardList, isLoading: promoCardsLoading } = useSelector(
+//     (state) => state.promoCards
+//   );
+//   const { sideBannerList, isLoading: sideBannersLoading } = useSelector(
+//     (state) => state.sideBanners || { sideBannerList: [], isLoading: false }
+//   );
+//   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+//   //..
+//   const { user, isAuthenticated } = useSelector((state) => state.auth);
+//   //..
+//   const dispatch = useDispatch();
+//   const navigate = useNavigate();
+//   const { toast } = useToast();
+
+//   function handleGetProductDetails(getCurrentProductId) {
+//     dispatch(fetchProductDetails(getCurrentProductId));
+//   }
+//   function handleAddtoCart(getCurrentProductId) {
+//     if (!isAuthenticated) {
+//       // isAuthenticated kontrolü eklendi
+//       toast({ variant: "destructive", title: "Lütfen önce giriş yapın." });
+//       return;
+//     }
+//     dispatch(
+//       addToCart({
+//         userId: user?.id,
+//         productId: getCurrentProductId,
+//         quantity: 1,
+//       })
+//     ).then((data) => {
+//       if (data?.payload?.success) {
+//         dispatch(fetchCartItems(user?.id));
+//         toast({ title: "Ürün başarıyla sepete eklendi", variant: "success" });
+//       } else {
+//         toast({
+//           variant: "destructive",
+//           title: data.payload?.message || "Sepete eklenemedi.",
+//         });
+//       }
+//     });
+//   }
+//   const handlePromoCardClick = (link) => {
+//     if (link) {
+//       if (link.startsWith("http") || link.startsWith("https")) {
+//         window.open(link, "noopener,noreferrer");
+//       } else {
+//         navigate(link);
+//       }
+//     }
+//   };
+//   const handleSideBannerNav = (direction) => {
+//     // Liste boş veya tanımsızsa bir şey yapma
+//     if (!sideBannerList || sideBannerList.length === 0) return;
+
+//     const newIndex = currentSideBannerIndex + direction; // Yeni indeksi hesapla
+
+//     // İndeks sınırlarının dışına çıkarsa başa veya sona sar
+//     if (newIndex < 0) {
+//       setCurrentSideBannerIndex(sideBannerList.length - 1); // Sona git
+//     } else if (newIndex >= sideBannerList.length) {
+//       setCurrentSideBannerIndex(0); // Başa dön
+//     } else {
+//       setCurrentSideBannerIndex(newIndex); // Normal ilerle
+//     }
+//   };
+
+//   // --- useEffects ---
+//   useEffect(() => {
+//     if (productDetails !== null) setOpenDetailsDialog(true);
+//   }, [productDetails]);
+
+//   // Otomatik Slider Geçişi için useEffect (Doğru çalışıyor)
+//   useEffect(() => {
+//     if (featureImageList && featureImageList?.length > 1) {
+//       const timer = setInterval(() => {
+//         setCurrentSlide(
+//           (prevSlide) => (prevSlide + 1) % featureImageList.length
+//         );
+//       }, 5000); // 5 saniyede bir değiştir
+//       return () => clearInterval(timer); // Component unmount olduğunda interval'ı temizle
+//     }
+//   }, [featureImageList]); // Sadece liste değiştiğinde veya dolduğunda çalışsın
+
+//   // İlk yüklemede verileri fetch et
+//   useEffect(() => {
+//     dispatch(
+//       fetchAllFilteredProducts({
+//         filterParams: { isFeatured: true },
+//         sortParams: "price-lowtohigh",
+//       })
+//     );
+//     dispatch(getFeatureImages());
+//     dispatch(fetchPromoCards());
+//     dispatch(fetchSideBanners());
+//   }, [dispatch]);
+
+//   // --- YENİ: Kadın ürünlerini filtreleme ---
+//   const womenProducts = useMemo(() => {
+//     if (!productList || productList.length === 0) {
+//       return [];
+//     }
+//     return productList.filter(
+//       (product) =>
+//         product.category &&
+//         (product.category.toLowerCase() === "women" ||
+//           product.category.toLowerCase() === "kadın")
+//     );
+//   }, [productList]);
+//   const womenProductsLoading = productsLoading;
+
+//   // --- YENİ: Erkek ürünlerini filtreleme ---
+//   const menProducts = useMemo(() => {
+//     if (!productList || productList.length === 0) return [];
+//     return productList.filter(
+//       (product) =>
+//         product.category &&
+//         (product.category.toLowerCase() === "men" ||
+//           product.category.toLowerCase() === "erkek")
+//     );
+//   }, [productList]);
+//   const menProductsLoading = productsLoading;
+
+//   // --- YENİ: Çocuk ürünlerini filtreleme ---
+//   const kidsProducts = useMemo(() => {
+//     if (!productList || productList.length === 0) return [];
+//     return productList.filter(
+//       (product) =>
+//         product.category &&
+//         (product.category.toLowerCase() === "kids" ||
+//           product.category.toLowerCase() === "Çocuk")
+//     );
+//   }, [productList]);
+//   const kidsProductsLoading = productsLoading;
+
+//   // --- YENİ: Çocuk ürünlerini filtreleme ---
+//   const accesProducts = useMemo(() => {
+//     if (!productList || productList.length === 0) return [];
+//     return productList.filter(
+//       (product) =>
+//         product.category &&
+//         (product.category.toLowerCase() === "kids" ||
+//           product.category.toLowerCase() === "Çocuk")
+//     );
+//   }, [productList]);
+//   const accesProductsLoading = productsLoading;
+
+//   return (
+//     <div className="flex flex-col min-h-screen">
+//       {/* BÖLÜM 1: PROMOSYON KARTLARI (Değişiklik yok) */}
+//       {/* <section className="bg-white pt-8 pb-2 no-scrollbar">
+//         <div className="container mx-auto px-20 max-[1024px]:px-0">
+//           <div className="flex justify-center items-center pb-2 px-4 no-scrollbar promo-card-container">
+//             {promoCardsLoading ? (
+//               Array.from({ length: 9 }).map((_, index) => (
+//                 <Card
+//                   key={`promo-skel-${index}`}
+//                   // Gerçek kartla aynı temel boyut ve stil özellikleri
+//                   className="relative flex-shrink-0 w-[110px] h-[110px] md:w-[125px] md:h-[125px] rounded-lg overflow-hidden border bg-gray-100"
+//                 >
+//                   <Skeleton className="w-full h-full" />
+
+//                   <div className="absolute bottom-0 left-0 right-0 p-1.5 pt-4">
+//                     <Skeleton className="h-3 w-4/5 mb-1" />
+//                     <Skeleton className="h-3 w-3/5" />
+//                   </div>
+//                 </Card>
+//               ))
+//             ) : promoCardList && promoCardList.length > 0 ? (
+//               promoCardList.map((promoCard) => (
+//                 <Card
+//                   key={promoCard._id}
+//                   onClick={() => handlePromoCardClick(promoCard.link)}
+//                   className={`relative flex-shrink-0 w-[125px] h-[125px] w-h1400 w-h1200  rounded-lg overflow-hidden ${
+//                     promoCard.link ? "cursor-pointer" : ""
+//                   } `}
+//                 >
+//                   <CardContent className="p-0 h-full">
+//                     <img
+//                       src={promoCard.image}
+//                       alt={promoCard.title || "Promosyon"}
+//                       className="w-full h-full object-contain transition-transform duration-300 "
+//                       loading="lazy"
+//                     />
+//                     {promoCard.title && (
+//                       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent p-2 pt-5">
+//                         <span className="font-medium text-white text-xs line-clamp-2">
+//                           {promoCard.title}
+//                         </span>
+//                       </div>
+//                     )}
+//                   </CardContent>
+//                 </Card>
+//               ))
+//             ) : (
+//               <div className="w-full text-center py-5 text-gray-500">
+//                 Deposunda Aktif fırsat yok.
+//               </div>
+//             )}
+//           </div>
+//         </div>
+//       </section> */}
+
+//       {/* BÖLÜM 1: PROMOSYON KARTLARI */}
+//       <section className="bg-white pt-8 pb-2">
+//         <div className="container mx-auto px-4 lg:px-20">
+//           <div className="promo-card-container">
+//             {promoCardsLoading ? (
+//               // Yükleme durumu için iskelet gösterimi
+//               Array.from({ length: 8 }).map((_, index) => (
+//                 <Card
+//                   key={`promo-skel-${index}`}
+//                   className="promo-card relative flex-shrink-0 rounded-lg overflow-hidden bg-gray-100"
+//                 >
+//                   <Skeleton className="w-full h-full" />
+//                   <div className="absolute bottom-0 left-0 right-0 p-1.5 pt-4">
+//                     <Skeleton className="h-3 w-4/5 mb-1" />
+//                     <Skeleton className="h-3 w-3/5" />
+//                   </div>
+//                 </Card>
+//               ))
+//             ) : promoCardList && promoCardList.length > 0 ? (
+//               promoCardList.slice(0, 8).map((promoCard) => (
+//                 <Card
+//                   key={promoCard._id}
+//                   onClick={() => handlePromoCardClick(promoCard.link)}
+//                   className={`promo-card relative flex-shrink-0 rounded-lg overflow-hidden ${
+//                     promoCard.link ? "cursor-pointer" : ""
+//                   }`}
+//                 >
+//                   <CardContent className="p-0 h-full">
+//                     <img
+//                       src={promoCard.image}
+//                       alt={promoCard.title || "Promosyon"}
+//                       className="w-full h-full object-contain transition-transform duration-300"
+//                       loading="lazy"
+//                     />
+//                   </CardContent>
+//                 </Card>
+//               ))
+//             ) : (
+//               <div className="w-full text-center py-5 text-gray-500">
+//                 Deposunda Aktif fırsat yok.
+//               </div>
+//             )}
+//           </div>
+//         </div>
+//       </section>
+
+//       {/* BÖLÜM 2: ORTADAKİ BANNER ALANI (SOL SLIDER, SAĞ STATİK) */}
+//       <section className="my-4 md:my-4 container mx-auto px-20 max-[1024px]:px-1">
+//         {featuresLoading || sideBannersLoading ? (
+//           <div className="flex flex-col md:flex-row gap-4 h-60 max-sm:h-[100px] max-md:h-[120px]">
+//             {/* Daha belirgin bir gri tonu veya hafif bir animasyon eklenebilir */}
+//             <Skeleton className="w-full md:w-[65%] h-full rounded-3xl bg-gray-200 animate-pulse" />
+//             <Skeleton className="w-full md:w-[35%] h-full rounded-3xl bg-gray-200 animate-pulse" />
+//           </div>
+//         ) : (
+//           <div className="flex flex-col md:flex-row gap-4 ">
+//             <div
+//               className={`relative w-full md:w-[65%] rounded-3xl overflow-hidden shadow-sm group max-sm:h-32 max-md:h-48 h-60`}
+//             >
+//               {featureImageList && featureImageList.length > 0 ? (
+//                 featureImageList.map((slide, index) => (
+//                   <img
+//                     key={slide._id || index}
+//                     src={slide.image}
+//                     alt={slide.title || `Banner ${index + 1}`}
+//                     onClick={() => handlePromoCardClick(slide.link)}
+//                     className={`${
+//                       index === currentSlide
+//                         ? "opacity-100 z-10"
+//                         : "opacity-0 z-0" // z-index eklendi
+//                     } absolute inset-0 w-full h-full object-center transition-opacity duration-1000 ease-in-out ${
+//                       slide.link ? "cursor-pointer" : ""
+//                     }`} // object-cover ve ease eklendi
+//                     loading="lazy"
+//                   />
+//                 ))
+//               ) : (
+//                 /* Resim yoksa placeholder */
+//                 <div className="w-full h-full flex items-center justify-center">
+//                   <span className="text-gray-400 text-sm">
+//                     Ana Banner Alanı
+//                   </span>
+//                 </div>
+//               )}
+//               {/* Slider Navigasyon Butonları (Sol Banner üzerine) */}
+//               {featureImageList && featureImageList.length > 1 && (
+//                 <>
+//                   <Button
+//                     variant="outline"
+//                     size="icon"
+//                     onClick={(e) => {
+//                       e.stopPropagation(); // Resim linkine gitmeyi engelle
+//                       setCurrentSlide(
+//                         (prev) =>
+//                           (prev - 1 + featureImageList.length) %
+//                           featureImageList.length
+//                       );
+//                     }}
+//                     className="absolute top-1/2 left-3 z-20 transform -translate-y-1/2 bg-white/60 hover:bg-white rounded-full h-8 w-8 max-sm:h-6 max-md:h-6 max-sm:w-6 max-md:w-6" // z-index ve stil
+//                   >
+//                     <ChevronLeftIcon className="w-5 h-5 text-gray-700" />
+//                   </Button>
+//                   <Button
+//                     variant="outline"
+//                     size="icon"
+//                     onClick={(e) => {
+//                       e.stopPropagation();
+//                       setCurrentSlide(
+//                         (prev) => (prev + 1) % featureImageList.length
+//                       );
+//                     }}
+//                     className="absolute top-1/2 right-3 z-20 transform -translate-y-1/2 bg-white/60 hover:bg-white rounded-full h-8 w-8 shadow-md max-sm:h-6 max-md:h-6 max-sm:w-6 max-md:w-6" // z-index ve stil
+//                   >
+//                     <ChevronRightIcon className="w-5 h-5 text-gray-700" />
+//                   </Button>
+//                 </>
+//               )}
+//             </div>
+
+//             {/* Sağ Yan Banner (Manuel Slider) */}
+//             <div
+//               className={`relative w-full md:w-[35%] rounded-3xl overflow-hidden shadow-sm group bg-gray-200 max-sm:h-32 max-md:h-48 h-60 max-[768px]:hidden`}
+//             >
+//               {/* sideBannerList'i map et ve currentSideBannerIndex'e göre göster */}
+//               {sideBannerList && sideBannerList.length > 0 ? (
+//                 sideBannerList.map((slide, index) => (
+//                   <img
+//                     key={slide._id || index}
+//                     src={slide.image}
+//                     alt={slide.title || `Yan Banner ${index + 1}`}
+//                     onClick={() => handlePromoCardClick(slide.link)}
+//                     className={`${
+//                       index === currentSideBannerIndex
+//                         ? "opacity-100 z-10"
+//                         : "opacity-0 z-0" // Yeni state'e göre kontrol
+//                     } absolute inset-0 w-full h-full object-center transition-opacity duration-300 ease-in-out ${
+//                       slide.link ? "cursor-pointer" : ""
+//                     }`}
+//                     loading="lazy"
+//                   />
+//                 ))
+//               ) : (
+//                 /* Resim yoksa placeholder */
+//                 <div className="w-full h-full flex items-center justify-center">
+//                   <span className="text-gray-400 text-sm">
+//                     Yan Banner Alanı
+//                   </span>
+//                 </div>
+//               )}
+
+//               {/* Manuel Slider Navigasyon Butonları */}
+//               {sideBannerList && sideBannerList.length > 1 && (
+//                 <>
+//                   {/* Sol Ok (Manuel) */}
+//                   <Button
+//                     variant="outline"
+//                     size="icon"
+//                     onClick={(e) => {
+//                       e.stopPropagation();
+//                       handleSideBannerNav(-1);
+//                     }} // YENİ handler'ı çağırır
+//                     className="absolute top-1/2 left-3 z-20 transform -translate-y-1/2 bg-white/60 hover:bg-white rounded-full h-8 w-8 shadow-md max-sm:h-6 max-md:h-6 max-sm:w-6 max-md:w-6"
+//                   >
+//                     <ChevronLeftIcon className="w-5 h-5 text-gray-700" />
+//                   </Button>
+//                   {/* Sağ Ok (Manuel) */}
+//                   <Button
+//                     variant="outline"
+//                     size="icon"
+//                     onClick={(e) => {
+//                       e.stopPropagation();
+//                       handleSideBannerNav(1);
+//                     }} // YENİ handler'ı çağırır
+//                     className="absolute top-1/2 right-3 z-20 transform -translate-y-1/2 bg-white/60 hover:bg-white rounded-full h-8 w-8 shadow-md max-sm:h-6 max-md:h-6 max-sm:w-6 max-md:w-6"
+//                   >
+//                     <ChevronRightIcon className="w-5 h-5 text-gray-700" />
+//                   </Button>
+//                 </>
+//               )}
+//             </div>
+//           </div>
+//         )}
+//       </section>
+
+//       {/* BÖLÜM 3: YATAY KAYDIRILABİLİR ÜRÜNLER */}
+//       <ProductCarousel
+//         // ${user.userName},
+//         title={user?.userName ? `Sana özel öneriler` : "Öne Çıkan Ürünler"}
+//         products={productList} // Mevcut productList'i kullanıyoruz
+//         isLoading={productsLoading} // Yüklenme durumunu iletiyoruz
+//         handleGetProductDetails={handleGetProductDetails}
+//         handleAddtoCart={handleAddtoCart} // Fonksiyonu doğru iletiyoruz
+//       />
+
+//       {/* --- YENİ: KADIN KATEGORİSİ CAROUSEL'I --- */}
+//       {(womenProducts.length > 0 || womenProductsLoading) && (
+//         <ProductCarousel
+//           title="Kadın" // Başlığı güncelle
+//           products={womenProducts} // Filtrelenmiş kadın ürünlerini ver
+//           isLoading={womenProductsLoading} // İlgili yüklenme durumunu ver
+//           handleGetProductDetails={handleGetProductDetails}
+//           handleAddtoCart={handleAddtoCart}
+//         />
+//       )}
+
+//       {/* --- YENİ: ERKEK KATEGORİSİ CAROUSEL'I --- */}
+//       {(menProducts.length > 0 || menProductsLoading) && (
+//         <ProductCarousel
+//           title="Erkek" // Başlığı güncelle
+//           products={menProducts} // Filtrelenmiş erkek ürünlerini ver
+//           isLoading={menProductsLoading} // İlgili yüklenme durumunu ver
+//           handleGetProductDetails={handleGetProductDetails}
+//           handleAddtoCart={handleAddtoCart}
+//         />
+//       )}
+
+//       {(menProducts.length > 0 || menProductsLoading) && (
+//         <ProductCarousel
+//           title="Çocuk" // Başlığı güncelle
+//           products={kidsProducts} // Filtrelenmiş erkek ürünlerini ver
+//           isLoading={kidsProductsLoading} // İlgili yüklenme durumunu ver
+//           handleGetProductDetails={handleGetProductDetails}
+//           handleAddtoCart={handleAddtoCart}
+//         />
+//       )}
+//       {(accesProducts.length > 0 || accesProductsLoading) && (
+//         <ProductCarousel
+//           title="Aksesuar" // Başlığı güncelle
+//           products={accesProducts} // Filtrelenmiş erkek ürünlerini ver
+//           isLoading={accesProductsLoading} // İlgili yüklenme durumunu ver
+//           handleGetProductDetails={handleGetProductDetails}
+//           handleAddtoCart={handleAddtoCart}
+//         />
+//       )}
+
+//       {/* Ürün Detay Dialog (Değişiklik yok) */}
+//       <ProductDetailsDialog
+//         open={openDetailsDialog}
+//         setOpen={setOpenDetailsDialog}
+//         productDetails={productDetails}
+//       />
+//     </div> // Ana div kapanışı
+//   );
+// }
+
+// export default ShoppingHome;
+
 import { Button } from "@/components/ui/button";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";

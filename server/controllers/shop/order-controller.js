@@ -384,12 +384,8 @@ const createOrder = async (req, res) => {
       totalAmount: calculatedTotal,
       orderDate: new Date(),
       iyzicoConversationId: conversationId,
-      // Henüz token veya paymentId yok
     });
     await pendingOrder.save(); // Siparişi kaydet
-
-    // --- Iyzico checkoutFormInitialize İsteği Hazırla ---
-    // !! Callback URL'i backend'deki yeni endpoint'e ayarlıyoruz !!
     const backendCallbackUrl = `http://localhost:5000/api/shop/order/iyzico-callback`; // Kendi backend adresin
 
     const request = {
@@ -437,8 +433,6 @@ const createOrder = async (req, res) => {
     iyzipay.checkoutFormInitialize.create(request, (err, result) => {
       if (err) {
         console.error("Iyzico checkoutFormInitialize Hatası:", err);
-        // Sipariş oluşturuldu ama Iyzico başlatılamadı, belki siparişi iptal et?
-        // Veya kullanıcıya hata gösterip tekrar denemesini sağla
         return res.status(500).json({
           success: false,
           message: "Iyzico ödeme formu başlatılamadı.",
@@ -565,6 +559,7 @@ const handleIyzicoCallback = async (req, res) => {
           order.orderUpdateDate = new Date();
 
           try {
+            const productUpdatePromises = [];
             for (let item of order.cartItems) {
               await Product.findByIdAndUpdate(item.productId, {
                 $inc: { totalStock: -item.quantity, salesCount: item.quantity },

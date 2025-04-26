@@ -4,7 +4,7 @@ const UserSchema = new mongoose.Schema({
   userName: {
     type: String,
     required: true,
-    unique: true,
+    unique: false,
   },
   email: {
     type: String,
@@ -13,11 +13,16 @@ const UserSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
+    required: false,
   },
   role: {
     type: String,
     default: "user",
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true,
   },
 });
 
