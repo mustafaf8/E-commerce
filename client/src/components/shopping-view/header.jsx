@@ -77,7 +77,7 @@ function HeaderRightContent() {
     dispatch(logoutUser())
       .unwrap()
       .then(() => {
-        navigate("/shop/home");
+        navigate("/auth/login");
         toast({
           title: "Çıkış yapıldı",
           description: "Başka bir zaman görüşmek üzere!",
