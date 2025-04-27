@@ -270,7 +270,7 @@ function ShoppingCheckout() {
                 </div>
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>Kargo</span>
-                  <span>Hesaplanacak</span> {/* Veya sabit bir değer */}
+                  <span>Ücretsiz</span> {/* Veya sabit bir değer */}
                 </div>
                 <Separator className="my-3" /> {/* Toplamdan önce ayırıcı */}
                 <div className="flex justify-between text-lg font-bold">

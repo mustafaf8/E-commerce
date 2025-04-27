@@ -108,7 +108,14 @@ function ShoppingProductTile({
           >
             {product?.title}
           </h2>
-
+          {product?.averageReview !== undefined && (
+            <div className="flex items-center mb-1 pointer-events-none">
+              <StarRatingComponent rating={product.averageReview} />
+              <span className="ml-1 text-xs text-muted-foreground font-semibold">
+                ({product.averageReview.toFixed(1)})
+              </span>
+            </div>
+          )}
           <div className="py-2">
             {product?.salePrice !== undefined && product.salePrice !== null ? (
               <div
@@ -154,14 +161,6 @@ function ShoppingProductTile({
               </div>
             )}
           </div>
-          {product?.averageReview !== undefined && (
-            <div className="flex items-center mb-1">
-              <StarRatingComponent rating={product.averageReview} />
-              <span className="ml-1 text-xs text-muted-foreground font-semibold">
-                ({product.averageReview.toFixed(1)})
-              </span>
-            </div>
-          )}
         </CardContent>
       </div>
 

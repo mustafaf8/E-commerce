@@ -955,7 +955,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
             </div>
             {/* ------- FİYAT GÖSTERİMİ SON ------- */}
             <div className="flex items-center mt-1 mb-3">
-              <div className="flex items-center gap-0.5">
+              <div className="flex items-center gap-0.5 pointer-events-none">
                 <StarRatingComponent rating={averageReview} />
               </div>
               <span className="text-xs text-gray-500 font-medium ml-1.5">
