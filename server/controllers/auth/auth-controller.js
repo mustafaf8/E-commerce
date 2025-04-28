@@ -1,341 +1,10 @@
-// const bcrypt = require("bcryptjs");
-// const jwt = require("jsonwebtoken");
-// const User = require("../../models/User");
-
-// //register
-// const registerUser = async (req, res) => {
-//   const { userName, email, password } = req.body;
-
-//   try {
-//     const checkUser = await User.findOne({ email });
-//     if (checkUser)
-//       return res.json({
-//         success: false,
-//         message: "User Already exists with the same email! Please try again",
-//       });
-
-//     const hashPassword = await bcrypt.hash(password, 12);
-//     const newUser = new User({
-//       userName,
-//       email,
-//       password: hashPassword,
-//     });
-
-//     await newUser.save();
-//     res.status(200).json({
-//       success: true,
-//       message: "Registration successful",
-//     });
-//   } catch (e) {
-//     console.log(e);
-//     res.status(500).json({
-//       success: false,
-//       message: "Some error occured",
-//     });
-//   }
-// };
-
-// //login
-// const loginUser = async (req, res) => {
-//   const { email, password } = req.body;
-
-//   try {
-//     const checkUser = await User.findOne({ email });
-//     if (!checkUser)
-//       return res.json({
-//         success: false,
-//         message: "User doesn't exists! Please register first",
-//       });
-
-//     const checkPasswordMatch = await bcrypt.compare(
-//       password,
-//       checkUser.password
-//     );
-//     if (!checkPasswordMatch)
-//       return res.json({
-//         success: false,
-//         message: "Incorrect password! Please try again",
-//       });
-
-//     const token = jwt.sign(
-//       {
-//         id: checkUser._id,
-//         role: checkUser.role,
-//         email: checkUser.email,
-//         userName: checkUser.userName,
-//       },
-//       "CLIENT_SECRET_KEY",
-//       { expiresIn: "60m" }
-//     );
-
-//     res.cookie("token", token, { httpOnly: true, secure: false }).json({
-//       // burda false true yapildi
-//       success: true,
-//       message: "Logged in successfully",
-//       user: {
-//         email: checkUser.email,
-//         role: checkUser.role,
-//         id: checkUser._id,
-//         userName: checkUser.userName,
-//       },
-//     });
-//   } catch (e) {
-//     console.log(e);
-//     res.status(500).json({
-//       success: false,
-//       message: "Some error occured",
-//     });
-//   }
-// };
-
-// //logout
-
-// const logoutUser = (req, res) => {
-//   res.clearCookie("token").json({
-//     success: true,
-//     message: "Logged out successfully!",
-//   });
-// };
-
-// //auth middleware
-// const authMiddleware = async (req, res, next) => {
-//   const token = req.cookies.token;
-//   if (!token)
-//     return res.status(401).json({
-//       success: false,
-//       message: "Unauthorised user!",
-//     });
-
-//   try {
-//     const decoded = jwt.verify(token, "CLIENT_SECRET_KEY");
-//     req.user = decoded;
-//     next();
-//   } catch (error) {
-//     res.status(401).json({
-//       success: false,
-//       message: "Unauthorised user!",
-//     });
-//   }
-// };
-
-// module.exports = { registerUser, loginUser, logoutUser, authMiddleware };
-
-// const bcrypt = require("bcryptjs");
-// const jwt = require("jsonwebtoken");
-// const User = require("../../models/User");
-
-// //register
-// const registerUser = async (req, res) => {
-//   const { userName, email, password } = req.body;
-
-//   try {
-//     const checkUser = await User.findOne({ email });
-//     if (checkUser)
-//       return res.json({
-//         success: false,
-//         message:
-//           "Aynı e-posta ile zaten bir kullanıcı mevcut! Lütfen tekrar deneyin.",
-//       });
-
-//     const hashPassword = await bcrypt.hash(password, 12);
-//     const newUser = new User({
-//       userName,
-//       email,
-//       password: hashPassword,
-//     });
-
-//     await newUser.save();
-//     res.status(200).json({
-//       success: true,
-//       message: "Kayıt işlemi başarılı",
-//     });
-//   } catch (e) {
-//     console.log(e);
-//     res.status(500).json({
-//       success: false,
-//       message: "Bir hata oluştu",
-//     });
-//   }
-// };
-
-// //login
-// const loginUser = async (req, res) => {
-//   const { email, password } = req.body;
-
-//   try {
-//     const checkUser = await User.findOne({ email });
-//     if (!checkUser)
-//       return res.json({
-//         success: false,
-//         message: "Kullanıcı mevcut değil! Lütfen önce kayıt olun.",
-//       });
-
-//     const checkPasswordMatch = await bcrypt.compare(
-//       password,
-//       checkUser.password
-//     );
-//     if (!checkPasswordMatch)
-//       return res.json({
-//         success: false,
-//         message: "Şifre yanlış! Lütfen tekrar deneyin.",
-//       });
-
-//     const token = jwt.sign(
-//       {
-//         id: checkUser._id,
-//         role: checkUser.role,
-//         email: checkUser.email,
-//         userName: checkUser.userName,
-//       },
-//       process.env.CLIENT_SECRET_KEY || "DEFAULT_SECRET_KEY", // Ortam değişkeni kullanmak daha güvenli
-//       { expiresIn: "1h" } // Örnek: 1 saat geçerlilik
-//     );
-
-//     res
-//       .cookie("token", token, {
-//         httpOnly: true, // JavaScript erişimini engeller (Güvenlik için iyi)
-//         secure: process.env.NODE_ENV === "production", // Sadece HTTPS'te (production) true yap
-//         sameSite: "Lax", // Çerezlerin cross-site isteklerde nasıl gönderileceğini kontrol eder (Lax genellikle iyi bir başlangıç)
-//         // maxAge: 60 * 60 * 1000 // Opsiyonel: 1 saat (milisaniye cinsinden)
-//         path: "/",
-//       })
-//       .json({
-//         success: true,
-//         message: "Başarıyla giriş yapıldı",
-//         user: {
-//           email: checkUser.email,
-//           role: checkUser.role,
-//           id: checkUser._id,
-//           userName: checkUser.userName,
-//         },
-//       });
-//     // *** DÜZELTME SONU ***
-//   } catch (e) {
-//     console.log(e);
-//     res.status(500).json({
-//       success: false,
-//       message: "Bir hata oluştu",
-//     });
-//   }
-// };
-
-// //logout
-// const logoutUser = (req, res) => {
-//   res
-//     .clearCookie("token", {
-//       httpOnly: true,
-//       secure: process.env.NODE_ENV === "production",
-//       sameSite: "Lax",
-//       path: "/",
-//     })
-//     .json({
-//       success: true,
-//       message: "Başarıyla çıkış yapıldı!",
-//     });
-// };
-
-// //auth middleware
-// const authMiddleware = async (req, res, next) => {
-//   const token = req.cookies.token;
-//   console.log("authMiddleware -> Received token:", token); // Token'ı logla (debug için)
-//   if (!token)
-//     return res.status(401).json({
-//       success: false,
-//       message: "Yetkisiz kullanıcı! Token bulunamadı.", // Mesajı biraz daha açıklayıcı yap
-//     });
-
-//   try {
-//     const decoded = jwt.verify(
-//       token,
-//       process.env.CLIENT_SECRET_KEY || "DEFAULT_SECRET_KEY"
-//     );
-//     req.user = decoded;
-//     next();
-//   } catch (error) {
-//     console.error(
-//       "authMiddleware -> Token verification failed:",
-//       error.message
-//     ); // Hata logu
-//     // Hata durumunda da çerezi temizlemeyi düşünebilirsin
-//     res.clearCookie("token", {
-//       httpOnly: true,
-//       secure: process.env.NODE_ENV === "production",
-//       sameSite: "Lax",
-//       path: "/",
-//     });
-//     res.status(401).json({
-//       success: false,
-//       message: "Yetkisiz kullanıcı! Geçersiz veya süresi dolmuş token.", // Mesajı biraz daha açıklayıcı yap
-//     });
-//   }
-// };
-
-// const updateUserDetails = async (req, res) => {
-//   try {
-//     const { userId } = req.user; // authMiddleware'den gelen kullanıcı ID'si
-//     const { userName, email } = req.body;
-
-//     const user = await User.findById(userId);
-
-//     if (!user) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Kullanıcı bulunamadı",
-//       });
-//     }
-
-//     // Güncellenecek alanları kontrol et ve güncelle
-//     if (userName) {
-//       user.userName = userName;
-//     }
-//     if (email && email !== user.email) {
-//       // E-posta değiştiriliyorsa, benzersizliğini kontrol et
-//       const emailExists = await User.findOne({ email });
-//       if (emailExists && emailExists._id.toString() !== userId) {
-//         return res.status(400).json({
-//           success: false,
-//           message: "Bu e-posta adresi zaten kullanımda.",
-//         });
-//       }
-//       user.email = email;
-//     }
-
-//     await user.save();
-
-//     res.status(200).json({
-//       success: true,
-//       message: "Kullanıcı bilgileri güncellendi",
-//       user: {
-//         id: user._id,
-//         userName: user.userName,
-//         email: user.email,
-//       },
-//     });
-//   } catch (error) {
-//     console.error("Kullanıcı güncelleme hatası:", error);
-//     res.status(500).json({
-//       success: false,
-//       message: "Kullanıcı bilgileri güncellenirken hata oluştu.",
-//     });
-//   }
-// };
-
-// module.exports = {
-//   registerUser,
-//   loginUser,
-//   logoutUser,
-//   authMiddleware,
-//   updateUserDetails,
-// };
-
-// server/controllers/auth/auth-controller.js
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../../models/User");
 const passport = require("passport"); // passport import edildi
-const GoogleStrategy = require("passport-google-oauth20").Strategy; // Google stratejisi import edildi
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const admin = require("firebase-admin");
 
-// --- YENİ: Passport Yapılandırması ---
 passport.use(
   new GoogleStrategy(
     {
@@ -449,20 +118,16 @@ const registerUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-  // ... (mevcut kod)
   const { email, password } = req.body;
 
   try {
     const checkUser = await User.findOne({ email });
     if (!checkUser)
       return res.status(404).json({
-        // 404 Not Found
         success: false,
         message: "Kullanıcı mevcut değil! Lütfen önce kayıt olun.",
       });
-
-    // Şifre kontrolü: Kullanıcının googleId'si yoksa şifre kontrolü yap
-    if (!checkUser.googleId) {
+    if (!checkUser.googleId && !checkUser.phoneNumber) {
       if (!password) {
         return res
           .status(400)
@@ -474,16 +139,15 @@ const loginUser = async (req, res) => {
       );
       if (!checkPasswordMatch)
         return res.status(401).json({
-          // 401 Unauthorized
           success: false,
           message: "Şifre yanlış! Lütfen tekrar deneyin.",
         });
-    } else if (checkUser.googleId && password) {
+    } else if ((checkUser.googleId || checkUser.phoneNumber) && password) {
       // Google ile kayıtlı kullanıcı şifre ile giriş yapmaya çalışıyorsa?
       // Bu durumu nasıl yöneteceğinize karar vermelisiniz.
       // Belki bir uyarı mesajı gösterebilirsiniz.
       console.warn(
-        `Google ile kayıtlı kullanıcı (${email}) şifre ile giriş yapmaya çalıştı.`
+        `Google/telefon ile kayıtlı kullanıcı (${email}) şifre ile giriş yapmaya çalıştı.`
       );
       // Şifre kontrolünü atlayıp token oluşturabilir veya hata verebilirsiniz.
       // Şimdilik token oluşturmaya devam edelim.
@@ -516,6 +180,7 @@ const loginUser = async (req, res) => {
           role: checkUser.role,
           id: checkUser._id,
           userName: checkUser.userName,
+          phoneNumber: checkUser.phoneNumber,
           // profilePicture: checkUser.profilePicture // Varsa profil resmini de gönder
         },
       });
@@ -581,10 +246,6 @@ const authMiddleware = async (req, res, next) => {
       token,
       process.env.CLIENT_SECRET_KEY || "DEFAULT_SECRET_KEY"
     );
-    // Token geçerliyse, kullanıcıyı manuel olarak req.user'a ekleyebiliriz
-    // Ancak ideal olanı session kullanmaktır. Bu kısmı sadece fallback olarak düşünün.
-    // Veya token tabanlı bir session mekanizması kurun.
-    // Şimdilik, decode edilmiş bilgiyi ekleyelim.
     const userFromToken = await User.findById(decoded.id).select("-password"); // Şifreyi alma
     if (!userFromToken) {
       throw new Error("Token'daki kullanıcı bulunamadı.");
@@ -611,49 +272,76 @@ const authMiddleware = async (req, res, next) => {
 };
 
 const updateUserDetails = async (req, res) => {
-  // ... (mevcut kod)
   try {
-    // authMiddleware sayesinde req.user'da kullanıcı ID'si olmalı
     if (!req.user || !req.user.id) {
       return res
         .status(401)
         .json({ success: false, message: "Yetkilendirme hatası." });
     }
     const userId = req.user.id;
-    const { userName, email } = req.body;
-
-    // Boş değer kontrolü
-    if (!userName && !email) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Güncellenecek bilgi girilmedi." });
-    }
+    // İstekten gelen veriyi al (sadece izin verilen alanlar)
+    const { userName, email, phoneNumber } = req.body;
 
     const user = await User.findById(userId);
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "Kullanıcı bulunamadı" });
 
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "Kullanıcı bulunamadı",
-      });
-    }
+    // Güncellenecek alanları tutacak obje
+    const updatedFields = {};
 
-    // Güncellenecek alanları kontrol et ve güncelle
-    let updatedFields = {};
+    // 1. Kullanıcı adı her zaman güncellenebilir (eğer gönderildiyse ve farklıysa)
     if (userName && userName !== user.userName) {
       updatedFields.userName = userName;
     }
-    if (email && email !== user.email) {
-      // E-posta değiştiriliyorsa, benzersizliğini kontrol et
-      const emailExists = await User.findOne({ email });
-      if (emailExists && emailExists._id.toString() !== userId) {
+
+    // 2. E-posta güncellemesi:
+    //    - Sadece kullanıcıda e-posta YOKSA ve yeni bir e-posta gönderildiyse
+    //    - VEYA (İsteğe bağlı: Eğer e-posta düzenlemeye izin verilecekse) kullanıcıda e-posta VARSA ama gönderilen farklıysa
+    if (!user.email && email) {
+      // Kullanıcıda e-posta yok, yenisi gönderildi
+      // Yeni e-postanın başka bir kullanıcı tarafından kullanılmadığını kontrol et
+      const emailExists = await User.findOne({ email: email });
+      if (emailExists) {
+        // ID kontrolüne gerek yok çünkü bu kullanıcıda e-posta yoktu
         return res.status(400).json({
           success: false,
           message: "Bu e-posta adresi zaten kullanımda.",
         });
       }
+      // Format kontrolü (Basit)
+      if (!/\S+@\S+\.\S+/.test(email)) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Geçersiz e-posta formatı." });
+      }
       updatedFields.email = email;
     }
+
+    // 3. Telefon Numarası güncellemesi:
+    //    - Sadece kullanıcıda telefon numarası YOKSA ve yeni bir numara gönderildiyse
+    if (!user.phoneNumber && phoneNumber) {
+      // Kullanıcıda telefon yok, yenisi gönderildi
+      // Yeni telefon numarasının başka bir kullanıcı tarafından kullanılmadığını kontrol et
+      const phoneExists = await User.findOne({ phoneNumber: phoneNumber });
+      if (phoneExists) {
+        return res.status(400).json({
+          success: false,
+          message: "Bu telefon numarası zaten kayıtlı.",
+        });
+      }
+      // Format kontrolü (Basit - daha iyi bir validasyon gerekebilir)
+      // Örneğin + ile başlamalı ve belirli sayıda rakam içermeli
+      if (!/^\+?[1-9]\d{1,14}$/.test(phoneNumber)) {
+        return res.status(400).json({
+          success: false,
+          message: "Geçersiz telefon numarası formatı.",
+        });
+      }
+      updatedFields.phoneNumber = phoneNumber;
+    }
+    // Mevcut telefon numarasını değiştirmeye İZİN VERMİYORUZ (OTP ile doğrulanmalı)
 
     // Eğer güncellenecek alan varsa işlemi yap
     if (Object.keys(updatedFields).length > 0) {
@@ -663,13 +351,14 @@ const updateUserDetails = async (req, res) => {
       // Güncellenmiş kullanıcıyı (yeni token ile?) döndür
       const updatedUser = await User.findById(userId).select("-password");
 
-      // Token'ı da güncellemek isteyebilirsiniz (opsiyonel)
+      // Token'ı da güncelle (yeni bilgilerle)
       const newToken = jwt.sign(
         {
           id: updatedUser._id,
           role: updatedUser.role,
           email: updatedUser.email,
           userName: updatedUser.userName,
+          phoneNumber: updatedUser.phoneNumber, // Token'a telefonu da ekle
         },
         process.env.CLIENT_SECRET_KEY || "DEFAULT_SECRET_KEY",
         { expiresIn: "1h" }
@@ -686,12 +375,12 @@ const updateUserDetails = async (req, res) => {
         success: true,
         message: "Kullanıcı bilgileri güncellendi",
         user: {
-          // Sadece gerekli bilgileri döndür
+          // Frontend'e güncel bilgileri gönder
           id: updatedUser._id,
           userName: updatedUser.userName,
           email: updatedUser.email,
           role: updatedUser.role,
-          // profilePicture: updatedUser.profilePicture
+          phoneNumber: updatedUser.phoneNumber,
         },
       });
     } else {
@@ -707,6 +396,206 @@ const updateUserDetails = async (req, res) => {
     });
   }
 };
+// --- YENİ: Telefon Numarası Doğrulama ve Giriş/Yeni Kullanıcı Kontrolü ---
+const verifyPhoneNumberLogin = async (req, res) => {
+  const { token } = req.body; // Frontend'den gelen Firebase ID Token
+
+  if (!token) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Firebase token eksik." });
+  }
+
+  try {
+    // Firebase Admin SDK ile token'ı doğrula
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    const phoneNumber = decodedToken.phone_number; // Doğrulanmış telefon numarası
+
+    if (!phoneNumber) {
+      throw new Error("Firebase token içinde telefon numarası bulunamadı.");
+    }
+
+    // Veritabanında bu telefon numarasına sahip kullanıcı var mı?
+    let user = await User.findOne({ phoneNumber: phoneNumber });
+
+    if (user) {
+      // Kullanıcı var, giriş yap (JWT oluştur ve cookie'ye ata)
+      const jwtToken = jwt.sign(
+        {
+          id: user._id,
+          role: user.role,
+          email: user.email,
+          userName: user.userName,
+          phoneNumber: user.phoneNumber,
+        },
+        process.env.CLIENT_SECRET_KEY || "DEFAULT_SECRET_KEY",
+        { expiresIn: "1h" }
+      );
+
+      res.cookie("token", jwtToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Lax",
+        path: "/",
+      });
+
+      console.log(`Mevcut kullanıcı giriş yaptı (Telefon): ${phoneNumber}`);
+      res.status(200).json({
+        success: true,
+        isNewUser: false, // Mevcut kullanıcı
+        message: "Giriş başarılı",
+        user: {
+          id: user._id,
+          userName: user.userName,
+          email: user.email,
+          role: user.role,
+          phoneNumber: user.phoneNumber,
+        },
+      });
+    } else {
+      // Kullanıcı yok, frontend'e yeni kullanıcı olduğunu bildir
+      console.log(`Yeni kullanıcı algılandı (Telefon): ${phoneNumber}`);
+      res.status(200).json({
+        success: true,
+        isNewUser: true, // Yeni kullanıcı
+        message: "Telefon numarası doğrulandı, kayıt gerekiyor.",
+        phoneNumber: phoneNumber, // İsim alma adımında lazım olabilir
+      });
+    }
+  } catch (error) {
+    console.error(
+      "Firebase token doğrulama veya kullanıcı kontrol hatası:",
+      error
+    );
+    let message = "Telefon numarası doğrulama başarısız.";
+    if (error.code === "auth/id-token-expired") {
+      message = "Oturum süresi dolmuş, lütfen tekrar giriş yapın.";
+    } else if (error.code === "auth/argument-error") {
+      message = "Geçersiz Firebase token.";
+    }
+    res
+      .status(401)
+      .json({ success: false, message: message, error: error.message });
+  }
+};
+
+// --- YENİ: Telefon Numarası ile Yeni Kullanıcı Kaydı ---
+const registerPhoneNumberUser = async (req, res) => {
+  const { token, userName } = req.body; // Firebase token ve kullanıcı adı
+
+  if (!token || !userName || !userName.trim()) {
+    return res.status(400).json({
+      success: false,
+      message: "Firebase token ve kullanıcı adı gerekli.",
+    });
+  }
+
+  try {
+    // Token'ı tekrar doğrula (güvenlik için)
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    const phoneNumber = decodedToken.phone_number;
+
+    if (!phoneNumber) {
+      throw new Error("Firebase token içinde telefon numarası bulunamadı.");
+    }
+
+    // Bu telefon numarasıyla zaten kayıtlı bir kullanıcı var mı? (Ekstra kontrol)
+    const existingUser = await User.findOne({ phoneNumber: phoneNumber });
+    if (existingUser) {
+      console.warn(
+        `Register attempt for existing phone number: ${phoneNumber}. Logging in instead.`
+      );
+      // Kullanıcı zaten varsa, login işlemi yap (JWT oluştur, cookie ata)
+      const jwtToken = jwt.sign(
+        {
+          id: existingUser._id,
+          role: existingUser.role,
+          email: existingUser.email,
+          userName: existingUser.userName,
+          phoneNumber: existingUser.phoneNumber,
+        },
+        process.env.CLIENT_SECRET_KEY || "DEFAULT_SECRET_KEY",
+        { expiresIn: "1h" }
+      );
+      res.cookie("token", jwtToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Lax",
+        path: "/",
+      });
+      return res.status(200).json({
+        success: true,
+        message: "Kullanıcı zaten kayıtlı, giriş yapıldı.",
+        user: {
+          id: existingUser._id,
+          userName: existingUser.userName,
+          email: existingUser.email,
+          role: existingUser.role,
+          phoneNumber: existingUser.phoneNumber,
+        },
+      });
+    }
+
+    // Yeni kullanıcıyı oluştur
+    const newUser = new User({
+      userName: userName.trim(),
+      phoneNumber: phoneNumber,
+      role: "user", // Varsayılan rol
+      // email ve password boş kalacak (modelde optional yaptık)
+    });
+
+    await newUser.save();
+    console.log(
+      `Yeni kullanıcı kaydedildi (Telefon): ${phoneNumber}, Ad: ${newUser.userName}`
+    );
+
+    // Yeni kullanıcı için JWT oluştur ve cookie'ye ata
+    const jwtToken = jwt.sign(
+      {
+        id: newUser._id,
+        role: newUser.role,
+        email: newUser.email,
+        userName: newUser.userName,
+        phoneNumber: newUser.phoneNumber,
+      },
+      process.env.CLIENT_SECRET_KEY || "DEFAULT_SECRET_KEY",
+      { expiresIn: "1h" }
+    );
+
+    res.cookie("token", jwtToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Lax",
+      path: "/",
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Kayıt başarılı!",
+      user: {
+        id: newUser._id,
+        userName: newUser.userName,
+        email: newUser.email,
+        role: newUser.role,
+        phoneNumber: newUser.phoneNumber,
+      },
+    });
+  } catch (error) {
+    console.error("Telefon numarası ile kullanıcı kaydı hatası:", error);
+    let message = "Kullanıcı kaydı sırasında bir hata oluştu.";
+    if (error.code === "auth/id-token-expired") {
+      message = "Oturum süresi dolmuş, lütfen tekrar deneyin.";
+    } else if (error.code === 11000) {
+      // Mongoose duplicate key error
+      message = "Bu telefon numarası zaten kayıtlı.";
+      // Bu durumda belki login'e yönlendirmek daha iyi olabilir?
+      // Ama frontend'deki akış bunu engellemeliydi.
+    }
+    res
+      .status(500)
+      .json({ success: false, message: message, error: error.message });
+  }
+};
 
 module.exports = {
   registerUser,
@@ -714,5 +603,6 @@ module.exports = {
   logoutUser,
   authMiddleware,
   updateUserDetails,
-  // Passport'u da export etmeye gerek yok, çünkü bu dosyada kullanıldı
+  verifyPhoneNumberLogin, // <-- Yeni fonksiyonu export et
+  registerPhoneNumberUser, // <-- Yeni fonksiyonu export et
 };

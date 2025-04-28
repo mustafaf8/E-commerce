@@ -1,30 +1,3 @@
-// const express = require("express");
-// const {
-//   registerUser,
-//   loginUser,
-//   logoutUser,
-//   authMiddleware,
-//   updateUserDetails,
-// } = require("../../controllers/auth/auth-controller");
-
-// const router = express.Router();
-
-// router.post("/register", registerUser);
-// router.post("/login", loginUser);
-// router.post("/logout", logoutUser);
-// router.get("/check-auth", authMiddleware, (req, res) => {
-//   const user = req.user;
-//   res.status(200).json({
-//     success: true,
-//     message: "Authenticated user!",
-//     user,
-//   });
-// });
-// router.put("/update", authMiddleware, updateUserDetails);
-
-// module.exports = router;
-
-// server/routes/auth/auth-routes.js
 const express = require("express");
 const passport = require("passport"); // passport import edildi
 const jwt = require("jsonwebtoken"); // <--- BU SATIRI EKLEYİN
@@ -34,6 +7,8 @@ const {
   logoutUser,
   authMiddleware,
   updateUserDetails,
+  verifyPhoneNumberLogin, // <-- Yeni controller importu
+  registerPhoneNumberUser, // <-- Yeni controller importu
 } = require("../../controllers/auth/auth-controller"); // Controller fonksiyonları
 
 const router = express.Router();
@@ -55,6 +30,7 @@ router.get("/check-auth", authMiddleware, (req, res) => {
       email: user.email,
       userName: user.userName,
       role: user.role,
+      phoneNumber: user.phoneNumber,
       // profilePicture: user.profilePicture
     },
   });
@@ -118,5 +94,9 @@ router.get(
     res.redirect(redirectUrl);
   }
 );
+// --- YENİ: Telefon Numarası ile Giriş Rotaları ---
+router.post("/phone/verify", verifyPhoneNumberLogin); // OTP sonrası doğrulama ve kullanıcı kontrolü
+router.post("/phone/register", registerPhoneNumberUser); // Yeni kullanıcı kaydı (isim alındıktan sonra)
+// --- ---
 
 module.exports = router;

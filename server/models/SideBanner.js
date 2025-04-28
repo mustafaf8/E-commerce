@@ -15,8 +15,6 @@ const SideBannerSchema = new mongoose.Schema(
       type: String, // Opsiyonel link
       trim: true,
     },
-    // order: { type: Number, default: 0 }, // Sıralama için eklenebilir
-    // isActive: { type: Boolean, default: true }, // Aktif durumu için eklenebilir
   },
   { timestamps: true }
 );

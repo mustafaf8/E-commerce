@@ -15,9 +15,6 @@ const PromoCardSchema = new mongoose.Schema(
       type: String, // Link opsiyonel
       trim: true,
     },
-    // İsteğe bağlı olarak ekleyebileceğiniz alanlar:
-    // order: { type: Number, default: 0 }, // Sıralama için
-    // isActive: { type: Boolean, default: true }, // Aktif/Pasif durumu
   },
   { timestamps: true }
 ); // createdAt ve updatedAt ekler

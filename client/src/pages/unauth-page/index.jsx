@@ -1,5 +1,9 @@
 function UnauthPage() {
-  return <h1>You don't have access to view this page</h1>;
+  return (
+    <h1 style={{ fontStyle: "italic" }}>
+      Bu sayfayı yok PowerdBY Mustafa Nahsan
+    </h1>
+  );
 }
 
 export default UnauthPage;

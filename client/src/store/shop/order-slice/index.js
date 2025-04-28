@@ -36,17 +36,6 @@ export const createNewOrder = createAsyncThunk(
   }
 );
 
-// capturePayment Thunk'ı Iyzico backend callback akışında GEREKLİ DEĞİL.
-// Bu yüzden kaldırıyoruz veya yorum satırı yapıyoruz.
-/*
-export const capturePayment = createAsyncThunk(
-    "/order/capturePayment",
-    async ({ paymentId, payerId, orderId }) => {
-        // ... Bu kod artık kullanılmayacak ...
-    }
-);
-*/
-
 // Diğer Thunk'lar (kullanıcı siparişlerini alma) aynı kalabilir
 export const getAllOrdersByUserId = createAsyncThunk(
   "order/getAllOrdersByUserId",

@@ -11,10 +11,10 @@ function ProductFilter({ filters, handleFilter }) {
       <div className="p-4 border-b">
         <h2 className="text-lg font-extrabold">Filtre</h2>
       </div>
-      <div className="p-4 space-y-4">
+      <div className="p-4 flex flex-col max-[600px]:flex-row gap-14">
         {Object.keys(filterOptions).map((keyItem) => (
           <Fragment key={keyItem}>
-            <div>
+            <div className="mt-0">
               <h3 className="text-base font-bold">{keyItem}</h3>
               <div className="grid gap-2 mt-2">
                 {filterOptions[keyItem].map((option) => (
@@ -36,7 +36,6 @@ function ProductFilter({ filters, handleFilter }) {
                 ))}
               </div>
             </div>
-            <Separator />
           </Fragment>
         ))}
       </div>

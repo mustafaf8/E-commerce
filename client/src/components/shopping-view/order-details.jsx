@@ -28,10 +28,6 @@ function ShoppingOrderDetailsView({ orderDetails }) {
     }
   }
 
-  // Adres bilgisindeki iletişim adını al
-  // const contactName =
-  //   orderDetails?.addressInfo?.contactName || "Alıcı Bilgisi Yok";
-
   const statusMapping = {
     pending: { label: "Beklemede", color: "bg-yellow-400" },
     inProcess: { label: "Hazırlanıyor", color: "bg-orange-500" },

@@ -1,10 +1,8 @@
-// client/src/components/admin-view/image-upload.jsx (Güncellenmiş Hali)
 import { FileIcon, UploadCloudIcon, XIcon } from "lucide-react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { useEffect, useRef } from "react"; // useEffect kaldırıldı (upload için)
 import { Button } from "../ui/button";
-// import axios from "axios"; // axios'a burada gerek yok
 import { Skeleton } from "../ui/skeleton"; // Skeleton kalabilir (dosya seçimi sonrası için)
 
 function ProductImageUpload({
@@ -44,8 +42,6 @@ function ProductImageUpload({
       inputRef.current.value = ""; // Input'u temizle
     }
   }
-
-  // --- uploadImageToCloudinary fonksiyonu ve useEffect kaldırıldı ---
 
   return (
     <div className={`w-full mt-4 ${isCustomStyling ? "" : "max-w-md mx-auto"}`}>

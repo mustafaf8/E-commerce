@@ -54,103 +54,127 @@ function AdminOrderDetailsView({ orderDetails }) {
   };
 
   return (
-    <DialogContent className="sm:max-w-[600px]">
-      <div className="grid gap-6">
-        <div className="grid gap-2">
-          <div className="flex mt-6 items-center justify-between">
-            <p className="font-medium">Sipariş ID</p>
-            <Label>{orderDetails?._id}</Label>
+    <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <div className="grid gap-6 ">
+        <div className="grid gap-2 text-sm">
+          <div className="flex items-center justify-between">
+            <p className="text-muted-foreground">Sipariş ID</p>
+            <Label className="font-mono text-xs">
+              {orderDetails?._id}
+            </Label>{" "}
+            {/* font-mono ve text-xs */}
           </div>
-          <div className="flex mt-2 items-center justify-between">
-            <p className="font-medium">Sipariş Tarihi</p>
-            <Label>{orderDetails?.orderDate.split("T")[0]}</Label>
-          </div>
-          <div className="flex mt-2 items-center justify-between">
-            <p className="font-medium">Sipariş Tutarı</p>
-            <Label>{orderDetails?.totalAmount} TL</Label>
-          </div>
-          <div className="flex mt-2 items-center justify-between">
-            <p className="font-medium">Ödeme Yöntemi</p>
-            <Label>{orderDetails?.paymentMethod}</Label>
-          </div>
-          <div className="flex mt-2 items-center justify-between">
-            <p className="font-medium">Ödeme Durumu</p>
-            <Label>{orderDetails?.paymentStatus}</Label>
-          </div>
-          <div className="flex mt-2 items-center justify-between">
-            <p className="font-medium">Sipariş Durumu</p>
+          <div className="flex items-center justify-between">
+            <p className="text-muted-foreground">Sipariş Tarihi</p>
             <Label>
-              {/* <Badge
-                variant={
-                  orderDetails.orderStatus === "confirmed"
-                    ? "default"
-                    : orderDetails.orderStatus === "pending"
-                    ? "secondary"
-                    : orderDetails.orderStatus === "failed" ||
-                      orderDetails.orderStatus === "rejected"
-                    ? "destructive"
-                    : "outline"
-                }
-                className="text-xs"
-              >
-                {orderDetails?.orderStatus}
-              </Badge> */}
-              {/* <Badge
-                className={`py-1 px-3 ${
-                  orderDetails?.orderStatus === "confirmed"
-                    ? "bg-green-500"
-                    : orderDetails?.orderStatus === "rejected"
-                    ? "bg-red-600"
-                    : orderDetails?.orderStatus === "inProcess" ||
-                      orderDetails?.orderStatus === "inShipping"
-                    ? "bg-orange-300" // Hazırlanıyor veya Kargoda -> Turuncu
-                    : "bg-black"
-                }`}
-              >
-                {orderDetails?.orderStatus}
-              </Badge> */}
-              <Badge
-                className={`p-1 px-3 w-24 justify-center ${
-                  statusMapping[orderDetails?.orderStatus]?.color ||
-                  statusMapping.default.color
-                }`}
-              >
-                {statusMapping[orderDetails?.orderStatus]?.label ||
-                  statusMapping.default.label}
-              </Badge>
+              {orderDetails?.orderDate
+                ? new Date(orderDetails.orderDate).toLocaleDateString("tr-TR")
+                : "N/A"}
+            </Label>{" "}
+            {/* Tarih formatlama */}
+          </div>
+          <div className="flex items-center justify-between">
+            <p className="text-muted-foreground">Sipariş Tutarı</p>
+            <Label className="font-semibold">
+              {orderDetails?.totalAmount?.toFixed(2) || 0} TL
+            </Label>{" "}
+            {/* toFixed(2) */}
+          </div>
+          <div className="flex items-center justify-between">
+            <p className="text-muted-foreground">Ödeme Yöntemi</p>
+            <Label className="capitalize">
+              {orderDetails?.paymentMethod?.replace("_", " ") ||
+                "Belirtilmemiş"}
             </Label>
+          </div>
+          <div className="flex items-center justify-between">
+            <p className="text-muted-foreground">Ödeme Durumu</p>
+            <Label className="capitalize">
+              {orderDetails?.paymentStatus || "Bilinmiyor"}
+            </Label>
+          </div>
+          <div className="flex items-center justify-between">
+            <p className="text-muted-foreground">Sipariş Durumu</p>
+            <Badge
+              className={`py-1 px-3 text-xs justify-center min-w-[90px] ${
+                // min-width eklendi
+                statusMapping[orderDetails?.orderStatus]?.color ||
+                statusMapping.default.color
+              }`}
+            >
+              {statusMapping[orderDetails?.orderStatus]?.label ||
+                statusMapping.default.label}
+            </Badge>
           </div>
         </div>
         <Separator />
-        <div className="grid gap-4">
-          <div className="grid gap-2">
-            <div className="font-medium">Sipariş Detayı</div>
-            <ul className="grid gap-3">
-              {orderDetails?.cartItems && orderDetails?.cartItems.length > 0
-                ? orderDetails?.cartItems.map((item) => (
-                    <li className="flex items-center justify-between">
-                      <span>Başlık: {item.title}</span>
-                      <span>Adet: {item.quantity}</span>
-                      <span>Fiyat: {item.price} TL</span>
-                    </li>
-                  ))
-                : null}
-            </ul>
-          </div>
+        <div className="grid gap-3">
+          <h3 className="font-semibold text-base">Sipariş İçeriği</h3>{" "}
+          <ul className="grid gap-2 text-sm">
+            {orderDetails?.cartItems && orderDetails?.cartItems.length > 0 ? (
+              orderDetails.cartItems.map((item, index) => (
+                <li
+                  key={item.productId + "-" + index}
+                  className="flex items-center justify-between border-b pb-1 last:border-b-0"
+                >
+                  <span className="flex-1 mr-2 truncate" title={item.title}>
+                    {item.title}{" "}
+                    <span className="text-muted-foreground">
+                      (x{item.quantity})
+                    </span>
+                  </span>
+                  <span className="font-medium">
+                    {(item.price * item.quantity).toFixed(2)} TL
+                  </span>
+                </li>
+              ))
+            ) : (
+              <li className="text-muted-foreground text-center">
+                Sipariş içeriği boş.
+              </li>
+            )}
+          </ul>
         </div>
-        <div className="grid gap-4">
-          <div className="grid gap-2">
-            <div className="font-medium">Teslimat Adresi</div>
-            <div className="grid gap-0.5 text-muted-foreground">
-              <span>{user.userName}</span>
-              <span>{orderDetails?.addressInfo?.address}</span>
-              <span>{orderDetails?.addressInfo?.city}</span>
-              <span>{orderDetails?.addressInfo?.pincode}</span>
-              <span>{orderDetails?.addressInfo?.phone}</span>
-              <span>{orderDetails?.addressInfo?.notes}</span>
+        <Separator />
+        {/* Teslimat Adresi */}
+        <div className="grid gap-2">
+          <h3 className="font-semibold text-base">Teslimat Adresi</h3>
+          {orderDetails?.addressInfo ? (
+            <div className="grid gap-0.5 text-sm text-muted-foreground">
+              <span>
+                <span className="font-medium text-foreground">Alıcı:</span>
+                {user?.userName || "N/A"}
+              </span>
+              <span>
+                <span className="font-medium text-foreground">Adres:</span>
+                {orderDetails.addressInfo.address}
+              </span>
+              <span>
+                <span className="font-medium text-foreground">Şehir:</span>
+                {orderDetails.addressInfo.city}
+              </span>
+              <span>
+                <span className="font-medium text-foreground">Posta Kodu:</span>
+                {orderDetails.addressInfo.pincode}
+              </span>
+              <span>
+                <span className="font-medium text-foreground">Telefon:</span>
+                {orderDetails.addressInfo.phone}
+              </span>
+              {orderDetails.addressInfo.notes && (
+                <span>
+                  <span className="font-medium text-foreground">Not:</span>
+                  {orderDetails.addressInfo.notes}
+                </span>
+              )}
             </div>
-          </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Adres bilgisi bulunamadı.
+            </p>
+          )}
         </div>
+        <Separator />
 
         <div>
           <CommonForm

@@ -215,24 +215,6 @@ function ShoppingHeader() {
           <MenuItems />
         </div>
 
-        {/* Mobile Menu Sheet (Sağda) */}
-        {/* <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="outline" size="icon" className="lg:hidden">
-              <Menu className="h-6 w-6" />
-              <span className="sr-only">Toggle header menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-full max-w-xs">
-            <div className="mb-6">
-              <MenuItems />
-            </div>
-            <div className="border-t pt-4">
-              <HeaderRightContent />
-            </div>
-          </SheetContent>
-        </Sheet> */}
-
         {/* Desktop Right Content (Avatar/Login) (Sağda) */}
         <div className="hidden lg:block">
           <HeaderRightContent />

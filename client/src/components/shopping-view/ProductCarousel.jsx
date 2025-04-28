@@ -1,4 +1,3 @@
-// client/src/components/shopping-view/ProductCarousel.jsx
 import { useState, useRef, useEffect, useCallback } from "react"; // useCallback eklendi
 import ShoppingProductTile from "./product-tile";
 import ProductTileSkeleton from "./product-tile-skeleton.jsx";
@@ -7,6 +6,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import PropTypes from "prop-types";
 import { cn } from "@/lib/utils"; // cn utility'sini import et
 import { useMemo } from "react"; // useMemo eklendi
+import { useNavigate } from "react-router-dom";
 
 function ProductCarousel({
   title,
@@ -14,11 +14,13 @@ function ProductCarousel({
   isLoading,
   handleGetProductDetails,
   handleAddtoCart,
+  viewAllPath,
 }) {
   const skeletonCount = 6;
   const scrollContainerRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const navigate = useNavigate();
 
   // Kaydırma durumunu kontrol eden fonksiyon
   const checkScroll = useCallback(() => {
@@ -77,7 +79,14 @@ function ProductCarousel({
       setTimeout(checkScroll, 350); // smooth behavior süresine yakın bir gecikme
     }
   };
-
+  const handleViewAllClick = () => {
+    if (viewAllPath) {
+      navigate(viewAllPath); // Prop olarak gelen yola yönlendir
+    } else {
+      console.warn("ProductCarousel: viewAllPath prop'u tanımlanmamış.");
+      // İsteğe bağlı: Varsayılan bir sayfaya yönlendirilebilir navigate('/shop/listing');
+    }
+  };
   return (
     <section className=" bg-transparent relative group/carousel pl-1">
       <div className="container mx-auto px-16 max-[1024px]:px-1 ">
@@ -86,7 +95,7 @@ function ProductCarousel({
             {title}
           </h1>
           <h1 className="flex items-end justify-center text-sm font-semibold text-red-600 cursor-pointer hover:text-gray-700 transition duration-200 ease-in-out">
-            <p>Tümü </p>
+            <p onClick={handleViewAllClick}>Tümü</p>
             <ChevronRightIcon className="w-4 h-4 font-semibold text-red-600 " />
           </h1>
         </div>
@@ -168,6 +177,7 @@ ProductCarousel.propTypes = {
   isLoading: PropTypes.bool,
   handleGetProductDetails: PropTypes.func.isRequired,
   handleAddtoCart: PropTypes.func.isRequired,
+  viewAllPath: PropTypes.string,
 };
 
 export default ProductCarousel;

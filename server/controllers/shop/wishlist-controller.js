@@ -12,10 +12,6 @@ const getWishlist = async (req, res) => {
         .json({ success: false, message: "Kullanıcı ID'si gerekli." });
     }
 
-    // Kullanıcının favori listesini bul ve ürün detaylarını populate et
-    // Frontend şu an sadece ID bekliyor gibi görünüyor,
-    // ama populate etmek daha verimli olabilir. Frontend'i buna göre güncelleyebiliriz.
-    // Şimdilik frontend'in beklediği gibi sadece ID'leri içeren item'ları döndürelim.
     const wishlist = await Wishlist.findOne({ userId });
     // .populate('items.productId'); // <<< İstersen ürün detaylarını getirmek için bunu açabilirsin
 
@@ -36,12 +32,10 @@ const addToWishlist = async (req, res) => {
   try {
     const { userId, productId } = req.body;
     if (!userId || !productId) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Kullanıcı ID'si ve Ürün ID'si gerekli.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Kullanıcı ID'si ve Ürün ID'si gerekli.",
+      });
     }
 
     // Ürünün var olup olmadığını kontrol et (opsiyonel ama önerilir)
@@ -66,35 +60,29 @@ const addToWishlist = async (req, res) => {
 
     if (itemIndex > -1) {
       // Zaten varsa tekrar ekleme, başarı mesajı döndür
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: "Ürün zaten favorilerinizde.",
-          data: { productId },
-        });
+      return res.status(200).json({
+        success: true,
+        message: "Ürün zaten favorilerinizde.",
+        data: { productId },
+      });
     } else {
       // Favorilere ekle
       wishlist.items.push({ productId });
       await wishlist.save();
-      res
-        .status(201)
-        .json({
-          success: true,
-          message: "Ürün favorilere eklendi.",
-          data: { productId },
-        });
+      res.status(201).json({
+        success: true,
+        message: "Ürün favorilere eklendi.",
+        data: { productId },
+      });
     }
   } catch (error) {
     console.error("Favorilere eklenirken hata:", error);
     // Duplicate key hatası (aynı anda eklemeye çalışılırsa vs.) yönetilebilir
     if (error.code === 11000) {
-      return res
-        .status(409)
-        .json({
-          success: false,
-          message: "İşlem çakışması, lütfen tekrar deneyin.",
-        });
+      return res.status(409).json({
+        success: false,
+        message: "İşlem çakışması, lütfen tekrar deneyin.",
+      });
     }
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
@@ -105,12 +93,10 @@ const removeFromWishlist = async (req, res) => {
   try {
     const { userId, productId } = req.params; // Parametrelerden al
     if (!userId || !productId) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Kullanıcı ID'si ve Ürün ID'si gerekli.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Kullanıcı ID'si ve Ürün ID'si gerekli.",
+      });
     }
 
     // Kullanıcının favori listesini bul
@@ -136,13 +122,11 @@ const removeFromWishlist = async (req, res) => {
     } else {
       // Değişikliği kaydet
       await wishlist.save();
-      res
-        .status(200)
-        .json({
-          success: true,
-          message: "Ürün favorilerden çıkarıldı.",
-          data: { productId },
-        });
+      res.status(200).json({
+        success: true,
+        message: "Ürün favorilerden çıkarıldı.",
+        data: { productId },
+      });
     }
   } catch (error) {
     console.error("Favorilerden çıkarılırken hata:", error);

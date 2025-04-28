@@ -1,10 +1,3 @@
-// function NotFound() {
-//   return <div>Sayfa Bulunamadı</div>;
-// }
-
-// export default NotFound;
-
-// client/src/pages/not-found.jsx (Mevcut dosyanın güncellenmiş hali)
 import { Frown, Home } from "lucide-react"; // İkonlar
 import { Button } from "@/components/ui/button"; // Shadcn Button
 import { Link } from "react-router-dom";

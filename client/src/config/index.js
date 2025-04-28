@@ -187,44 +187,6 @@ export const sortOptions = [
   { id: "title-ztoa", label: "Title: Z to A" },
 ];
 
-// export const addressFormControls = [
-//   {
-//     label: "İl",
-//     name: "city",
-//     componentType: "input",
-//     type: "text",
-//     placeholder: "İl adını girin",
-//   },
-//   {
-//     label: "Adres",
-//     name: "address",
-//     componentType: "input",
-//     type: "text",
-//     placeholder: "Adresinizi girin",
-//   },
-//   {
-//     label: "Posta Kodu",
-//     name: "pincode",
-//     componentType: "input",
-//     type: "text",
-//     placeholder: "Posta kodunu girin",
-//   },
-//   {
-//     label: "Telefon Numarası",
-//     name: "phone",
-//     componentType: "input",
-//     type: "text",
-//     placeholder: "Telefon numarasını girin",
-//   },
-//   {
-//     label: "Not",
-//     name: "notes",
-//     componentType: "textarea",
-//     placeholder: "Notunuzu girin",
-//   },
-// ];
-
-// client/src/config/index.js
 export const addressFormControls = [
   {
     name: "address",
@@ -280,7 +242,14 @@ export const userInfoFormControls = [
     label: "E-posta",
     componentType: "input",
     type: "email",
-    // disabled: true, // E-posta düzenlenemezse bu satırı ekleyin
+  },
+  {
+    name: "phoneNumber", // state ve modeldeki alan adı ile eşleşmeli
+    label: "Telefon Numarası",
+    componentType: "input",
+    type: "tel", // Telefon tipi
+    placeholder: "Telefon numaranız (varsa)", // Placeholder
+    disabled: true, // <<< DÜZENLENEMEZ YAPILDI
   },
   // Diğer alanlar eklenebilir (örneğin, profil fotoğrafı, telefon numarası vb.)
 ];

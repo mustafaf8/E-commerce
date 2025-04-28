@@ -10,10 +10,6 @@ const AboutUs = () => {
         Hakkımızda
       </h1>
       <div className="prose prose-lg dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 space-y-4">
-        {" "}
-        {/* Okunabilirlik için prose sınıfı */}
-        {/* --- BURAYA rmrenerji.com SİTESİNDEKİ İÇERİĞİ YAPIŞTIRIN --- */}
-        {/* Örnek Paragraflar (Bunları silip kendi içeriğinizi ekleyin): */}
         <p>
           [MARKA ADINIZ], sektördeki deneyimi ve yenilikçi yaklaşımıyla
           müşterilerine kaliteli ürünler sunmayı hedefleyen bir e-ticaret
