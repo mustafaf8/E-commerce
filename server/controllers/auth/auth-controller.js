@@ -69,24 +69,18 @@ passport.deserializeUser(async (id, done) => {
 });
 // --- Passport Yapılandırması Sonu ---
 
-// Mevcut Fonksiyonlar (registerUser, loginUser, logoutUser, authMiddleware, updateUserDetails)
-// ... (Bu fonksiyonlarda değişiklik yapmaya gerek yok, ancak Google ile giriş yapan kullanıcılar için loginUser'a alternatif olacak)
-
 const registerUser = async (req, res) => {
-  // ... (mevcut kod)
   const { userName, email, password } = req.body;
 
   try {
     const checkUser = await User.findOne({ email });
     if (checkUser)
       return res.status(400).json({
-        // 400 Bad Request daha uygun olabilir
         success: false,
         message:
           "Aynı e-posta ile zaten bir kullanıcı mevcut! Lütfen tekrar deneyin.",
       });
 
-    // Şifre kontrolü: Google ile giriş yapıldıysa şifre olmayabilir, ama normal kayıtta olmalı
     if (!password) {
       return res.status(400).json({
         success: false,
@@ -103,13 +97,11 @@ const registerUser = async (req, res) => {
 
     await newUser.save();
     res.status(201).json({
-      // 201 Created
       success: true,
       message: "Kayıt işlemi başarılı",
     });
   } catch (e) {
     console.log(e);
-    // Genel hata mesajı
     res.status(500).json({
       success: false,
       message: "Kayıt sırasında bir hata oluştu.",
@@ -142,15 +134,14 @@ const loginUser = async (req, res) => {
           success: false,
           message: "Şifre yanlış! Lütfen tekrar deneyin.",
         });
-    } else if ((checkUser.googleId || checkUser.phoneNumber) && password) {
-      // Google ile kayıtlı kullanıcı şifre ile giriş yapmaya çalışıyorsa?
-      // Bu durumu nasıl yöneteceğinize karar vermelisiniz.
-      // Belki bir uyarı mesajı gösterebilirsiniz.
-      console.warn(
-        `Google/telefon ile kayıtlı kullanıcı (${email}) şifre ile giriş yapmaya çalıştı.`
-      );
-      // Şifre kontrolünü atlayıp token oluşturabilir veya hata verebilirsiniz.
-      // Şimdilik token oluşturmaya devam edelim.
+    } else if (checkUser.phoneNumber && password) {
+      // console.warn(
+      //   `Google/telefon ile kayıtlı kullanıcı (${email}) şifre ile giriş yapmaya çalıştı.`
+      // );
+      return res.status(400).json({
+        success: false,
+        message: "Bu kullanıcı telefon ile kayıtlı, şifre ile giriş yapamaz.",
+      });
     }
 
     // Token oluşturma (aynı kalır)
@@ -194,8 +185,6 @@ const loginUser = async (req, res) => {
 };
 
 const logoutUser = (req, res, next) => {
-  // next parametresi eklendi
-  // Passport'un logout fonksiyonunu kullanmak session'ı temizler
   req.logout(function (err) {
     if (err) {
       return next(err);
@@ -295,16 +284,9 @@ const updateUserDetails = async (req, res) => {
     if (userName && userName !== user.userName) {
       updatedFields.userName = userName;
     }
-
-    // 2. E-posta güncellemesi:
-    //    - Sadece kullanıcıda e-posta YOKSA ve yeni bir e-posta gönderildiyse
-    //    - VEYA (İsteğe bağlı: Eğer e-posta düzenlemeye izin verilecekse) kullanıcıda e-posta VARSA ama gönderilen farklıysa
     if (!user.email && email) {
-      // Kullanıcıda e-posta yok, yenisi gönderildi
-      // Yeni e-postanın başka bir kullanıcı tarafından kullanılmadığını kontrol et
       const emailExists = await User.findOne({ email: email });
       if (emailExists) {
-        // ID kontrolüne gerek yok çünkü bu kullanıcıda e-posta yoktu
         return res.status(400).json({
           success: false,
           message: "Bu e-posta adresi zaten kullanımda.",
@@ -319,11 +301,7 @@ const updateUserDetails = async (req, res) => {
       updatedFields.email = email;
     }
 
-    // 3. Telefon Numarası güncellemesi:
-    //    - Sadece kullanıcıda telefon numarası YOKSA ve yeni bir numara gönderildiyse
     if (!user.phoneNumber && phoneNumber) {
-      // Kullanıcıda telefon yok, yenisi gönderildi
-      // Yeni telefon numarasının başka bir kullanıcı tarafından kullanılmadığını kontrol et
       const phoneExists = await User.findOne({ phoneNumber: phoneNumber });
       if (phoneExists) {
         return res.status(400).json({
@@ -331,8 +309,6 @@ const updateUserDetails = async (req, res) => {
           message: "Bu telefon numarası zaten kayıtlı.",
         });
       }
-      // Format kontrolü (Basit - daha iyi bir validasyon gerekebilir)
-      // Örneğin + ile başlamalı ve belirli sayıda rakam içermeli
       if (!/^\+?[1-9]\d{1,14}$/.test(phoneNumber)) {
         return res.status(400).json({
           success: false,
@@ -341,17 +317,10 @@ const updateUserDetails = async (req, res) => {
       }
       updatedFields.phoneNumber = phoneNumber;
     }
-    // Mevcut telefon numarasını değiştirmeye İZİN VERMİYORUZ (OTP ile doğrulanmalı)
-
-    // Eğer güncellenecek alan varsa işlemi yap
     if (Object.keys(updatedFields).length > 0) {
       await User.updateOne({ _id: userId }, { $set: updatedFields });
       console.log(`Kullanıcı ${userId} güncellendi:`, updatedFields);
-
-      // Güncellenmiş kullanıcıyı (yeni token ile?) döndür
       const updatedUser = await User.findById(userId).select("-password");
-
-      // Token'ı da güncelle (yeni bilgilerle)
       const newToken = jwt.sign(
         {
           id: updatedUser._id,
@@ -603,6 +572,6 @@ module.exports = {
   logoutUser,
   authMiddleware,
   updateUserDetails,
-  verifyPhoneNumberLogin, // <-- Yeni fonksiyonu export et
-  registerPhoneNumberUser, // <-- Yeni fonksiyonu export et
+  verifyPhoneNumberLogin,
+  registerPhoneNumberUser,
 };

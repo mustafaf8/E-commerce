@@ -1,5 +1,5 @@
 import Address from "@/components/shopping-view/address";
-import img from "../../assets/banner-3.webp"; // Varlık yolunu kontrol et
+import img from "../../assets/tutu.jpg"; // Varlık yolunu kontrol et
 import { useDispatch, useSelector } from "react-redux";
 import UserCartItemsContent from "@/components/shopping-view/cart-items-content";
 import { Button } from "@/components/ui/button";
@@ -129,15 +129,12 @@ function ShoppingCheckout() {
       })
       .catch((error) => {
         console.error("createNewOrder error:", error);
-        // Hata mesajı useEffect içinde zaten gösteriliyor, burada tekrar göstermeye gerek yok
-        // Sadece konsol log yeterli olabilir veya spesifik başka bir işlem
       });
   }
 
   return (
     <div className="flex flex-col">
-      {/* Banner kısmı aynı kalabilir */}
-      <div className="relative h-[200px] md:h-[300px] w-full overflow-hidden">
+      <div className="relative h-[200px] md:h-[200px] w-full overflow-hidden">
         <img
           src={img}
           className="h-full w-full object-cover"
@@ -145,7 +142,7 @@ function ShoppingCheckout() {
         />
         {/* Başlık eklendi */}
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-          <h1 className="text-3xl md:text-4xl font-bold text-white">Ödeme</h1>
+          <h1 className="text-3xl md:text-5xl font-bold text-white">Ödeme</h1>
         </div>
       </div>
 

@@ -1,20 +1,10 @@
-// client/src/components/common/footer.jsx
-import React from "react";
 import { Link } from "react-router-dom"; // İç linkler için
 import {
   Instagram,
-  Youtube,
-  Twitter, // X ikonu yerine Twitter kullanabiliriz
   Facebook,
-  Linkedin,
   MessageSquare, // WhatsApp/Destek ikonu
   ArrowUpCircle, // Başa dön ikonu
 } from "lucide-react";
-
-// Ödeme yöntemi logoları için örnek import (gerçek yolları ayarlamanız gerekir)
-// import visaLogo from '@/assets/payment/visa.png';
-// import mastercardLogo from '@/assets/payment/mastercard.png';
-// ... diğer logolar
 
 const Footer = () => {
   const scrollToTop = () => {
@@ -64,7 +54,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/ortaklarimiz"
+                  to="/shop/ortaklarimiz"
                   className="hover:text-primary dark:hover:text-secondary"
                 >
                   İş Ortaklarımız
@@ -73,7 +63,7 @@ const Footer = () => {
 
               <li>
                 <Link
-                  to="/kvkk"
+                  to="/shop/kvkk"
                   className="hover:text-primary dark:hover:text-secondary"
                 >
                   Kişisel Verilerin Korunması
@@ -81,19 +71,10 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/bilgi-guvenligi"
+                  to="/shop/bilgi-guvenligi"
                   className="hover:text-primary dark:hover:text-secondary"
                 >
                   Bilgi Güvenliği Politikası
-                </Link>
-              </li>
-              {/* ... diğer linkler */}
-              <li>
-                <Link
-                  to="/iletisim"
-                  className="hover:text-primary dark:hover:text-secondary"
-                >
-                  İletişim
                 </Link>
               </li>
             </ul>
@@ -125,7 +106,7 @@ const Footer = () => {
               {/* ... diğer linkler */}
               <li>
                 <Link
-                  to="/islem-rehberi"
+                  to="/shop/islem-rehberi"
                   className="hover:text-primary dark:hover:text-secondary"
                 >
                   İşlem Rehberi

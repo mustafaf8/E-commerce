@@ -26,6 +26,10 @@ import ShoppingWishlist from "./pages/shopping-view/wishlist";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import AboutUs from "./components/shopping-view/about-us";
 import BottomNavBar from "./components/common/BottomNavBar";
+import Partners from "./pages/shopping-view/Partners"; // Yeni
+import KVKK from "./pages/shopping-view/KVKK"; // Yeni
+import InfoSecurityPolicy from "./pages/shopping-view/InfoSecurityPolicy";
+import TransactionGuide from "./pages/shopping-view/TransactionGuide";
 
 function App() {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -34,7 +38,6 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // Uygulama yüklendiğinde kimlik doğrulama durumunu kontrol et
     dispatch(checkAuth());
   }, [dispatch]);
 
@@ -92,10 +95,12 @@ function App() {
           <Route path="home" element={<ShoppingHome />} />
           <Route path="listing" element={<ShoppingListing />} />
           <Route path="search" element={<SearchProducts />} />
-
-          {/* YENİ HAKKIMIZDA ROTASI */}
+          {/* --- FOOTER SAYFALARI --- */}
           <Route path="hakkimizda" element={<AboutUs />} />
-
+          <Route path="ortaklarimiz" element={<Partners />} /> {/* Yeni */}
+          <Route path="kvkk" element={<KVKK />} /> {/* Yeni */}
+          <Route path="bilgi-guvenligi" element={<InfoSecurityPolicy />} />
+          <Route path="islem-rehberi" element={<TransactionGuide />} />
           {/* === GİRİŞ GEREKTİREN Mağaza Rotaları === */}
           <Route
             path="payment-success"
