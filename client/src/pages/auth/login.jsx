@@ -322,9 +322,7 @@ function AuthLogin() {
 
   // Google ile Giriş (Sadece backend'e yönlendirme)
   const handleGoogleLogin = () => {
-    window.location.href =
-      import.meta.env.VITE_GOOGLE_AUTH_URL ||
-      "http://localhost:5000/api/auth/google";
+    window.location.href = import.meta.env.VITE_GOOGLE_AUTH_URL;
   };
 
   const renderSelectMethod = () => (
