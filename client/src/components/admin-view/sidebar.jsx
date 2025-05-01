@@ -33,7 +33,7 @@ function MenuItems({ setOpen }) {
   const navigate = useNavigate();
 
   return (
-    <nav className="mt-8 flex-col flex gap-2">
+    <nav className=" mt-8 flex-col flex gap-2">
       {adminSidebarMenuItems.map((menuItem) => (
         <div
           key={menuItem.id}
@@ -57,7 +57,7 @@ function AdminSideBar({ open, setOpen }) {
   return (
     <Fragment>
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="left" className="w-64">
+        <SheetContent side="left" className="w-72">
           <div className="flex flex-col h-full">
             <SheetHeader className="border-b">
               <SheetTitle className="flex gap-2 mt-5 mb-5">

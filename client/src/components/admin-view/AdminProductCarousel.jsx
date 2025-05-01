@@ -2,10 +2,11 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import AdminProductTile from "./product-tile"; // Shopping yerine Admin tile
 import ProductTileSkeleton from "../shopping-view/product-tile-skeleton.jsx"; // Skeleton kullanabiliriz
-import { Button } from "@/components/ui/button";
+
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import PropTypes from "prop-types";
 import { cn } from "@/lib/utils";
+import { Button } from "../ui/button";
 
 function AdminProductCarousel({
   title,
@@ -78,15 +79,12 @@ function AdminProductCarousel({
         {/* "Tümü" linki admin için gereksiz, kaldırıldı */}
       </div>
       <div className="relative">
-        {/* Sol Kaydırma Butonu */}
         <Button
           size="icon"
           className={cn(
-            "absolute top-1/2 left-[-15px] z-20 transform -translate-y-1/2 bg-white/70 hover:bg-white border rounded-full h-8 w-8 shadow-md transition-opacity duration-300 opacity-0 group-hover/carousel:opacity-100", // Hover'da görünür yapıldı
-            !isLoading && canScrollLeft ? "visible" : "invisible" // Görünürlük state'e bağlandı
+            "absolute top-1/2 left-[-15px] z-20 transform -translate-y-1/2 bg-white/70 hover:bg-white border rounded-full h-8 w-8 shadow-md transition-opacity duration-300 opacity-0 group-hover/carousel:opacity-100 visible" // Hover'da görünür yapıldı
           )}
           onClick={() => scroll("left")}
-          disabled={!canScrollLeft || isLoading}
         >
           <ChevronLeftIcon className="w-5 h-5 text-gray-700" />
         </Button>
@@ -122,15 +120,12 @@ function AdminProductCarousel({
           )}
         </div>
 
-        {/* Sağ Kaydırma Butonu */}
         <Button
           size="icon"
           className={cn(
-            "absolute top-1/2 right-[-15px] z-20 transform -translate-y-1/2 bg-white/70 hover:bg-white border rounded-full h-8 w-8 shadow-md transition-opacity duration-300 opacity-0 group-hover/carousel:opacity-100",
-            !isLoading && canScrollRight ? "visible" : "invisible"
+            "absolute top-1/2 right-[250px] z-20 transform -translate-y-1/2 bg-white/70 hover:bg-white border rounded-full h-28 w-238 shadow-md transition-opacity duration-300 opacity-0 group-hover/carousel:opacity-100 visible"
           )}
           onClick={() => scroll("right")}
-          disabled={!canScrollRight || isLoading}
         >
           <ChevronRightIcon className="w-5 h-5 text-gray-700" />
         </Button>

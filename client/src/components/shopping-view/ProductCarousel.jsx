@@ -38,32 +38,23 @@ function ProductCarousel({
       setCanScrollLeft(false);
       setCanScrollRight(false);
     }
-  }, []); // Bağımlılık yok, çünkü sadece ref'i kullanıyor
+  }, []);
 
-  // Bileşen yüklendiğinde ve ürünler değiştiğinde scroll durumunu kontrol et
   useEffect(() => {
-    // Ürünler yüklendikten sonra veya değiştiğinde kısa bir gecikme ile kontrol et
-    // Bu, DOM'un güncellenmesine zaman tanır
     const timer = setTimeout(() => {
       checkScroll();
-    }, 100); // 100ms gecikme
-
-    // Resize olayını dinle, pencere boyutu değişince de kontrol et
+    }, 100);
     window.addEventListener("resize", checkScroll);
-
     return () => {
       clearTimeout(timer);
       window.removeEventListener("resize", checkScroll);
     };
-    // isLoading ve products değiştiğinde yeniden çalıştır
   }, [products, isLoading, checkScroll]);
 
-  // Kaydırma fonksiyonu
   const scroll = (direction) => {
     const container = scrollContainerRef.current;
     if (container) {
-      // Ne kadar kaydırılacak? Genellikle görünür alan kadar veya biraz daha azı iyi çalışır.
-      const scrollAmount = container.clientWidth * 0.8; // Görünür alanın %80'i kadar kaydır
+      const scrollAmount = container.clientWidth * 0.8;
       const newScrollLeft =
         direction === "left"
           ? container.scrollLeft - scrollAmount
@@ -73,10 +64,7 @@ function ProductCarousel({
         left: newScrollLeft,
         behavior: "smooth", // Yumuşak kaydırma efekti
       });
-
-      // scrollTo asenkron olabilir ve anında scroll event'i tetiklemeyebilir.
-      // Bu yüzden buton durumunu kısa bir gecikmeyle güncelliyoruz.
-      setTimeout(checkScroll, 350); // smooth behavior süresine yakın bir gecikme
+      setTimeout(checkScroll, 350);
     }
   };
   const handleViewAllClick = () => {

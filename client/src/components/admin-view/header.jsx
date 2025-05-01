@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "@/store/auth-slice";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
+import PropTypes from "prop-types";
 
 function AdminHeader({ setOpen }) {
   const { user } = useSelector((state) => state.auth);
@@ -12,18 +13,12 @@ function AdminHeader({ setOpen }) {
   const { toast } = useToast();
 
   function handleLogout() {
-    // console.log("[handleLogout] Function called. Dispatching logoutUser...");
     dispatch(logoutUser())
-      .unwrap() // .unwrap() kullanmak promise'in sonucunu (fulfilled/rejected) yakalamayı kolaylaştırır
+      .unwrap()
       .then(() => {
-        // Dispatch başarılı olduğunda (Redux state güncellendiğinde) çalışır
-        // console.log(
-        //   "[handleLogout] logoutUser dispatch successful. Navigating..."
-        // );
-        navigate("/shop/home"); // <-- 3. Başarılı çıkış sonrası yönlendir
+        navigate("/shop/home");
       })
       .catch((error) => {
-        // Eğer logoutUser thunk'ı reject olursa veya ağ hatası olursa burası çalışır
         console.error(
           "[handleLogout] Dispatch sırasında hata oluştu veya çıkış başarısız oldu:",
           error
@@ -37,7 +32,6 @@ function AdminHeader({ setOpen }) {
     <header className="flex items-center justify-between px-4 py-3 bg-background border-b">
       <Button onClick={() => setOpen(true)} className="lg:hidden sm:block">
         <AlignJustify />
-        <span className="sr-only">Toggle Menu</span>
       </Button>
       <div className="flex flex-1 justify-end items-center">
         {user && (
@@ -47,13 +41,11 @@ function AdminHeader({ setOpen }) {
             </span>
           </div>
         )}
-        {/* === YENİ EKLENECEK KISIM SONU === */}
-        {/* Mevcut Çıkış Butonu */}
+
         <Button
           onClick={handleLogout}
           className="inline-flex gap-2 items-center rounded-md px-4 py-2 text-sm font-medium shadow"
         >
-          {/* LogOut ikonunun boyutunu opsiyonel olarak ayarlayabilirsiniz */}
           <LogOut size={16} />
           Çıkış
         </Button>
@@ -61,5 +53,8 @@ function AdminHeader({ setOpen }) {
     </header>
   );
 }
+AdminHeader.propTypes = {
+  setOpen: PropTypes.func.isRequired,
+};
 
 export default AdminHeader;

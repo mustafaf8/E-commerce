@@ -243,7 +243,7 @@ function AdminProducts() {
       <div className="mb-4 w-full flex justify-end">
         <Button onClick={() => handleEditClick(null)}>Yeni Ürün Ekle</Button>
       </div>
-      <div className="space-y-0">
+      <div className="space-y-8">
         {listLoading ? (
           Array.from({ length: 3 }).map((_, catIndex) => (
             <div key={`cat-skel-${catIndex}`} className="space-y-4">
