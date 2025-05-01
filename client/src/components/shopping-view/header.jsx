@@ -1,12 +1,11 @@
-import { Heart, LogIn } from "lucide-react"; // <-- İkonu import et
-import { LogOut, Menu, ShoppingCart, UserCog } from "lucide-react";
+import { Heart, LogIn, LogOut, ShoppingCart, UserCog } from "lucide-react";
 import {
   Link,
   useLocation,
   useNavigate,
   useSearchParams,
 } from "react-router-dom";
-import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
+import { Sheet } from "../ui/sheet";
 import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { shoppingViewHeaderMenuItems } from "@/config";
@@ -194,9 +193,23 @@ function HeaderRightContent() {
 function ShoppingHeader() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { isAuthenticated } = useSelector((state) => state.auth);
-  const { cartItems } = useSelector((state) => state.shopCart);
-  const { isCartOpen } = useSelector((state) => state.shopCart);
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
+
+  function handleLogout() {
+    dispatch(logoutUser())
+      .unwrap()
+      .then(() => {
+        navigate("/auth/login"); // Login'e yönlendir
+        toast({
+          title: "Çıkış yapıldı",
+          description: "Başka bir zaman görüşmek üzere!",
+          variant: "success",
+        });
+      })
+      .catch((error) => {
+        console.error("Shop logout failed:", error);
+      });
+  }
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
@@ -204,8 +217,8 @@ function ShoppingHeader() {
         <Link to="/shop/home" className="flex items-center gap-2 mr-4">
           <span className="">
             <img
-              className="w-32 md:w-40" // Boyut biraz ayarlandı
-              src="../src/assets/dlogo2.png" // Bu yolun public klasörüne göre doğru olduğundan emin ol veya import kullan
+              className="w-32 md:w-40"
+              src="../src/assets/dlogo2.png"
               alt="logo"
             />
           </span>
@@ -215,8 +228,45 @@ function ShoppingHeader() {
           <MenuItems />
         </div>
 
-        {/* Desktop Right Content (Avatar/Login) (Sağda) */}
-        <div className="hidden lg:block">
+        <div className="lg:hidden flex items-center ml-auto">
+          {isAuthenticated && user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Avatar className="h-8 w-8 cursor-pointer border hover:border-gray-400">
+                  <AvatarFallback className="text-sm bg-gray-200 text-black font-bold">
+                    {user.userName && user.userName.length > 0
+                      ? user.userName[0].toUpperCase()
+                      : "?"}
+                  </AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="bottom" align="end" className="w-48">
+                <DropdownMenuLabel className="text-xs px-2 py-1.5">
+                  Merhaba, {user.userName}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="text-xs px-2 py-1.5"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="mr-2 h-3.5 w-3.5" /> Çıkış Yap
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button
+              variant="outline"
+              onClick={() => navigate("/auth/login")}
+              size="mustafa"
+              className="inline-flex items-center"
+            >
+              <LogIn className="mr-2 h-5 w-5" />
+              Giriş Yap
+            </Button>
+          )}
+        </div>
+
+        <div className="hidden lg:block ml-auto">
           <HeaderRightContent />
         </div>
       </div>

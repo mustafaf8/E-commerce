@@ -1,6 +1,5 @@
 import ConfirmationModal from "@/components/admin-view/ConfirmationModal";
 import ProductImageUpload from "@/components/admin-view/image-upload";
-import AdminProductTile from "@/components/admin-view/product-tile";
 import CommonForm from "@/components/common/form";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,9 +17,12 @@ import {
   editProduct,
   fetchAllProducts,
 } from "@/store/admin/products-slice";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
+import AdminProductCarousel from "@/components/admin-view/AdminProductCarousel";
+import AdminProductDetailsDialog from "@/components/admin-view/AdminProductDetailsDialog";
+import ProductTileSkeleton from "@/components/shopping-view/product-tile-skeleton.jsx";
 
 const initialFormData = {
   title: "",
@@ -31,6 +33,7 @@ const initialFormData = {
   salePrice: "",
   totalStock: "",
   averageReview: 0,
+  image: "",
 };
 
 function AdminProducts() {
@@ -47,6 +50,8 @@ function AdminProducts() {
   const { productList, isLoading: listLoading } = useSelector(
     (state) => state.adminProducts
   );
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [selectedProductDetails, setSelectedProductDetails] = useState(null);
   const dispatch = useDispatch();
   const { toast } = useToast();
 
@@ -80,28 +85,21 @@ function AdminProducts() {
     }
   };
 
-  // --- Güncellenmiş onSubmit Fonksiyonu ---
   async function onSubmit(event) {
     event.preventDefault();
-    let finalImageUrl = formData.image; // Düzenleme için mevcut URL ile başla
-
-    setProductImageLoadingState(true); // Yükleme başladı
-
+    let finalImageUrl = formData.image;
+    setProductImageLoadingState(true);
     try {
-      // 1. Yeni bir dosya seçildiyse, onu yükle
       if (productImageFile) {
         console.log("Yeni ürün resmi yükleniyor...");
         const uploadedUrl = await uploadImage(productImageFile);
         if (!uploadedUrl) {
-          // Yükleme başarısız oldu (toast uploadImage içinde gösterildi)
           setProductImageLoadingState(false);
-          return; // İşlemi durdur
+          return;
         }
-        finalImageUrl = uploadedUrl; // Başarılıysa yeni URL'i kullan
+        finalImageUrl = uploadedUrl;
         console.log("Yeni resim URL'i alındı:", finalImageUrl);
       }
-
-      // 2. Yeni ürün eklerken resim URL'si zorunlu mu kontrol et
       if (!finalImageUrl && currentEditedId === null) {
         toast({
           variant: "warning",
@@ -110,22 +108,15 @@ function AdminProducts() {
         setProductImageLoadingState(false);
         return;
       }
-
-      // 3. Gönderilecek son veriyi hazırla
       const dataToSend = {
         ...formData,
-        image: finalImageUrl, // Nihai URL'i kullan
+        image: finalImageUrl,
       };
-
       console.log("Redux'a gönderilecek veri:", dataToSend);
-
-      // 4. Redux action'ını dispatch et (Ekleme veya Güncelleme)
       if (currentEditedId !== null) {
-        // Güncelleme
         await dispatch(
           editProduct({ id: currentEditedId, formData: dataToSend })
-        ).unwrap(); // unwrap ile sonucu yakala
-        // Başarılı olursa formu temizle ve kapat
+        ).unwrap();
         dispatch(fetchAllProducts());
         setFormData(initialFormData);
         setProductImageFile(null);
@@ -133,9 +124,7 @@ function AdminProducts() {
         setCurrentEditedId(null);
         toast({ title: "Ürün başarıyla güncellendi.", variant: "success" });
       } else {
-        // Ekleme
-        await dispatch(addNewProduct(dataToSend)).unwrap(); // unwrap ile sonucu yakala
-        // Başarılı olursa formu temizle ve kapat
+        await dispatch(addNewProduct(dataToSend)).unwrap();
         dispatch(fetchAllProducts());
         setOpenCreateProductsDialog(false);
         setProductImageFile(null);
@@ -143,34 +132,30 @@ function AdminProducts() {
         toast({ title: "Ürün başarıyla eklendi.", variant: "success" });
       }
     } catch (error) {
-      // Dispatch işlemi veya yükleme sonrası hata olursa
       console.error("onSubmit sırasında hata:", error);
-      // Redux thunk'ları rejectWithValue ile hata döndürdüğünde error.message anlamlı olabilir
       toast({
         variant: "destructive",
         title: "İşlem Başarısız",
         description: error?.message || "Ürün kaydedilirken bir hata oluştu.",
       });
     } finally {
-      setProductImageLoadingState(false); // Yüklemeyi her durumda bitir
+      setProductImageLoadingState(false);
     }
   }
 
-  // Silme Fonksiyonu
   function openDeleteConfirmation(productId) {
-    console.log("Silme onayı açılıyor, ID:", productId); // Debug
-    setProductIdToDelete(productId); // Silinecek ID'yi state'e kaydet
-    setShowConfirmModal(true); // Modalı aç
+    console.log("Silme onayı açılıyor, ID:", productId);
+    setProductIdToDelete(productId);
+    setShowConfirmModal(true);
   }
-  // 2. Modal kapatma fonksiyonu
+
   function closeConfirmationModal() {
-    setShowConfirmModal(false); // Modalı kapat
-    setProductIdToDelete(null); // ID'yi sıfırla
+    setShowConfirmModal(false);
+    setProductIdToDelete(null);
   }
-  // 3. Modal onaylandığında çalışacak fonksiyon
   function confirmDeleteHandler() {
     if (productIdToDelete) {
-      console.log("Silme işlemi onaylandı, ID:", productIdToDelete); // Debug
+      console.log("Silme işlemi onaylandı, ID:", productIdToDelete);
       dispatch(deleteProduct(productIdToDelete)).then((data) => {
         if (data?.payload?.success) {
           dispatch(fetchAllProducts());
@@ -183,7 +168,7 @@ function AdminProducts() {
         }
       });
     }
-    closeConfirmationModal(); // İşlem sonrası modalı kapat
+    closeConfirmationModal();
   }
   function isFormValid() {
     return Object.keys(formData)
@@ -191,11 +176,8 @@ function AdminProducts() {
       .map((key) => formData[key] !== "")
       .every((item) => item);
   }
-
-  // Düzenleme modu için formu doldurma
   useEffect(() => {
     if (currentEditedId && openCreateProductsDialog) {
-      // Dialog açıkken ve ID varsa
       const productToEdit = productList.find(
         (item) => item._id === currentEditedId
       );
@@ -205,71 +187,102 @@ function AdminProducts() {
           productToEdit
         );
         setFormData(productToEdit);
-        // Düzenleme başlarken seçili dosyayı temizle, sadece mevcut URL (formData.image) kullanılır
         setProductImageFile(null);
       }
     } else if (!openCreateProductsDialog) {
-      // Dialog kapandığında temizle
       setCurrentEditedId(null);
       setFormData(initialFormData);
       setProductImageFile(null);
     }
-  }, [currentEditedId, productList, openCreateProductsDialog]); // openCreateProductsDialog bağımlılığı eklendi
+  }, [currentEditedId, productList, openCreateProductsDialog]);
 
   useEffect(() => {
     dispatch(fetchAllProducts());
   }, [dispatch]);
 
+  // --- YENİ: Ürünleri kategoriye göre gruplama ---
+  const groupedProducts = useMemo(() => {
+    if (!productList || productList.length === 0) return {};
+    return productList.reduce((acc, product) => {
+      const category = product.category || "Uncategorized"; // Kategorisiz ürünler için
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(product);
+      return acc;
+    }, {});
+  }, [productList]);
+
+  const categories = Object.keys(groupedProducts).sort();
+  const handleEditClick = (product) => {
+    if (!product) return;
+    setCurrentEditedId(product._id);
+    setFormData({
+      title: product.title || "",
+      description: product.description || "",
+      category: product.category || "",
+      brand: product.brand || "",
+      price: product.price || "",
+      salePrice: product.salePrice || "",
+      totalStock: product.totalStock || "",
+      averageReview: product.averageReview || 0,
+      image: product.image || "",
+    });
+    setProductImageFile(null);
+    setOpenCreateProductsDialog(true);
+  };
+
+  const handleShowDetailsClick = (product) => {
+    setSelectedProductDetails(product);
+    setIsDetailsDialogOpen(true);
+  };
   console.log(formData, "productList");
 
   return (
     <Fragment>
       <div className="mb-5 w-full flex justify-end">
-        <Button
-          onClick={() => {
-            setCurrentEditedId(null); // Düzenleme modunu
-            setFormData(initialFormData); // Formu sıfırla
-            setProductImageFile(null); // Seçili dosyayı
-            setOpenCreateProductsDialog(true); // Dialog'u aç
-          }}
-        >
-          Yeni Ürün Ekle
-        </Button>
+        <Button onClick={() => handleEditClick(null)}>Yeni Ürün Ekle</Button>
       </div>
-      {/* Ürün Listesi */}
-      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-        {listLoading ? ( // Liste yüklenirken Skeleton göster
-          Array.from({ length: 8 }).map((_, index) => (
-            <div
-              key={index}
-              className="w-full max-w-xs mx-auto space-y-2 border p-2 rounded-lg"
-            >
-              <Skeleton className="h-[300px] w-full rounded-t-lg" />
-              <Skeleton className="h-5 w-3/4" />
-              <Skeleton className="h-4 w-1/2" />
-              <Skeleton className="h-9 w-full" />
+
+      {/* --- YENİ: Kategori Carousel Gösterimi --- */}
+      <div className="space-y-8">
+        {listLoading ? (
+          Array.from({ length: 3 }).map((_, catIndex) => (
+            <div key={`cat-skel-${catIndex}`} className="space-y-4">
+              <Skeleton className="h-8 w-1/4" />
+              <div className="flex space-x-4 overflow-hidden pb-4">
+                {Array.from({ length: 4 }).map((_, prodIndex) => (
+                  <div
+                    key={`prod-skel-${catIndex}-${prodIndex}`}
+                    className="flex-shrink-0 w-60"
+                  >
+                    <ProductTileSkeleton />
+                  </div>
+                ))}
+              </div>
             </div>
           ))
-        ) : productList && productList.length > 0 ? (
-          productList.map((productItem) => (
-            <AdminProductTile
-              key={productItem._id}
-              setOpenCreateProductsDialog={setOpenCreateProductsDialog}
-              setCurrentEditedId={setCurrentEditedId}
-              product={productItem}
-              handleDelete={openDeleteConfirmation}
+        ) : categories.length > 0 ? (
+          categories.map((category) => (
+            <AdminProductCarousel
+              key={category}
+              title={category} // Kategori adını başlık olarak ver
+              products={groupedProducts[category]} // O kategoriye ait ürünleri ver
+              isLoading={listLoading} // Carousel içi yükleme (şu an genel state kullanılıyor)
+              handleEditProduct={handleEditClick} // Düzenleme fonksiyonunu ilet
+              handleDeleteProduct={openDeleteConfirmation} // Silme fonksiyonunu ilet
+              handleShowAdminDetails={handleShowDetailsClick} // Detay gösterme fonksiyonunu ilet
             />
           ))
         ) : (
-          <p className="col-span-full text-center text-gray-500">
+          <p className="text-center text-gray-500 py-10">
             Gösterilecek ürün bulunamadı.
-          </p> // Boş liste mesajı
+          </p>
         )}
       </div>
       <Sheet
         open={openCreateProductsDialog}
         onOpenChange={(isOpen) => {
-          // Kapatıldığında state'leri temizle
           if (!isOpen) {
             setCurrentEditedId(null);
             setFormData(initialFormData);
@@ -278,7 +291,6 @@ function AdminProducts() {
           setOpenCreateProductsDialog(isOpen);
         }}
       >
-        {/* Sheet içeriği genişletildi ve overflow eklendi */}
         <SheetContent
           side="right"
           className="w-[600px] sm:w-[700px] overflow-y-auto"
@@ -288,15 +300,13 @@ function AdminProducts() {
               {currentEditedId !== null ? "Ürünü Düzenle" : "Yeni Ürün Ekle"}
             </SheetTitle>
           </SheetHeader>
-
-          {/* Güncellenmiş ProductImageUpload Kullanımı */}
           <ProductImageUpload
-            id="product-image-upload" // Benzersiz ID
-            imageFile={productImageFile} // Seçilen dosya state'i
-            setImageFile={setProductImageFile} // Dosya state'ini güncelleyen fonksiyon
-            isEditMode={currentEditedId !== null}
+            id="product-image-upload"
+            imageFile={productImageFile}
+            setImageFile={setProductImageFile}
+            // Düzenleme modunda resim alanı disabled olmamalı, yeni resim yüklenebilmeli
+            // isEditMode={currentEditedId !== null}
           />
-          {/* Mevcut resmi (düzenleme modunda) gösterme */}
           {currentEditedId !== null && formData.image && !productImageFile && (
             <div className="mt-2">
               <p className="text-sm font-medium mb-1">Mevcut Resim:</p>
@@ -307,12 +317,9 @@ function AdminProducts() {
               />
             </div>
           )}
-          {/* Yükleme göstergesi */}
           {productImageLoadingState && (
             <p className="text-sm text-blue-600 mt-2">Resim yükleniyor...</p>
           )}
-
-          {/* Form */}
           <div className="py-6">
             <CommonForm
               onSubmit={onSubmit}
@@ -320,25 +327,30 @@ function AdminProducts() {
               setFormData={setFormData}
               buttonText={currentEditedId !== null ? "Güncelle" : "Ekle"}
               formControls={addProductFormElements}
-              // Buton disable koşulu güncellendi
-              // isBtnDisabled={
-              //   productImageLoadingState ||
-              //   !isFormValid() ||
-              //   (currentEditedId === null && !productImageFile)
-              // } // Yeni ürün eklerken resim seçilmiş olmalı
+              isBtnDisabled={
+                productImageLoadingState ||
+                !isFormValid() ||
+                (currentEditedId === null &&
+                  !productImageFile &&
+                  !formData.image)
+              }
             />
           </div>
         </SheetContent>
       </Sheet>
+
       <ConfirmationModal
-        isOpen={showConfirmModal} // Modalı kontrol eden state
+        isOpen={showConfirmModal}
         onClose={closeConfirmationModal}
         onConfirm={confirmDeleteHandler}
         onCancel={closeConfirmationModal}
-        title="Ürünü Silme Onayı"
         message="Bu ürünü kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz."
-        confirmText="Sil"
-        cancelText="İptal"
+      />
+
+      <AdminProductDetailsDialog
+        open={isDetailsDialogOpen}
+        setOpen={setIsDetailsDialogOpen}
+        productDetails={selectedProductDetails}
       />
     </Fragment>
   );

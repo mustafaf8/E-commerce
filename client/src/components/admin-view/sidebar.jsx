@@ -75,7 +75,7 @@ function AdminSideBar({ open, setOpen }) {
           className="flex cursor-pointer items-center gap-2"
         >
           <ChartNoAxesCombined size={30} />
-          <h1 className="text-2xl font-extrabold">Admin Paneli</h1>
+          <h1 className="text-2xl font-extrabold">Admin </h1>
         </div>
         <MenuItems />
       </aside>

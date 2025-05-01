@@ -41,10 +41,9 @@ function App() {
     dispatch(checkAuth());
   }, [dispatch]);
 
-  // Kimlik doğrulama durumu kontrol edilirken yükleme göstergesi
   if (isLoading) return <Skeleton className="w-full h-screen bg-gray-200" />; // Daha genel bir skeleton
 
-  console.log("Auth Loading:", isLoading, "User:", user); // Konsol logları kontrol için kalabilir
+  console.log("Auth Loading:", isLoading, "User:", user);
 
   return (
     <div className="flex flex-col overflow-hidden bg-white">
