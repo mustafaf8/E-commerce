@@ -85,3 +85,102 @@ AdminProductTile.propTypes = {
 };
 
 export default AdminProductTile;
+
+// AdminProductTile.jsx - The individual product card component
+// import { Button } from "../ui/button";
+// import { PencilIcon, TrashIcon, InfoIcon } from "lucide-react";
+// import PropTypes from "prop-types";
+
+// function AdminProductTile({
+//   product,
+//   handleEdit,
+//   handleDelete,
+//   handleShowDetails,
+// }) {
+//   // Format price to Turkish Lira
+//   const formatPrice = (price) => {
+//     return new Intl.NumberFormat("tr-TR", {
+//       style: "currency",
+//       currency: "TRY",
+//       minimumFractionDigits: 2,
+//     }).format(price);
+//   };
+
+//   return (
+//     <div className="bg-white rounded-lg shadow-md overflow-hidden h-full flex flex-col transition-all hover:shadow-lg">
+//       {/* Product Image */}
+//       <div className="relative aspect-square bg-gray-100">
+//         <img
+//           src={product.imageUrl || "/placeholder.jpg"}
+//           alt={product.title}
+//           className="w-full h-full object-cover"
+//           onError={(e) => {
+//             e.target.onerror = null;
+//             e.target.src = "/placeholder.jpg";
+//           }}
+//         />
+
+//         {/* Admin action buttons overlay */}
+//         <div className="absolute top-2 right-2 flex flex-col gap-2">
+//           <Button
+//             size="icon"
+//             variant="secondary"
+//             className="w-8 h-8 rounded-full bg-white/80 hover:bg-white"
+//             onClick={handleEdit}
+//           >
+//             <PencilIcon className="h-4 w-4" />
+//           </Button>
+
+//           <Button
+//             size="icon"
+//             variant="destructive"
+//             className="w-8 h-8 rounded-full bg-white/80 hover:bg-red-500 hover:text-white"
+//             onClick={handleDelete}
+//           >
+//             <TrashIcon className="h-4 w-4" />
+//           </Button>
+
+//           <Button
+//             size="icon"
+//             variant="secondary"
+//             className="w-8 h-8 rounded-full bg-white/80 hover:bg-blue-500 hover:text-white"
+//             onClick={handleShowDetails}
+//           >
+//             <InfoIcon className="h-4 w-4" />
+//           </Button>
+//         </div>
+//       </div>
+
+//       {/* Product Info */}
+//       <div className="p-3 flex flex-col flex-grow">
+//         <h3 className="font-medium text-gray-900 line-clamp-2 mb-1">
+//           {product.title}
+//         </h3>
+
+//         <div className="flex items-center justify-between mt-auto">
+//           <span className="text-lg font-bold text-gray-900">
+//             {formatPrice(product.price)}
+//           </span>
+//           <span className="text-xs text-gray-500">
+//             {product.stockStatus || "Stokta"}
+//           </span>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// AdminProductTile.propTypes = {
+//   product: PropTypes.shape({
+//     _id: PropTypes.string.isRequired,
+//     title: PropTypes.string.isRequired,
+//     price: PropTypes.number.isRequired,
+//     imageUrl: PropTypes.string,
+//     stockStatus: PropTypes.string,
+//   }).isRequired,
+//   handleEdit: PropTypes.func.isRequired,
+//   handleDelete: PropTypes.func.isRequired,
+//   handleShowDetails: PropTypes.func.isRequired,
+// };
+
+// export default AdminProductTile;
