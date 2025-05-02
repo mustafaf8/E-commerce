@@ -10,7 +10,6 @@ const createOrder = async (req, res) => {
   try {
     const { userId, cartItems, addressInfo, cartId } = req.body;
 
-    // --- Doğrulamalar (Kullanıcı, Adres vb.) ---
     const user = await User.findById(userId);
     if (!user)
       return res
@@ -25,10 +24,9 @@ const createOrder = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Sepet ürünleri geçersiz." });
 
-    // --- Sepet Ürünlerini Doğrula ve Toplamı Hesapla ---
     let calculatedTotal = 0;
     const basketItemsForIyzico = [];
-    const orderCartItems = []; // DB'ye kaydedilecek ürünler
+    const orderCartItems = [];
 
     for (const item of cartItems) {
       const product = await Product.findById(item.productId);
@@ -43,7 +41,7 @@ const createOrder = async (req, res) => {
           name: product.title,
           category1: product.category || "Default Kategori",
           itemType: Iyzipay.BASKET_ITEM_TYPE.PHYSICAL,
-          price: itemTotalPrice.toFixed(2), // Ürünün toplam fiyatı (miktar * birim fiyat)
+          price: itemTotalPrice.toFixed(2),
         });
 
         // Sipariş modeli için formatla
@@ -80,7 +78,7 @@ const createOrder = async (req, res) => {
       orderDate: new Date(),
       iyzicoConversationId: conversationId,
     });
-    await pendingOrder.save(); // Siparişi kaydet
+    await pendingOrder.save();
     const backendCallbackUrl = `http://localhost:5000/api/shop/order/iyzico-callback`; // Kendi backend adresin
 
     const request = {
@@ -98,7 +96,7 @@ const createOrder = async (req, res) => {
         name: user.userName.split(" ")[0] || "Ad",
         surname: user.userName.split(" ")[1] || "Soyad",
         gsmNumber: addressInfo.phone || "+905000000000",
-        email: user.email,
+        email: user.email || "muhasebe@rmrenerji.com",
         identityNumber: "11111111111", // Gerçek TC alınmalı
         registrationAddress: addressInfo.address,
         ip: req.ip || "127.0.0.1",
@@ -114,7 +112,6 @@ const createOrder = async (req, res) => {
         zipCode: addressInfo.pincode,
       },
       billingAddress: {
-        // Genellikle shipping ile aynı
         contactName: user.userName,
         city: addressInfo.city,
         country: "Turkey",
@@ -130,7 +127,7 @@ const createOrder = async (req, res) => {
         console.error("Iyzico checkoutFormInitialize Hatası:", err);
         return res.status(500).json({
           success: false,
-          message: "Iyzico ödeme formu başlatılamadı.",
+          message: "Iyzico ödeme başlatılamadı.",
           error: err,
         });
       }
@@ -158,13 +155,13 @@ const createOrder = async (req, res) => {
           success: false,
           message:
             result.errorMessage ||
-            "Iyzico ödeme formu başlatılamadı (başarısız durum).",
+            "Iyzico ödeme başlatılamadı (başarısız durum).",
           errorCode: result.errorCode,
         });
       }
     });
   } catch (e) {
-    console.error("createOrder Genel Hata:", e);
+    console.error(" Genel Hata:", e);
     res.status(500).json({
       success: false,
       message: "Sipariş oluşturulurken sunucu hatası oluştu.",
@@ -172,7 +169,6 @@ const createOrder = async (req, res) => {
   }
 };
 
-// YENİ Callback İşleyici Fonksiyon
 const handleIyzicoCallback = async (req, res) => {
   console.log("Iyzico Callback Geldi. Body:", req.body);
   const { token, status: iyzicoStatus } = req.body; // Iyzico'dan gelen token
@@ -210,10 +206,7 @@ const handleIyzicoCallback = async (req, res) => {
         }
 
         if (err) {
-          console.error(
-            `Iyzico checkoutForm.retrieve Hatası (Order ID: ${orderId}):`,
-            err
-          );
+          console.error(`Iyzico Hatası (Order ID: ${orderId}):`, err);
           await Order.findByIdAndUpdate(orderId, {
             orderStatus: "failed",
             paymentStatus: "callback_error",
@@ -228,14 +221,11 @@ const handleIyzicoCallback = async (req, res) => {
           result
         );
 
-        // Ödeme sonucunu işle
         if (
           result.status === "success" &&
           (result.paymentStatus === "SUCCESS" ||
             result.paymentStatus === "success")
         ) {
-          // Ödeme Başarılı
-
           // Sipariş zaten işlenmiş mi tekrar kontrol et (güvenlik için)
           if (
             order.orderStatus === "confirmed" ||
@@ -317,24 +307,21 @@ const getAllOrdersByUser = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const orders = await Order.find({ userId });
-
-    if (!orders.length) {
-      return res.status(404).json({
-        success: false,
-        message: "No orders found!",
-      });
-    }
+    // Doğrudan paymentStatus'u 'paid' olanları filtrele
+    const orders = await Order.find({
+      userId,
+      paymentStatus: "paid", // <<< Sadece 'paid' olanları getir
+    }).sort({ orderDate: -1 }); // En yeniden eskiye sırala
 
     res.status(200).json({
       success: true,
-      data: orders,
+      data: orders, // Boş olsa bile başarıyla döndür
     });
   } catch (e) {
-    console.log(e);
+    console.error("getAllOrdersByUser error:", e);
     res.status(500).json({
       success: false,
-      message: "Some error occured!",
+      message: "Siparişler alınırken bir hata oluştu!",
     });
   }
 };

@@ -252,10 +252,10 @@ function AdminProductCarousel({
   return (
     // w-full kaldırıldı, genişliği parent belirleyecek
     <section className="relative mb-6 border rounded-lg shadow-sm bg-white overflow-hidden">
-      {/* Kategori başlığı */}
       <div className="flex items-center justify-between p-4 border-b">
-        <h2 className="text-lg font-bold text-gray-800 capitalize">{title}</h2>
-        {/* Buraya "Tümünü Gör" linki eklenebilir */}
+        <h2 className="text-lg font-bold text-gray-800 capitalize">
+          {title} ({products?.length || 0} ürün)
+        </h2>
       </div>
 
       {/* Carousel container */}

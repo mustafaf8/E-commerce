@@ -72,6 +72,19 @@ passport.deserializeUser(async (id, done) => {
 const registerUser = async (req, res) => {
   const { userName, email, password } = req.body;
 
+  if (!userName || !email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "Kullanıcı adı, e-posta ve şifre alanları zorunludur.",
+    });
+  }
+
+  if (password.length < 4) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Şifre en az 4 karakter olmalıdır." });
+  }
+
   try {
     const checkUser = await User.findOne({ email });
     if (checkUser)

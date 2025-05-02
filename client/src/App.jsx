@@ -43,7 +43,7 @@ function App() {
 
   if (isLoading) return <Skeleton className="w-full h-screen bg-gray-200" />; // Daha genel bir skeleton
 
-  console.log("Auth Loading:", isLoading, "User:", user);
+  // console.log("Auth Loading:", isLoading, "User:", user);
 
   return (
     <div className="flex flex-col overflow-hidden bg-white">

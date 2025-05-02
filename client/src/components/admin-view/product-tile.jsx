@@ -4,9 +4,9 @@ import PropTypes from "prop-types";
 
 function AdminProductTile({
   product,
-  handleEdit, // Yeni: Düzenleme handler'ı
-  handleDelete, // Mevcut: Silme handler'ı
-  handleShowDetails, // Yeni: Detay gösterme handler'ı
+  handleEdit,
+  handleDelete,
+  handleShowDetails,
 }) {
   return (
     <Card className="w-full max-w-xs mx-auto flex flex-col h-full">
@@ -48,13 +48,18 @@ function AdminProductTile({
               )} TL`}</span>
             ) : null}
           </div>
-          {/* Stok Bilgisi (Admin için önemli olabilir) */}
-          <p className="text-xs text-gray-500">
-            Stok: {product?.totalStock ?? "N/A"}
-          </p>
+
+          <div className="flex justify-between items-center">
+            <p className="text-xs text-gray-500">
+              Stok: {product?.totalStock ?? "N/A"}
+            </p>
+            <p className="text-xs text-gray-500">
+              Satılan: {product?.salesCount ?? 0}
+            </p>
+          </div>
         </CardContent>
       </div>
-      {/* --- Tıklanabilir Alan Sonu --- */}
+
       <CardFooter className="flex justify-between items-center p-3 border-t">
         <Button onClick={handleEdit} size="sm">
           Düzenle
@@ -78,6 +83,7 @@ AdminProductTile.propTypes = {
     price: PropTypes.number,
     salePrice: PropTypes.number,
     totalStock: PropTypes.number,
+    salesCount: PropTypes.number,
   }).isRequired,
   handleEdit: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
