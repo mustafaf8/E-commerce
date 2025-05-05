@@ -1,8 +1,11 @@
 import {
   BadgeCheck,
   ChartNoAxesCombined,
+  Home,
   LayoutDashboard,
+  LayoutGrid,
   ShoppingBasket,
+  Tags,
 } from "lucide-react";
 import { Fragment } from "react";
 import { useNavigate } from "react-router-dom";
@@ -27,6 +30,28 @@ const adminSidebarMenuItems = [
     path: "/admin/orders",
     icon: <BadgeCheck />,
   },
+  // --- YENİ MENÜ ÖĞESİ ---
+  {
+    id: "brands", // Benzersiz bir id
+    label: "Markalar", // Menüde görünecek isim
+    path: "/admin/brands", // Gideceği yol (route)
+    icon: <Tags size={20} />, // İkonu ayarla
+  },
+  // --- KATEGORİ YÖNETİMİ (Eğer eklenmediyse bunu da ekle) ---
+  {
+    id: "categories",
+    label: "Kategoriler",
+    path: "/admin/categories",
+    icon: <LayoutGrid size={20} />, // Örneğin LayoutGrid ikonu
+  },
+  // --- ANA SAYFA BÖLÜMLERİ (Eğer eklenmediyse bunu da ekle) ---
+  {
+    id: "home-sections",
+    label: "Ana Sayfa Yönetimi",
+    path: "/admin/home-sections",
+    icon: <Home size={20} />, // Örneğin Home ikonu
+  },
+  // --- ---
 ];
 
 function MenuItems({ setOpen }) {

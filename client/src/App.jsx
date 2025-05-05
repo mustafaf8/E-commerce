@@ -30,6 +30,9 @@ import Partners from "./pages/shopping-view/Partners"; // Yeni
 import KVKK from "./pages/shopping-view/KVKK"; // Yeni
 import InfoSecurityPolicy from "./pages/shopping-view/InfoSecurityPolicy";
 import TransactionGuide from "./pages/shopping-view/TransactionGuide";
+import AdminCategories from "./pages/admin-view/categories"; // Yeni import
+import AdminHomeSections from "./pages/admin-view/home-sections";
+import AdminBrands from "./pages/admin-view/brands";
 
 function App() {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -86,6 +89,9 @@ function App() {
           <Route path="products" element={<AdminProducts />} />
           <Route path="orders" element={<AdminOrders />} />
           <Route path="features" element={<AdminFeatures />} />
+          <Route path="categories" element={<AdminCategories />} />
+          <Route path="home-sections" element={<AdminHomeSections />} />
+          <Route path="brands" element={<AdminBrands />} />
         </Route>
         {/* === ADMİN KORUMASI SONU === */}
 

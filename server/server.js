@@ -38,11 +38,15 @@ const commonFeatureRouter = require("./routes/common/feature-routes");
 const shopWishlistRouter = require("./routes/shop/wishlist-routes");
 const commonSideBannerRouter = require("./routes/common/side-banner-routes");
 
-// Passport yapılandırmasını (strateji, serialize, deserialize) yükle
-// Bu satırın, auth-controller.js dosyasındaki passport ile ilgili kodları çalıştırması gerekir.
+const adminCategoryRouter = require("./routes/admin/category-routes"); // Yeni
+const adminHomeSectionRouter = require("./routes/admin/home-section-routes"); // Yeni
+const commonCategoryRouter = require("./routes/common/category-routes"); // Yeni
+const shopHomeSectionRouter = require("./routes/shop/home-section-routes");
+const adminBrandRouter = require("./routes/admin/brand-routes"); // Yeni
+const commonBrandRouter = require("./routes/common/brand-routes");
+
 require("./controllers/auth/auth-controller");
 
-// MongoDB bağlantısını kur
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
@@ -50,8 +54,6 @@ mongoose
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
-// --- Middleware Tanımlamaları (DOĞRU SIRAYLA) ---
 
 // 1. CORS Middleware
 app.use(
@@ -121,7 +123,12 @@ app.use("/api/common/side-banners", commonSideBannerRouter);
 app.use("/api/common/feature", commonFeatureRouter);
 app.use("/api/shop/wishlist", shopWishlistRouter);
 app.use("/api/common/promo-cards", commonPromoCardRouter);
-// --- Rota Tanımlamaları Sonu ---
+app.use("/api/admin/categories", adminCategoryRouter); // Yeni Admin Kategori Rotaları
+app.use("/api/admin/home-sections", adminHomeSectionRouter); // Yeni Admin Ana Sayfa Bölüm Rotaları
+app.use("/api/common/categories", commonCategoryRouter); // Yeni Ortak Kategori Rotaları
+app.use("/api/shop/home-sections", shopHomeSectionRouter);
+app.use("/api/admin/brands", adminBrandRouter); // Yeni
+app.use("/api/common/brands", commonBrandRouter); // Yeni
 
 // Sunucuyu dinlemeye başla
 app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));

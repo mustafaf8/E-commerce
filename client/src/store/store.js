@@ -12,6 +12,9 @@ import commonFeatureSlice from "./common-slice";
 import promoCardReducer from "./common-slice/promo-card-slice";
 import wishlistReducer from "./shop/wishlist-slice";
 import sideBannerReducer from "./common-slice/side-banner-slice";
+import categoriesReducer from "./common-slice/categories-slice"; // Yeni
+import homeSectionsReducer from "./common-slice/home-sections-slice"; // Yeni
+import brandsReducer from "./common-slice/brands-slice";
 
 const store = configureStore({
   reducer: {
@@ -28,6 +31,9 @@ const store = configureStore({
     promoCards: promoCardReducer,
     shopWishlist: wishlistReducer,
     sideBanners: sideBannerReducer,
+    categories: categoriesReducer,
+    homeSections: homeSectionsReducer,
+    brands: brandsReducer,
   },
 });
 
