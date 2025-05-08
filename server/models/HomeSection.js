@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 const HomeSectionSchema = new mongoose.Schema(
   {
     title: {
-      // Carousel başlığı (örn: "Kadın Yeni Sezon")
       type: String,
       required: true,
       trim: true,

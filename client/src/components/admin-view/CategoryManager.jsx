@@ -341,7 +341,6 @@ import {
   BadgeX,
   Edit,
   PlusCircle,
-  Table,
   Trash2,
 } from "lucide-react";
 
@@ -521,12 +520,7 @@ function CategoryManager() {
               className="flex items-center justify-between p-3 border rounded-md bg-muted/30 hover:bg-muted/60 transition-colors"
             >
               <div className="flex flex-col sm:flex-row sm:items-center gap-x-4 gap-y-1 flex-grow min-w-0 mr-4">
-                {" "}
-                {/* Esnek genişlik ve sağ boşluk */}
-                {/* Kategori Adı ve Slug */}
                 <div className="min-w-0">
-                  {" "}
-                  {/* Taşmayı önlemek için */}
                   <p
                     className="font-semibold text-base truncate"
                     title={category.name}
