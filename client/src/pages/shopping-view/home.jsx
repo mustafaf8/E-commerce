@@ -58,9 +58,6 @@ function ShoppingHome() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { toast } = useToast();
-  //   // --- YENİ STATE'LER: En Çok Satanlar için ---
-  const [bestSellingProducts, setBestSellingProducts] = useState([]);
-  const [bestSellingLoading, setBestSellingLoading] = useState(true);
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [currentSideBannerIndex, setCurrentSideBannerIndex] = useState(0);
@@ -368,24 +365,25 @@ function ShoppingHome() {
               </div>
             )
           )
-        ) : // === --- ===
-        activeHomeSections && activeHomeSections.length > 0 ? (
+        ) : activeHomeSections && activeHomeSections.length > 0 ? (
           activeHomeSections.map((section) => {
-            // ... (fetchConfig oluşturma aynı) ...
             let filterParams = {};
-            let sortParams = "salesCount-desc";
+            let sortParams = "salesCount-desc"; // Varsayılan sıralama
             let fetchKey = section._id;
+            let viewAllPath = "/shop/listing"; // <<< Varsayılan "Tümü" linki
 
             if (section.contentType === "BEST_SELLING") {
               sortParams = "salesCount-desc";
               fetchKey = "best-selling";
+              viewAllPath = "/shop/listing?sortBy=salesCount-desc"; // <<< En çok satanlar için sıralama parametresi ekle
             } else if (
               section.contentType === "CATEGORY" &&
               section.contentValue
             ) {
               filterParams = { category: [section.contentValue] };
-              sortParams = "createdAt-desc";
+              sortParams = "createdAt-desc"; // veya başka bir varsayılan
               fetchKey = `category-${section.contentValue}`;
+              viewAllPath = `/shop/listing?category=${section.contentValue}`; // <<< Kategori parametresi ekle
             } else if (
               section.contentType === "BRAND" &&
               section.contentValue
@@ -393,33 +391,50 @@ function ShoppingHome() {
               filterParams = { brand: [section.contentValue] };
               sortParams = "createdAt-desc";
               fetchKey = `brand-${section.contentValue}`;
+              viewAllPath = `/shop/listing?brand=${section.contentValue}`; // <<< Marka parametresi ekle
             }
-            // ...
+            // --- Diğer contentType'lar için de benzer şekilde eklenebilir ---
+
+            const fetchConfig = {
+              key: fetchKey,
+              filterParams: filterParams,
+              sortParams: sortParams,
+              limit: section.itemLimit || 10,
+            };
 
             return (
+              // <ProductCarousel
+              //   key={section._id} // Benzersiz key
+              //   title={section.title} // Backend'den gelen başlık
+
+              //   fetchConfig={{
+
+              //     key: fetchKey,
+              //     filterParams: filterParams,
+              //     sortParams: sortParams,
+              //     limit: section.itemLimit || 10, // Backend'den gelen limit
+              //   }}
+              //   // --- Alternatif: Eğer home.jsx fetch yapıp products array'ini geçecekse ---
+              //   // products={/* İlgili ürün dizisi */}
+              //   // isLoading={/* İlgili yüklenme durumu */}
+              //   // --- ---
+              //   handleGetProductDetails={handleGetProductDetails}
+              //   handleAddtoCart={handleAddtoCart}
+              //   // viewAllPath prop'unu dinamik oluşturabilirsin, örn:
+              //   viewAllPath={
+              //     section.contentType === "CATEGORY"
+              //       ? `/shop/listing?category=${section.contentValue}`
+              //       : "/shop/listing"
+
+              //   }
+              // />
               <ProductCarousel
-                key={section._id} // Benzersiz key
-                title={section.title} // Backend'den gelen başlık
-                // ProductCarousel'un kendi fetch yapması için filtre/sıralama props'ları:
-                fetchConfig={{
-                  // Yeni bir prop nesnesi
-                  key: fetchKey, // Bu config değiştiğinde yeniden fetch tetiklenir
-                  filterParams: filterParams,
-                  sortParams: sortParams,
-                  limit: section.itemLimit || 10, // Backend'den gelen limit
-                }}
-                // --- Alternatif: Eğer home.jsx fetch yapıp products array'ini geçecekse ---
-                // products={/* İlgili ürün dizisi */}
-                // isLoading={/* İlgili yüklenme durumu */}
-                // --- ---
+                key={section._id}
+                title={section.title}
+                fetchConfig={fetchConfig}
                 handleGetProductDetails={handleGetProductDetails}
                 handleAddtoCart={handleAddtoCart}
-                // viewAllPath prop'unu dinamik oluşturabilirsin, örn:
-                viewAllPath={
-                  section.contentType === "CATEGORY"
-                    ? `/shop/listing?category=${section.contentValue}`
-                    : "/shop/listing"
-                }
+                viewAllPath={viewAllPath} // <<< Dinamik olarak oluşturulan path'i kullan
               />
             );
           })
