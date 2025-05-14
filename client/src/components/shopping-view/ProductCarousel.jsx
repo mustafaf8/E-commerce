@@ -309,21 +309,20 @@ function ProductCarousel({
   };
 
   return (
-    <section className="bg-transparent relative group/carousel pl-1">
-      <div className="container mx-auto px-16 max-[1024px]:px-1 ">
+    <section className="bg-transparent relative group/carousel ">
+      <div className="container mx-auto px-0 max-[1024px]:px-1 ">
         <div className="flex items-center justify-between p-3 mb-0">
-          <h1 className="text-2xl md:text-xl font-bold mb-0 text-gray-800 max-[400px]:text-lg max-[400px]:font-semibold">
+          <h1 className="text-2xl md:text-xl font-bold mb-0 text-gray-800 max-[400px]:text-lg max-[400px]:font-semibold pl-2">
             {title}
           </h1>
-          {viewAllPath && ( // Sadece viewAllPath varsa göster
+          {viewAllPath && (
             <h1 className="flex items-end justify-center text-sm font-semibold text-red-600 cursor-pointer hover:text-gray-700 transition duration-200 ease-in-out">
               <p onClick={handleViewAllClick}>Tümü</p>
               <ChevronRightIcon className="w-4 h-4 font-semibold text-red-600 " />
             </h1>
           )}
         </div>
-        <div className="flex items-center justify-between relative">
-          {/* Sol Kaydırma Butonu */}
+        <div className="flex items-center justify-start relative">
           <Button
             size="icon"
             className={cn(
@@ -337,14 +336,12 @@ function ProductCarousel({
             <ChevronLeftIcon className="w-5 h-5 text-gray-700" />
           </Button>
 
-          {/* Kaydırılabilir Alan */}
           <div
             ref={scrollContainerRef}
             onScroll={checkScroll}
-            className="flex space-x-4 overflow-x-auto pb-4 no-scrollbar"
+            className="flex space-x-3 overflow-x-auto pb-4 no-scrollbar"
           >
-            {/* --- YENİ: Yüklenme, Hata ve Ürün Gösterimi --- */}
-            {internalLoading ? ( // internalLoading kullan
+            {internalLoading ? (
               Array.from({ length: skeletonCount }).map((_, index) => (
                 <div
                   key={`skel-${fetchConfig?.key || title}-${index}`}
@@ -377,10 +374,8 @@ function ProductCarousel({
                 Bu bölümde gösterilecek ürün bulunamadı.
               </div>
             )}
-            {/* --- --- */}
           </div>
 
-          {/* Sağ Kaydırma Butonu */}
           <Button
             size="icon"
             className={cn(

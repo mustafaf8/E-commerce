@@ -150,21 +150,20 @@ function ShoppingHome() {
   }, [productDetails]);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <section className="bg-white pt-8 pb-2">
+    <div className="bg-white flex flex-col min-h-screen">
+      <section className=" pt-8 pb-2">
         <div className="container mx-auto px-4 lg:px-20">
-          <div className="promo-card-container">
+          <div className="promo-card-container ">
             {promoCardsLoading ? (
-              // Yükleme durumu için iskelet gösterimi
               Array.from({ length: 8 }).map((_, index) => (
                 <Card
                   key={`promo-skel-${index}`}
-                  className="promo-card relative flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 "
+                  className="promo-card px-2 relative flex-shrink-0 rounded-lg overflow-hidden  w-32 h-30 md:w-36 md:h-30"
                 >
-                  <Skeleton className="w-full h-full" />
-                  <div className="absolute bottom-0 left-0 right-0 p-1.5 pt-4">
-                    <Skeleton className="h-3 w-4/5 mb-1" />
-                    <Skeleton className="h-3 w-3/5" />
+                  <Skeleton className="w-full h-full bg-gray-300" />
+                  <div className="absolute bottom-0 left-0 right-0 p-5 pt-4">
+                    <Skeleton className="h-3 w-4/5 mb-1 " />
+                    <Skeleton className="h-3 w-3/5 " />
                   </div>
                 </Card>
               ))
@@ -188,27 +187,23 @@ function ShoppingHome() {
                 </Card>
               ))
             ) : (
-              <div className="w-full text-center py-5 text-gray-500">
-                Deposunda Aktif fırsat yok.
-              </div>
+              <div className="w-full text-center flex justify-center items-center py-5 text-gray-500"></div>
             )}
           </div>
         </div>
       </section>
 
-      {/* BÖLÜM 2: ORTADAKİ BANNER ALANI (SOL SLIDER, SAĞ STATİK) */}
-      <section className="my-4 md:my-4 container mx-auto px-20 max-[1024px]:px-1">
+      <section className=" my-4 md:my-4 container mx-auto px-20 max-[1024px]:px-1">
         {featuresLoading || sideBannersLoading ? (
-          <div className="flex flex-col md:flex-row gap-4 h-60 max-sm:h-[100px] max-md:h-[120px]">
-            {/* Daha belirgin bir gri tonu veya hafif bir animasyon eklenebilir */}
-            <Skeleton className="w-full md:w-[65%] h-full rounded-3xl bg-gray-200 animate-pulse" />
-            <Skeleton className="w-full md:w-[35%] h-full rounded-3xl bg-gray-200 animate-pulse" />
+          <div className="flex flex-col md:flex-row gap-4 h-60  max-sm:h-[200px] max-md:h-[200px]">
+            <Skeleton className="w-full md:w-[65%] h-full rounded-3xl bg-gray-200 animate-pulse max-sm:h-40" />
+            <Skeleton className="w-full md:w-[35%] h-full rounded-3xl bg-gray-200 animate-pulse max-md:hidden" />
           </div>
         ) : (
-          <div className="flex flex-col md:flex-row gap-4 ">
+          <div className="flex  md:flex-row gap-4 ">
             {/* Sol Ana Banner (Artık Slider) */}
             <div
-              className={`relative w-full md:w-[65%] rounded-3xl overflow-hidden shadow-sm group max-sm:h-32 max-md:h-48 h-60`}
+              className={`relative w-full md:w-[65%] rounded-3xl overflow-hidden shadow-sm group max-sm:h-40 max-md:h-48 h-60`}
             >
               {featureImageList && featureImageList.length > 0 ? (
                 featureImageList.map((slide, index) => (
@@ -230,9 +225,7 @@ function ShoppingHome() {
               ) : (
                 /* Resim yoksa placeholder */
                 <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-gray-400 text-sm">
-                    Ana Banner Alanı
-                  </span>
+                  <span className="text-gray-400 text-sm">Banner Alanı</span>
                 </div>
               )}
               {/* Slider Navigasyon Butonları (Sol Banner üzerine) */}
@@ -272,7 +265,7 @@ function ShoppingHome() {
 
             {/* Sağ Yan Banner (Manuel Slider) */}
             <div
-              className={`relative w-full md:w-[35%] rounded-3xl overflow-hidden shadow-sm group bg-gray-200 max-sm:h-32 max-md:h-48 h-60 max-[768px]:hidden`}
+              className={`relative w-full md:w-[35%] rounded-3xl overflow-hidden shadow-sm group bg-gray-200 max-sm:h-32 max-md:h-48 h-60 max-md:hidden`}
             >
               {/* sideBannerList'i map et ve currentSideBannerIndex'e göre göster */}
               {sideBannerList && sideBannerList.length > 0 ? (
@@ -280,7 +273,7 @@ function ShoppingHome() {
                   <img
                     key={slide._id || index}
                     src={slide.image}
-                    alt={slide.title || `Yan Banner ${index + 1}`}
+                    alt={slide.title || `Banner ${index + 1}`}
                     onClick={() => handlePromoCardClick(slide.link)}
                     className={`${
                       index === currentSideBannerIndex
@@ -294,10 +287,8 @@ function ShoppingHome() {
                 ))
               ) : (
                 /* Resim yoksa placeholder */
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-gray-400 text-sm">
-                    Yan Banner Alanı
-                  </span>
+                <div className="w-full h-full flex items-center justify-center bg-gray-50 ">
+                  <span className="text-gray-400 text-sm">Banner Alanı</span>
                 </div>
               )}
 
@@ -335,36 +326,23 @@ function ShoppingHome() {
         )}
       </section>
 
-      <div className="container mx-auto px-4 lg:px-20 space-y-8 py-8">
-        {/* === SKELETON YÜKLEME DÜZELTMESİ === */}
+      <div className="container mx-auto px-4 lg:px-20 space-y-0 pb-8">
         {sectionsLoading ? (
-          Array.from({ length: 3 }).map(
-            (
-              _,
-              sectionIndex // Değişken adı: sectionIndex
-            ) => (
-              // key içinde sectionIndex kullan
-              <div key={`home-section-skel-${sectionIndex}`}>
-                <Skeleton className="h-8 w-1/3 mb-4" />
-                <div className="flex space-x-4 overflow-hidden pb-4">
-                  {Array.from({ length: 4 }).map(
-                    (
-                      _,
-                      productIndex // Değişken adı: productIndex
-                    ) => (
-                      <div
-                        // key içinde sectionIndex ve productIndex kullan
-                        key={`home-prod-skel-${sectionIndex}-${productIndex}`}
-                        className="flex-shrink-0 w-60"
-                      >
-                        <ProductTileSkeleton />
-                      </div>
-                    )
-                  )}
-                </div>
+          Array.from({ length: 3 }).map((_, sectionIndex) => (
+            <div key={`home-section-skel-${sectionIndex}`}>
+              <Skeleton className="h-8 w-1/3 mb-4" />
+              <div className="flex space-x-4 overflow-hidden pb-4">
+                {Array.from({ length: 6 }).map((_, productIndex) => (
+                  <div
+                    key={`home-prod-skel-${sectionIndex}-${productIndex}`}
+                    className="flex-shrink-0 w-60"
+                  >
+                    <ProductTileSkeleton />
+                  </div>
+                ))}
               </div>
-            )
-          )
+            </div>
+          ))
         ) : activeHomeSections && activeHomeSections.length > 0 ? (
           activeHomeSections.map((section) => {
             let filterParams = {};
@@ -406,9 +384,7 @@ function ShoppingHome() {
               // <ProductCarousel
               //   key={section._id} // Benzersiz key
               //   title={section.title} // Backend'den gelen başlık
-
               //   fetchConfig={{
-
               //     key: fetchKey,
               //     filterParams: filterParams,
               //     sortParams: sortParams,
@@ -425,7 +401,6 @@ function ShoppingHome() {
               //     section.contentType === "CATEGORY"
               //       ? `/shop/listing?category=${section.contentValue}`
               //       : "/shop/listing"
-
               //   }
               // />
               <ProductCarousel
