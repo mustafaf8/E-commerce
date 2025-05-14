@@ -12,30 +12,54 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import NoSearchResults from "./NoSearchResults";
+import ProductTileSkeleton from "@/components/shopping-view/product-tile-skeleton.jsx";
 
 function SearchProducts() {
   const [keyword, setKeyword] = useState("");
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-  const dispatch = useDispatch();
-  const { searchResults } = useSelector((state) => state.shopSearch);
-  const { productDetails } = useSelector((state) => state.shopProducts);
+
+  const {
+    searchResults,
+    isLoading: searchLoading, // Yüklenme durumunu search slice'tan al
+  } = useSelector((state) => state.shopSearch);
+  const { productDetails, isLoading: detailsLoading } = useSelector(
+    (state) => state.shopProducts
+  );
 
   const { user } = useSelector((state) => state.auth);
-
   const { cartItems } = useSelector((state) => state.shopCart);
   const { toast } = useToast();
+  const dispatch = useDispatch();
+
   useEffect(() => {
-    if (keyword && keyword.trim() !== "" && keyword.trim().length > 3) {
-      setTimeout(() => {
-        setSearchParams(new URLSearchParams(`?keyword=${keyword}`));
-        dispatch(getSearchResults(keyword));
-      }, 1000);
+    const keywordFromUrl = searchParams.get("keyword");
+    if (keywordFromUrl && keywordFromUrl.trim() !== "") {
+      setKeyword(keywordFromUrl); // Arama çubuğunu güncelle
+      dispatch(getSearchResults(keywordFromUrl.trim()));
     } else {
-      setSearchParams(new URLSearchParams(`?keyword=${keyword}`));
+      // URL'de keyword yoksa veya boşsa, sonuçları temizle
       dispatch(resetSearchResults());
+      // İsteğe bağlı: Eğer keyword yoksa ve kullanıcı bir şeyler yazmaya başlarsa diye arama çubuğunu boşaltabilirsiniz.
+      setKeyword("");
     }
-  }, [keyword]);
+  }, [searchParams, dispatch]); // searchParams değiştiğinde çalışır
+
+  // const handleSearchInputChange = (event) => {
+  //   setKeyword(event.target.value);
+  // };
+
+  // const handleSearchSubmit = (event) => {
+  //   event.preventDefault();
+  //   if (keyword.trim() !== "") {
+  //     // URL'yi güncelle (bu useEffect'i tetikleyecek ve arama yapılacak)
+  //     setSearchParams({ keyword: keyword.trim() });
+  //   } else {
+  //     // Boş arama ise URL'den keyword'ü kaldır ve sonuçları temizle
+  //     setSearchParams({});
+  //     dispatch(resetSearchResults());
+  //   }
+  // };
 
   function handleAddtoCart(getCurrentProductId, getTotalStock) {
     console.log(cartItems);
@@ -88,28 +112,27 @@ function SearchProducts() {
 
   return (
     <div className="container mx-auto md:px-6 px-4 py-8">
-      <div className="flex justify-center mb-8">
-        <div className="w-full flex items-center">
-          <Input
-            value={keyword}
-            name="keyword"
-            onChange={(event) => setKeyword(event.target.value)}
-            className="py-6"
-            placeholder="Ürün Ara..."
-          />
+      {searchLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <ProductTileSkeleton key={`search-skel-${index}`} />
+          ))}
         </div>
-      </div>
-      {!searchResults.length ? <NoSearchResults /> : null}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-        {searchResults.map((item) => (
-          <ShoppingProductTile
-            key={item.id} // 'item.id' benzersiz bir tanımlayıcı olmalı
-            handleAddtoCart={handleAddtoCart}
-            product={item}
-            handleGetProductDetails={handleGetProductDetails}
-          />
-        ))}
-      </div>
+      ) : searchResults.length === 0 && searchParams.get("keyword") ? ( // Sadece arama yapıldıysa ve sonuç yoksa göster
+        <NoSearchResults />
+      ) : searchResults.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+          {searchResults.map((item) => (
+            <ShoppingProductTile
+              key={item._id} // API'den gelen _id'yi kullan
+              handleAddtoCart={() => handleAddtoCart(item._id, item.totalStock)}
+              product={item}
+              handleGetProductDetails={() => handleGetProductDetails(item._id)}
+            />
+          ))}
+        </div>
+      ) : null}{" "}
+      {/* Başlangıçta veya boş arama teriminde hiçbir şey gösterme */}
       <ProductDetailsDialog
         open={openDetailsDialog}
         setOpen={setOpenDetailsDialog}

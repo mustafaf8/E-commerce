@@ -48,4 +48,4 @@ const Button = React.forwardRef(
 );
 Button.displayName = "Button";
 
-export { Button, buttonVariants };
+export { Button };

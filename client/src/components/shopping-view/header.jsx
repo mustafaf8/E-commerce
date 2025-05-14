@@ -1,3 +1,341 @@
+// // import { Heart, LogIn, LogOut, ShoppingCart, UserCog } from "lucide-react"; // Menu ikonu eklendi (mobil için)
+// // import {
+// //   Link,
+// //   useLocation,
+// //   useNavigate,
+// //   useSearchParams,
+// // } from "react-router-dom";
+// // import { Sheet, SheetTrigger } from "../ui/sheet"; // SheetContent ve SheetTrigger eklendi
+// // import { Button } from "../ui/button";
+// // import { useDispatch, useSelector } from "react-redux";
+// // import {
+// //   DropdownMenu,
+// //   DropdownMenuContent,
+// //   DropdownMenuItem,
+// //   DropdownMenuLabel,
+// //   DropdownMenuSeparator,
+// //   DropdownMenuTrigger,
+// // } from "../ui/dropdown-menu";
+// // import { Avatar, AvatarFallback } from "../ui/avatar";
+// // import { logoutUser } from "@/store/auth-slice";
+// // import UserCartWrapper from "./cart-wrapper";
+// // import { useEffect, useState, useMemo } from "react"; // useMemo eklendi
+// // import { fetchCartItems } from "@/store/shop/cart-slice";
+// // import { Label } from "../ui/label";
+// // import { toast } from "../ui/use-toast";
+// // import { fetchAllCategories } from "@/store/common-slice/categories-slice";
+// // import { Skeleton } from "@/components/ui/skeleton";
+// // import PropTypes from "prop-types";
+
+// // function MenuItems({ isMobile = false, closeSheet }) {
+// //   const navigate = useNavigate();
+// //   const location = useLocation();
+// //   const [searchParams, setSearchParams] = useSearchParams();
+// //   const dispatch = useDispatch();
+
+// //   const { categoryList = [], isLoading: categoriesLoading } = useSelector(
+// //     (state) => state.categories || { categoryList: [], isLoading: false }
+// //   );
+
+// //   useEffect(() => {
+// //     if (!categoryList.length) {
+// //       dispatch(fetchAllCategories());
+// //     }
+// //   }, [dispatch, categoryList.length]);
+
+// //   function handleNavigate(categorySlug = null) {
+// //     sessionStorage.removeItem("filters");
+
+// //     if (categorySlug) {
+// //       const currentFilter = { category: [categorySlug] };
+// //       sessionStorage.setItem("filters", JSON.stringify(currentFilter));
+
+// //       if (location.pathname.includes("/shop/listing")) {
+// //         setSearchParams(new URLSearchParams(`?category=${categorySlug}`));
+// //       } else {
+// //         navigate(`/shop/listing?category=${categorySlug}`);
+// //       }
+// //     } else {
+// //       if (location.pathname.includes("/shop/listing")) {
+// //         setSearchParams({});
+// //       } else {
+// //         navigate(`/shop/listing`);
+// //       }
+// //     }
+
+// //     if (isMobile && closeSheet) {
+// //       closeSheet();
+// //     }
+// //   }
+
+// //   const staticMenuItems = [
+// //     { id: "search", label: "Ara", path: "/shop/search" },
+// //     { id: "products", label: "Tüm Ürünler", path: "/shop/listing" },
+// //   ];
+
+// //   const dynamicCategoryItems = useMemo(() => {
+// //     return categoryList
+// //       .filter((cat) => cat.isActive) // Sadece aktif kategorileri al
+// //       .map((cat) => ({
+// //         id: cat.slug, // ID olarak slug kullanılıyor
+// //         label: cat.name,
+// //         path: `/shop/listing?category=${cat.slug}`, // Doğrudan link oluşturuluyor
+// //         isCategory: true, // Kategori olduğunu belirtmek için flag
+// //       }));
+// //   }, [categoryList]); // Sadece kategori listesi değiştiğinde yeniden hesapla
+
+// //   const allMenuItems = [...staticMenuItems, ...dynamicCategoryItems];
+
+// //   return (
+// //     <nav
+// //       className={`flex ${
+// //         isMobile ? "flex-col space-y-4 p-4" : "items-center gap-6"
+// //       }`}
+// //     >
+// //       {categoriesLoading && !isMobile ? (
+// //         <>
+// //           <Skeleton className="h-5 w-16" />
+// //           <Skeleton className="h-5 w-24" />
+// //           <Skeleton className="h-5 w-20" />
+// //           <Skeleton className="h-5 w-16" />
+// //           <Skeleton className="h-5 w-20" />
+// //           <Skeleton className="h-5 w-16" />
+// //           <Skeleton className="h-5 w-20" />
+// //           <Skeleton className="h-5 w-16" />
+// //         </>
+// //       ) : (
+// //         // Menü öğelerini render et
+// //         allMenuItems.map((menuItem) => (
+// //           <Label
+// //             onClick={() => {
+// //               if (
+// //                 menuItem.path === "/shop/home" ||
+// //                 menuItem.path === "/shop/search"
+// //               ) {
+// //                 navigate(menuItem.path);
+// //                 if (isMobile && closeSheet) closeSheet();
+// //               } else {
+// //                 handleNavigate(menuItem.isCategory ? menuItem.id : null);
+// //               }
+// //             }}
+// //             className={`text-sm font-medium cursor-pointer ${
+// //               isMobile ? "py-2 border-b" : ""
+// //             } hover:text-primary transition-colors`}
+// //             key={menuItem.id}
+// //           >
+// //             {menuItem.label}
+// //           </Label>
+// //         ))
+// //       )}
+// //     </nav>
+// //   );
+// // }
+// // // --- ---
+
+// // function HeaderRightContent({ closeSheet }) {
+// //   const { user, isAuthenticated } = useSelector((state) => state.auth);
+// //   const { cartItems } = useSelector((state) => state.shopCart);
+// //   const [openCartSheet, setOpenCartSheet] = useState(false);
+// //   const navigate = useNavigate();
+// //   const dispatch = useDispatch();
+
+// //   function handleLogout() {
+// //     dispatch(logoutUser())
+// //       .unwrap()
+// //       .then(() => {
+// //         navigate("/auth/login");
+// //         toast({
+// //           title: "Çıkış yapıldı",
+// //           description: "Başka bir zaman görüşmek üzere!",
+// //           variant: "success",
+// //         });
+// //         if (closeSheet) closeSheet(); // Mobil menüyü kapat
+// //       })
+// //       .catch((error) => {
+// //         console.error("Shop logout failed:", error);
+// //         toast({
+// //           variant: "destructive",
+// //           title: "Çıkış yapılamadı.",
+// //         });
+// //       });
+// //   }
+
+// //   function handleNavigate(path) {
+// //     navigate(path);
+// //     if (closeSheet) closeSheet(); // Mobil menüyü kapat
+// //   }
+
+// //   useEffect(() => {
+// //     if (isAuthenticated && user?.id && !cartItems?.items?.length) {
+// //       // Sepet boşsa veya yoksa fetch et
+// //       dispatch(fetchCartItems(user.id));
+// //     }
+// //   }, [dispatch, user?.id, isAuthenticated, cartItems?.items?.length]); // cartItems.items.length bağımlılığı eklendi
+
+// //   const uniqueProductCount = cartItems?.items
+// //     ? new Set(cartItems.items.map((item) => item.productId)).size
+// //     : 0;
+
+// //   return (
+// //     <div className="flex lg:items-center lg:flex-row flex-col gap-4 p-4 lg:p-0 border-t lg:border-none">
+// //       {/* Sepet Sheet'i (Açık/Kapalı Kontrolü) */}
+// //       <Sheet open={openCartSheet} onOpenChange={setOpenCartSheet}>
+// //         {/* Tetikleyici Buton (Sadece Sheet için, içeride render edilmez) */}
+// //         <SheetTrigger asChild>
+// //           <Button
+// //             variant="outline"
+// //             size="mustafa"
+// //             className="relative inline-flex items-center w-full lg:w-auto justify-center"
+// //           >
+// //             <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
+// //             {isAuthenticated && uniqueProductCount > 0 && (
+// //               <span className="absolute top-[-5px] right-[2px] bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5 font-bold">
+// //                 {uniqueProductCount}
+// //               </span>
+// //             )}
+// //             <p className="pl-2">Sepetim</p>
+// //           </Button>
+// //         </SheetTrigger>
+// //         {/* Sepet İçeriği */}
+// //         <UserCartWrapper
+// //           setOpenCartSheet={setOpenCartSheet} // Kapatma fonksiyonunu ilet
+// //           cartItems={
+// //             isAuthenticated && cartItems?.items?.length > 0
+// //               ? cartItems.items
+// //               : []
+// //           }
+// //         />
+// //       </Sheet>
+
+// //       {/* Siparişlerim Butonu (Sadece masaüstünde görünsün) */}
+// //       {isAuthenticated && (
+// //         <Button
+// //           onClick={() => handleNavigate("/shop/account")}
+// //           variant="outline"
+// //           size="mustafa"
+// //           className="relative hidden lg:inline-flex w-full lg:w-auto justify-center"
+// //         >
+// //           Siparişlerim
+// //         </Button>
+// //       )}
+
+// //       {/* Kullanıcı Giriş/Avatar Bölümü */}
+// //       {isAuthenticated && user ? (
+// //         <DropdownMenu>
+// //           <DropdownMenuTrigger asChild>
+// //             <Avatar className="h-8 w-8 bg-black cursor-pointer border border-gray-200">
+// //               <AvatarFallback className="bg-gray-200 text-black text-sm font-extrabold">
+// //                 {user.userName && user.userName.length > 0
+// //                   ? user.userName[0].toUpperCase()
+// //                   : "?"}
+// //               </AvatarFallback>
+// //             </Avatar>
+// //           </DropdownMenuTrigger>
+// //           <DropdownMenuContent side="bottom" align="end" className="w-56">
+// //             <DropdownMenuLabel>Merhaba, {user.userName}</DropdownMenuLabel>
+// //             <DropdownMenuSeparator />
+// //             <DropdownMenuItem onClick={() => handleNavigate("/shop/account")}>
+// //               <UserCog className="mr-2 h-4 w-4" />
+// //               Hesabım
+// //             </DropdownMenuItem>
+// //             <DropdownMenuItem onClick={() => handleNavigate("/shop/wishlist")}>
+// //               <Heart className="mr-2 h-4 w-4" />
+// //               Favorilerim
+// //             </DropdownMenuItem>
+// //             <DropdownMenuSeparator />
+// //             <DropdownMenuItem onClick={handleLogout}>
+// //               <LogOut className="mr-2 h-4 w-4" />
+// //               Çıkış Yap
+// //             </DropdownMenuItem>
+// //           </DropdownMenuContent>
+// //         </DropdownMenu>
+// //       ) : (
+// //         <Button
+// //           variant="outline"
+// //           onClick={() => handleNavigate("/auth/login")}
+// //           size="mustafa"
+// //           className="inline-flex items-center w-full lg:w-auto justify-center"
+// //         >
+// //           <LogIn className="mr-2 h-5 w-5" />
+// //           Giriş Yap
+// //         </Button>
+// //       )}
+// //     </div>
+// //   );
+// // }
+
+// // function ShoppingHeader() {
+// //   const navigate = useNavigate();
+// //   const { isAuthenticated, user } = useSelector((state) => state.auth);
+
+// //   return (
+// //     <header className="sticky top-0 z-40 w-full border-b bg-background">
+// //       <div className="flex h-16 items-center justify-between px-4 md:px-6">
+// //         <Link to="/shop/home" className="flex items-center gap-2 mr-4">
+// //           <span className="">
+// //             <img
+// //               className="w-32 md:w-40"
+// //               src="../src/assets/dlogo2.png"
+// //               alt="logo"
+// //             />
+// //           </span>
+// //         </Link>
+
+// //         <div className="hidden lg:flex flex-1 justify-center">
+// //           <MenuItems />
+// //         </div>
+
+// //         <div className="lg:hidden flex items-center ml-auto">
+// //           {isAuthenticated && user ? (
+// //             <DropdownMenu>
+// //               <DropdownMenuTrigger asChild>
+// //                 <Avatar className="h-8 w-8 cursor-pointer border hover:border-gray-400">
+// //                   <AvatarFallback className="text-sm bg-gray-200 text-black font-bold">
+// //                     {user.userName && user.userName.length > 0
+// //                       ? user.userName[0].toUpperCase()
+// //                       : "?"}
+// //                   </AvatarFallback>
+// //                 </Avatar>
+// //               </DropdownMenuTrigger>
+// //               <DropdownMenuContent side="bottom" align="end" className="w-48">
+// //                 <DropdownMenuLabel className="text-xs px-2 py-1.5">
+// //                   Merhaba, {user.userName}
+// //                 </DropdownMenuLabel>
+// //                 <DropdownMenuSeparator />
+// //               </DropdownMenuContent>
+// //             </DropdownMenu>
+// //           ) : (
+// //             <Button
+// //               variant="outline"
+// //               onClick={() => navigate("/auth/login")}
+// //               size="mustafa"
+// //               className="inline-flex items-center"
+// //             >
+// //               <LogIn className="mr-2 h-5 w-5" />
+// //               Giriş Yap
+// //             </Button>
+// //           )}
+// //         </div>
+
+// //         <div className="hidden lg:block ml-auto">
+// //           <HeaderRightContent />
+// //         </div>
+// //       </div>
+// //     </header>
+// //   );
+// // }
+
+// // export default ShoppingHeader;
+
+// // MenuItems.propTypes = {
+// //   isMobile: PropTypes.bool,
+// //   closeSheet: PropTypes.func,
+// // };
+
+// // HeaderRightContent.propTypes = {
+// //   closeSheet: PropTypes.func,
+// // };
+
 // import { Heart, LogIn, LogOut, ShoppingCart, UserCog } from "lucide-react";
 // import {
 //   Link,
@@ -5,10 +343,8 @@
 //   useNavigate,
 //   useSearchParams,
 // } from "react-router-dom";
-// import { Sheet } from "../ui/sheet";
 // import { Button } from "../ui/button";
 // import { useDispatch, useSelector } from "react-redux";
-// import { shoppingViewHeaderMenuItems } from "@/config";
 // import {
 //   DropdownMenu,
 //   DropdownMenuContent,
@@ -20,46 +356,105 @@
 // import { Avatar, AvatarFallback } from "../ui/avatar";
 // import { logoutUser } from "@/store/auth-slice";
 // import UserCartWrapper from "./cart-wrapper";
-// import { useEffect, useState } from "react";
+// import { Sheet, SheetTrigger } from "../ui/sheet";
+// import { useEffect, useState, useMemo } from "react";
 // import { fetchCartItems } from "@/store/shop/cart-slice";
 // import { Label } from "../ui/label";
 // import { toast } from "../ui/use-toast";
+// import { fetchAllCategories } from "@/store/common-slice/categories-slice";
+// import { Skeleton } from "@/components/ui/skeleton";
+// import PropTypes from "prop-types";
 
-// function MenuItems() {
+// // MenuItems bileşeni artık sadece dinamik kategori linklerini yönetecek
+// function DynamicCategoryMenuItems() {
 //   const navigate = useNavigate();
 //   const location = useLocation();
 //   const [searchParams, setSearchParams] = useSearchParams();
+//   const dispatch = useDispatch();
 
-//   function handleNavigate(getCurrentMenuItem) {
+//   const { categoryList = [], isLoading: categoriesLoading } = useSelector(
+//     (state) => state.categories || { categoryList: [], isLoading: false }
+//   );
+
+//   useEffect(() => {
+//     if (!categoryList.length) {
+//       dispatch(fetchAllCategories());
+//     }
+//   }, [dispatch, categoryList.length]);
+
+//   function handleNavigate(categorySlug) {
+//     // categorySlug artık null olamaz, hep bir kategoriye gidilecek
 //     sessionStorage.removeItem("filters");
-//     const currentFilter =
-//       getCurrentMenuItem.id !== "home" &&
-//       getCurrentMenuItem.id !== "products" &&
-//       getCurrentMenuItem.id !== "search"
-//         ? {
-//             category: [getCurrentMenuItem.id],
-//           }
-//         : null;
-
+//     const currentFilter = { category: [categorySlug] };
 //     sessionStorage.setItem("filters", JSON.stringify(currentFilter));
 
-//     location.pathname.includes("listing") && currentFilter !== null
-//       ? setSearchParams(
-//           new URLSearchParams(`?category=${getCurrentMenuItem.id}`)
-//         )
-//       : navigate(getCurrentMenuItem.path);
+//     if (location.pathname.includes("/shop/listing")) {
+//       setSearchParams(new URLSearchParams(`?category=${categorySlug}`));
+//     } else {
+//       navigate(`/shop/listing?category=${categorySlug}`);
+//     }
 //   }
 
+//   const dynamicCategoryItems = useMemo(() => {
+//     return categoryList
+//       .filter((cat) => cat.isActive)
+//       .map((cat) => ({
+//         id: cat.slug,
+//         label: cat.name,
+//         path: `/shop/listing?category=${cat.slug}`, // Path artık kullanılmayabilir, handleNavigate var
+//         isCategory: true, // Bu hala handleNavigate için önemli
+//       }));
+//   }, [categoryList]);
+
 //   return (
-//     <nav className="flex flex-col mb-3 lg:mb-0 lg:items-center gap-6 lg:flex-row">
-//       {shoppingViewHeaderMenuItems.map((menuItem) => (
-//         <Label
-//           onClick={() => handleNavigate(menuItem)}
-//           className="text-sm font-medium cursor-pointer"
-//           key={menuItem.id}
+//     <nav className="flex items-center gap-x-4 md:gap-x-6">
+//       {" "}
+//       {/* Yatayda boşluklar ayarlandı */}
+//       {categoriesLoading ? (
+//         <>
+//           <Skeleton className="h-5 w-16" />
+//           <Skeleton className="h-5 w-24" />
+//           <Skeleton className="h-5 w-20" />
+//           {/* Daha fazla skeleton eklenebilir */}
+//         </>
+//       ) : (
+//         dynamicCategoryItems.map((menuItem) => (
+//           <Label
+//             onClick={() => handleNavigate(menuItem.id)} // Direkt slug'ı gönderiyoruz
+//             className="text-sm font-medium cursor-pointer hover:text-primary transition-colors"
+//             key={menuItem.id}
+//           >
+//             {menuItem.label}
+//           </Label>
+//         ))
+//       )}
+//     </nav>
+//   );
+// }
+// // DynamicCategoryMenuItems için PropTypes eklenebilir (eğer prop alıyorsa)
+
+// // Sağ taraftaki statik linkler (Ara, Tüm Ürünler) için ayrı bir bileşen
+// function StaticRightMenuItems() {
+//   const navigate = useNavigate();
+//   const staticLinks = [
+//     { id: "products", label: "Tüm Ürünler", path: "/shop/listing" },
+//     { id: "search", label: "Ara", path: "/shop/search" },
+//   ];
+
+//   return (
+//     <nav className="flex items-center gap-x-3 md:gap-x-4">
+//       {" "}
+//       {/* Yatayda boşluklar ayarlandı */}
+//       {staticLinks.map((link) => (
+//         <Button
+//           variant="ghost" // Buton olarak daha iyi görünebilir
+//           size="sm"
+//           onClick={() => navigate(link.path)}
+//           className="text-sm font-medium text-muted-foreground hover:text-primary px-2 md:px-3"
+//           key={link.id}
 //         >
-//           {menuItem.label}
-//         </Label>
+//           {link.label}
+//         </Button>
 //       ))}
 //     </nav>
 //   );
@@ -79,74 +474,76 @@
 //         navigate("/auth/login");
 //         toast({
 //           title: "Çıkış yapıldı",
-//           description: "Başka bir zaman görüşmek üzere!",
 //           variant: "success",
 //         });
 //       })
 //       .catch((error) => {
 //         console.error("Shop logout failed:", error);
+//         toast({
+//           variant: "destructive",
+//           title: "Çıkış yapılamadı.",
+//         });
 //       });
 //   }
 
+//   function handleNavigate(path) {
+//     navigate(path);
+//   }
+
 //   useEffect(() => {
-//     if (isAuthenticated && user?.id) {
+//     if (isAuthenticated && user?.id && !cartItems?.items?.length) {
 //       dispatch(fetchCartItems(user.id));
 //     }
-//   }, [dispatch, user?.id, isAuthenticated]);
+//   }, [dispatch, user?.id, isAuthenticated, cartItems?.items?.length]);
 
-//   // console.log(cartItems, "mustafa");
+//   const uniqueProductCount = cartItems?.items
+//     ? new Set(cartItems.items.map((item) => item.productId)).size
+//     : 0;
 
 //   return (
-//     <div className="flex lg:items-center lg:flex-row flex-col gap-4">
-//       <Sheet open={openCartSheet} onOpenChange={() => setOpenCartSheet(false)}>
-//         {isAuthenticated && (
+//     <div className="flex items-center gap-2 md:gap-3">
+//       <Sheet open={openCartSheet} onOpenChange={setOpenCartSheet}>
+//         <SheetTrigger asChild>
 //           <Button
-//             onClick={() => navigate("/shop/account")}
-//             variant="outline"
-//             size="mustafa" // Özel boyutun uygun göründüğünden emin ol
-//             className="relative hidden sm:inline-flex" // Küçük ekranlarda gizle
+//             variant="ghost" // İkon butonları için 'ghost' daha uygun
+//             size="icon"
+//             className="relative p-1" // Padding ayarlandı
 //           >
-//             Siparişlerim
+//             <ShoppingCart className="w-16 h-16 " />
+//             {isAuthenticated && uniqueProductCount > 0 && (
+//               <span className="absolute top-0 right-0 transform translate-x-1/3 -translate-y-1/3 bg-red-600 text-white text-[10px] rounded-full px-1.5 py-0.5 leading-tight font-bold">
+//                 {uniqueProductCount}
+//               </span>
+//             )}
+//             <span className="sr-only">Sepetim</span>
 //           </Button>
-//         )}
-//         {/* Sepet Butonu */}
-//         <Button
-//           onClick={() => setOpenCartSheet(true)}
-//           variant="outline"
-//           size="mustafa" // Özel boyutun uygun göründüğünden emin ol
-//           className="relative inline-flex items-center" //
-//         >
-//           <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
-//           {/* Sepet ürün sayısını sadece giriş yapmışsa ve ürün varsa göster */}
-//           {isAuthenticated && (cartItems?.items?.length || 0) > 0 && (
-//             <span className="absolute top-[-5px] right-[2px] bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5 font-bold">
-//               {cartItems.items.length}
-//             </span>
-//           )}
-//           {/* Küçük ekranlarda "Sepetim" yazısı gizlenebilir */}
-//           <p className="pl-2 hidden sm:block">Sepetim</p>
-//         </Button>
+//         </SheetTrigger>
 //         <UserCartWrapper
 //           setOpenCartSheet={setOpenCartSheet}
 //           cartItems={
-//             // Sepet içeriğini sadece giriş yapmışsa gönder
-//             isAuthenticated &&
-//             cartItems &&
-//             cartItems.items &&
-//             cartItems.items.length > 0
+//             isAuthenticated && cartItems?.items?.length > 0
 //               ? cartItems.items
 //               : []
 //           }
 //         />
 //       </Sheet>
+
+//       {isAuthenticated && (
+//         <Button
+//           onClick={() => handleNavigate("/shop/account")}
+//           variant="ghost" // Siparişlerim için de ghost olabilir veya outline
+//           size="sm" // Daha kompakt
+//           className="relative hidden lg:inline-flex px-2 md:px-3 text-muted-foreground hover:text-primary"
+//         >
+//           Siparişlerim
+//         </Button>
+//       )}
+
 //       {isAuthenticated && user ? (
-//         // ** Kullanıcı GİRİŞ YAPMIŞ ise: Avatar ve Dropdown **
 //         <DropdownMenu>
 //           <DropdownMenuTrigger asChild>
-//             <Avatar className="bg-black cursor-pointer border-2 border-gray-200 hover:border-gray-400 transition duration-200 ease-in-out">
-//               {/* Tıklanabilir hissi için */}
-//               <AvatarFallback className="bg-gray-200 text-black font-extrabold">
-//                 {/* Kullanıcı adı varsa ve boş değilse baş harfi al, yoksa "?" göster */}
+//             <Avatar className="h-8 w-8 cursor-pointer border hover:opacity-80">
+//               <AvatarFallback className="bg-muted text-sm font-semibold">
 //                 {user.userName && user.userName.length > 0
 //                   ? user.userName[0].toUpperCase()
 //                   : "?"}
@@ -154,15 +551,13 @@
 //             </Avatar>
 //           </DropdownMenuTrigger>
 //           <DropdownMenuContent side="bottom" align="end" className="w-56">
-//             {" "}
-//             {/* Açılma yönü ayarlandı */}
 //             <DropdownMenuLabel>Merhaba, {user.userName}</DropdownMenuLabel>
 //             <DropdownMenuSeparator />
-//             <DropdownMenuItem onClick={() => navigate("/shop/account")}>
+//             <DropdownMenuItem onClick={() => handleNavigate("/shop/account")}>
 //               <UserCog className="mr-2 h-4 w-4" />
 //               Hesabım
 //             </DropdownMenuItem>
-//             <DropdownMenuItem onClick={() => navigate("/shop/wishlist")}>
+//             <DropdownMenuItem onClick={() => handleNavigate("/shop/wishlist")}>
 //               <Heart className="mr-2 h-4 w-4" />
 //               Favorilerim
 //             </DropdownMenuItem>
@@ -174,99 +569,51 @@
 //           </DropdownMenuContent>
 //         </DropdownMenu>
 //       ) : (
-//         // ** Kullanıcı GİRİŞ YAPMAMIŞ ise: Giriş Yap Butonu **
 //         <Button
-//           variant="outline" // Veya farklı bir stil tercih edebilirsin
-//           onClick={() => navigate("/auth/login")} // Login sayfasına yönlendir
-//           size="mustafa" // Diğer butonlarla aynı boyutta olması iyi olabilir
-//           className="inline-flex items-center"
+//           variant="outline"
+//           onClick={() => handleNavigate("/auth/login")}
+//           size="sm"
+//           className="inline-flex items-center px-2 md:px-3"
 //         >
-//           <LogIn className="mr-2 h-5 w-5" /> {/* İsteğe bağlı ikon */}
-//           Giriş Yap
+//           <LogIn className="mr-1.5 h-4 w-4" />
+//           Giriş
 //         </Button>
 //       )}
-//       {/* --- Koşullu Render Sonu --- */}
 //     </div>
 //   );
 // }
+// HeaderRightContent.propTypes = {
+//   /* Proplar varsa eklenecek */
+// };
 
 // function ShoppingHeader() {
-//   const navigate = useNavigate();
-//   const dispatch = useDispatch();
-//   const { isAuthenticated, user } = useSelector((state) => state.auth);
-
-//   function handleLogout() {
-//     dispatch(logoutUser())
-//       .unwrap()
-//       .then(() => {
-//         navigate("/auth/login"); // Login'e yönlendir
-//         toast({
-//           title: "Çıkış yapıldı",
-//           description: "Başka bir zaman görüşmek üzere!",
-//           variant: "success",
-//         });
-//       })
-//       .catch((error) => {
-//         console.error("Shop logout failed:", error);
-//       });
-//   }
-
 //   return (
 //     <header className="sticky top-0 z-40 w-full border-b bg-background">
 //       <div className="flex h-16 items-center justify-between px-4 md:px-6">
-//         <Link to="/shop/home" className="flex items-center gap-2 mr-4">
+//         {/* Logo (Sola Yaslı) */}
+//         <Link to="/shop/home" className="flex items-center gap-2">
+//           {" "}
+//           {/* mr-auto kaldırıldı */}
 //           <span className="">
 //             <img
 //               className="w-32 md:w-40"
-//               src="../src/assets/dlogo2.png"
+//               src="/src/assets/dlogo2.png" // Bu yolu projenize göre doğrulayın
 //               alt="logo"
 //             />
 //           </span>
 //         </Link>
 
+//         {/* Dinamik Kategori Menüsü (Ortada, sadece masaüstünde) */}
 //         <div className="hidden lg:flex flex-1 justify-center">
-//           <MenuItems />
+//           <DynamicCategoryMenuItems />
 //         </div>
 
-//         <div className="lg:hidden flex items-center ml-auto">
-//           {isAuthenticated && user ? (
-//             <DropdownMenu>
-//               <DropdownMenuTrigger asChild>
-//                 <Avatar className="h-8 w-8 cursor-pointer border hover:border-gray-400">
-//                   <AvatarFallback className="text-sm bg-gray-200 text-black font-bold">
-//                     {user.userName && user.userName.length > 0
-//                       ? user.userName[0].toUpperCase()
-//                       : "?"}
-//                   </AvatarFallback>
-//                 </Avatar>
-//               </DropdownMenuTrigger>
-//               <DropdownMenuContent side="bottom" align="end" className="w-48">
-//                 <DropdownMenuLabel className="text-xs px-2 py-1.5">
-//                   Merhaba, {user.userName}
-//                 </DropdownMenuLabel>
-//                 <DropdownMenuSeparator />
-//                 <DropdownMenuItem
-//                   className="text-xs px-2 py-1.5"
-//                   onClick={handleLogout}
-//                 >
-//                   <LogOut className="mr-2 h-3.5 w-3.5" /> Çıkış Yap
-//                 </DropdownMenuItem>
-//               </DropdownMenuContent>
-//             </DropdownMenu>
-//           ) : (
-//             <Button
-//               variant="outline"
-//               onClick={() => navigate("/auth/login")}
-//               size="mustafa"
-//               className="inline-flex items-center"
-//             >
-//               <LogIn className="mr-2 h-5 w-5" />
-//               Giriş Yap
-//             </Button>
-//           )}
-//         </div>
-
-//         <div className="hidden lg:block ml-auto">
+//         {/* Sağ Bölüm: Statik Linkler (Ara, Tüm Ürünler) ve HeaderRightContent (Sepet, Avatar/Giriş) */}
+//         <div className="flex items-center gap-2 md:gap-4 ml-auto">
+//           <div className="hidden lg:flex">
+//             <StaticRightMenuItems />
+//           </div>
+//           {/* Sepet, Avatar/Giriş (Her zaman görünür) */}
 //           <HeaderRightContent />
 //         </div>
 //       </div>
@@ -280,20 +627,19 @@ import {
   Heart,
   LogIn,
   LogOut,
-  Menu,
   ShoppingCart,
   UserCog,
-} from "lucide-react"; // Menu ikonu eklendi (mobil için)
+  Search,
+} from "lucide-react";
 import {
   Link,
   useLocation,
   useNavigate,
   useSearchParams,
 } from "react-router-dom";
-import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet"; // SheetContent ve SheetTrigger eklendi
 import { Button } from "../ui/button";
+import { Input } from "../ui/input"; // Arama çubuğu için
 import { useDispatch, useSelector } from "react-redux";
-// import { shoppingViewHeaderMenuItems } from "@/config"; // <<< Sabit menü kaldırıldı
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -305,134 +651,85 @@ import {
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { logoutUser } from "@/store/auth-slice";
 import UserCartWrapper from "./cart-wrapper";
-import { useEffect, useState, useMemo } from "react"; // useMemo eklendi
+import { Sheet, SheetTrigger } from "../ui/sheet";
+import { useEffect, useState, useMemo } from "react";
 import { fetchCartItems } from "@/store/shop/cart-slice";
-import { Label } from "../ui/label";
-import { toast } from "../ui/use-toast";
-// *** YENİ İMPORTLAR ***
 import { fetchAllCategories } from "@/store/common-slice/categories-slice";
-import { Skeleton } from "@/components/ui/skeleton"; // Yükleme durumu için
-// *** --- ***
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "../ui/use-toast";
+import PropTypes from "prop-types";
 
-// --- MenuItems Bileşeni Güncellemesi ---
-function MenuItems({ isMobile = false, closeSheet }) {
-  // Mobil durum ve sheet kapatma prop'ları
+// Kategori Menüsü (Header'ın Alt Satırı İçin)
+function CategorySubMenu() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const dispatch = useDispatch();
 
-  // *** Kategorileri Redux'tan Çek ***
   const { categoryList = [], isLoading: categoriesLoading } = useSelector(
     (state) => state.categories || { categoryList: [], isLoading: false }
   );
 
-  // Kategorileri ilk yüklemede çekmek için useEffect
   useEffect(() => {
-    // Eğer kategoriler henüz yüklenmediyse fetch et
     if (!categoryList.length) {
       dispatch(fetchAllCategories());
     }
-  }, [dispatch, categoryList.length]); // Sadece dispatch ve liste uzunluğu değiştiğinde çalışsın
+  }, [dispatch, categoryList.length]);
 
-  // --- Navigasyon Fonksiyonu Güncellemesi (Slug Kullanımı) ---
-  function handleNavigate(categorySlug = null) {
-    sessionStorage.removeItem("filters"); // Önceki filtreleri temizle
+  function handleNavigateToCategory(categorySlug) {
+    sessionStorage.removeItem("filters");
+    const currentFilter = { category: [categorySlug] };
+    sessionStorage.setItem("filters", JSON.stringify(currentFilter));
 
-    if (categorySlug) {
-      // Kategori linkine tıklandıysa
-      const currentFilter = { category: [categorySlug] };
-      sessionStorage.setItem("filters", JSON.stringify(currentFilter));
-
-      // Eğer zaten listing sayfasındaysak URL'i güncelle, değilse sayfaya git
-      if (location.pathname.includes("/shop/listing")) {
-        setSearchParams(new URLSearchParams(`?category=${categorySlug}`));
-      } else {
-        navigate(`/shop/listing?category=${categorySlug}`);
-      }
+    if (location.pathname.includes("/shop/listing")) {
+      setSearchParams(new URLSearchParams(`?category=${categorySlug}`));
     } else {
-      // "Tüm Ürünler" veya "Ana Sayfa" gibi genel bir linke tıklandıysa
-      // Kategori filtresi olmadan listing sayfasına git
-      if (location.pathname.includes("/shop/listing")) {
-        setSearchParams({}); // Parametreleri temizle
-      } else {
-        navigate(`/shop/listing`);
-      }
-    }
-
-    // Eğer mobil menüdeyse, menüyü kapat
-    if (isMobile && closeSheet) {
-      closeSheet();
+      navigate(`/shop/listing?category=${categorySlug}`);
     }
   }
-  // --- ---
 
-  // Sabit menü öğeleri (Ana Sayfa ve Tüm Ürünler)
-  const staticMenuItems = [
-    { id: "products", label: "Tüm Ürünler", path: "/shop/listing" },
-    { id: "search", label: "Ara", path: "/shop/search" }, // Arama linki de eklenebilir
-  ];
-
-  // Dinamik kategori menü öğeleri oluşturma
-  const dynamicCategoryItems = useMemo(() => {
+  const activeCategories = useMemo(() => {
     return categoryList
-      .filter((cat) => cat.isActive) // Sadece aktif kategorileri al
+      .filter((cat) => cat.isActive)
       .map((cat) => ({
-        id: cat.slug, // ID olarak slug kullanılıyor
+        id: cat.slug,
         label: cat.name,
-        path: `/shop/listing?category=${cat.slug}`, // Doğrudan link oluşturuluyor
-        isCategory: true, // Kategori olduğunu belirtmek için flag
       }));
-  }, [categoryList]); // Sadece kategori listesi değiştiğinde yeniden hesapla
+  }, [categoryList]);
 
-  // Tüm menü öğelerini birleştir
-  const allMenuItems = [...staticMenuItems, ...dynamicCategoryItems];
+  if (categoriesLoading) {
+    return (
+      <div className="flex items-center gap-x-3 md:gap-x-4 overflow-x-auto no-scrollbar px-4 md:px-6 h-10">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <Skeleton key={i} className="h-5 w-20 rounded" />
+        ))}
+      </div>
+    );
+  }
+
+  if (!activeCategories.length) {
+    return <div className="h-10 border-t"></div>; // Kategori yoksa boş bir satır (tasarıma göre ayarlanabilir)
+  }
 
   return (
-    <nav
-      className={`flex ${
-        isMobile ? "flex-col space-y-4 p-4" : "items-center gap-6"
-      }`}
-    >
-      {categoriesLoading && !isMobile ? (
-        // Masaüstü yükleme iskeleti
-        <>
-          <Skeleton className="h-5 w-16" />
-          <Skeleton className="h-5 w-24" />
-          <Skeleton className="h-5 w-20" />
-          <Skeleton className="h-5 w-16" />
-        </>
-      ) : (
-        // Menü öğelerini render et
-        allMenuItems.map((menuItem) => (
-          <Label
-            onClick={() => {
-              if (
-                menuItem.path === "/shop/home" ||
-                menuItem.path === "/shop/search"
-              ) {
-                navigate(menuItem.path);
-                if (isMobile && closeSheet) closeSheet();
-              } else {
-                handleNavigate(menuItem.isCategory ? menuItem.id : null);
-              }
-            }}
-            className={`text-sm font-medium cursor-pointer ${
-              isMobile ? "py-2 border-b" : ""
-            } hover:text-primary transition-colors`}
-            key={menuItem.id}
-          >
-            {menuItem.label}
-          </Label>
-        ))
-      )}
+    <nav className="flex flex-wrap items-center justify-center gap-x-3 md:gap-x-4 overflow-x-auto no-scrollbar px-4 md:px-6 h-10 bg-muted/30 dark:bg-muted/10">
+      {activeCategories.map((category) => (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => handleNavigateToCategory(category.id)}
+          className="text-sm font-medium text-muted-foreground hover:text-primary px-2 whitespace-nowrap"
+          key={category.id}
+        >
+          {category.label}
+        </Button>
+      ))}
     </nav>
   );
 }
-// --- ---
 
-function HeaderRightContent({ closeSheet }) {
-  // closeSheet prop'u eklendi
+// Sağ Üst Köşe İkonları ve Linkler (Hesabım, Sepetim)
+function MainHeaderActions() {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.shopCart);
   const [openCartSheet, setOpenCartSheet] = useState(false);
@@ -444,108 +741,57 @@ function HeaderRightContent({ closeSheet }) {
       .unwrap()
       .then(() => {
         navigate("/auth/login");
-        toast({
-          title: "Çıkış yapıldı",
-          description: "Başka bir zaman görüşmek üzere!",
-          variant: "success",
-        });
-        if (closeSheet) closeSheet(); // Mobil menüyü kapat
+        toast({ title: "Çıkış yapıldı", variant: "success" });
       })
       .catch((error) => {
         console.error("Shop logout failed:", error);
-        toast({
-          // Toast eklendi
-          variant: "destructive",
-          title: "Çıkış yapılamadı.",
-        });
+        toast({ variant: "destructive", title: "Çıkış yapılamadı." });
       });
-  }
-
-  function handleNavigate(path) {
-    navigate(path);
-    if (closeSheet) closeSheet(); // Mobil menüyü kapat
   }
 
   useEffect(() => {
     if (isAuthenticated && user?.id && !cartItems?.items?.length) {
-      // Sepet boşsa veya yoksa fetch et
       dispatch(fetchCartItems(user.id));
     }
-  }, [dispatch, user?.id, isAuthenticated, cartItems?.items?.length]); // cartItems.items.length bağımlılığı eklendi
+  }, [dispatch, user?.id, isAuthenticated, cartItems?.items?.length]);
 
   const uniqueProductCount = cartItems?.items
     ? new Set(cartItems.items.map((item) => item.productId)).size
     : 0;
 
   return (
-    <div className="flex lg:items-center lg:flex-row flex-col gap-4 p-4 lg:p-0 border-t lg:border-none">
-      {/* Sepet Sheet'i (Açık/Kapalı Kontrolü) */}
-      <Sheet open={openCartSheet} onOpenChange={setOpenCartSheet}>
-        {/* Tetikleyici Buton (Sadece Sheet için, içeride render edilmez) */}
-        <SheetTrigger asChild>
-          <Button
-            variant="outline"
-            size="mustafa"
-            className="relative inline-flex items-center w-full lg:w-auto justify-center"
-          >
-            <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
-            {isAuthenticated && uniqueProductCount > 0 && (
-              <span className="absolute top-[-5px] right-[2px] bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5 font-bold">
-                {uniqueProductCount}
-              </span>
-            )}
-            <p className="pl-2">Sepetim</p>
-          </Button>
-        </SheetTrigger>
-        {/* Sepet İçeriği */}
-        <UserCartWrapper
-          setOpenCartSheet={setOpenCartSheet} // Kapatma fonksiyonunu ilet
-          cartItems={
-            isAuthenticated && cartItems?.items?.length > 0
-              ? cartItems.items
-              : []
-          }
-        />
-      </Sheet>
-
-      {/* Siparişlerim Butonu (Sadece masaüstünde görünsün) */}
-      {isAuthenticated && (
-        <Button
-          onClick={() => handleNavigate("/shop/account")}
-          variant="outline"
-          size="mustafa"
-          className="relative hidden lg:inline-flex w-full lg:w-auto justify-center"
-        >
-          Siparişlerim
-        </Button>
-      )}
-
-      {/* Kullanıcı Giriş/Avatar Bölümü */}
+    <div className="flex items-center gap-3 md:gap-4">
+      {/* Hesabım / Giriş Yap */}
       {isAuthenticated && user ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              variant="outline"
-              className="flex items-center gap-2 w-full lg:w-auto justify-center"
+              variant="ghost"
+              className="flex items-center gap-2 px-2 md:px-3 py-1.5 h-auto"
             >
-              <Avatar className="h-6 w-6 bg-black cursor-pointer border border-gray-200">
-                <AvatarFallback className="bg-gray-200 text-black text-xs font-extrabold">
+              <Avatar className="h-7 w-7 md:h-8 md:w-8 border">
+                <AvatarFallback className="bg-muted text-xs md:text-sm font-semibold">
                   {user.userName && user.userName.length > 0
                     ? user.userName[0].toUpperCase()
                     : "?"}
                 </AvatarFallback>
               </Avatar>
-              <span className="hidden lg:inline">{user.userName}</span>
+              <div className="hidden md:flex flex-col items-start">
+                <span className="text-xs text-muted-foreground">Hesabım</span>
+                <span className="text-sm font-medium line-clamp-1">
+                  {user.userName}
+                </span>
+              </div>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end" className="w-56">
             <DropdownMenuLabel>Merhaba, {user.userName}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => handleNavigate("/shop/account")}>
+            <DropdownMenuItem onClick={() => navigate("/shop/account")}>
               <UserCog className="mr-2 h-4 w-4" />
-              Hesabım
+              Hesabım & Siparişlerim
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleNavigate("/shop/wishlist")}>
+            <DropdownMenuItem onClick={() => navigate("/shop/wishlist")}>
               <Heart className="mr-2 h-4 w-4" />
               Favorilerim
             </DropdownMenuItem>
@@ -558,85 +804,157 @@ function HeaderRightContent({ closeSheet }) {
         </DropdownMenu>
       ) : (
         <Button
-          variant="outline"
-          onClick={() => handleNavigate("/auth/login")}
-          size="mustafa"
-          className="inline-flex items-center w-full lg:w-auto justify-center"
+          variant="ghost"
+          onClick={() => navigate("/auth/login")}
+          className="flex flex-col items-center px-2 md:px-3 py-1 h-auto"
         >
-          <LogIn className="mr-2 h-5 w-5" />
-          Giriş Yap
+          <LogIn className="h-5 w-5 md:h-6 md:w-6 text-muted-foreground" />
+          <span className="text-xs mt-0.5 text-muted-foreground">
+            Giriş Yap
+          </span>
         </Button>
       )}
+
+      {/* Sepetim */}
+      <Sheet open={openCartSheet} onOpenChange={setOpenCartSheet}>
+        <SheetTrigger asChild>
+          <Button
+            variant="secondary"
+            className="flex items-center gap-2 px-3 md:px-4 py-2 h-auto max-lg:hidden"
+          >
+            <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
+            <span className="hidden md:inline text-sm font-medium">
+              Sepetim
+            </span>
+            {isAuthenticated && uniqueProductCount > 0 && (
+              <span className=" bg-red-500 text-primary-foreground text-xs rounded-full px-2 py-1 font-bold">
+                {uniqueProductCount}
+              </span>
+            )}
+          </Button>
+        </SheetTrigger>
+        <UserCartWrapper
+          setOpenCartSheet={setOpenCartSheet}
+          cartItems={
+            isAuthenticated && cartItems?.items?.length > 0
+              ? cartItems.items
+              : []
+          }
+        />
+      </Sheet>
+    </div>
+  );
+}
+MainHeaderActions.propTypes = {
+  /* Proplar varsa eklenecek */
+};
+
+// Üst İnce Şerit (Top Strip) - İsteğe Bağlı
+function TopStrip() {
+  const navigate = useNavigate();
+  const stripLinks = [
+    { label: "Siparişlerim", path: "/shop/account" }, // Giriş gerektirebilir
+    { label: "Süper Fiyat", path: "/shop/listing?tag=super-fiyat" },
+    { label: "Kampanyalar", path: "/shop/listing?tag=kampanya" },
+    // { label: "Müşteri Hizmetleri", path: "/shop/musteri-hizmetleri" },
+  ];
+
+  return (
+    <div className="bg-gray-100 dark:bg-gray-800 text-xs text-muted-foreground hidden lg:block">
+      <div className="container mx-auto px-4 md:px-20 h-8 flex justify-end items-center gap-x-4 md:gap-x-6">
+        {stripLinks.map((link) => (
+          <Link
+            key={link.label}
+            to={link.path}
+            className="hover:text-primary transition-colors"
+          >
+            {link.label}
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }
 
 function ShoppingHeader() {
   const navigate = useNavigate();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Mobil menü state'i
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // Mobil menüyü kapatma fonksiyonu
-  const closeMobileMenu = () => setIsMobileMenuOpen(false);
+  useEffect(() => {
+    const keywordFromUrl = searchParams.get("keyword");
+    if (keywordFromUrl) {
+      setSearchTerm(keywordFromUrl);
+    }
+  }, [searchParams]);
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault(); // Formun varsayılan submit davranışını engelle
+    if (searchTerm.trim()) {
+      navigate(`/shop/search?keyword=${encodeURIComponent(searchTerm.trim())}`);
+    }
+  };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background">
-      <div className="flex h-16 items-center justify-between px-4 md:px-6">
-        {/* Logo */}
-        <Link to="/shop/home" className="flex items-center gap-2 mr-4">
-          <span className="">
+    <header className="sticky top-0 z-40 w-full border-b bg-background shadow-sm">
+      {/* En Üst İnce Şerit (Sadece masaüstü için) */}
+      <TopStrip />
+
+      {/* Ana Header Satırı */}
+      <div className="container mx-auto px-4 md:px-20">
+        <div className="flex h-20 items-center justify-between gap-4 md:gap-6">
+          {/* Logo */}
+          <Link to="/shop/home" className="flex-shrink-0">
             <img
-              className="w-32 md:w-40"
-              // src="../src/assets/dlogo2.png" // Doğru yolu kontrol edin
-              src="/src/assets/dlogo2.png" // Proje kök dizinine göre yol
+              className="h-10 md:h-12 w-auto" // Boyut ayarlandı
+              src="/src/assets/dlogo2.png"
               alt="logo"
             />
-          </span>
-        </Link>
+          </Link>
 
-        {/* Masaüstü Menü (Geniş ekranlarda görünür) */}
-        <div className="hidden lg:flex flex-1 justify-center">
-          <MenuItems isMobile={false} />
-        </div>
+          {/* Arama Çubuğu (Ortada ve Esnek) */}
+          <form
+            onSubmit={handleSearchSubmit}
+            className="flex-grow mx-4 min-w-0 max-w-2xl"
+          >
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground max-lg:hidden" />
+              <Input
+                type="search"
+                placeholder="Ürün, kategori veya marka ara..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full rounded-md bg-muted pl-10 pr-4 py-2.5 h-11 text-sm border-transparent focus:border-primary focus:bg-background focus:ring-1 focus:ring-primary max-lg:hidden"
+              />
+              <button type="submit" className="hidden"></button>
+            </div>
+          </form>
 
-        {/* Mobil Menü Tetikleyici (Küçük ekranlarda görünür) */}
-        <div className="lg:hidden flex items-center ml-auto">
-          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Menüyü Aç</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent
-              side="left"
-              className="w-[80vw] max-w-[300px] p-0 flex flex-col"
-            >
-              {/* Mobil Menü İçeriği */}
-              {/* Logo (Mobil Menüde) */}
-              <div className="p-4 border-b">
-                <Link to="/shop/home" onClick={closeMobileMenu}>
-                  <img
-                    className="w-32"
-                    src="/src/assets/dlogo2.png"
-                    alt="logo"
-                  />
-                </Link>
-              </div>
-              <div className="flex-grow overflow-y-auto">
-                <MenuItems isMobile={true} closeSheet={closeMobileMenu} />
-              </div>
-              {/* Mobil Menü Sağ İçerik (Giriş/Avatar/Sepet vb.) */}
-              <HeaderRightContent closeSheet={closeMobileMenu} />
-            </SheetContent>
-          </Sheet>
+          {/* Sağdaki Aksiyonlar (Hesabım, Sepetim) */}
+          <div className="flex-shrink-0">
+            <MainHeaderActions />
+          </div>
         </div>
+      </div>
+      {/* Arama Çubuğu (Sadece Küçük Ekranlarda Ayrı Satırda) */}
+      <div className="lg:hidden px-4 pb-1 pt-1 border-t dark:border-gray-700">
+        <form onSubmit={handleSearchSubmit} className="w-full">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Ne aramıştınız?"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full rounded-md bg-muted/70 dark:bg-muted/30 pl-10 pr-4 py-2 h-10 text-sm border-transparent focus:border-primary focus:bg-background focus:ring-1 focus:ring-primary"
+            />
+          </div>
+        </form>
+      </div>
 
-        {/* Masaüstü Sağ İçerik (Geniş ekranlarda görünür) */}
-        <div className="hidden lg:flex items-center ml-auto">
-          {/* HeaderRightContent'i direkt render etmek yerine içeriğini buraya taşıyabiliriz */}
-          {/* Veya HeaderRightContent'i prop olmadan çağırabiliriz */}
-          <HeaderRightContent />
-        </div>
+      {/* Kategori Menü Satırı (Sadece masaüstünde header'ın altında) */}
+      <div className="hidden lg:block border-t border-border">
+        <CategorySubMenu />
       </div>
     </header>
   );
