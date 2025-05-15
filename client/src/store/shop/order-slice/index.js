@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { clearGuestCart } from "@/lib/guestCartUtils";
 
 // Initial state güncellendi: approvalURL -> paymentPageUrl, error eklendi
 const initialState = {
@@ -79,7 +80,26 @@ export const getOrderDetails = createAsyncThunk(
   }
 );
 
-// Slice tanımı güncellendi
+export const createGuestOrderThunk = createAsyncThunk(
+  "order/createGuestOrder",
+  async (orderData, { rejectWithValue }) => {
+    // orderData: { guestInfo: {...}, cartItems: [...] }
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/shop/order/guest-create",
+        orderData
+        // Misafir olduğu için withCredentials: true GEREKMEYEBİLİR,
+        // ancak backend CORS ayarları cookie gerektirmiyorsa sorun olmaz.
+      );
+      return response.data; // { success: true, paymentPageUrl: '...', orderId: '...' } bekleniyor
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || { message: "Misafir siparişi oluşturulamadı." }
+      );
+    }
+  }
+);
+
 const shoppingOrderSlice = createSlice({
   name: "shopOrder", // Slice adı düzeltildi (genellikle state'deki key ile aynı olur)
   initialState,
@@ -179,9 +199,36 @@ const shoppingOrderSlice = createSlice({
           action.error.message ||
           "Sipariş detayı alınırken bir hata oluştu.";
         state.orderDetails = null;
+      })
+      // --- createGuestOrderThunk ---
+      .addCase(createGuestOrderThunk.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+        state.paymentPageUrl = null;
+        state.orderId = null;
+      })
+      .addCase(createGuestOrderThunk.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.paymentPageUrl = action.payload?.paymentPageUrl;
+        state.orderId = action.payload?.orderId;
+        state.error = !action.payload?.success
+          ? action.payload?.message ||
+            "Misafir siparişi oluşturuldu ama ödeme URL alınamadı."
+          : null;
+        // Misafir siparişi başarılıysa, local sepeti temizleyebiliriz.
+        if (action.payload?.success) {
+          clearGuestCart(); // guestCartUtils'tan import edin
+        }
+      })
+      .addCase(createGuestOrderThunk.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error =
+          action.payload?.message ||
+          action.error.message ||
+          "Misafir siparişi oluşturulurken bir hata oluştu.";
+        state.paymentPageUrl = null;
+        state.orderId = null;
       });
-
-    // capturePayment için reducer'lar kaldırıldı.
   },
 });
 

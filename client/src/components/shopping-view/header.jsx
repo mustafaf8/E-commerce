@@ -658,6 +658,7 @@ import { fetchAllCategories } from "@/store/common-slice/categories-slice";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "../ui/use-toast";
 import PropTypes from "prop-types";
+import OrderTrackingModal from "./OrderTrackingModal";
 
 // Kategori Menüsü (Header'ın Alt Satırı İçin)
 function CategorySubMenu() {
@@ -749,14 +750,31 @@ function MainHeaderActions() {
       });
   }
 
-  useEffect(() => {
-    if (isAuthenticated && user?.id && !cartItems?.items?.length) {
-      dispatch(fetchCartItems(user.id));
-    }
-  }, [dispatch, user?.id, isAuthenticated, cartItems?.items?.length]);
+  // useEffect(() => {
+  //   if (isAuthenticated && user?.id && !cartItems?.items?.length) {
+  //     dispatch(fetchCartItems(user.id));
+  //   }
+  // }, [dispatch, user?.id, isAuthenticated, cartItems?.items?.length]);
 
+  // const uniqueProductCount = cartItems?.items
+  //   ? new Set(cartItems.items.map((item) => item.productId)).size
+  //   : 0;
+  useEffect(() => {
+    // Bu effect App.jsx'e taşındığı için burada tekrar çağrılmasına gerek olmayabilir.
+    // Eğer App.jsx'teki sepet yönetimi yeterliyse bu bloğu kaldırabilirsiniz.
+    // Değilse, aşağıdaki gibi bırakabilirsiniz:
+    if (isAuthenticated && user?.id) {
+      // console.log("Header: Authenticated, fetching cart for user:", user.id);
+      // dispatch(fetchCartItems(user.id)); // Giriş yapmış kullanıcı için
+    } else if (!isAuthenticated) {
+      // console.log("Header: Guest, fetching/initializing cart from localStorage");
+      // dispatch(fetchCartItems()); // Misafir kullanıcı için (userId olmadan)
+    }
+  }, [dispatch, user?.id, isAuthenticated]); // cartItems?.items?.length bağımlılığını kaldırdım, gereksiz döngüye neden olabilir.
+  // isAuthenticated ve user?.id yeterli olmalı.
+  // ...
   const uniqueProductCount = cartItems?.items
-    ? new Set(cartItems.items.map((item) => item.productId)).size
+    ? new Set(cartItems.items.map((item) => item.productId)).size // productId string veya obje olabilir, dikkat.
     : 0;
 
   return (
@@ -826,7 +844,7 @@ function MainHeaderActions() {
             <span className="hidden md:inline text-sm font-medium">
               Sepetim
             </span>
-            {isAuthenticated && uniqueProductCount > 0 && (
+            {uniqueProductCount > 0 && (
               <span className=" bg-red-500 text-primary-foreground text-xs rounded-full px-2 py-1 font-bold">
                 {uniqueProductCount}
               </span>
@@ -845,37 +863,64 @@ function MainHeaderActions() {
     </div>
   );
 }
-MainHeaderActions.propTypes = {
-  /* Proplar varsa eklenecek */
-};
 
-// Üst İnce Şerit (Top Strip) - İsteğe Bağlı
 function TopStrip() {
   const navigate = useNavigate();
+  const { isAuthenticated } = useSelector((state) => state.auth);
+  const [isTrackingModalOpen, setIsTrackingModalOpen] = useState(false);
+
+  // handleOrdersClick fonksiyonunu stripLinks'ten ÖNCE tanımlayın
+  const handleOrdersClick = (e) => {
+    if (isAuthenticated) {
+      navigate("/shop/account");
+    } else {
+      e.preventDefault();
+      setIsTrackingModalOpen(true);
+    }
+  };
+
   const stripLinks = [
-    { label: "Siparişlerim", path: "/shop/account" }, // Giriş gerektirebilir
-    { label: "Süper Fiyat", path: "/shop/listing?tag=super-fiyat" },
-    { label: "Kampanyalar", path: "/shop/listing?tag=kampanya" },
-    // { label: "Müşteri Hizmetleri", path: "/shop/musteri-hizmetleri" },
+    {
+      id: "orders",
+      label: "Siparişlerim",
+      path: "/shop/account",
+      action: handleOrdersClick, // Şimdi handleOrdersClick tanımlı
+    },
+    {
+      id: "super-price",
+      label: "Süper Fiyat",
+      path: "/shop/listing?tag=super-fiyat",
+    },
+    {
+      id: "campaigns",
+      label: "Kampanyalar",
+      path: "/shop/listing?tag=kampanya",
+    },
   ];
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-800 text-xs text-muted-foreground hidden lg:block">
-      <div className="container mx-auto px-4 md:px-20 h-8 flex justify-end items-center gap-x-4 md:gap-x-6">
-        {stripLinks.map((link) => (
-          <Link
-            key={link.label}
-            to={link.path}
-            className="hover:text-primary transition-colors"
-          >
-            {link.label}
-          </Link>
-        ))}
+    <>
+      <div className="bg-gray-100 dark:bg-gray-800 text-xs text-muted-foreground hidden lg:block">
+        <div className="container mx-auto px-4 md:px-20 h-8 flex justify-end items-center gap-x-4 md:gap-x-6">
+          {stripLinks.map((link) => (
+            <Link
+              key={link.id}
+              to={link.path}
+              onClick={link.action}
+              className="hover:text-primary transition-colors"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
       </div>
-    </div>
+      <OrderTrackingModal
+        isOpen={isTrackingModalOpen}
+        onClose={() => setIsTrackingModalOpen(false)}
+      />
+    </>
   );
 }
-
 function ShoppingHeader() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");

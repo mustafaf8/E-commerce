@@ -20,18 +20,16 @@ import {
 import AdminOrderDetailsView from "./order-details";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  // <<< Admin slice'dan import et
   fetchUsersWithOrders,
   fetchOrdersByUserIdForAdmin,
   getOrderDetailsForAdmin,
   resetOrderDetails,
-  clearSelectedUserOrders, // <<< Yeni action
+  clearSelectedUserOrders,
 } from "@/store/admin/order-slice";
 import { Badge } from "../ui/badge";
 import { format, parseISO, isValid } from "date-fns";
 import { ArrowLeft, Loader2, Bell } from "lucide-react";
 
-// Kullanıcı Listesi Tablosu (Yeni Component)
 function UserListTable({ users, onViewOrdersClick, isLoading }) {
   return (
     <Table>
@@ -95,7 +93,6 @@ function UserListTable({ users, onViewOrdersClick, isLoading }) {
   );
 }
 
-// Kullanıcının Siparişleri Tablosu (Yeni Component)
 function UserOrdersTable({ orders, onViewDetailsClick, isLoading }) {
   const statusMapping = {
     pending: { label: "Beklemede", color: "bg-yellow-400" },
@@ -184,8 +181,8 @@ function AdminOrdersView() {
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [selectedOrderIdForDetails, setSelectedOrderIdForDetails] =
     useState(null);
-  const dispatch = useDispatch();
 
+  const dispatch = useDispatch();
   const {
     userList,
     selectedUserOrders,
@@ -259,21 +256,17 @@ function AdminOrdersView() {
           </div>
           {/* Sağ tarafa başka bir şey eklenebilir */}
         </div>
-        {/* Hata mesajı gösterimi */}
+
         {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto">
-        {" "}
-        {/* İçeriğin kaydırılması için */}
         {!selectedUserId ? (
-          // Kullanıcı listesini göster
           <UserListTable
             users={userList}
             onViewOrdersClick={handleViewUserOrders}
             isLoading={isUserListLoading}
           />
         ) : (
-          // Seçili kullanıcının siparişlerini göster
           <UserOrdersTable
             orders={selectedUserOrders}
             onViewDetailsClick={handleViewOrderDetails}
@@ -281,7 +274,6 @@ function AdminOrdersView() {
           />
         )}
       </CardContent>
-      {/* Sipariş Detayları Dialogu */}
       <Dialog
         open={!!selectedOrderIdForDetails}
         onOpenChange={(isOpen) => !isOpen && handleDetailsDialogClose()}
