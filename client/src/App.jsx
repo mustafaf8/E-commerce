@@ -241,7 +241,8 @@ function App() {
   }, [dispatch, user?.id, isAuthenticated, authIsLoading]);
 
   if (authIsLoading)
-    return <Skeleton className="w-full h-screen bg-gray-200" />; // Daha genel bir skeleton
+    return <Skeleton className="w-full h-screen bg-gray-200" />;
+  const isAdminPage = location.pathname.startsWith("/admin");
 
   // console.log("Auth Loading:", isLoading, "User:", user);
 
@@ -344,9 +345,13 @@ function App() {
         {/* Bulunamayan Sayfalar */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-      <div className="bottom-nav-container">
-        <BottomNavBar />
-      </div>
+      {!isAdminPage && (
+        <div className="bottom-nav-container lg:hidden">
+          {" "}
+          {/* lg:hidden ile büyük ekranlarda gizle */}
+          <BottomNavBar />
+        </div>
+      )}
     </div>
   );
 }

@@ -258,3 +258,69 @@ export const userInfoFormControls = [
     disabled: true,
   },
 ];
+
+export const orderStatusMapping = {
+  pending: {
+    label: "Beklemede",
+    color: "bg-yellow-400",
+    textColor: "text-yellow-800 dark:text-yellow-200",
+  },
+  pending_payment: {
+    label: "Ödeme Bekleniyor",
+    color: "bg-amber-500",
+    textColor: "text-amber-800 dark:text-amber-200",
+  },
+  confirmed: {
+    label: "Onaylandı",
+    color: "bg-blue-500",
+    textColor: "text-blue-100 dark:text-blue-200",
+  },
+  inProcess: {
+    label: "Hazırlanıyor",
+    color: "bg-orange-500",
+    textColor: "text-orange-100 dark:text-orange-200",
+  },
+  inShipping: {
+    label: "Kargoda",
+    color: "bg-teal-500",
+    textColor: "text-teal-100 dark:text-teal-200",
+  },
+  delivered: {
+    label: "Teslim Edildi",
+    color: "bg-green-600",
+    textColor: "text-green-100 dark:text-green-200",
+  },
+  rejected: {
+    label: "Reddedildi",
+    color: "bg-red-600",
+    textColor: "text-red-100 dark:text-red-200",
+  },
+  cancelled: {
+    label: "İptal Edildi",
+    color: "bg-slate-500",
+    textColor: "text-slate-100 dark:text-slate-200",
+  },
+  failed: {
+    label: "Başarısız",
+    color: "bg-red-700",
+    textColor: "text-red-100 dark:text-red-200",
+  },
+  default: {
+    label: "Bilinmiyor",
+    color: "bg-gray-700",
+    textColor: "text-gray-100 dark:text-gray-200",
+  },
+};
+
+// Admin panelinde sipariş durumu güncelleme formu için seçenekler (opsiyonel)
+export const adminOrderStatusOptions = [
+  { id: "pending", label: "Beklemede" },
+  { id: "pending_payment", label: "Ödeme Bekleniyor" },
+  { id: "confirmed", label: "Onaylandı" },
+  { id: "inProcess", label: "Hazırlanıyor" },
+  { id: "inShipping", label: "Kargoda" },
+  { id: "delivered", label: "Teslim Edildi" },
+  { id: "rejected", label: "Reddedildi" },
+  { id: "cancelled", label: "İptal Edildi" },
+  { id: "failed", label: "Başarısız" },
+];

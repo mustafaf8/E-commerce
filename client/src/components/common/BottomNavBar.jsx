@@ -84,7 +84,7 @@
 // export default BottomNavBar;
 
 // client/src/components/common/BottomNavBar.jsx
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Home, ShoppingCart, User, LayoutGrid, Heart } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux"; // useDispatch import edilmiş ama kullanılmıyor, kaldırılabilir.
@@ -157,7 +157,7 @@ const BottomNavBar = () => {
                         ? uniqueProductCount
                         : cartProductItems.length > 0
                         ? "!"
-                        : ""}{" "}
+                        : ""}
                       {/* Unique count 0 ise ve item varsa ! göster */}
                     </span>
                   )}

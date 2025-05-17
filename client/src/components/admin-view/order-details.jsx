@@ -53,6 +53,17 @@ function AdminOrderDetailsView({ orderDetails }) {
     default: { label: "Bilinmiyor", color: "bg-black" },
   };
 
+  const isGuest = orderDetails?.isGuestOrder;
+  const recipientName = isGuest
+    ? orderDetails?.guestInfo?.fullName || orderDetails?.addressInfo?.fullName
+    : orderDetails?.userId?.userName;
+  const recipientEmail = isGuest
+    ? orderDetails?.guestInfo?.email
+    : orderDetails?.userId?.email;
+  const recipientPhoneForDisplay = isGuest
+    ? orderDetails?.addressInfo?.phone || orderDetails?.guestInfo?.phone
+    : orderDetails?.userId?.phoneNumber;
+
   return (
     <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
       <div className="grid gap-6 ">
@@ -145,6 +156,13 @@ function AdminOrderDetailsView({ orderDetails }) {
                 <span className="font-medium text-foreground">Alıcı:</span>
                 {user?.userName || "N/A"}
               </span>
+              {isGuest && recipientEmail && (
+                <span>
+                  <span className="font-medium text-foreground">E-posta:</span>{" "}
+                  {recipientEmail}
+                </span>
+              )}
+
               <span>
                 <span className="font-medium text-foreground">Adres:</span>
                 {orderDetails.addressInfo.address}

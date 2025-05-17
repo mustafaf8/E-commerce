@@ -11,7 +11,25 @@ const initialState = {
   isUserOrdersLoading: false, // <<< YENİ
   isDetailsLoading: false, // <<< YENİ
   error: null, // <<< YENİ: Hata yönetimi için
+  guestOrderList: [], // YENİ: Misafir siparişleri için liste
+  isGuestOrdersLoading: false,
 };
+
+export const fetchAllGuestOrdersForAdmin = createAsyncThunk(
+  "adminOrder/fetchAllGuestOrdersForAdmin",
+  async (_, { rejectWithValue }) => {
+    try {
+      // Backend'de bu endpoint'i oluşturmanız gerekecek.
+      // Bu endpoint, Order modelinde isGuestOrder: true olan tüm siparişleri dönmeli.
+      const response = await axios.get(
+        `http://localhost:5000/api/admin/orders/guest-orders`
+      );
+      return response.data; // { success: true, data: [...] } bekleniyor
+    } catch (error) {
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
 
 export const getAllOrdersForAdmin = createAsyncThunk(
   "/order/getAllOrdersForAdmin",
@@ -215,8 +233,26 @@ const adminOrderSlice = createSlice({
           action.payload?.message ||
           action.error?.message ||
           "Durum güncellenemedi.";
+      })
+      .addCase(fetchAllGuestOrdersForAdmin.pending, (state) => {
+        state.isGuestOrdersLoading = true;
+        state.isLoading = true; // Genel loading'i de true yapabiliriz
+        state.error = null;
+      })
+      .addCase(fetchAllGuestOrdersForAdmin.fulfilled, (state, action) => {
+        state.isGuestOrdersLoading = false;
+        state.isLoading = false;
+        state.guestOrderList = action.payload?.data || [];
+      })
+      .addCase(fetchAllGuestOrdersForAdmin.rejected, (state, action) => {
+        state.isGuestOrdersLoading = false;
+        state.isLoading = false;
+        state.guestOrderList = [];
+        state.error =
+          action.payload?.message ||
+          action.error?.message ||
+          "Misafir siparişleri alınamadı.";
       });
-
     // getAllOrdersForAdmin thunk'ını kullanmıyorsak ilgili case'leri kaldırabiliriz.
     // .addCase(getAllOrdersForAdmin.pending, (state) => { /*...*/ })
     // .addCase(getAllOrdersForAdmin.fulfilled, (state, action) => { /*...*/ })

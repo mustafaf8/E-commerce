@@ -14,7 +14,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 const adminSidebarMenuItems = [
   {
     id: "dashboard",
-    label: "Ana Panel",
+    label: "Banner",
     path: "/admin/dashboard",
     icon: <LayoutDashboard />,
   },
@@ -47,7 +47,7 @@ const adminSidebarMenuItems = [
   // --- ANA SAYFA BÖLÜMLERİ (Eğer eklenmediyse bunu da ekle) ---
   {
     id: "home-sections",
-    label: "Ana Sayfa Yönetimi",
+    label: "AnaSayfa Yönetimi",
     path: "/admin/home-sections",
     icon: <Home size={20} />, // Örneğin Home ikonu
   },
@@ -94,16 +94,6 @@ function AdminSideBar({ open, setOpen }) {
           </div>
         </SheetContent>
       </Sheet>
-      <aside className="hidden w-64 flex-col border-r bg-background p-6 lg:flex">
-        <div
-          onClick={() => navigate("/admin/dashboard")}
-          className="flex cursor-pointer items-center gap-2"
-        >
-          <ChartNoAxesCombined size={30} />
-          <h1 className="text-2xl font-extrabold">Admin </h1>
-        </div>
-        <MenuItems />
-      </aside>
     </Fragment>
   );
 }

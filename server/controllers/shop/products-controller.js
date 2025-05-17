@@ -9,7 +9,7 @@ const getFilteredProducts = async (req, res) => {
       category: categorySlugs = [],
       brand: brandSlugs = [],
       sortBy = "salesCount-desc",
-      limit = 10,
+      limit = 30,
     } = req.query;
 
     let filters = {};
@@ -36,6 +36,10 @@ const getFilteredProducts = async (req, res) => {
       } else {
         return res.status(200).json({ success: true, data: [] });
       }
+    }
+    // "En Çok Satanlar" için özel filtreleme
+    if (sortBy === "salesCount-desc") {
+      filters.salesCount = { $gt: 0 }; // salesCount > 0 olanları getir
     }
 
     let sort = {};

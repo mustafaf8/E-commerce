@@ -700,8 +700,8 @@ function CategorySubMenu() {
 
   if (categoriesLoading) {
     return (
-      <div className="flex items-center gap-x-3 md:gap-x-4 overflow-x-auto no-scrollbar px-4 md:px-6 h-10">
-        {Array.from({ length: 8 }).map((_, i) => (
+      <div className="flex items-center justify-center gap-x-3 md:gap-x-4 overflow-x-auto no-scrollbar px-4 md:px-6 h-10">
+        {Array.from({ length: 10 }).map((_, i) => (
           <Skeleton key={i} className="h-5 w-20 rounded" />
         ))}
       </div>

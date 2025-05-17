@@ -4,8 +4,9 @@ const {
   getAllOrdersOfAllUsers,
   getOrderDetailsForAdmin,
   updateOrderStatus,
-  getUsersWithOrders, // <<< YENİ
+  getUsersWithOrders,
   getOrdersByUserIdForAdmin,
+  getAllGuestOrdersForAdmin,
 } = require("../../controllers/admin/order-controller");
 
 const router = express.Router();
@@ -15,5 +16,6 @@ router.get("/details/:id", getOrderDetailsForAdmin);
 router.put("/update/:id", updateOrderStatus);
 router.get("/users-list", getUsersWithOrders);
 router.get("/user/:userId", getOrdersByUserIdForAdmin);
+router.get("/guest-orders", getAllGuestOrdersForAdmin);
 
 module.exports = router;
