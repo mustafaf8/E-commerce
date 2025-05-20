@@ -1,7 +1,5 @@
-// server/controllers/common/side-banner-controller.js
 const SideBanner = require("../../models/SideBanner");
 
-// Tüm (aktif) yan banner'ları getir
 const getSideBanners = async (req, res) => {
   try {
     const sideBanners = await SideBanner.find({}).sort({ createdAt: -1 });
@@ -12,9 +10,7 @@ const getSideBanners = async (req, res) => {
   }
 };
 
-// Yeni bir yan banner ekle (Admin Yetkisi Gerekli)
 const addSideBanner = async (req, res) => {
-  // !!! Yetki Kontrolü Eklenmeli (Middleware veya Controller içinde) !!!
   // if (req.user?.role !== 'admin') { ... }
 
   try {
@@ -44,9 +40,7 @@ const addSideBanner = async (req, res) => {
   }
 };
 
-// Yan banner'ı sil (Admin Yetkisi Gerekli)
 const deleteSideBanner = async (req, res) => {
-  // !!! Yetki Kontrolü Eklenmeli (Middleware veya Controller içinde) !!!
   // if (req.user?.role !== 'admin') { ... }
 
   try {

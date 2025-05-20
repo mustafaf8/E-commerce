@@ -24,19 +24,15 @@ import { useSearchParams } from "react-router-dom";
 import isEqual from "lodash/isEqual";
 import { Skeleton } from "@/components/ui/skeleton";
 import ProductTileSkeleton from "@/components/shopping-view/product-tile-skeleton.jsx";
-// *** YENİ İMPORTLAR ***
 import { fetchAllCategories } from "@/store/common-slice/categories-slice";
 import { fetchAllBrands } from "@/store/common-slice/brands-slice";
-// *** --- ***
 
-// --- Filtre Parametrelerini URL'den Alma ve URL'ye Yazma Yardımcıları (Slug Kullanacak Şekilde) ---
 function createSearchParamsHelper(filterParams) {
   const queryParams = [];
   const sortedKeys = Object.keys(filterParams).sort();
 
   for (const key of sortedKeys) {
     const value = filterParams[key];
-    // Değer bir dizi ise ve boş değilse slug'ları birleştir
     if (Array.isArray(value) && value.length > 0) {
       const sortedValue = [...value].sort();
       const paramValue = sortedValue.join(",");
@@ -53,13 +49,11 @@ function parseUrlParamsToFilters(searchParams) {
   for (const key of sortedKeys) {
     const value = searchParams.get(key);
     if (value) {
-      // Virgülle ayrılmış slug'ları diziye çevir ve sırala
       filters[key] = value.split(",").sort();
     }
   }
   return filters;
 }
-// --- ---
 
 function ShoppingListing() {
   const dispatch = useDispatch();
@@ -69,34 +63,28 @@ function ShoppingListing() {
     isLoading: productsLoading,
   } = useSelector((state) => state.shopProducts);
   const { cartItems } = useSelector((state) => state.shopCart);
-  const { user, isAuthenticated } = useSelector((state) => state.auth); // isAuthenticated eklendi
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
   const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
-
-  // *** YENİ: Kategori ve Marka State'lerini Redux'tan Al ***
   const { categoryList = [], isLoading: categoriesLoading } = useSelector(
     (state) => state.categories || { categoryList: [], isLoading: false }
   );
   const { brandList = [], isLoading: brandsLoading } = useSelector(
     (state) => state.brands || { brandList: [], isLoading: false }
   );
-  // *** --- ***
-
   const [filters, setFilters] = useState(() =>
     parseUrlParamsToFilters(searchParams)
   );
   const [sort, setSort] = useState(
     searchParams.get("sortBy") || "salesCount-desc"
-  ); // URL'den sortBy al veya varsayılan
+  );
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
-
   const isInitialMount = useRef(true);
   const lastFiltersPushedToUrl = useRef(createSearchParamsHelper(filters));
 
-  // --- Filtreleme Fonksiyonu (handleFilter - Aynı kalabilir, slug değerlerini alacak) ---
   const handleFilter = useCallback((getSectionId, getCurrentOptionSlug) => {
     setFilters((prevFilters) => {
-      const cpyFilters = JSON.parse(JSON.stringify(prevFilters)); // Basit deep copy
+      const cpyFilters = JSON.parse(JSON.stringify(prevFilters));
       const currentSectionFilters = cpyFilters[getSectionId]
         ? [...cpyFilters[getSectionId]]
         : [];
@@ -123,11 +111,9 @@ function ShoppingListing() {
     });
   }, []);
 
-  // --- Sıralama Fonksiyonu (URL'yi de güncellesin) ---
   const handleSort = useCallback(
     (value) => {
       setSort(value);
-      // URL'ye sortBy parametresini ekle/güncelle
       const currentParams = new URLSearchParams(searchParams);
       currentParams.set("sortBy", value);
       setSearchParams(currentParams, { replace: true });
@@ -135,7 +121,6 @@ function ShoppingListing() {
     [searchParams, setSearchParams]
   );
 
-  // --- Ürün Detayları (Aynı kalabilir) ---
   const handleGetProductDetails = useCallback(
     (getCurrentProductId) => {
       dispatch(fetchProductDetails(getCurrentProductId));
@@ -143,12 +128,10 @@ function ShoppingListing() {
     [dispatch]
   );
 
-  // --- Sepete Ekle (Aynı kalabilir, isAuthenticated kontrolü eklenebilir) ---
   const handleAddtoCart = useCallback(
     (getCurrentProductId, getTotalStock) => {
       if (!isAuthenticated) {
         toast({ variant: "destructive", title: "Lütfen önce giriş yapın." });
-        // navigate('/auth/login', { state: { from: location } }); // Giriş sayfasına yönlendirme eklenebilir
         return;
       }
       const getCartItems = cartItems?.items || [];
@@ -174,7 +157,7 @@ function ShoppingListing() {
         .unwrap()
         .then((payload) => {
           if (payload?.success) {
-            dispatch(fetchCartItems(user?.id)); // Sepeti tekrar çek
+            dispatch(fetchCartItems(user?.id));
             toast({ title: "Ürün sepete eklendi", variant: "success" });
           } else {
             toast({
@@ -190,16 +173,14 @@ function ShoppingListing() {
           });
         });
     },
-    [dispatch, cartItems, user?.id, toast, isAuthenticated] // isAuthenticated eklendi
+    [dispatch, cartItems, user?.id, toast, isAuthenticated]
   );
 
-  // --- Effect: Update URL when 'filters' state changes (State -> URL Sync) ---
   useEffect(() => {
     if (isInitialMount.current) return;
 
     const newFiltersString = createSearchParamsHelper(filters);
     if (newFiltersString !== lastFiltersPushedToUrl.current) {
-      // Sıralama parametresini de koruyarak URL'yi güncelle
       const currentParams = new URLSearchParams(searchParams);
       Object.keys(filters).forEach((key) => {
         if (filters[key].length > 0) {
@@ -208,9 +189,7 @@ function ShoppingListing() {
           currentParams.delete(key);
         }
       });
-      // Eğer filtre boşsa ama URL'de varsa sil
       ["category", "brand"].forEach((key) => {
-        // Genişletilebilir
         if (!filters[key] || filters[key].length === 0) {
           currentParams.delete(key);
         }
@@ -219,37 +198,30 @@ function ShoppingListing() {
       setSearchParams(currentParams, { replace: true });
       lastFiltersPushedToUrl.current = newFiltersString;
     }
-  }, [filters, searchParams, setSearchParams]); // searchParams eklendi
+  }, [filters, searchParams, setSearchParams]);
 
-  // --- Effect: Sync state from URL changes (URL -> State Sync) ---
   useEffect(() => {
     const urlFilters = parseUrlParamsToFilters(searchParams);
     const urlFiltersString = createSearchParamsHelper(urlFilters);
-    const urlSortBy = searchParams.get("sortBy") || "salesCount-desc"; // URL'den sort al
+    const urlSortBy = searchParams.get("sortBy") || "salesCount-desc";
 
-    // Hem filtreleri hem de sıralamayı kontrol et
     if (
       (!isEqual(filters, urlFilters) &&
         urlFiltersString !== lastFiltersPushedToUrl.current) ||
       sort !== urlSortBy
     ) {
       setFilters(urlFilters);
-      setSort(urlSortBy); // Sıralamayı da güncelle
+      setSort(urlSortBy);
       lastFiltersPushedToUrl.current = urlFiltersString;
     }
 
     if (isInitialMount.current) {
       isInitialMount.current = false;
     }
-  }, [searchParams]); // Sadece searchParams'a bağımlı
+  }, [searchParams]);
 
-  // --- Effect: Fetch products when filters or sort state changes ---
   useEffect(() => {
-    // Sadece state değiştiğinde değil, URL'den gelen parametreler değiştiğinde de fetch tetiklenmeli
-    // Yukarıdaki URL->State sync effect'i state'i güncelleyeceği için bu effect çalışacak.
     if (!isInitialMount.current) {
-      // İlk mount'ta zaten fetch edilecek
-      // Sıralama bilgisini de ekle
       const fetchSort = searchParams.get("sortBy") || sort;
       dispatch(
         fetchAllFilteredProducts({
@@ -258,13 +230,11 @@ function ShoppingListing() {
         })
       );
     }
-  }, [dispatch, filters, sort]); // filters ve sort state'lerine bağımlı
+  }, [dispatch, filters, sort]);
 
-  // --- Effect: Fetch initial data (categories, brands, initial products) ---
   useEffect(() => {
     dispatch(fetchAllCategories());
     dispatch(fetchAllBrands());
-    // İlk ürünleri URL'deki filtre ve sıralamaya göre çek
     const initialUrlFilters = parseUrlParamsToFilters(searchParams);
     const initialUrlSort = searchParams.get("sortBy") || "salesCount-desc";
     dispatch(
@@ -273,30 +243,27 @@ function ShoppingListing() {
         sortParams: initialUrlSort,
       })
     );
-  }, [dispatch]); // Sadece dispatch'e bağımlı, bir kere çalışır
+  }, [dispatch]);
 
-  // --- Effect: Open product details dialog ---
   useEffect(() => {
     if (productDetails !== null) {
       setOpenDetailsDialog(true);
     }
   }, [productDetails]);
 
-  // Dialog kapandığında productDetails'i temizle
   const handleDialogClose = useCallback(() => {
     setOpenDetailsDialog(false);
-    dispatch(setProductDetails(null)); // Redux'taki detayı temizle
+    dispatch(setProductDetails(null));
   }, [dispatch]);
 
-  // --- YENİ: Filtreleme için kullanılacak dinamik seçenekler ---
   const dynamicFilterOptions = useMemo(
     () => ({
       category: categoryList
         .filter((cat) => cat.isActive)
-        .map((cat) => ({ id: cat.slug, label: cat.name })), // slug'ı id olarak kullan
+        .map((cat) => ({ id: cat.slug, label: cat.name })),
       brand: brandList
         .filter((brand) => brand.isActive)
-        .map((brand) => ({ id: brand.slug, label: brand.name })), // slug'ı id olarak kullan
+        .map((brand) => ({ id: brand.slug, label: brand.name })),
     }),
     [categoryList, brandList]
   );
@@ -306,19 +273,15 @@ function ShoppingListing() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6 p-4 md:p-6 max-[600px]:p-0">
-      {/* *** ProductFilter'a dinamik seçenekleri ve yükleme durumunu gönder *** */}
       <ProductFilter
         filters={filters}
         handleFilter={handleFilter}
-        dynamicFilterOptions={dynamicFilterOptions} // Yeni prop
-        isLoading={categoriesLoading || brandsLoading} // Yeni prop
+        dynamicFilterOptions={dynamicFilterOptions}
+        isLoading={categoriesLoading || brandsLoading}
       />
-      {/* --- --- */}
       <div className="bg-background w-full rounded-lg shadow-sm border">
         <div className="p-4 border-b flex items-center justify-between">
-          {/* Başlık (Kategori/Marka isimlerini bulup gösterme eklenebilir) */}
           <h2 className="text-lg font-semibold">
-            {/* Dinamik Başlık (Örnek) */}
             {filters?.category?.length > 0
               ? `${filters.category
                   .map(
@@ -356,10 +319,7 @@ function ShoppingListing() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-[200px]">
-                <DropdownMenuRadioGroup
-                  value={sort} // Güncel sort state'ini kullan
-                  onValueChange={handleSort} // handleSort fonksiyonunu çağır
-                >
+                <DropdownMenuRadioGroup value={sort} onValueChange={handleSort}>
                   {sortOptions.map((sortItem) => (
                     <DropdownMenuRadioItem
                       value={sortItem.id}
@@ -373,9 +333,8 @@ function ShoppingListing() {
             </DropdownMenu>
           </div>
         </div>
-        {/* Ürün Grid'i */}
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
-          {productsLoading ? ( // productsLoading kullan
+          {productsLoading ? (
             Array.from({ length: skeletonCount }).map((_, index) => (
               <ProductTileSkeleton key={`skeleton-${index}`} />
             ))
@@ -387,7 +346,7 @@ function ShoppingListing() {
                 product={productItem}
                 handleAddtoCart={() =>
                   handleAddtoCart(productItem._id, productItem.totalStock)
-                } // Fonksiyon çağrısını düzelt
+                }
               />
             ))
           ) : (
@@ -397,11 +356,10 @@ function ShoppingListing() {
           )}
         </div>
       </div>
-      {/* Ürün Detay Dialog (handleDialogClose eklendi) */}
       <ProductDetailsDialog
         open={openDetailsDialog}
-        setOpen={setOpenDetailsDialog} // Direkt state setter yerine handleDialogClose'u vermek daha iyi olabilir
-        onOpenChange={(isOpen) => !isOpen && handleDialogClose()} // Dialog kapanınca temizleme
+        setOpen={setOpenDetailsDialog}
+        onOpenChange={(isOpen) => !isOpen && handleDialogClose()}
         productDetails={productDetails}
       />
     </div>

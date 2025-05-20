@@ -1,149 +1,18 @@
-// import axios from "axios";
-// import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-
-// const initialState = {
-//   cartItems: [],
-//   isLoading: false,
-//   isCartOpen: false,
-// };
-
-// export const addToCart = createAsyncThunk(
-//   "cart/addToCart",
-//   async ({ userId, productId, quantity }) => {
-//     const response = await axios.post(
-//       "http://localhost:5000/api/shop/cart/add",
-//       {
-//         userId,
-//         productId,
-//         quantity,
-//       }
-//     );
-
-//     return response.data;
-//   }
-// );
-
-// export const fetchCartItems = createAsyncThunk(
-//   "cart/fetchCartItems",
-//   async (userId) => {
-//     const response = await axios.get(
-//       `http://localhost:5000/api/shop/cart/get/${userId}`
-//     );
-
-//     return response.data;
-//   }
-// );
-
-// export const deleteCartItem = createAsyncThunk(
-//   "cart/deleteCartItem",
-//   async ({ userId, productId }) => {
-//     const response = await axios.delete(
-//       `http://localhost:5000/api/shop/cart/${userId}/${productId}`
-//     );
-
-//     return response.data;
-//   }
-// );
-
-// export const updateCartQuantity = createAsyncThunk(
-//   "cart/updateCartQuantity",
-//   async ({ userId, productId, quantity }) => {
-//     const response = await axios.put(
-//       "http://localhost:5000/api/shop/cart/update-cart",
-//       {
-//         userId,
-//         productId,
-//         quantity,
-//       }
-//     );
-
-//     return response.data;
-//   }
-// );
-
-// const shoppingCartSlice = createSlice({
-//   name: "shoppingCart",
-//   initialState,
-//   reducers: {
-//     setIsCartOpen: (state, action) => {
-//       state.isCartOpen = action.payload;
-//     },
-//   },
-//   extraReducers: (builder) => {
-//     builder
-//       .addCase(addToCart.pending, (state) => {
-//         state.isLoading = true;
-//       })
-//       .addCase(addToCart.fulfilled, (state, action) => {
-//         state.isLoading = false;
-//         state.cartItems = action.payload.data;
-//       })
-//       .addCase(addToCart.rejected, (state) => {
-//         state.isLoading = false;
-//         state.cartItems = [];
-//       })
-//       .addCase(fetchCartItems.pending, (state) => {
-//         state.isLoading = true;
-//       })
-//       .addCase(fetchCartItems.fulfilled, (state, action) => {
-//         state.isLoading = false;
-//         state.cartItems = action.payload.data;
-//       })
-//       .addCase(fetchCartItems.rejected, (state) => {
-//         state.isLoading = false;
-//         state.cartItems = [];
-//       })
-//       .addCase(updateCartQuantity.pending, (state) => {
-//         state.isLoading = true;
-//       })
-//       .addCase(updateCartQuantity.fulfilled, (state, action) => {
-//         state.isLoading = false;
-//         state.cartItems = action.payload.data;
-//       })
-//       .addCase(updateCartQuantity.rejected, (state) => {
-//         state.isLoading = false;
-//         state.cartItems = [];
-//       })
-//       .addCase(deleteCartItem.pending, (state) => {
-//         state.isLoading = true;
-//       })
-//       .addCase(deleteCartItem.fulfilled, (state, action) => {
-//         state.isLoading = false;
-//         state.cartItems = action.payload.data;
-//       })
-//       .addCase(deleteCartItem.rejected, (state) => {
-//         state.isLoading = false;
-//         state.cartItems = [];
-//       });
-//   },
-// });
-
-// export const { setIsCartOpen } = shoppingCartSlice.actions;
-// export default shoppingCartSlice.reducer;
-
-// client/src/store/shop/cart-slice/index.js
 import axios from "axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   getGuestCart,
   saveGuestCart,
   clearGuestCart,
-  // addProductToGuestCart, // Thunk içinde bu fonksiyonları direkt kullanabiliriz
-  // updateGuestCartItemQuantity,
-  // removeProductFromGuestCart,
-} from "@/lib/guestCartUtils"; // Oluşturduğumuz yardımcı fonksiyonlar
+} from "@/lib/guestCartUtils";
 
 const initialState = {
-  cartItems: { items: [], guestCartId: null, _id: null }, // Yapıyı backend'den dönen cart objesine benzetelim
+  cartItems: { items: [], guestCartId: null, _id: null },
   isLoading: false,
   isCartOpen: false,
-  error: null, // Hata yönetimi için
+  error: null,
 };
 
-// Ürün detaylarını getirmek için (sepete eklerken fiyat vb. bilgiler için)
-// Bu thunk zaten product-slice içinde var, onu kullanabiliriz veya burada da bir tane tanımlayabiliriz.
-// Şimdilik product-slice'taki fetchProductDetails'ı kullanacağımızı varsayalım.
-// addToCart Thunk (Misafir için totalStock kaydını teyit edelim):
 export const addToCart = createAsyncThunk(
   "cart/addToCart",
   async (
@@ -155,7 +24,6 @@ export const addToCart = createAsyncThunk(
     if (!auth.isAuthenticated) {
       try {
         if (!productDetails || productDetails.totalStock === undefined) {
-          // totalStock kontrolü eklendi
           return rejectWithValue({
             success: false,
             message:
@@ -197,7 +65,7 @@ export const addToCart = createAsyncThunk(
             salePrice: productDetails.salePrice,
             title: productDetails.title,
             image: productDetails.image,
-            totalStock: productDetails.totalStock, // Bu bilgi misafir sepetindeki ürün için önemli
+            totalStock: productDetails.totalStock,
           });
         }
         const newGuestCart = { ...localCart, items: updatedCartItems };
@@ -210,7 +78,6 @@ export const addToCart = createAsyncThunk(
         });
       }
     } else {
-      // Giriş yapmış kullanıcı için backend çağrısı...
       try {
         const response = await axios.post(
           "http://localhost:5000/api/shop/cart/add",
@@ -234,15 +101,10 @@ export const addToCart = createAsyncThunk(
 export const fetchCartItems = createAsyncThunk(
   "cart/fetchCartItems",
   async (userId, { getState, rejectWithValue }) => {
-    // userId opsiyonel olabilir
     const { auth } = getState();
     if (!auth.isAuthenticated && !userId) {
       try {
         const guestCart = getGuestCart();
-        // Misafir sepetindeki ürünlerin güncel fiyatlarını/detaylarını almak iyi bir pratik olabilir
-        // Ama bu, her sepet yüklemesinde birden fazla API isteği anlamına gelebilir.
-        // Şimdilik localStorage'daki ham veriyi döndürelim.
-        // Fiyatlar ödeme adımında backend tarafından doğrulanacak.
         return { success: true, data: guestCart, fromLocalStorage: true };
       } catch (error) {
         return rejectWithValue({
@@ -251,9 +113,8 @@ export const fetchCartItems = createAsyncThunk(
         });
       }
     } else {
-      // Giriş yapmış kullanıcı
       try {
-        const idToFetch = userId || auth.user.id; // Eğer userId gelirse onu, yoksa state'deki user.id'yi kullan
+        const idToFetch = userId || auth.user.id;
         if (!idToFetch)
           return rejectWithValue({
             success: false,
@@ -263,7 +124,7 @@ export const fetchCartItems = createAsyncThunk(
           `http://localhost:5000/api/shop/cart/get/${idToFetch}`,
           { withCredentials: true }
         );
-        return { ...response.data, fromLocalStorage: false }; // success ve data backend'den gelecek
+        return { ...response.data, fromLocalStorage: false };
       } catch (error) {
         return rejectWithValue(
           error.response?.data || {
@@ -282,7 +143,6 @@ export const deleteCartItem = createAsyncThunk(
     const { auth } = getState();
 
     if (!auth.isAuthenticated) {
-      // Misafir Kullanıcı: LocalStorage'dan sil
       try {
         const localCart = getGuestCart();
         const updatedItems = localCart.items.filter(
@@ -299,14 +159,11 @@ export const deleteCartItem = createAsyncThunk(
         });
       }
     } else {
-      // Giriş yapmış kullanıcı: Backend'e istek gönder
       try {
-        // userId'yi state'den al
         const userId = auth.user.id;
-        // Backend endpoint'i :productId parametresini path'ten almalı.
         const response = await axios.delete(
           `http://localhost:5000/api/shop/cart/${userId}/${productId}`,
-          { withCredentials: true } // userId backend'de req.user'dan alınacak
+          { withCredentials: true }
         );
         return { ...response.data, fromLocalStorage: false };
       } catch (error) {
@@ -324,11 +181,8 @@ export const deleteCartItem = createAsyncThunk(
 export const updateCartQuantity = createAsyncThunk(
   "cart/updateCartQuantity",
   async ({ productId, quantity }, { getState, rejectWithValue }) => {
-    // 'quantity' burada YENİ İSTENEN MİKTAR
-    const { auth, shopProducts } = getState(); // shopProducts'ı stok kontrolü için alıyoruz
-
+    const { auth, shopProducts } = getState();
     if (!auth.isAuthenticated) {
-      // Misafir Kullanıcı: LocalStorage'ı güncelle
       try {
         const localCart = getGuestCart();
         const itemIndex = localCart.items.findIndex(
@@ -344,7 +198,6 @@ export const updateCartQuantity = createAsyncThunk(
 
         const cartItemToUpdate = localCart.items[itemIndex];
 
-        // Stok kontrolü: Ürünün toplam stoğu, misafir sepetine eklenirken kaydedilmiş olmalı.
         if (cartItemToUpdate.totalStock === undefined) {
           // Eğer totalStock bilgisi bir şekilde kaydedilmemişse (bu bir hata durumudur),
           // kullanıcıyı yanıltmamak adına işlemi reddetmek daha güvenli olabilir.
@@ -359,15 +212,14 @@ export const updateCartQuantity = createAsyncThunk(
             success: false,
             message: "Stokta yeterli ürün bulunmamaktadır.",
             isStockError: true,
-            availableStock: cartItemToUpdate.totalStock, // Mevcut toplam stok
+            availableStock: cartItemToUpdate.totalStock,
             requestedQuantity: quantity,
           });
         }
 
-        const updatedItems = [...localCart.items]; // Sepet öğelerinin bir kopyasını oluştur
+        const updatedItems = [...localCart.items];
 
         if (quantity <= 0) {
-          // İstenen yeni miktar 0 veya daha az ise ürünü sil
           updatedItems.splice(itemIndex, 1);
         } else {
           updatedItems[itemIndex] = {
@@ -387,11 +239,10 @@ export const updateCartQuantity = createAsyncThunk(
         });
       }
     } else {
-      // Giriş yapmış kullanıcı: Backend'e istek gönder
       try {
         const response = await axios.put(
-          "http://localhost:5000/api/shop/cart/update-cart", // Endpoint'i kontrol et, /update-cart veya /update-item
-          { productId, quantity }, // userId backend'de req.user'dan alınacak
+          "http://localhost:5000/api/shop/cart/update-cart",
+          { productId, quantity },
           { withCredentials: true }
         );
         return { ...response.data, fromLocalStorage: false };
@@ -401,7 +252,6 @@ export const updateCartQuantity = createAsyncThunk(
           message: "Sepet güncellenemedi (API).",
         };
         if (errorData.isStockError) {
-          // Backend'den gelebilecek stok hatasını da yakala
           return rejectWithValue(errorData);
         }
         return rejectWithValue(errorData);
@@ -410,7 +260,6 @@ export const updateCartQuantity = createAsyncThunk(
   }
 );
 
-// YENİ THUNK: Giriş yapıldığında yerel sepeti backend ile senkronize et
 export const syncLocalCartToBackend = createAsyncThunk(
   "cart/syncLocalCart",
   async (_, { getState, dispatch, rejectWithValue }) => {
@@ -424,7 +273,6 @@ export const syncLocalCartToBackend = createAsyncThunk(
 
     const localCart = getGuestCart();
     if (localCart.items.length === 0) {
-      // Senkronize edilecek bir şey yoksa, sadece backend sepetini çek
       await dispatch(fetchCartItems(auth.user.id));
       return {
         success: true,
@@ -439,10 +287,8 @@ export const syncLocalCartToBackend = createAsyncThunk(
         { withCredentials: true }
       );
       if (response.data.success) {
-        clearGuestCart(); // Başarılı senkronizasyon sonrası yerel sepeti temizle
-        // Senkronize edilmiş sepeti state'e yazmak için fetchCartItems'ı tekrar çağırmak yerine
-        // doğrudan backend'den dönen güncel sepeti kullanabiliriz.
-        return { ...response.data, fromLocalStorage: false }; // Backend'den dönen güncel sepet
+        clearGuestCart();
+        return { ...response.data, fromLocalStorage: false };
       } else {
         return rejectWithValue(response.data);
       }
@@ -464,14 +310,12 @@ const shoppingCartSlice = createSlice({
     setIsCartOpen: (state, action) => {
       state.isCartOpen = action.payload;
     },
-    // Misafir sepetini state'e yüklemek için bir reducer (opsiyonel, thunk da yapabilir)
     loadGuestCartToState: (state, action) => {
       state.cartItems = action.payload || { items: [], guestCartId: null };
       state.isLoading = false;
       state.error = null;
     },
     clearCartState: (state) => {
-      // Logout sonrası veya sepet temizleme için
       state.cartItems = { items: [], guestCartId: null, _id: null };
       state.isLoading = false;
       state.error = null;
@@ -489,11 +333,9 @@ const shoppingCartSlice = createSlice({
           items: [],
           guestCartId: null,
           _id: null,
-        }; // API'den gelen veya yerel sepet
+        };
       } else {
-        // Eğer backend success:false döndürürse veya payload'da data yoksa
         state.error = action.payload?.message || "Sepet işlemi başarısız oldu.";
-        // state.cartItems'ı boşaltmak yerine mevcutu koruyabiliriz, kullanıcıya hata gösterilir.
       }
     };
     const handleRejected = (state, action) => {
@@ -502,14 +344,12 @@ const shoppingCartSlice = createSlice({
         action.payload?.message ||
         action.error?.message ||
         "Bilinmeyen bir sepet hatası oluştu.";
-      // Hata durumunda sepeti boşaltmak yerine mevcutu koruyabiliriz.
     };
 
     builder
       .addCase(addToCart.pending, handlePending)
       .addCase(addToCart.fulfilled, handleFulfilled)
       .addCase(addToCart.rejected, (state, action) => {
-        // addToCart için özel reject handling
         state.isLoading = false;
         state.error =
           action.payload?.message ||
@@ -526,7 +366,6 @@ const shoppingCartSlice = createSlice({
       .addCase(updateCartQuantity.pending, handlePending)
       .addCase(updateCartQuantity.fulfilled, handleFulfilled)
       .addCase(updateCartQuantity.rejected, (state, action) => {
-        // updateCartQuantity için özel reject handling
         state.isLoading = false;
         state.error =
           action.payload?.message ||
@@ -540,7 +379,7 @@ const shoppingCartSlice = createSlice({
       .addCase(deleteCartItem.fulfilled, handleFulfilled)
       .addCase(deleteCartItem.rejected, handleRejected)
       .addCase(syncLocalCartToBackend.pending, handlePending)
-      .addCase(syncLocalCartToBackend.fulfilled, handleFulfilled) // sync sonrası backend'den dönen güncel sepeti alır
+      .addCase(syncLocalCartToBackend.fulfilled, handleFulfilled)
       .addCase(syncLocalCartToBackend.rejected, handleRejected);
   },
 });

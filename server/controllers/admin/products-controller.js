@@ -64,7 +64,6 @@ const addProduct = async (req, res) => {
 };
 
 //fetch all products
-
 const fetchAllProducts = async (req, res) => {
   try {
     const listOfProducts = await Product.find({});

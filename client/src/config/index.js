@@ -60,13 +60,6 @@ export const addProductFormElements = [
     options: [],
     placeholder: "Kategori Seçin",
     required: true,
-    // options: [
-    //   { id: "men", label: "Men" },
-    //   { id: "women", label: "Women" },
-    //   { id: "kids", label: "Kids" },
-    //   { id: "accessories", label: "Accessories" },
-    //   { id: "footwear", label: "Footwear" },
-    // ],
   },
   {
     label: "Marka",
@@ -75,14 +68,6 @@ export const addProductFormElements = [
     options: [],
     placeholder: "Marka Seçin (Opsiyonel)", // Opsiyonel ise placeholder'ı güncelle
     required: false,
-    // options: [
-    //   { id: "nike", label: "Nike" },
-    //   { id: "adidas", label: "Adidas" },
-    //   { id: "puma", label: "Puma" },
-    //   { id: "levi", label: "Levi's" },
-    //   { id: "zara", label: "Zara" },
-    //   { id: "h&m", label: "H&M" },
-    // ],
   },
   {
     label: "Fiyat",
@@ -149,41 +134,6 @@ export const shoppingViewHeaderMenuItems = [
     path: "/shop/search",
   },
 ];
-
-// export const categoryOptionsMap = {
-//   men: "Men",
-//   women: "Women",
-//   kids: "Kids",
-//   accessories: "Accessories",
-//   footwear: "Footwear",
-// };
-
-// export const brandOptionsMap = {
-//   nike: "Nike",
-//   adidas: "Adidas",
-//   puma: "Puma",
-//   levi: "Levi",
-//   zara: "Zara",
-//   "h&m": "H&M",
-// };
-
-// export const filterOptions = {
-//   category: [
-//     { id: "men", label: "Men" },
-//     { id: "women", label: "Women" },
-//     { id: "kids", label: "Kids" },
-//     { id: "accessories", label: "Accessories" },
-//     { id: "footwear", label: "Footwear" },
-//   ],
-//   brand: [
-//     { id: "nike", label: "Nike" },
-//     { id: "adidas", label: "Adidas" },
-//     { id: "puma", label: "Puma" },
-//     { id: "levi", label: "Levi's" },
-//     { id: "zara", label: "Zara" },
-//     { id: "h&m", label: "H&M" },
-//   ],
-// };
 
 export const sortOptions = [
   { id: "salesCount-desc", label: "En Çok Satanlar" },

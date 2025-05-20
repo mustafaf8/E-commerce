@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import CommonForm from "../common/form";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { addressFormControls } from "@/config";
@@ -11,7 +12,6 @@ import {
 } from "@/store/shop/address-slice";
 import AddressCard from "./address-card";
 import { useToast } from "../ui/use-toast";
-import { Separator } from "../ui/separator"; // Görsel ayırıcı için
 import ConfirmationModal from "../admin-view/ConfirmationModal";
 
 const initialAddressFormData = {
@@ -44,7 +44,6 @@ function Address({ setCurrentSelectedAddress, seciliAdresProp }) {
 
       return;
     }
-
     currentEditedId !== null
       ? dispatch(
           editaAddress({
@@ -82,8 +81,8 @@ function Address({ setCurrentSelectedAddress, seciliAdresProp }) {
 
   function handleDeleteAddress(getCurrentAddress) {
     if (getCurrentAddress?._id) {
-      setAddressIdToDelete(getCurrentAddress._id); // Silinecek ID'yi state'e ata
-      setShowConfirmModal(true); // Modalı göster
+      setAddressIdToDelete(getCurrentAddress._id);
+      setShowConfirmModal(true);
     } else {
       console.error("Silinecek adres ID'si bulunamadı.");
       toast({
@@ -107,16 +106,12 @@ function Address({ setCurrentSelectedAddress, seciliAdresProp }) {
   }
 
   function isFormValid() {
-    // Yalnızca zorunlu alanları tanımla
     const requiredFields = ["address", "city", "phone", "pincode"];
-
-    // Bu zorunlu alanların HER BİRİNİN formData içinde olup olmadığını
-    // ve değerlerinin boşlukları temizlendikten sonra boş olmadığını kontrol et
     return requiredFields.every(
       (field) =>
-        Object.prototype.hasOwnProperty.call(formData, field) && // Alan formData'da var mı?
-        typeof formData[field] === "string" && // Değer string mi? (trim hatasını önler)
-        formData[field].trim() !== "" // Değer boş değil mi?
+        Object.prototype.hasOwnProperty.call(formData, field) &&
+        typeof formData[field] === "string" &&
+        formData[field].trim() !== ""
     );
   }
   function confirmDeleteHandler() {
@@ -191,7 +186,7 @@ function Address({ setCurrentSelectedAddress, seciliAdresProp }) {
       </CardContent>
       <ConfirmationModal
         isOpen={showConfirmModal}
-        onClose={closeConfirmationModal} // Dialog onClose ile de kapanabilir
+        onClose={closeConfirmationModal}
         title="Adresi Silme Onayı"
         message="Bu adresi kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz."
         onConfirm={confirmDeleteHandler}
@@ -202,5 +197,9 @@ function Address({ setCurrentSelectedAddress, seciliAdresProp }) {
     </Card>
   );
 }
+Address.propTypes = {
+  setCurrentSelectedAddress: PropTypes.func.isRequired,
+  seciliAdresProp: PropTypes.object,
+};
 
 export default Address;

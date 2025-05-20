@@ -11,6 +11,7 @@ import {
   updateOrderStatus,
 } from "@/store/admin/order-slice";
 import { useToast } from "../ui/use-toast";
+import PropTypes from "prop-types";
 
 const initialFormData = {
   status: "",
@@ -54,15 +55,9 @@ function AdminOrderDetailsView({ orderDetails }) {
   };
 
   const isGuest = orderDetails?.isGuestOrder;
-  const recipientName = isGuest
-    ? orderDetails?.guestInfo?.fullName || orderDetails?.addressInfo?.fullName
-    : orderDetails?.userId?.userName;
   const recipientEmail = isGuest
     ? orderDetails?.guestInfo?.email
     : orderDetails?.userId?.email;
-  const recipientPhoneForDisplay = isGuest
-    ? orderDetails?.addressInfo?.phone || orderDetails?.guestInfo?.phone
-    : orderDetails?.userId?.phoneNumber;
 
   return (
     <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
@@ -70,10 +65,7 @@ function AdminOrderDetailsView({ orderDetails }) {
         <div className="grid gap-2 text-sm">
           <div className="flex items-center justify-between">
             <p className="text-muted-foreground">Sipariş ID</p>
-            <Label className="font-mono text-xs">
-              {orderDetails?._id}
-            </Label>{" "}
-            {/* font-mono ve text-xs */}
+            <Label className="font-mono text-xs">{orderDetails?._id}</Label>
           </div>
           <div className="flex items-center justify-between">
             <p className="text-muted-foreground">Sipariş Tarihi</p>
@@ -81,15 +73,13 @@ function AdminOrderDetailsView({ orderDetails }) {
               {orderDetails?.orderDate
                 ? new Date(orderDetails.orderDate).toLocaleDateString("tr-TR")
                 : "N/A"}
-            </Label>{" "}
-            {/* Tarih formatlama */}
+            </Label>
           </div>
           <div className="flex items-center justify-between">
             <p className="text-muted-foreground">Sipariş Tutarı</p>
             <Label className="font-semibold">
               {orderDetails?.totalAmount?.toFixed(2) || 0} TL
-            </Label>{" "}
-            {/* toFixed(2) */}
+            </Label>
           </div>
           <div className="flex items-center justify-between">
             <p className="text-muted-foreground">Ödeme Yöntemi</p>
@@ -220,5 +210,42 @@ function AdminOrderDetailsView({ orderDetails }) {
     </DialogContent>
   );
 }
+AdminOrderDetailsView.propTypes = {
+  orderDetails: PropTypes.shape({
+    _id: PropTypes.string,
+    orderDate: PropTypes.string,
+    totalAmount: PropTypes.number,
+    paymentMethod: PropTypes.string,
+    paymentStatus: PropTypes.string,
+    orderStatus: PropTypes.string,
+    isGuestOrder: PropTypes.bool,
+    guestInfo: PropTypes.shape({
+      fullName: PropTypes.string,
+      email: PropTypes.string,
+      phone: PropTypes.string,
+    }),
+    addressInfo: PropTypes.shape({
+      fullName: PropTypes.string,
+      address: PropTypes.string,
+      city: PropTypes.string,
+      pincode: PropTypes.string,
+      phone: PropTypes.string,
+      notes: PropTypes.string,
+    }),
+    userId: PropTypes.shape({
+      userName: PropTypes.string,
+      email: PropTypes.string,
+      phoneNumber: PropTypes.string,
+    }),
+    cartItems: PropTypes.arrayOf(
+      PropTypes.shape({
+        productId: PropTypes.string,
+        title: PropTypes.string,
+        quantity: PropTypes.number,
+        price: PropTypes.string,
+      })
+    ),
+  }).isRequired,
+};
 
 export default AdminOrderDetailsView;

@@ -4,7 +4,6 @@ const Brand = require("../../models/Brand");
 
 const getFilteredProducts = async (req, res) => {
   try {
-    // query'den category slug'ları, brand slug'ları vb. alınacak
     const {
       category: categorySlugs = [],
       brand: brandSlugs = [],
@@ -14,16 +13,14 @@ const getFilteredProducts = async (req, res) => {
 
     let filters = {};
 
-    // Kategori slug'larına göre Category ObjectId'lerini bul
     if (categorySlugs.length > 0) {
-      const Category = mongoose.model("Category"); // Category modelini al
+      const Category = mongoose.model("Category");
       const categories = await Category.find({
         slug: { $in: categorySlugs.split(",") },
       }).select("_id");
       if (categories.length > 0) {
         filters.category = { $in: categories.map((cat) => cat._id) };
       } else {
-        // Slug'larla eşleşen kategori yoksa boş sonuç döndür
         return res.status(200).json({ success: true, data: [] });
       }
     }
@@ -32,14 +29,13 @@ const getFilteredProducts = async (req, res) => {
         slug: { $in: brandSlugs.split(",") },
       }).select("_id");
       if (brands.length > 0) {
-        filters.brand = { $in: brands.map((b) => b._id) }; // brand ObjectId'leri ile filtrele
+        filters.brand = { $in: brands.map((b) => b._id) };
       } else {
         return res.status(200).json({ success: true, data: [] });
       }
     }
-    // "En Çok Satanlar" için özel filtreleme
     if (sortBy === "salesCount-desc") {
-      filters.salesCount = { $gt: 0 }; // salesCount > 0 olanları getir
+      filters.salesCount = { $gt: 0 };
     }
 
     let sort = {};
@@ -64,30 +60,26 @@ const getFilteredProducts = async (req, res) => {
         break;
     }
 
-    // Populate category ve brand isimlerini almak için (isteğe bağlı)
     const products = await Product.find(filters)
       .sort(sort)
-      .limit(parseInt(limit, 10)) // Limiti uygula
-      .populate("category", "name slug") // Kategori bilgilerini getir
+      .limit(parseInt(limit, 10))
+      .populate("category", "name slug")
       .populate("brand", "name slug")
-      .select("-description"); // Listelemede açıklamayı alma (opsiyonel)
+      .select("-description");
 
     res.status(200).json({
       success: true,
       data: products,
     });
-  } catch (
-    error // Hata 'e' yerine 'error' olmalı
-  ) {
-    console.error("getFilteredProducts error:", error); // Loglama iyileştirildi
+  } catch (error) {
+    console.error("getFilteredProducts error:", error);
     res.status(500).json({
       success: false,
-      message: "Ürünler getirilirken bir hata oluştu.", // Mesaj düzeltildi
+      message: "Ürünler getirilirken bir hata oluştu.",
     });
   }
 };
 
-// getProductDetails fonksiyonu da populate kullanabilir
 const getProductDetails = async (req, res) => {
   try {
     const { id } = req.params;
@@ -106,10 +98,10 @@ const getProductDetails = async (req, res) => {
       data: product,
     });
   } catch (error) {
-    console.error("getProductDetails error:", error); // Loglama iyileştirildi
+    console.error("getProductDetails error:", error);
     res.status(500).json({
       success: false,
-      message: "Ürün detayı alınırken bir hata oluştu.", // Mesaj düzeltildi
+      message: "Ürün detayı alınırken bir hata oluştu.",
     });
   }
 };

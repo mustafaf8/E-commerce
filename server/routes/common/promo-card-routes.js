@@ -1,4 +1,3 @@
-// server/routes/common/promo-card-routes.js
 const express = require("express");
 const {
   getPromoCards,
@@ -10,7 +9,6 @@ const {
 
 const router = express.Router();
 
-// Herkesin erişebileceği endpoint
 router.get("/get", getPromoCards);
 
 // Sadece adminlerin erişebileceği endpoint'ler

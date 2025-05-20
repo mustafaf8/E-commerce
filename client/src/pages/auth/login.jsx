@@ -10,8 +10,8 @@ import {
   Phone,
   KeyRound,
   User as UserIcon,
-  Mail, // E-posta ikonu
-  ChromeIcon, // Google ikonu
+  Mail,
+  ChromeIcon,
 } from "lucide-react";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
@@ -20,10 +20,10 @@ import { auth } from "@/firebase-config";
 import {
   verifyPhoneLogin,
   registerPhoneUser,
-  loginUser, // E-posta/şifre girişi için import et
+  loginUser,
 } from "@/store/auth-slice";
-import CommonForm from "@/components/common/form"; // E-posta/şifre formu için
-import { loginFormControls } from "@/config"; // E-posta/şifre form kontrolleri
+import CommonForm from "@/components/common/form";
+import { loginFormControls } from "@/config";
 import {
   Card,
   CardContent,
@@ -31,7 +31,7 @@ import {
   CardTitle,
   CardDescription,
   CardFooter,
-} from "@/components/ui/card"; // Kart bileşenleri
+} from "@/components/ui/card";
 
 const initialEmailPasswordState = {
   email: "",
@@ -39,19 +39,18 @@ const initialEmailPasswordState = {
 };
 
 function AuthLogin() {
-  // Giriş adımı state'i: 'select', 'phone', 'otp', 'name', 'email'
-  const [step, setStep] = useState("select"); // Başlangıçta seçim ekranı
+  const [step, setStep] = useState("select");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otp, setOtp] = useState("");
   const [userName, setUserName] = useState("");
   const [emailPasswordFormData, setEmailPasswordFormData] = useState(
     initialEmailPasswordState
-  ); // E-posta/Şifre state'i
+  );
   const [confirmationResult, setConfirmationResult] = useState(null);
-  const [loading, setLoading] = useState(false); // Genel yükleme durumu
-  const [otpLoading, setOtpLoading] = useState(false); // Sadece OTP işlemleri için
-  const [emailLoading, setEmailLoading] = useState(false); // E-posta/şifre girişi için
-  const [nameLoading, setNameLoading] = useState(false); // İsim kaydı için
+  const [loading, setLoading] = useState(false);
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [nameLoading, setNameLoading] = useState(false);
   const [resendDisabled, setResendDisabled] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
 
@@ -60,16 +59,14 @@ function AuthLogin() {
   const { toast } = useToast();
   const { isAuthenticated } = useSelector((state) => state.auth);
 
-  // Kullanıcı zaten giriş yapmışsa yönlendirme
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/shop/home");
     }
   }, [isAuthenticated, navigate]);
 
-  // reCAPTCHA Kurulumu (sadece telefon adımındayken)
   useEffect(() => {
-    let verifier = window.recaptchaVerifier; // Mevcut verifier'ı al
+    let verifier = window.recaptchaVerifier;
     if (step === "phone" && !verifier) {
       try {
         console.log("Setting up reCAPTCHA...");
@@ -82,12 +79,9 @@ function AuthLogin() {
               variant: "warning",
               title: "reCAPTCHA süresi doldu, tekrar deneyin.",
             });
-            // reCAPTCHA'yı temizle ve yeniden oluşturmayı dene
             if (window.recaptchaVerifier) {
               window.recaptchaVerifier.clear();
               window.recaptchaVerifier = null;
-              // Yeniden render tetiklemesi için state güncellemesi gerekebilir veya doğrudan kurulumu tekrar çağırabiliriz.
-              // Ancak bu genellikle otomatik olmaz, kullanıcının tekrar denemesi daha iyi olabilir.
             }
           },
         });
@@ -95,7 +89,7 @@ function AuthLogin() {
           console.error("reCAPTCHA render error:", err);
           toast({ variant: "destructive", title: "reCAPTCHA yüklenemedi." });
         });
-        window.recaptchaVerifier = verifier; // Global değişkene ata
+        window.recaptchaVerifier = verifier;
       } catch (error) {
         console.error("Error setting up reCAPTCHA:", error);
         toast({
@@ -105,10 +99,8 @@ function AuthLogin() {
       }
     }
 
-    // Cleanup
     return () => {
       if (verifier && typeof verifier.clear === "function") {
-        // Fonksiyonun varlığını kontrol et
         try {
           verifier.clear();
           console.log("reCAPTCHA cleared.");
@@ -118,9 +110,8 @@ function AuthLogin() {
         }
       }
     };
-  }, [step, toast]); // Sadece 'step' değiştiğinde çalışsın
+  }, [step, toast]);
 
-  // Tekrar gönder sayacı
   useEffect(() => {
     let interval = null;
     if (resendDisabled && resendTimer > 0) {
@@ -133,7 +124,6 @@ function AuthLogin() {
     return () => clearInterval(interval);
   }, [resendDisabled, resendTimer]);
 
-  // OTP Gönder
   const handleSendOtp = async (event) => {
     event.preventDefault();
     if (!isValidPhoneNumber(phoneNumber)) {
@@ -144,8 +134,8 @@ function AuthLogin() {
       toast({ variant: "destructive", title: "reCAPTCHA Hazır Değil" });
       return;
     }
-    setOtpLoading(true); // Sadece OTP yüklemesini başlat
-    setLoading(true); // Genel yüklemeyi de başlat
+    setOtpLoading(true);
+    setLoading(true);
     setResendDisabled(true);
     setResendTimer(60);
 
@@ -181,7 +171,6 @@ function AuthLogin() {
     }
   };
 
-  // OTP Doğrula
   const handleVerifyOtp = async (event) => {
     event.preventDefault();
     if (!otp || otp.length !== 6 || !confirmationResult) {
@@ -202,7 +191,6 @@ function AuthLogin() {
 
       if (backendResponse.success && !backendResponse.isNewUser) {
         toast({ variant: "success", title: "Giriş Başarılı!" });
-        // Redux state güncellendiği için otomatik yönlendirme olmalı
       } else if (backendResponse.success && backendResponse.isNewUser) {
         setStep("name");
         toast({ variant: "info", title: "Hesabınızı Tamamlayın" });
@@ -218,21 +206,19 @@ function AuthLogin() {
         title: "SMS Doğrulama Hatası",
         description: error.message,
       });
-      setStep("phone"); // Hata olursa telefon adımına geri dön
+      setStep("phone");
     } finally {
       setOtpLoading(false);
       setLoading(false);
     }
   };
 
-  // İsimle Yeni Kullanıcı Kaydet
   const handleRegisterNewUser = async (event) => {
     event.preventDefault();
     if (!userName.trim()) {
       toast({ variant: "destructive", title: "İsim Alanı Boş" });
       return;
     }
-    // confirmationResult hala geçerli mi? Belki token'ı tekrar almak daha iyi.
     const user = auth.currentUser;
     if (!user) {
       toast({
@@ -255,7 +241,6 @@ function AuthLogin() {
 
       if (backendResponse.success) {
         toast({ variant: "success", title: "Kayıt Başarılı!" });
-        // Redux state güncellendi, yönlendirme otomatik olmalı
       } else {
         throw new Error(backendResponse.message || "Backend kaydı başarısız.");
       }
@@ -272,9 +257,7 @@ function AuthLogin() {
     }
   };
 
-  // OTP Tekrar Gönder
   const handleResendOtp = () => {
-    // reCAPTCHA'yı sıfırlama denemesi
     if (window.recaptchaVerifier && window.recaptchaWidgetId !== undefined) {
       try {
         grecaptcha.reset(window.recaptchaWidgetId);
@@ -285,7 +268,6 @@ function AuthLogin() {
     handleSendOtp({ preventDefault: () => {} });
   };
 
-  // E-posta/Şifre ile Giriş
   const handleEmailPasswordLogin = (event) => {
     event.preventDefault();
     setEmailLoading(true);
@@ -298,7 +280,6 @@ function AuthLogin() {
             title: payload.message || "Giriş Başarılı!",
             variant: "success",
           });
-          // Yönlendirme Redux state değişikliği ile tetiklenir
         } else {
           toast({
             title: payload.message || "Giriş Başarısız",
@@ -320,7 +301,6 @@ function AuthLogin() {
       });
   };
 
-  // Google ile Giriş (Sadece backend'e yönlendirme)
   const handleGoogleLogin = () => {
     window.location.href = import.meta.env.VITE_GOOGLE_AUTH_URL;
   };

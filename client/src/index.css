@@ -1,14 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-/* Scrollbar'ı gizlemek için */
+
 .no-scrollbar::-webkit-scrollbar {
-  display: none; /* Safari ve Chrome */
+  display: none;
 }
 
 .no-scrollbar {
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 @layer base {
@@ -75,7 +75,6 @@
   body {
     @apply bg-background text-foreground;
   }
-  /* styles.css veya global.css dosyanızda */
   .line-through-red {
     text-decoration: line-through;
     text-decoration-color: red;
@@ -128,16 +127,16 @@
 
 .cart-count-badge {
   position: absolute;
-  top: -8px; /* İkonun üstüne konumlandır */
+  top: -8px;
   right: -8px;
   background-color: red;
   color: white;
-  border-radius: 50%; /* Daire şekli */
-  padding: 0.2rem 0.4rem; /* İç boşluk */
-  font-size: 0.75rem; /* Yazı boyutu */
+  border-radius: 50%;
+  padding: 0.2rem 0.4rem;
+  font-size: 0.75rem;
   font-weight: bold;
-  z-index: 10; /* İkonun üzerinde görünsün */
-  min-width: 1rem; /* Minimum genişlik */
+  z-index: 10;
+  min-width: 1rem;
   text-align: center;
 }
 
@@ -146,28 +145,25 @@
   outline: 1px dotted blue; */
 }
 
-/* Promosyon kartları için grid yapısı */
 .promo-card-container {
   display: grid;
   gap: 8px;
   width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
-  -ms-overflow-style: none; /* IE ve Edge için */
-  scrollbar-width: none; /* Firefox için */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .promo-card-container::-webkit-scrollbar {
-  display: none; /* Chrome, Safari ve Opera için */
+  display: none;
 }
 
-/* Tüm kartların kenarlarını kaldır */
 .promo-card {
-  border: none !important; /* Border'ı tamamen kaldır */
-  box-shadow: none !important; /* Varsa gölgeyi de kaldır */
+  border: none !important;
+  box-shadow: none !important;
 }
 
-/* Card komponenti için border özelliğini geçersiz kıl */
 .promo-card-container .MuiCard-root,
 .promo-card-container .Card {
   border: none !important;
@@ -175,13 +171,12 @@
   outline: none !important;
 }
 
-/* 800px'den küçük ekranlar için: 4 sütun 2 satır */
 @media (max-width: 699px) {
   .promo-card-container {
-    grid-template-columns: repeat(4, 1fr); /* 4 sütun */
-    grid-template-rows: repeat(2, auto); /* 2 satır */
-    grid-auto-flow: row; /* Elemanları satır satır yerleştir */
-    max-height: none; /* Yükseklik sınırını kaldır */
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, auto);
+    grid-auto-flow: row;
+    max-height: none;
     gap: 1px;
   }
   .promo-card {
@@ -190,12 +185,11 @@
   }
 }
 
-/* 800px ve üstü ekranlar için: 8 sütun 1 satır */
 @media (min-width: 700px) {
   .promo-card-container {
-    grid-template-columns: repeat(8, 1fr); /* 8 sütun */
-    grid-template-rows: auto; /* 1 satır */
-    grid-auto-flow: column; /* Elemanları sütun sütun yerleştir */
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: auto;
+    grid-auto-flow: column;
   }
   .promo-card {
     width: 100%;
@@ -203,7 +197,6 @@
   }
 }
 
-/* Ekstra büyük ekranlar için kart boyutlarını artır */
 @media (min-width: 1200px) {
   .promo-card {
     height: 125px;

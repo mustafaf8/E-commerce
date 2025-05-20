@@ -1,22 +1,20 @@
-// server/models/PromoCard.js
 const mongoose = require("mongoose");
-
 const PromoCardSchema = new mongoose.Schema(
   {
     image: {
       type: String,
-      required: [true, "Resim URL'si gereklidir."], // Resim zorunlu
+      required: [true, "Resim URL'si gereklidir."],
     },
     title: {
-      type: String, // Başlık opsiyonel
+      type: String,
       trim: true,
     },
     link: {
-      type: String, // Link opsiyonel
+      type: String,
       trim: true,
     },
   },
   { timestamps: true }
-); // createdAt ve updatedAt ekler
+);
 
 module.exports = mongoose.model("PromoCard", PromoCardSchema);

@@ -1,16 +1,15 @@
 const mongoose = require("mongoose");
-
 const ProductSchema = new mongoose.Schema(
   {
     image: {
       type: String,
-      required: [true, "Ürün resmi zorunludur."], // Gerekliyse true yapın
+      required: [true, "Ürün resmi zorunludur."],
     },
     title: {
       type: String,
       required: [true, "Ürün başlığı zorunludur."],
       trim: true,
-      index: true, // Aramalar için index eklenebilir
+      index: true,
     },
     description: {
       type: String,
@@ -19,12 +18,12 @@ const ProductSchema = new mongoose.Schema(
     price: {
       type: Number,
       required: [true, "Ürün fiyatı zorunludur."],
-      min: [0, "Fiyat negatif olamaz."], // Minimum değer kontrolü
+      min: [0, "Fiyat negatif olamaz."],
     },
     salePrice: {
       type: Number,
       required: [true, "Ürün fiyatı zorunludur."],
-      min: [0, "Fiyat negatif olamaz."], // Minimum değer kontrolü
+      min: [0, "Fiyat negatif olamaz."],
     },
     totalStock: {
       type: Number,
@@ -45,14 +44,14 @@ const ProductSchema = new mongoose.Schema(
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Category", // Yeni Category modeline referans
-      required: true, // Kategori zorunlu olsun
+      ref: "Category",
+      required: true,
       index: true,
     },
     brand: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Brand", // Yeni Brand modeline referans
-      required: false, // Marka zorunlu olmayabilir, isteğe bağlıysa false yap
+      ref: "Brand",
+      required: false,
       index: true,
     },
     salesCount: {

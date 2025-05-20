@@ -1,4 +1,3 @@
-// server/routes/admin/brand-routes.js
 const express = require("express");
 const {
   addBrandAdmin,

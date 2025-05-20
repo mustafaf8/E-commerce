@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 const Partners = () => {
-  // İş ortaklarını kategorilere ayırdım
   const partnerCategories = [
     {
       id: "premium",
@@ -51,7 +50,6 @@ const Partners = () => {
         </div>
       </div>
       <div className="container mx-auto px-4 py-8 md:py-16">
-        {/* Kategori Seçimi */}
         <div className="flex flex-wrap justify-center gap-4 mb-12">
           {partnerCategories.map((category) => (
             <button
@@ -67,8 +65,6 @@ const Partners = () => {
             </button>
           ))}
         </div>
-
-        {/* İş Ortakları Logoları */}
         {partnerCategories.map((category) => (
           <div
             key={category.id}
@@ -104,8 +100,6 @@ const Partners = () => {
             </div>
           </div>
         ))}
-
-        {/* İşbirliği Teklifi */}
         <div className="mt-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-8 md:p-12 text-white shadow-lg">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">

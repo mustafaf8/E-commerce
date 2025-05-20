@@ -1,5 +1,6 @@
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import PropTypes from "prop-types";
 import {
   Select,
   SelectContent,
@@ -18,13 +19,6 @@ function CommonForm({
   buttonText,
   isBtnDisabled = false,
 }) {
-  function handleOnChange(e) {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  }
   function renderInputsByComponentType(getControlItem) {
     let element = null;
     const value = formData[getControlItem.name] || "";
@@ -131,5 +125,27 @@ function CommonForm({
     </form>
   );
 }
+CommonForm.propTypes = {
+  formControls: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+      componentType: PropTypes.string.isRequired,
+      placeholder: PropTypes.string,
+      type: PropTypes.string,
+      options: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.string.isRequired,
+          label: PropTypes.string.isRequired,
+        })
+      ),
+    })
+  ),
+  formData: PropTypes.object.isRequired,
+  setFormData: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  buttonText: PropTypes.string,
+  isBtnDisabled: PropTypes.bool,
+};
 
 export default CommonForm;

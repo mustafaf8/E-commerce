@@ -1,14 +1,13 @@
-// YENİ DOSYA: client/src/pages/shopping-view/PaymentFailurePage.jsx
-import React from "react";
+import "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { XCircle } from "lucide-react"; // Hata ikonu
+import { XCircle } from "lucide-react";
 
 const PaymentFailurePage = () => {
   const [searchParams] = useSearchParams();
   const status = searchParams.get("status");
   const orderId = searchParams.get("orderId");
   const errorCode = searchParams.get("errorCode");
-  const message = searchParams.get("message"); // Opsiyonel mesaj
+  const message = searchParams.get("message");
 
   let failureMessage = "Ödeme sırasında bir hata oluştu.";
   if (status === "failed") {

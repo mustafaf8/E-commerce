@@ -1,44 +1,6 @@
-//     // --- YENİ: En Çok Satanları Çek ---
-//     setBestSellingLoading(true); // Yüklemeyi başlat
-//     dispatch(
-//       fetchAllFilteredProducts({
-//         filterParams: {},
-//         sortParams: "salesCount-desc",
-//       })
-//     )
-//       .unwrap() // Thunk'ın sonucunu yakala
-//       .then((payload) => {
-//         // Thunk'tan dönen payload içindeki data'yı kontrol et
-//         if (payload && payload.success && payload.data) {
-//           setBestSellingProducts(payload.data); // State'i güncelle
-//         } else {
-//           // Başarısız olursa veya data yoksa boş dizi ata
-//           setBestSellingProducts([]);
-//           console.error("En çok satanlar alınamadı:", payload?.message);
-//           // İsteğe bağlı: Kullanıcıya hata mesajı göster
-//           // toast({ variant: "warning", title: "En çok satanlar yüklenemedi." });
-//         }
-//       })
-//       .catch((error) => {
-//         // Thunk reject olursa hatayı yakala
-//         console.error("En çok satanlar alınırken hata:", error);
-//         setBestSellingProducts([]);
-//         // İsteğe bağlı: Kullanıcıya hata mesajı göster
-//         // toast({ variant: "destructive", title: "En çok satanlar yüklenirken hata oluştu." });
-//       })
-//       .finally(() => {
-//         setBestSellingLoading(false); // Yüklemeyi bitir
-//       });
-//     dispatch(fetchAllFilteredProducts({ filterParams: {}, sortParams: "" }));
-//     dispatch(getFeatureImages());
-//     dispatch(fetchPromoCards());
-//     dispatch(fetchSideBanners());
-//   }, [dispatch]);
-
 import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProductDetails } from "@/store/shop/products-slice";
-
 import { useNavigate } from "react-router-dom";
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import { useToast } from "@/components/ui/use-toast";
@@ -58,11 +20,9 @@ function ShoppingHome() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { toast } = useToast();
-
   const [currentSlide, setCurrentSlide] = useState(0);
   const [currentSideBannerIndex, setCurrentSideBannerIndex] = useState(0);
   const { productDetails } = useSelector((state) => state.shopProducts);
-
   const { featureImageList, isLoading: featuresLoading } = useSelector(
     (state) => state.commonFeature
   );
@@ -75,11 +35,9 @@ function ShoppingHome() {
   const { activeHomeSections = [], isLoading: sectionsLoading } = useSelector(
     (state) => state.homeSections || { activeHomeSections: [], isLoading: true }
   );
-
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 
-  // --- Handler Fonksiyonlar (Aynı kalabilir) ---
   const handleGetProductDetails = useCallback(
     (getCurrentProductId) => {
       dispatch(fetchProductDetails(getCurrentProductId));
@@ -96,24 +54,19 @@ function ShoppingHome() {
     }
   };
   const handleSideBannerNav = (direction) => {
-    // Liste boş veya tanımsızsa bir şey yapma
     if (!sideBannerList || sideBannerList.length === 0) return;
-
-    const newIndex = currentSideBannerIndex + direction; // Yeni indeksi hesapla
-
-    // İndeks sınırlarının dışına çıkarsa başa veya sona sar
+    const newIndex = currentSideBannerIndex + direction;
     if (newIndex < 0) {
-      setCurrentSideBannerIndex(sideBannerList.length - 1); // Sona git
+      setCurrentSideBannerIndex(sideBannerList.length - 1);
     } else if (newIndex >= sideBannerList.length) {
-      setCurrentSideBannerIndex(0); // Başa dön
+      setCurrentSideBannerIndex(0);
     } else {
-      setCurrentSideBannerIndex(newIndex); // Normal ilerle
+      setCurrentSideBannerIndex(newIndex);
     }
   };
 
   function handleAddtoCart(getCurrentProductId) {
     if (!isAuthenticated) {
-      // isAuthenticated kontrolü eklendi
       toast({ variant: "destructive", title: "Lütfen önce giriş yapın." });
       return;
     }
@@ -135,10 +88,8 @@ function ShoppingHome() {
       }
     });
   }
-  // [dispatch, isAuthenticated, user?.id, toast];
 
   useEffect(() => {
-    // Ana sayfa bölümlerini çek
     dispatch(fetchActiveHomeSections());
     dispatch(getFeatureImages());
     dispatch(fetchPromoCards());
@@ -201,7 +152,6 @@ function ShoppingHome() {
           </div>
         ) : (
           <div className="flex  md:flex-row gap-4 ">
-            {/* Sol Ana Banner (Artık Slider) */}
             <div
               className={`relative w-full md:w-[65%] rounded-3xl overflow-hidden shadow-sm group max-sm:h-40 max-md:h-48 h-60`}
             >
@@ -218,31 +168,29 @@ function ShoppingHome() {
                         : "opacity-0 z-0" // z-index eklendi
                     } absolute inset-0 w-full h-full object-center transition-opacity duration-1000 ease-in-out ${
                       slide.link ? "cursor-pointer" : ""
-                    }`} // object-cover ve ease eklendi
+                    }`}
                     loading="lazy"
                   />
                 ))
               ) : (
-                /* Resim yoksa placeholder */
                 <div className="w-full h-full flex items-center justify-center">
                   <span className="text-gray-400 text-sm">Banner Alanı</span>
                 </div>
               )}
-              {/* Slider Navigasyon Butonları (Sol Banner üzerine) */}
               {featureImageList && featureImageList.length > 1 && (
                 <>
                   <Button
                     variant="outline"
                     size="icon"
                     onClick={(e) => {
-                      e.stopPropagation(); // Resim linkine gitmeyi engelle
+                      e.stopPropagation();
                       setCurrentSlide(
                         (prev) =>
                           (prev - 1 + featureImageList.length) %
                           featureImageList.length
                       );
                     }}
-                    className="absolute top-1/2 left-3 z-20 transform -translate-y-1/2 bg-white/60 hover:bg-white rounded-full h-8 w-8 max-sm:h-6 max-md:h-6 max-sm:w-6 max-md:w-6" // z-index ve stil
+                    className="absolute top-1/2 left-3 z-20 transform -translate-y-1/2 bg-white/60 hover:bg-white rounded-full h-8 w-8 max-sm:h-6 max-md:h-6 max-sm:w-6 max-md:w-6"
                   >
                     <ChevronLeftIcon className="w-5 h-5 text-gray-700" />
                   </Button>
@@ -255,19 +203,16 @@ function ShoppingHome() {
                         (prev) => (prev + 1) % featureImageList.length
                       );
                     }}
-                    className="absolute top-1/2 right-3 z-20 transform -translate-y-1/2 bg-white/60 hover:bg-white rounded-full h-8 w-8 shadow-md max-sm:h-6 max-md:h-6 max-sm:w-6 max-md:w-6" // z-index ve stil
+                    className="absolute top-1/2 right-3 z-20 transform -translate-y-1/2 bg-white/60 hover:bg-white rounded-full h-8 w-8 shadow-md max-sm:h-6 max-md:h-6 max-sm:w-6 max-md:w-6"
                   >
                     <ChevronRightIcon className="w-5 h-5 text-gray-700" />
                   </Button>
                 </>
               )}
             </div>
-
-            {/* Sağ Yan Banner (Manuel Slider) */}
             <div
               className={`relative w-full md:w-[35%] rounded-3xl overflow-hidden shadow-sm group bg-gray-200 max-sm:h-32 max-md:h-48 h-60 max-md:hidden`}
             >
-              {/* sideBannerList'i map et ve currentSideBannerIndex'e göre göster */}
               {sideBannerList && sideBannerList.length > 0 ? (
                 sideBannerList.map((slide, index) => (
                   <img
@@ -278,7 +223,7 @@ function ShoppingHome() {
                     className={`${
                       index === currentSideBannerIndex
                         ? "opacity-100 z-10"
-                        : "opacity-0 z-0" // Yeni state'e göre kontrol
+                        : "opacity-0 z-0"
                     } absolute inset-0 w-full h-full object-center transition-opacity duration-300 ease-in-out ${
                       slide.link ? "cursor-pointer" : ""
                     }`}
@@ -286,35 +231,30 @@ function ShoppingHome() {
                   />
                 ))
               ) : (
-                /* Resim yoksa placeholder */
                 <div className="w-full h-full flex items-center justify-center bg-gray-50 ">
                   <span className="text-gray-400 text-sm">Banner Alanı</span>
                 </div>
               )}
-
-              {/* Manuel Slider Navigasyon Butonları */}
               {sideBannerList && sideBannerList.length > 1 && (
                 <>
-                  {/* Sol Ok (Manuel) */}
                   <Button
                     variant="outline"
                     size="icon"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleSideBannerNav(-1);
-                    }} // YENİ handler'ı çağırır
+                    }}
                     className="absolute top-1/2 left-3 z-20 transform -translate-y-1/2 bg-white/60 hover:bg-white rounded-full h-8 w-8 shadow-md max-sm:h-6 max-md:h-6 max-sm:w-6 max-md:w-6"
                   >
                     <ChevronLeftIcon className="w-5 h-5 text-gray-700" />
                   </Button>
-                  {/* Sağ Ok (Manuel) */}
                   <Button
                     variant="outline"
                     size="icon"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleSideBannerNav(1);
-                    }} // YENİ handler'ı çağırır
+                    }}
                     className="absolute top-1/2 right-3 z-20 transform -translate-y-1/2 bg-white/60 hover:bg-white rounded-full h-8 w-8 shadow-md max-sm:h-6 max-md:h-6 max-sm:w-6 max-md:w-6"
                   >
                     <ChevronRightIcon className="w-5 h-5 text-gray-700" />
@@ -346,22 +286,22 @@ function ShoppingHome() {
         ) : activeHomeSections && activeHomeSections.length > 0 ? (
           activeHomeSections.map((section) => {
             let filterParams = {};
-            let sortParams = "salesCount-desc"; // Varsayılan sıralama
+            let sortParams = "salesCount-desc";
             let fetchKey = section._id;
-            let viewAllPath = "/shop/listing"; // <<< Varsayılan "Tümü" linki
+            let viewAllPath = "/shop/listing";
 
             if (section.contentType === "BEST_SELLING") {
               sortParams = "salesCount-desc";
               fetchKey = "best-selling";
-              viewAllPath = "/shop/listing?sortBy=salesCount-desc"; // <<< En çok satanlar için sıralama parametresi ekle
+              viewAllPath = "/shop/listing?sortBy=salesCount-desc";
             } else if (
               section.contentType === "CATEGORY" &&
               section.contentValue
             ) {
               filterParams = { category: [section.contentValue] };
-              sortParams = "createdAt-desc"; // veya başka bir varsayılan
+              sortParams = "createdAt-desc";
               fetchKey = `category-${section.contentValue}`;
-              viewAllPath = `/shop/listing?category=${section.contentValue}`; // <<< Kategori parametresi ekle
+              viewAllPath = `/shop/listing?category=${section.contentValue}`;
             } else if (
               section.contentType === "BRAND" &&
               section.contentValue
@@ -369,9 +309,8 @@ function ShoppingHome() {
               filterParams = { brand: [section.contentValue] };
               sortParams = "createdAt-desc";
               fetchKey = `brand-${section.contentValue}`;
-              viewAllPath = `/shop/listing?brand=${section.contentValue}`; // <<< Marka parametresi ekle
+              viewAllPath = `/shop/listing?brand=${section.contentValue}`;
             }
-            // --- Diğer contentType'lar için de benzer şekilde eklenebilir ---
 
             const fetchConfig = {
               key: fetchKey,
@@ -381,35 +320,13 @@ function ShoppingHome() {
             };
 
             return (
-              // <ProductCarousel
-              //   key={section._id} // Benzersiz key
-              //   title={section.title} // Backend'den gelen başlık
-              //   fetchConfig={{
-              //     key: fetchKey,
-              //     filterParams: filterParams,
-              //     sortParams: sortParams,
-              //     limit: section.itemLimit || 10, // Backend'den gelen limit
-              //   }}
-              //   // --- Alternatif: Eğer home.jsx fetch yapıp products array'ini geçecekse ---
-              //   // products={/* İlgili ürün dizisi */}
-              //   // isLoading={/* İlgili yüklenme durumu */}
-              //   // --- ---
-              //   handleGetProductDetails={handleGetProductDetails}
-              //   handleAddtoCart={handleAddtoCart}
-              //   // viewAllPath prop'unu dinamik oluşturabilirsin, örn:
-              //   viewAllPath={
-              //     section.contentType === "CATEGORY"
-              //       ? `/shop/listing?category=${section.contentValue}`
-              //       : "/shop/listing"
-              //   }
-              // />
               <ProductCarousel
                 key={section._id}
                 title={section.title}
                 fetchConfig={fetchConfig}
                 handleGetProductDetails={handleGetProductDetails}
                 handleAddtoCart={handleAddtoCart}
-                viewAllPath={viewAllPath} // <<< Dinamik olarak oluşturulan path'i kullan
+                viewAllPath={viewAllPath}
               />
             );
           })
@@ -419,8 +336,6 @@ function ShoppingHome() {
           </div>
         )}
       </div>
-
-      {/* Ürün Detay Dialog (Aynı kalabilir) */}
       <ProductDetailsDialog
         open={openDetailsDialog}
         setOpen={setOpenDetailsDialog}

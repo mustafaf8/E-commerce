@@ -1,4 +1,3 @@
-// client/src/pages/shopping-view/GuestCheckoutAddress.jsx
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -12,24 +11,20 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import { addressFormControls } from "@/config"; // Mevcut adres form kontrollerini kullanabiliriz
-import { getGuestCart } from "@/lib/guestCartUtils"; // Misafir sepetini almak için
+import { addressFormControls } from "@/config";
+import { getGuestCart } from "@/lib/guestCartUtils";
 import {
   createGuestOrderThunk,
   resetPaymentPageUrl,
 } from "@/store/shop/order-slice";
 
-// ÖNEMLİ: order-slice.js içinde createGuestOrderThunk adında yeni bir thunk oluşturmanız gerekecek.
-// Bu thunk, backend'deki /api/shop/order/guest-create endpoint'ine istek atacak.
-// Şimdilik bu import'u yorum satırı yapalım ve mantığı kuralım.
-
 const initialAddressFormData = {
-  fullName: "", // Tam ad soyad için yeni bir alan ekleyebiliriz
+  fullName: "",
   address: "",
   city: "",
   pincode: "",
   phone: "",
-  email: "", // Misafir siparişi için e-posta alalım
+  email: "",
   notes: "",
 };
 
@@ -43,18 +38,16 @@ function GuestCheckoutAddress() {
   const {
     isLoading: orderIsLoading,
     error: orderError,
-    paymentPageUrl, // useSelector ile paymentPageUrl'i al
+    paymentPageUrl,
   } = useSelector((state) => state.shopOrder);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    // Eğer kullanıcı bir şekilde bu sayfaya giriş yapmışken gelirse, normal checkout'a yönlendir.
     if (isAuthenticated) {
       navigate("/shop/checkout");
     }
-    // Misafir sepetini yükle
     const guestCart = getGuestCart();
     if (!guestCart || guestCart.items.length === 0) {
       toast({
@@ -62,19 +55,13 @@ function GuestCheckoutAddress() {
         description: "Ödeme yapmak için sepetinize ürün eklemelisiniz.",
         variant: "warning",
       });
-      navigate("/shop/home"); // Veya sepet sayfasına
+      navigate("/shop/home");
     } else {
       setCartForCheckout(guestCart);
     }
   }, [isAuthenticated, navigate, toast]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
   const isFormValid = () => {
-    // Temel doğrulama: email, fullName, address, city, pincode, phone zorunlu
     return (
       formData.email.trim() !== "" &&
       /\S+@\S+\.\S+/.test(formData.email) &&
@@ -88,10 +75,8 @@ function GuestCheckoutAddress() {
   useEffect(() => {
     if (paymentPageUrl) {
       console.log("PaymentPageUrl alındı, yönlendiriliyor:", paymentPageUrl);
-      window.location.href = paymentPageUrl; // Iyzico sayfasına yönlendir
-      // Yönlendirme sonrası URL'yi Redux state'inden temizlemek iyi bir pratiktir.
-      // Böylece kullanıcı geri gelirse tekrar yönlendirme olmaz.
-      dispatch(resetPaymentPageUrl()); // Yeni bir action tanımlayıp bunu dispatch edin.
+      window.location.href = paymentPageUrl;
+      dispatch(resetPaymentPageUrl());
     }
   }, [paymentPageUrl, dispatch]);
 
@@ -113,7 +98,6 @@ function GuestCheckoutAddress() {
 
     const orderData = {
       guestInfo: {
-        // Adres ve iletişim bilgileri
         fullName: formData.fullName,
         email: formData.email,
         phone: formData.phone,
@@ -123,12 +107,9 @@ function GuestCheckoutAddress() {
         notes: formData.notes,
       },
       cartItems: cartForCheckout.items.map((item) => ({
-        // Sadece productId ve quantity yeterli olabilir
         productId: item.productId,
         quantity: item.quantity,
-        // Backend fiyatı zaten Product modelinden alacak
       })),
-      // guestCartId: cartForCheckout.guestCartId, // Backend'e iletmek isteyebilirsiniz
     };
 
     console.log("Misafir siparişi için gönderilecek veri:", orderData);
@@ -141,11 +122,6 @@ function GuestCheckoutAddress() {
             title: "Ödeme sayfasına yönlendiriliyorsunuz...",
             variant: "success",
           });
-          // Yönlendirme artık useEffect ile paymentPageUrl değiştiğinde yapılacak
-          // window.location.href = result.paymentPageUrl;
-          // Misafir siparişi başlatıldıktan sonra yerel sepeti temizleyebiliriz.
-          // Redux thunk içinde de yapılabilir.
-          // clearGuestCart(); // Bu, payment-success sayfasında veya callback'ten sonra yapılmalı.
         } else {
           toast({
             title: "Ödeme başlatılamadı",
@@ -163,7 +139,6 @@ function GuestCheckoutAddress() {
       });
   };
 
-  // addressFormControls'u bu component'e uyarlama (email ve fullName ekleyerek)
   const guestAddressFormControls = [
     {
       name: "fullName",
@@ -179,9 +154,8 @@ function GuestCheckoutAddress() {
       componentType: "input",
       type: "email",
     },
-    ...addressFormControls, // Mevcut adres kontrollerini buraya yay
+    ...addressFormControls,
   ];
-  // addressFormControls içinde 'notes' alanı zaten var, 'email' ve 'fullName' eklendi.
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -198,8 +172,8 @@ function GuestCheckoutAddress() {
           <CommonForm
             formControls={guestAddressFormControls}
             formData={formData}
-            setFormData={setFormData} // CommonForm'un inputları güncellemesi için
-            onSubmit={handleSubmitAddress} // Formun onSubmit'i bu olacak
+            setFormData={setFormData}
+            onSubmit={handleSubmitAddress}
             buttonText={orderIsLoading ? "İşleniyor..." : "Ödemeye Devam Et"}
             isBtnDisabled={orderIsLoading || !isFormValid()}
           />

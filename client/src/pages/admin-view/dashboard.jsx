@@ -1,9 +1,8 @@
-// client/src/pages/admin-view/dashboard.jsx
 import ProductImageUpload from "@/components/admin-view/image-upload";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input"; // Input eklendi
-import { Label } from "@/components/ui/label"; // Label eklendi
-import { useToast } from "@/components/ui/use-toast"; // Toast eklendi
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
 import {
   addFeatureImage,
   getFeatureImages,
@@ -23,11 +22,9 @@ import { Trash } from "lucide-react"; // Silme ikonu
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios"; // axios'u burada kullanacağız
-import { Skeleton } from "@/components/ui/skeleton"; // Skeleton
 import ConfirmationModal from "@/components/admin-view/ConfirmationModal";
 
 function AdminDashboard() {
-  // --- Feature Image State ve Fonksiyonları ---
   const [featureImageFile, setFeatureImageFile] = useState(null);
   const [featureImageLoadingState, setFeatureImageLoadingState] =
     useState(false);
@@ -46,7 +43,6 @@ function AdminDashboard() {
       }
   );
 
-  // --- Promo Card State ---
   const [promoCardImageFile, setPromoCardImageFile] = useState(null);
   const [promoCardImageLoadingState, setPromoCardImageLoadingState] =
     useState(false);
@@ -54,55 +50,43 @@ function AdminDashboard() {
   const [promoCardLink, setPromoCardLink] = useState("");
   const {
     promoCardList,
-    isLoading: promoLoading, // Listeyi çekerken yüklenme durumu
+    isLoading: promoLoading,
     error: promoError,
   } = useSelector((state) => state.promoCards);
-  // --- ---
-
   const [sideBannerImageFile, setSideBannerImageFile] = useState(null);
   const [sideBannerImageLoadingState, setSideBannerImageLoadingState] =
-    useState(false); // Added loading state
-  const [uploadedSideBannerImageUrl, setUploadedSideBannerImageUrl] =
-    useState("");
-
-  const [sideBannerTitle, setSideBannerTitle] = useState(""); // İsteğe bağlı
-  const [sideBannerLink, setSideBannerLink] = useState(""); // İsteğe bağlı
+    useState(false);
+  const [sideBannerTitle, setSideBannerTitle] = useState("");
+  const [sideBannerLink, setSideBannerLink] = useState("");
   const {
     sideBannerList,
     isLoading: sideBannerLoading,
     error: sideBannerError,
   } = useSelector(
     (state) =>
-      state.sideBanners || { sideBannerList: [], isLoading: false, error: null } // Slice yoksa varsayılan
+      state.sideBanners || { sideBannerList: [], isLoading: false, error: null }
   );
   const dispatch = useDispatch();
   const { toast } = useToast();
-
-  // confirmModal nesnesi: { isOpen, message, onConfirm }
   const [confirmModal, setConfirmModal] = useState({
     isOpen: false,
     message: "",
     onConfirm: null,
   });
-
-  // Ortak modalı kapatma fonksiyonu
   const closeModal = () =>
     setConfirmModal({ isOpen: false, message: "", onConfirm: null });
-
-  // Ortak modalı açma fonksiyonu
   const openModal = (message, onConfirm) => {
     setConfirmModal({ isOpen: true, message, onConfirm });
   };
 
-  // --- GENEL RESİM YÜKLEME FONKSİYONU ---
   const uploadImage = async (file) => {
     if (!file) return null;
-    console.log("--- [uploadImage] Yüklenecek dosya:", file.name); // Ekle
+    console.log("--- [uploadImage] Yüklenecek dosya:", file.name);
     const data = new FormData();
     data.append("my_file", file);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/admin/products/upload-image", // Genel yükleme endpoint'i
+        "http://localhost:5000/api/admin/products/upload-image",
         data
       );
       if (response?.data?.success) {
@@ -110,7 +94,7 @@ function AdminDashboard() {
           "--- [uploadImage] Başarılı. Dönen URL:",
           response.data.result.url
         ); // Ekle
-        return response.data.result.url; // Sadece URL'i döndür
+        return response.data.result.url;
       } else {
         throw new Error(response?.data?.message || "Resim yüklenemedi.");
       }
@@ -124,11 +108,10 @@ function AdminDashboard() {
           error.message ||
           "Bilinmeyen bir hata oluştu.",
       });
-      return null; // Hata durumunda null döndür
+      return null;
     }
   };
 
-  // --- Güncellenmiş Banner Ekleme İşleyici ---
   async function handleUploadFeatureImage() {
     if (!featureImageFile) {
       toast({
@@ -147,14 +130,12 @@ function AdminDashboard() {
         link: featureImageLink,
       };
       console.log(
-        ">>> addFeatureImage dispatch ediliyor, gönderilen veri:",
+        "addFeatureImage dispatch ediliyor, gönderilen veri:",
         bannerData
       );
-      // Güncellenmiş Redux action'ı çağırılıyor
       dispatch(addFeatureImage(bannerData))
         .then((data) => {
           if (data?.payload?.success) {
-            // dispatch(getFeatureImages()); yok, slice güncelliyor
             setFeatureImageFile(null);
             setFeatureImageTitle("");
             setFeatureImageLink("");
@@ -184,7 +165,6 @@ function AdminDashboard() {
     }
   }
 
-  // --- YENİ FONKSİYON: Banner Silme İşleyici ---
   function handleDeleteFeatureImage(bannerId) {
     openModal("Bu banner'ı silmek istediğinizden emin misiniz?", () => {
       dispatch(deleteFeatureImage(bannerId)).then((data) => {
@@ -200,7 +180,7 @@ function AdminDashboard() {
       });
     });
   }
-  // --- Promo Card Ekleme İşleyici ---
+
   async function handleUploadPromoCard() {
     if (!promoCardImageFile) {
       toast({
@@ -209,9 +189,9 @@ function AdminDashboard() {
       });
       return;
     }
-    setPromoCardImageLoadingState(true); // Yüklemeyi başlat
+    setPromoCardImageLoadingState(true);
 
-    const uploadedUrl = await uploadImage(promoCardImageFile); // Resmi yükle ve URL'i al
+    const uploadedUrl = await uploadImage(promoCardImageFile);
 
     if (uploadedUrl) {
       const promoData = {
@@ -224,10 +204,9 @@ function AdminDashboard() {
           console.log(
             "--- [handleUploadPromoCard] addPromoCard dispatch sonucu:",
             data.payload
-          ); // Ekle
+          );
           if (data?.payload?.success) {
-            // dispatch(fetchPromoCards()); // Gerek yok, slice güncelliyor
-            setPromoCardImageFile(null); // Seçili dosyayı temizle
+            setPromoCardImageFile(null);
             setPromoCardTitle("");
             setPromoCardLink("");
             toast({
@@ -242,15 +221,13 @@ function AdminDashboard() {
           }
         })
         .finally(() => {
-          setPromoCardImageLoadingState(false); // Yüklemeyi bitir
+          setPromoCardImageLoadingState(false);
         });
     } else {
-      // URL alınamadıysa
-      setPromoCardImageLoadingState(false); // Yüklemeyi bitir
+      setPromoCardImageLoadingState(false);
     }
   }
 
-  // --- Onaylı Promo Card Silme İşleyici ---
   function handleDeletePromoCard(cardId) {
     openModal(
       "Bu promosyon kartını silmek istediğinizden emin misiniz?",
@@ -281,9 +258,8 @@ function AdminDashboard() {
     setSideBannerImageLoadingState(true);
     const uploadedUrl = await uploadImage(sideBannerImageFile);
     if (uploadedUrl) {
-      // 5. URL alındıysa banner verisini hazırla
       const bannerData = {
-        image: uploadedUrl, // <<< Dönen GÜNCEL URL'i kullan
+        image: uploadedUrl,
         title: sideBannerTitle,
         link: sideBannerLink,
       };
@@ -309,7 +285,6 @@ function AdminDashboard() {
           }
         })
         .catch((err) => {
-          // Hata yakalama eklendi
           console.error("addSideBanner dispatch hatası:", err);
           toast({
             variant: "destructive",
@@ -317,15 +292,13 @@ function AdminDashboard() {
           });
         })
         .finally(() => {
-          setSideBannerImageLoadingState(false); // Yüklemeyi her durumda bitir
+          setSideBannerImageLoadingState(false);
         });
     } else {
-      // URL alınamadıysa (uploadImage içinde hata gösterildi)
-      setSideBannerImageLoadingState(false); // Yüklemeyi bitir
+      setSideBannerImageLoadingState(false);
     }
   }
 
-  // --- Onaylı Yan Banner Silme İşleyici ---
   function handleDeleteSideBanner(bannerId) {
     openModal("Bu küçük banner'ı silmek istediğinizden emin misiniz?", () => {
       dispatch(deleteSideBanner(bannerId)).then((data) => {
@@ -341,7 +314,6 @@ function AdminDashboard() {
       });
     });
   }
-  // İlk yüklemede verileri getir
   useEffect(() => {
     dispatch(getFeatureImages());
     dispatch(fetchPromoCards());
@@ -365,7 +337,6 @@ function AdminDashboard() {
   // });
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-      {/* Bölüm 2: Promosyon Kartları Yönetimi */}
       <div className="border p-6 rounded-lg shadow-sm bg-white">
         <h2 className="text-xl font-semibold mb-4 border-b pb-2">
           Fırsat Kartları Yönetimi
@@ -374,7 +345,7 @@ function AdminDashboard() {
           id="promo-card-image-upload"
           imageFile={promoCardImageFile}
           setImageFile={setPromoCardImageFile}
-          isCustomStyling={true} // Kompakt görünüm
+          isCustomStyling={true}
         />
         <div className="mt-4 space-y-1">
           <Label htmlFor="promoTitle">Kart Başlığı (Opsiyonel)</Label>
@@ -407,7 +378,6 @@ function AdminDashboard() {
             : "Yeni Fırsat Kartı Ekle"}
         </Button>
 
-        {/* Mevcut Kartlar Listesi */}
         <div className="mt-6 space-y-3 max-h-96 overflow-y-auto">
           <h3 className="text-md font-medium">Mevcut Fırsat Kartları:</h3>
           {promoLoading ? (
@@ -471,8 +441,8 @@ function AdminDashboard() {
           <Input
             id="featureTitle"
             type="text"
-            value={featureImageTitle} // <-- Yeni state
-            onChange={(e) => setFeatureImageTitle(e.target.value)} // <-- Yeni state
+            value={featureImageTitle}
+            onChange={(e) => setFeatureImageTitle(e.target.value)}
             placeholder="Örn: Yaz İndirimleri"
           />
         </div>
@@ -481,8 +451,8 @@ function AdminDashboard() {
           <Input
             id="featureLink"
             type="text"
-            value={featureImageLink} // <-- Yeni state
-            onChange={(e) => setFeatureImageLink(e.target.value)} // <-- Yeni state
+            value={featureImageLink}
+            onChange={(e) => setFeatureImageLink(e.target.value)}
             placeholder="Örn: /shop/listing?discount=true"
           />
         </div>
@@ -504,7 +474,7 @@ function AdminDashboard() {
                 <img
                   src={featureImgItem.image}
                   alt="Banner"
-                  className="w-64 h-20 object-cover rounded flex-shrink-0" // aspect ratio korunabilir
+                  className="w-64 h-20 object-cover rounded flex-shrink-0"
                 />
                 <div className="">
                   <div className="flex-grow overflow-hidden">
@@ -526,7 +496,7 @@ function AdminDashboard() {
                     variant="ghost"
                     size="icon"
                     className="text-red-500 hover:bg-red-100 h-7 w-7 flex-shrink-0"
-                    onClick={() => handleDeleteFeatureImage(featureImgItem._id)} // <-- Yeni silme fonksiyonu
+                    onClick={() => handleDeleteFeatureImage(featureImgItem._id)}
                   >
                     <Trash size={16} />
                   </Button>
@@ -543,12 +513,11 @@ function AdminDashboard() {
         <h2 className="text-xl font-semibold mb-4 border-b pb-2">
           Küçük Banner Yönetimi (Manuel Slider)
         </h2>
-        {/* Resim Yükleme */}
         <ProductImageUpload
-          id="side-banner-upload" // <-- Yeni ID
-          imageFile={sideBannerImageFile} // <-- Yeni state
-          setImageFile={setSideBannerImageFile} // <-- Yeni state
-          isCustomStyling={true} // Kompakt görünüm
+          id="side-banner-upload"
+          imageFile={sideBannerImageFile}
+          setImageFile={setSideBannerImageFile}
+          isCustomStyling={true}
         />
         {/* Başlık (Opsiyonel) */}
         <div className="mt-4 space-y-1">
@@ -556,8 +525,8 @@ function AdminDashboard() {
           <Input
             id="sideBannerTitle"
             type="text"
-            value={sideBannerTitle} // <-- Yeni state
-            onChange={(e) => setSideBannerTitle(e.target.value)} // <-- Yeni state
+            value={sideBannerTitle}
+            onChange={(e) => setSideBannerTitle(e.target.value)}
             placeholder="Örn: Özel Koleksiyon"
           />
         </div>
@@ -567,14 +536,14 @@ function AdminDashboard() {
           <Input
             id="sideBannerLink"
             type="text"
-            value={sideBannerLink} // <-- Yeni state
-            onChange={(e) => setSideBannerLink(e.target.value)} // <-- Yeni state
+            value={sideBannerLink}
+            onChange={(e) => setSideBannerLink(e.target.value)}
             placeholder="Örn: /shop/listing?tag=new"
           />
         </div>
 
         <Button
-          onClick={handleUploadSideBanner} // <-- Yeni fonksiyon
+          onClick={handleUploadSideBanner}
           className="mt-4 w-full"
           disabled={sideBannerImageLoadingState || !sideBannerImageFile}
         >
@@ -619,7 +588,7 @@ function AdminDashboard() {
                   variant="ghost"
                   size="icon"
                   className="text-red-500 hover:bg-red-100 h-7 w-7 flex-shrink-0"
-                  onClick={() => handleDeleteSideBanner(banner._id)} // <-- Yeni fonksiyon
+                  onClick={() => handleDeleteSideBanner(banner._id)}
                 >
                   <Trash size={16} />
                 </Button>
@@ -632,7 +601,6 @@ function AdminDashboard() {
           )}
         </div>
       </div>
-      {/* Ortak Confirmation Modal */}
       <ConfirmationModal
         isOpen={confirmModal.isOpen}
         message={confirmModal.message}

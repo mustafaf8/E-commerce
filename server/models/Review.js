@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 const ProductReviewSchema = new mongoose.Schema(
   {
     productId: String,

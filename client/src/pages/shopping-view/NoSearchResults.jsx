@@ -1,18 +1,15 @@
-// client/src/components/shopping-view/NoSearchResults.jsx
-import { SearchX, Home } from "lucide-react"; // İkonlar
+import { SearchX, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useSearchParams } from "react-router-dom";
 
 function NoSearchResults() {
   const [searchParams] = useSearchParams();
-  // URL'den arama terimini al (parametre adı 'keyword' veya 'query' olabilir)
   const searchTerm = searchParams.get("keyword") || searchParams.get("query");
 
   return (
     <div className="flex flex-col items-center justify-center text-center p-10 md:p-16 border rounded-lg bg-gray-50 min-h-[350px] my-8 shadow-sm">
-      <SearchX className="w-20 h-20 text-gray-400 mb-5" /> {/* İkon boyutu */}
+      <SearchX className="w-20 h-20 text-gray-400 mb-5" />
       <h2 className="text-2xl font-semibold mb-3 text-gray-800">
-        {/* Arama terimini mesaja ekle */}
         {searchTerm
           ? `'${searchTerm}' için Sonuç Bulunamadı`
           : "Arama Sonucu Bulunamadı"}

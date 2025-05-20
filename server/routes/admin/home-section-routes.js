@@ -1,4 +1,3 @@
-// server/routes/admin/home-section-routes.js
 const express = require("express");
 const {
   addHomeSectionAdmin,
@@ -11,7 +10,6 @@ const {
 
 const router = express.Router();
 
-// Admin yetkisi gerektiren rotalar
 router.post("/add", /* adminCheckMiddleware, */ addHomeSectionAdmin);
 router.get("/list", /* adminCheckMiddleware, */ getAllHomeSectionsAdmin);
 router.put("/update/:id", /* adminCheckMiddleware, */ updateHomeSectionAdmin);
@@ -22,6 +20,6 @@ router.delete(
 router.put(
   "/reorder",
   /* adminCheckMiddleware, */ updateHomeSectionsOrderAdmin
-); // Sıralama için
+);
 
 module.exports = router;

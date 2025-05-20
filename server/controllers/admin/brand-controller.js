@@ -1,8 +1,6 @@
-// server/controllers/admin/brand-controller.js
-const Brand = require("../../models/Brand"); // Brand modelini import et
-const Product = require("../../models/Product"); // İlişkili ürün kontrolü için
+const Brand = require("../../models/Brand");
+const Product = require("../../models/Product");
 
-// Yeni Marka Ekle (Admin)
 const addBrandAdmin = async (req, res) => {
   try {
     const { name, slug, isActive } = req.body;
@@ -14,12 +12,10 @@ const addBrandAdmin = async (req, res) => {
 
     const existingBrand = await Brand.findOne({ $or: [{ name }, { slug }] });
     if (existingBrand) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Bu isim veya slug ile zaten bir marka mevcut.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Bu isim veya slug ile zaten bir marka mevcut.",
+      });
     }
 
     const newBrand = new Brand({ name, slug, isActive });
@@ -30,13 +26,11 @@ const addBrandAdmin = async (req, res) => {
   } catch (error) {
     console.error("Admin marka ekleme hatası:", error);
     if (error.name === "ValidationError") {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Doğrulama Hatası",
-          errors: error.errors,
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Doğrulama Hatası",
+        errors: error.errors,
+      });
     }
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
@@ -59,12 +53,10 @@ const updateBrandAdmin = async (req, res) => {
       _id: { $ne: id },
     });
     if (existingBrand) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Bu isim veya slug başka bir markaya ait.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Bu isim veya slug başka bir markaya ait.",
+      });
     }
 
     const updatedBrand = await Brand.findByIdAndUpdate(
@@ -78,23 +70,19 @@ const updateBrandAdmin = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Güncellenecek marka bulunamadı." });
     }
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Marka güncellendi.",
-        data: updatedBrand,
-      });
+    res.status(200).json({
+      success: true,
+      message: "Marka güncellendi.",
+      data: updatedBrand,
+    });
   } catch (error) {
     console.error("Admin marka güncelleme hatası:", error);
     if (error.name === "ValidationError") {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Doğrulama Hatası",
-          errors: error.errors,
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Doğrulama Hatası",
+        errors: error.errors,
+      });
     }
     if (error.name === "CastError") {
       return res
@@ -109,16 +97,12 @@ const updateBrandAdmin = async (req, res) => {
 const deleteBrandAdmin = async (req, res) => {
   try {
     const { id } = req.params;
-
-    // Bu markayı kullanan ürün var mı kontrol et (ÖNEMLİ!)
     const productCount = await Product.countDocuments({ brand: id });
     if (productCount > 0) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: `Bu marka ${productCount} üründe kullanılıyor. Önce ürünleri düzenleyin veya markayı pasif yapın.`,
-        });
+      return res.status(400).json({
+        success: false,
+        message: `Bu marka ${productCount} üründe kullanılıyor. Önce ürünleri düzenleyin veya markayı pasif yapın.`,
+      });
     }
 
     const deletedBrand = await Brand.findByIdAndDelete(id);

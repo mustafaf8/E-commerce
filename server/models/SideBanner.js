@@ -1,6 +1,4 @@
-// server/models/SideBanner.js
 const mongoose = require("mongoose");
-
 const SideBannerSchema = new mongoose.Schema(
   {
     image: {
@@ -8,11 +6,11 @@ const SideBannerSchema = new mongoose.Schema(
       required: [true, "Resim URL'si gereklidir."],
     },
     title: {
-      type: String, // Opsiyonel başlık
+      type: String,
       trim: true,
     },
     link: {
-      type: String, // Opsiyonel link
+      type: String,
       trim: true,
     },
   },

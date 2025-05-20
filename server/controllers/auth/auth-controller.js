@@ -1,46 +1,37 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../../models/User");
-const passport = require("passport"); // passport import edildi
+const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const admin = require("firebase-admin");
 
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID, // .env dosyasından alınacak
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET, // .env dosyasından alınacak
-      callbackURL: "/api/auth/google/callback", // Sunucudaki callback rotası
-      scope: ["profile", "email"], // Google'dan hangi bilgileri istediğimiz
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "/api/auth/google/callback",
+      scope: ["profile", "email"],
     },
     async (accessToken, refreshToken, profile, done) => {
-      // Google'dan kullanıcı bilgileri geldiğinde bu fonksiyon çalışır
       try {
-        // 1. Kullanıcıyı Google ID ile veritabanında ara
         let user = await User.findOne({ googleId: profile.id });
 
         if (user) {
-          // Kullanıcı bulunduysa, kullanıcı nesnesini döndür
           return done(null, user);
         } else {
-          // Kullanıcı bulunamadıysa, e-posta ile kontrol et (isteğe bağlı ama önerilir)
           user = await User.findOne({ email: profile.emails[0].value });
 
           if (user) {
-            // E-posta ile bulunduysa, Google ID'sini ekle ve güncelle
             user.googleId = profile.id;
-            // user.profilePicture = profile.photos[0].value; // Profil resmini de alabiliriz
             await user.save();
             return done(null, user);
           } else {
-            // E-posta ile de bulunamadıysa, yeni kullanıcı oluştur
             const newUser = new User({
               googleId: profile.id,
-              userName: profile.displayName, // Google'dan gelen adı kullan
-              email: profile.emails[0].value, // Google'dan gelen e-postayı kullan
-              // Şifre alanı boş bırakılacak (modelde required:false yaptık)
-              role: "user", // Varsayılan rol
-              // profilePicture: profile.photos[0].value, // Profil resmi
+              userName: profile.displayName,
+              email: profile.emails[0].value,
+              role: "user",
             });
             await newUser.save();
             return done(null, newUser);
@@ -53,21 +44,18 @@ passport.use(
   )
 );
 
-// Kullanıcıyı session'a kaydetme (sadece ID'sini saklamak yeterli)
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
-// Kullanıcıyı session'dan alma
 passport.deserializeUser(async (id, done) => {
   try {
     const user = await User.findById(id);
-    done(null, user); // req.user olarak kullanıcı nesnesini ata
+    done(null, user);
   } catch (error) {
     done(error, null);
   }
 });
-// --- Passport Yapılandırması Sonu ---
 
 const registerUser = async (req, res) => {
   const { userName, email, password } = req.body;
@@ -105,7 +93,7 @@ const registerUser = async (req, res) => {
     const newUser = new User({
       userName,
       email,
-      password: hashPassword, // Sadece normal kayıtta şifre hash'lenir
+      password: hashPassword,
     });
 
     await newUser.save();
@@ -157,7 +145,6 @@ const loginUser = async (req, res) => {
       });
     }
 
-    // Token oluşturma (aynı kalır)
     const token = jwt.sign(
       {
         id: checkUser._id,
@@ -185,7 +172,6 @@ const loginUser = async (req, res) => {
           id: checkUser._id,
           userName: checkUser.userName,
           phoneNumber: checkUser.phoneNumber,
-          // profilePicture: checkUser.profilePicture // Varsa profil resmini de gönder
         },
       });
   } catch (e) {
@@ -252,7 +238,7 @@ const authMiddleware = async (req, res, next) => {
     if (!userFromToken) {
       throw new Error("Token'daki kullanıcı bulunamadı.");
     }
-    req.user = userFromToken; // Kullanıcıyı request'e ekle
+    req.user = userFromToken;
     console.log("authMiddleware -> User authenticated via token.");
     next();
   } catch (error) {
@@ -378,9 +364,9 @@ const updateUserDetails = async (req, res) => {
     });
   }
 };
-// --- YENİ: Telefon Numarası Doğrulama ve Giriş/Yeni Kullanıcı Kontrolü ---
+
 const verifyPhoneNumberLogin = async (req, res) => {
-  const { token } = req.body; // Frontend'den gelen Firebase ID Token
+  const { token } = req.body;
 
   if (!token) {
     return res
@@ -389,7 +375,6 @@ const verifyPhoneNumberLogin = async (req, res) => {
   }
 
   try {
-    // Firebase Admin SDK ile token'ı doğrula
     const decodedToken = await admin.auth().verifyIdToken(token);
     const phoneNumber = decodedToken.phone_number; // Doğrulanmış telefon numarası
 
@@ -461,9 +446,8 @@ const verifyPhoneNumberLogin = async (req, res) => {
   }
 };
 
-// --- YENİ: Telefon Numarası ile Yeni Kullanıcı Kaydı ---
 const registerPhoneNumberUser = async (req, res) => {
-  const { token, userName } = req.body; // Firebase token ve kullanıcı adı
+  const { token, userName } = req.body;
 
   if (!token || !userName || !userName.trim()) {
     return res.status(400).json({
@@ -473,7 +457,6 @@ const registerPhoneNumberUser = async (req, res) => {
   }
 
   try {
-    // Token'ı tekrar doğrula (güvenlik için)
     const decodedToken = await admin.auth().verifyIdToken(token);
     const phoneNumber = decodedToken.phone_number;
 
@@ -481,13 +464,11 @@ const registerPhoneNumberUser = async (req, res) => {
       throw new Error("Firebase token içinde telefon numarası bulunamadı.");
     }
 
-    // Bu telefon numarasıyla zaten kayıtlı bir kullanıcı var mı? (Ekstra kontrol)
     const existingUser = await User.findOne({ phoneNumber: phoneNumber });
     if (existingUser) {
       console.warn(
         `Register attempt for existing phone number: ${phoneNumber}. Logging in instead.`
       );
-      // Kullanıcı zaten varsa, login işlemi yap (JWT oluştur, cookie ata)
       const jwtToken = jwt.sign(
         {
           id: existingUser._id,
@@ -518,12 +499,10 @@ const registerPhoneNumberUser = async (req, res) => {
       });
     }
 
-    // Yeni kullanıcıyı oluştur
     const newUser = new User({
       userName: userName.trim(),
       phoneNumber: phoneNumber,
-      role: "user", // Varsayılan rol
-      // email ve password boş kalacak (modelde optional yaptık)
+      role: "user",
     });
 
     await newUser.save();
@@ -531,7 +510,6 @@ const registerPhoneNumberUser = async (req, res) => {
       `Yeni kullanıcı kaydedildi (Telefon): ${phoneNumber}, Ad: ${newUser.userName}`
     );
 
-    // Yeni kullanıcı için JWT oluştur ve cookie'ye ata
     const jwtToken = jwt.sign(
       {
         id: newUser._id,

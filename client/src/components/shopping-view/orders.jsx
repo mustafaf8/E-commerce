@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-// Dialog importları
 import {
   Dialog,
   DialogContent,
@@ -26,15 +25,12 @@ import {
   resetOrderDetails,
 } from "@/store/shop/order-slice";
 import { Badge } from "../ui/badge";
-// Tarih formatlama için (eğer kullanıyorsan)
 import { format, parseISO, isValid } from "date-fns";
 
 function ShoppingOrders() {
-  // Hangi siparişin detayının açık olduğunu tutacak state
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  // Gerekli Redux state'leri (detayların yüklenme durumu dahil)
   const {
     orderList = [],
     orderDetails,
@@ -42,20 +38,16 @@ function ShoppingOrders() {
   } = useSelector((state) => state.shopOrder || {});
 
   console.log(orderList, `orderDetails ${user?.id}`);
-
-  // "Detaylar" butonuna tıklandığında çalışacak fonksiyon
   function handleFetchOrderDetails(getId) {
-    setSelectedOrderId(getId); // Hangi siparişin istendiğini state'e kaydet
-    dispatch(getOrderDetails(getId)); // Detayları Redux üzerinden getir
+    setSelectedOrderId(getId);
+    dispatch(getOrderDetails(getId));
   }
 
-  // Dialog kapatıldığında çalışacak fonksiyon
   function handleDialogClose() {
-    setSelectedOrderId(null); // Seçili ID'yi sıfırla
-    dispatch(resetOrderDetails()); // Redux'taki detayları temizle
+    setSelectedOrderId(null);
+    dispatch(resetOrderDetails());
   }
 
-  // Kullanıcı değiştiğinde sipariş listesini getir
   useEffect(() => {
     if (user?.id) {
       dispatch(getAllOrdersByUserId(user.id));
@@ -92,7 +84,6 @@ function ShoppingOrders() {
           <TableBody>
             {orderList && orderList.length > 0 ? (
               orderList.map((orderItem) => {
-                // Güvenli tarih formatlama (split hatasını önlemek için)
                 let formattedDate = "N/A";
                 if (orderItem?.orderDate) {
                   try {
@@ -124,7 +115,6 @@ function ShoppingOrders() {
                       {orderItem?.totalAmount?.toFixed(2) || 0} TL
                     </TableCell>
                     <TableCell>
-                      {/* Buton sadece state'i güncelleyip action'ı dispatch eder */}
                       <Button
                         variant="outline"
                         size="sm"
@@ -132,7 +122,6 @@ function ShoppingOrders() {
                       >
                         Detaylar
                       </Button>
-                      {/* Dialog artık map içinde DEĞİL */}
                     </TableCell>
                   </TableRow>
                 );
@@ -146,31 +135,23 @@ function ShoppingOrders() {
             )}
           </TableBody>
         </Table>
-
-        {/* SADECE BİR TANE Dialog bileşeni, map döngüsünün dışında */}
         <Dialog
-          open={!!selectedOrderId} // Sadece bir sipariş ID'si seçiliyse açık olacak
+          open={!!selectedOrderId}
           onOpenChange={(isOpen) => {
-            // Dialog kapanmaya çalışırsa (overlay tıklama, ESC vb.)
             if (!isOpen) {
-              handleDialogClose(); // State'leri temizle
+              handleDialogClose();
             }
           }}
         >
-          {/* DialogContent Dialog içinde olmalı */}
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
               <DialogTitle>Sipariş Detayları ({selectedOrderId})</DialogTitle>
             </DialogHeader>
-
-            {/* Yüklenme veya hata durumunu göster */}
             {orderDetailsLoading ? (
               <div className="p-4 text-center">Yükleniyor...</div>
             ) : orderDetails ? (
-              // Yüklenen detayları gösteren component
               <ShoppingOrderDetailsView orderDetails={orderDetails} />
             ) : (
-              // Yükleme başarısızsa veya detay yoksa
               selectedOrderId && (
                 <div className="p-4 text-center text-red-500">
                   Sipariş detayları yüklenemedi.
@@ -179,7 +160,6 @@ function ShoppingOrders() {
             )}
 
             <DialogFooter>
-              {/* Kapatma butonu (onOpenChange tetiklenir) */}
               <DialogClose asChild>
                 <Button type="button" variant="secondary">
                   Kapat

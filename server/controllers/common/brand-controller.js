@@ -1,7 +1,5 @@
-// server/controllers/common/brand-controller.js
 const Brand = require("../../models/Brand");
 
-// Sadece Aktif Markaları Getir (Frontend Kullanımı İçin)
 const getActiveBrands = async (req, res) => {
   try {
     const brands = await Brand.find({ isActive: true }).sort({ name: 1 });

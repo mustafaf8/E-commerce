@@ -1,12 +1,11 @@
-// client/src/components/admin-view/BrandManager.jsx
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchAllBrands,
   addBrand,
   updateBrand,
   deleteBrand,
-} from "@/store/common-slice/brands-slice"; // Marka slice action'larını import et
+} from "@/store/common-slice/brands-slice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,7 +15,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
@@ -24,13 +22,12 @@ import { Edit, Trash2, PlusCircle, BadgeCheck, BadgeX } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import ConfirmationModal from "./ConfirmationModal";
 import { Skeleton } from "../ui/skeleton";
-import { Badge } from "../ui/badge"; // Badge'i import et
+import { Badge } from "../ui/badge";
 
 const initialBrandData = { name: "", slug: "", isActive: true };
 
 function BrandManager() {
   const dispatch = useDispatch();
-  // Redux state'inden markaları çek
   const {
     brandList = [],
     isLoading,
@@ -47,7 +44,7 @@ function BrandManager() {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchAllBrands()); // Başlangıçta markaları çek
+    dispatch(fetchAllBrands());
   }, [dispatch]);
 
   const handleInputChange = (e) => {
@@ -98,7 +95,6 @@ function BrandManager() {
       return;
     }
 
-    // addBrand ve updateBrand action'ları Redux slice'ında tanımlı olmalı
     const action = isEditing
       ? updateBrand({ id: currentBrand._id, brandData: currentBrand })
       : addBrand(currentBrand);
@@ -112,7 +108,7 @@ function BrandManager() {
             title: `Marka başarıyla ${isEditing ? "güncellendi" : "eklendi"}.`,
           });
           closeModal();
-          dispatch(fetchAllBrands()); // Listeyi yenile (veya slice otomatik yapar)
+          dispatch(fetchAllBrands());
         } else {
           toast({
             variant: "destructive",
@@ -138,13 +134,12 @@ function BrandManager() {
 
   const confirmDelete = () => {
     if (brandToDelete) {
-      // deleteBrand action'ı Redux slice'ında tanımlı olmalı
       dispatch(deleteBrand(brandToDelete._id))
         .unwrap()
         .then((payload) => {
           if (payload.success) {
             toast({ variant: "success", title: "Marka silindi." });
-            dispatch(fetchAllBrands()); // Listeyi yenile (veya slice otomatik yapar)
+            dispatch(fetchAllBrands());
           } else {
             toast({
               variant: "destructive",
@@ -173,8 +168,6 @@ function BrandManager() {
           <PlusCircle className="mr-2 h-4 w-4" /> Yeni Marka Ekle
         </Button>
       </div>
-
-      {/* Marka Listesi (Kategorideki gibi dikey liste) */}
       <div className="space-y-3">
         {isLoading && !brandList.length ? (
           <div className="space-y-2">

@@ -1,5 +1,4 @@
-// server/controllers/admin/category-controller.js
-const Category = require("../../models/Category"); // Category modelini import et
+const Category = require("../../models/Category");
 
 // Yeni Kategori Ekle (Admin)
 const addCategoryAdmin = async (req, res) => {
@@ -15,12 +14,10 @@ const addCategoryAdmin = async (req, res) => {
       $or: [{ name }, { slug }],
     });
     if (existingCategory) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Bu isim veya slug ile zaten bir kategori mevcut.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Bu isim veya slug ile zaten bir kategori mevcut.",
+      });
     }
 
     const newCategory = new Category({ name, slug, isActive });
@@ -31,13 +28,11 @@ const addCategoryAdmin = async (req, res) => {
   } catch (error) {
     console.error("Admin kategori ekleme hatası:", error);
     if (error.name === "ValidationError") {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Doğrulama Hatası",
-          errors: error.errors,
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Doğrulama Hatası",
+        errors: error.errors,
+      });
     }
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
@@ -61,12 +56,10 @@ const updateCategoryAdmin = async (req, res) => {
       _id: { $ne: id },
     }); // Kendisi hariç kontrol et
     if (existingCategory) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Bu isim veya slug başka bir kategoriye ait.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Bu isim veya slug başka bir kategoriye ait.",
+      });
     }
 
     const updatedCategory = await Category.findByIdAndUpdate(
@@ -76,30 +69,24 @@ const updateCategoryAdmin = async (req, res) => {
     );
 
     if (!updatedCategory) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: "Güncellenecek kategori bulunamadı.",
-        });
-    }
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Kategori güncellendi.",
-        data: updatedCategory,
+      return res.status(404).json({
+        success: false,
+        message: "Güncellenecek kategori bulunamadı.",
       });
+    }
+    res.status(200).json({
+      success: true,
+      message: "Kategori güncellendi.",
+      data: updatedCategory,
+    });
   } catch (error) {
     console.error("Admin kategori güncelleme hatası:", error);
     if (error.name === "ValidationError") {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Doğrulama Hatası",
-          errors: error.errors,
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Doğrulama Hatası",
+        errors: error.errors,
+      });
     }
     if (error.name === "CastError") {
       return res
@@ -114,15 +101,6 @@ const updateCategoryAdmin = async (req, res) => {
 const deleteCategoryAdmin = async (req, res) => {
   try {
     const { id } = req.params;
-
-    // TODO: Kategoriyi silmeden önce bu kategoriyi kullanan ürün olup olmadığını kontrol et.
-    // Eğer varsa silmeyi engelle veya ürünlerin kategorisini null yap/başka kategoriye ata.
-    // const Product = require('../../models/Product');
-    // const productCount = await Product.countDocuments({ category: id });
-    // if (productCount > 0) {
-    //     return res.status(400).json({ success: false, message: `Bu kategori ${productCount} üründe kullanılıyor. Önce ürünleri düzenleyin.` });
-    // }
-
     const deletedCategory = await Category.findByIdAndDelete(id);
 
     if (!deletedCategory) {

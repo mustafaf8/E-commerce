@@ -1,47 +1,6 @@
-// const Product = require("../../models/Product");
-
-// const searchProducts = async (req, res) => {
-//   try {
-//     const { keyword } = req.query;
-//     if (!keyword || typeof keyword !== "string") {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Keyword is required and must be in string format",
-//       });
-//     }
-
-//     const regEx = new RegExp(keyword, "i");
-
-//     const createSearchQuery = {
-//       $or: [
-//         { title: regEx },
-//         { description: regEx },
-//         { category: regEx },
-//         { brand: regEx },
-//       ],
-//     };
-
-//     const searchResults = await Product.find(createSearchQuery);
-
-//     res.status(200).json({
-//       success: true,
-//       data: searchResults,
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({
-//       success: false,
-//       message: "Error",
-//     });
-//   }
-// };
-
-// module.exports = { searchProducts };
-
-// server/controllers/shop/search-controller.js
 const Product = require("../../models/Product");
-const Category = require("../../models/Category"); // Category modelini import edin
-const Brand = require("../../models/Brand"); // Brand modelini import edin
+const Category = require("../../models/Category");
+const Brand = require("../../models/Brand");
 
 const searchProducts = async (req, res) => {
   try {
@@ -56,7 +15,6 @@ const searchProducts = async (req, res) => {
     }
 
     const trimmedKeyword = keyword.trim();
-    // MongoDB RegExp özel karakterlerinden kaçış
     const escapedKeyword = trimmedKeyword.replace(
       /[.*+?^${}()|[\]\\]/g,
       "\\$&"
@@ -104,8 +62,6 @@ const searchProducts = async (req, res) => {
     }
 
     const results = await Promise.all(searchPromises);
-
-    // Farklı sorgulardan gelen sonuçları birleştir ve mükerrer olanları kaldır
     const allProducts = [];
     const productIds = new Set();
 

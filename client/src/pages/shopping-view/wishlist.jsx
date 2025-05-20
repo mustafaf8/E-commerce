@@ -36,18 +36,10 @@ function ShoppingWishlist() {
   useEffect(() => {
     if (user?.id) {
       dispatch(fetchWishlist(user.id));
-      // Eğer tüm ürünler state'de yoksa veya güncel değilse, onları da fetch etmeniz gerekebilir
-      // Bu yöntem çok sayıda ürün varsa verimsiz olabilir.
-      // İdeal olanı, backend'in doğrudan favori ürün detaylarını döndürmesidir.
-      if (!productList.length) {
-        dispatch(
-          fetchAllFilteredProducts({ filterParams: {}, sortParams: "" })
-        ); // Veya uygun bir thunk
-      }
+      dispatch(fetchAllFilteredProducts({ filterParams: {}, sortParams: "" }));
     }
-  }, [dispatch, user?.id, productList.length]); // productList.length eklendi
+  }, [dispatch, user?.id]);
 
-  // Favori ID'lerine göre ürünleri filtrele
   const favoriteProducts = productList.filter((product) =>
     wishlistItems.includes(product._id)
   );

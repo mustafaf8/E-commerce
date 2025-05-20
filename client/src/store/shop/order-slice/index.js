@@ -2,42 +2,36 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { clearGuestCart } from "@/lib/guestCartUtils";
 
-// Initial state güncellendi: approvalURL -> paymentPageUrl, error eklendi
 const initialState = {
-  paymentPageUrl: null, // Iyzico ödeme sayfası URL'si için
+  paymentPageUrl: null,
   isLoading: false,
-  error: null, // Hata durumunu saklamak için
-  orderId: null, // Oluşturulan sipariş ID'si
-  orderList: [], // Kullanıcının sipariş listesi
-  orderDetails: null, // Detayı görüntülenen sipariş
+  error: null,
+  orderId: null,
+  orderList: [],
+  orderDetails: null,
 };
 
-// createNewOrder Thunk'ı backend'den paymentPageUrl bekleyecek şekilde kalıyor.
 export const createNewOrder = createAsyncThunk(
-  "order/createNewOrder", // Action type prefix
+  "order/createNewOrder",
   // async (orderData, { rejectWithValue }) => { // Hata yönetimi için rejectWithValue eklenebilir
   async (orderData) => {
     try {
       const response = await axios.post(
         "http://localhost:5000/api/shop/order/create",
         orderData,
-        { withCredentials: true } // Cookie'lerin gönderilmesi için
+        { withCredentials: true }
       );
-      // Backend'den { success: true, paymentPageUrl: '...', orderId: '...' } gibi bir yanıt bekleniyor
       return response.data;
     } catch (error) {
       console.error(
         "createNewOrder API Hatası:",
         error.response?.data || error.message
       );
-      // Hata durumunda özelleştirilmiş bir nesne veya sadece mesaj döndürebiliriz
-      // return rejectWithValue(error.response?.data || { message: 'Sipariş oluşturulamadı.' });
-      throw error; // Veya hatayı doğrudan fırlatıp rejected case'de yakala
+      throw error;
     }
   }
 );
 
-// Diğer Thunk'lar (kullanıcı siparişlerini alma) aynı kalabilir
 export const getAllOrdersByUserId = createAsyncThunk(
   "order/getAllOrdersByUserId",
   async (userId, { rejectWithValue }) => {
@@ -46,7 +40,7 @@ export const getAllOrdersByUserId = createAsyncThunk(
         `http://localhost:5000/api/shop/order/list/${userId}`,
         { withCredentials: true }
       );
-      return response.data; // { success: true, data: [...] } bekleniyor
+      return response.data;
     } catch (error) {
       console.error(
         "getAllOrdersByUserId API Hatası:",
@@ -67,7 +61,7 @@ export const getOrderDetails = createAsyncThunk(
         `http://localhost:5000/api/shop/order/details/${id}`,
         { withCredentials: true }
       );
-      return response.data; // { success: true, data: {...} } bekleniyor
+      return response.data;
     } catch (error) {
       console.error(
         "getOrderDetails API Hatası:",
@@ -83,15 +77,12 @@ export const getOrderDetails = createAsyncThunk(
 export const createGuestOrderThunk = createAsyncThunk(
   "order/createGuestOrder",
   async (orderData, { rejectWithValue }) => {
-    // orderData: { guestInfo: {...}, cartItems: [...] }
     try {
       const response = await axios.post(
         "http://localhost:5000/api/shop/order/guest-create",
         orderData
-        // Misafir olduğu için withCredentials: true GEREKMEYEBİLİR,
-        // ancak backend CORS ayarları cookie gerektirmiyorsa sorun olmaz.
       );
-      return response.data; // { success: true, paymentPageUrl: '...', orderId: '...' } bekleniyor
+      return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data || { message: "Misafir siparişi oluşturulamadı." }
@@ -101,72 +92,63 @@ export const createGuestOrderThunk = createAsyncThunk(
 );
 
 const shoppingOrderSlice = createSlice({
-  name: "shopOrder", // Slice adı düzeltildi (genellikle state'deki key ile aynı olur)
+  name: "shopOrder",
   initialState,
   reducers: {
-    // Sipariş detayı görüntülemeden çıkıldığında state'i temizlemek için
     resetOrderDetails: (state) => {
       state.orderDetails = null;
     },
-    // Ödeme sayfası URL'sini manuel olarak temizlemek gerekirse (opsiyonel)
     resetPaymentPageUrl: (state) => {
       state.paymentPageUrl = null;
     },
-    // Hata durumunu manuel temizlemek için (opsiyonel)
     clearOrderError: (state) => {
       state.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
-      // --- createNewOrder ---
       .addCase(createNewOrder.pending, (state) => {
         state.isLoading = true;
-        state.error = null; // Yeni istek başlarken hatayı temizle
-        state.paymentPageUrl = null; // Önceki URL'i temizle
+        state.error = null;
+        state.paymentPageUrl = null;
         state.orderId = null;
       })
       .addCase(createNewOrder.fulfilled, (state, action) => {
         state.isLoading = false;
-        // Payload'dan paymentPageUrl ve orderId'yi al ve state'e ata
-        state.paymentPageUrl = action.payload?.paymentPageUrl; // Değişti: approvalURL -> paymentPageUrl
+        state.paymentPageUrl = action.payload?.paymentPageUrl;
         state.orderId = action.payload?.orderId;
         state.error = !action.payload?.success
           ? action.payload?.message ||
             "Sipariş oluşturuldu ama ödeme URL alınamadı."
-          : null; // Backend success=false dönerse hata set et
+          : null;
 
-        // Eğer işlem başarılıysa orderId'yi sakla (isteğe bağlı)
         if (action.payload?.success && action.payload?.orderId) {
           sessionStorage.setItem(
             "currentOrderId",
             JSON.stringify(action.payload.orderId)
           );
         } else {
-          // Başarısızsa sessionStorage'ı temizle (opsiyonel)
           sessionStorage.removeItem("currentOrderId");
         }
       })
       .addCase(createNewOrder.rejected, (state, action) => {
         state.isLoading = false;
-        // Hata bilgisini state'e yaz (action.error veya rejectWithValue'dan gelen action.payload)
         state.error =
           action.payload?.message ||
           action.error.message ||
           "Sipariş oluşturulurken bir hata oluştu.";
         state.paymentPageUrl = null;
         state.orderId = null;
-        sessionStorage.removeItem("currentOrderId"); // Hata durumunda temizle
+        sessionStorage.removeItem("currentOrderId");
       })
 
-      // --- getAllOrdersByUserId ---
       .addCase(getAllOrdersByUserId.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
       .addCase(getAllOrdersByUserId.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.orderList = action.payload?.data || []; // Backend'den gelen datayı al
+        state.orderList = action.payload?.data || [];
         state.error = !action.payload?.success
           ? action.payload?.message || "Siparişler alınamadı."
           : null;
@@ -180,14 +162,13 @@ const shoppingOrderSlice = createSlice({
         state.orderList = [];
       })
 
-      // --- getOrderDetails ---
       .addCase(getOrderDetails.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
       .addCase(getOrderDetails.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.orderDetails = action.payload?.data || null; // Backend'den gelen datayı al
+        state.orderDetails = action.payload?.data || null;
         state.error = !action.payload?.success
           ? action.payload?.message || "Sipariş detayı alınamadı."
           : null;
@@ -200,7 +181,7 @@ const shoppingOrderSlice = createSlice({
           "Sipariş detayı alınırken bir hata oluştu.";
         state.orderDetails = null;
       })
-      // --- createGuestOrderThunk ---
+
       .addCase(createGuestOrderThunk.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -215,9 +196,8 @@ const shoppingOrderSlice = createSlice({
           ? action.payload?.message ||
             "Misafir siparişi oluşturuldu ama ödeme URL alınamadı."
           : null;
-        // Misafir siparişi başarılıysa, local sepeti temizleyebiliriz.
         if (action.payload?.success) {
-          clearGuestCart(); // guestCartUtils'tan import edin
+          clearGuestCart();
         }
       })
       .addCase(createGuestOrderThunk.rejected, (state, action) => {
@@ -232,9 +212,7 @@ const shoppingOrderSlice = createSlice({
   },
 });
 
-// Action'ları export et
 export const { resetOrderDetails, resetPaymentPageUrl, clearOrderError } =
   shoppingOrderSlice.actions;
 
-// Reducer'ı export et
 export default shoppingOrderSlice.reducer;

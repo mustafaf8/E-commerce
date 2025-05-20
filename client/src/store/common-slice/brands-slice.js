@@ -1,17 +1,13 @@
-// client/src/store/common/brands-slice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const initialState = {
   brandList: [],
-  isLoading: false, // Genel listeleme yüklenmesi için
-  isProcessing: false, // Ekleme/Güncelleme/Silme işlemleri için ayrı loading state'i
+  isLoading: false,
+  isProcessing: false,
   error: null,
 };
 
-// --- Public/Common Thunk ---
-
-// Aktif Markaları Getirme (Frontend Kullanımı)
 export const fetchAllBrands = createAsyncThunk(
   "brands/fetchAll",
   async (_, { rejectWithValue }) => {
@@ -19,7 +15,7 @@ export const fetchAllBrands = createAsyncThunk(
       const response = await axios.get(
         `http://localhost:5000/api/common/brands/list`
       );
-      return response.data; // { success: true, data: [...] }
+      return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data || { message: "Markalar getirilemedi." }
@@ -28,20 +24,15 @@ export const fetchAllBrands = createAsyncThunk(
   }
 );
 
-// --- Admin için CRUD Thunk'ları ---
-
-// Yeni Marka Ekleme (Admin)
 export const addBrand = createAsyncThunk(
   "brands/add",
   async (brandData, { rejectWithValue }) => {
     try {
-      // brandData: { name: '...', slug: '...', isActive: ... }
       const response = await axios.post(
-        `http://localhost:5000/api/admin/brands/add`, // Admin endpoint'ini kullan
+        `http://localhost:5000/api/admin/brands/add`,
         brandData
-        // Gerekirse admin token header'ı eklenecek (axios interceptor ile?)
       );
-      return response.data; // { success: true, data: newBrand }
+      return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data || { message: "Marka eklenemedi." }
@@ -50,17 +41,15 @@ export const addBrand = createAsyncThunk(
   }
 );
 
-// Marka Güncelleme (Admin)
 export const updateBrand = createAsyncThunk(
   "brands/update",
   async ({ id, brandData }, { rejectWithValue }) => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/admin/brands/update/${id}`, // Admin endpoint'ini kullan
+        `http://localhost:5000/api/admin/brands/update/${id}`,
         brandData
-        // Gerekirse admin token header'ı eklenecek
       );
-      return response.data; // { success: true, data: updatedBrand }
+      return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data || { message: "Marka güncellenemedi." }
@@ -69,16 +58,14 @@ export const updateBrand = createAsyncThunk(
   }
 );
 
-// Marka Silme (Admin)
 export const deleteBrand = createAsyncThunk(
   "brands/delete",
   async (id, { rejectWithValue }) => {
     try {
       const response = await axios.delete(
-        `http://localhost:5000/api/admin/brands/delete/${id}` // Admin endpoint'ini kullan
-        // Gerekirse admin token header'ı eklenecek
+        `http://localhost:5000/api/admin/brands/delete/${id}`
       );
-      return response.data; // { success: true, data: { _id: id } }
+      return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data || { message: "Marka silinemedi." }
@@ -97,7 +84,6 @@ const brandsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // fetchAllBrands (Listeleme)
       .addCase(fetchAllBrands.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -112,19 +98,16 @@ const brandsSlice = createSlice({
         state.brandList = [];
       })
 
-      // addBrand (Admin İşlemi)
       .addCase(addBrand.pending, (state) => {
-        state.isProcessing = true; // İşlem başlıyor
+        state.isProcessing = true;
         state.error = null;
       })
       .addCase(addBrand.fulfilled, (state, action) => {
         state.isProcessing = false;
         if (action.payload?.success && action.payload?.data) {
-          state.brandList.push(action.payload.data); // Yeni markayı listeye ekle
-          // Listeyi isim sırasına göre tekrar sıralayabiliriz (opsiyonel)
+          state.brandList.push(action.payload.data);
           state.brandList.sort((a, b) => a.name.localeCompare(b.name));
         } else {
-          // Backend success:false döndürdüyse hatayı state'e yaz
           state.error =
             action.payload?.message || "Marka eklenemedi (backend).";
         }
@@ -135,7 +118,6 @@ const brandsSlice = createSlice({
           action.payload?.message || "Marka eklenirken bir hata oluştu.";
       })
 
-      // updateBrand (Admin İşlemi)
       .addCase(updateBrand.pending, (state) => {
         state.isProcessing = true;
         state.error = null;
@@ -147,8 +129,8 @@ const brandsSlice = createSlice({
             (brand) => brand._id === action.payload.data._id
           );
           if (index !== -1) {
-            state.brandList[index] = action.payload.data; // Güncellenmiş markayı yerine koy
-            state.brandList.sort((a, b) => a.name.localeCompare(b.name)); // Sıralamayı koru
+            state.brandList[index] = action.payload.data;
+            state.brandList.sort((a, b) => a.name.localeCompare(b.name));
           }
         } else {
           state.error =
@@ -161,7 +143,6 @@ const brandsSlice = createSlice({
           action.payload?.message || "Marka güncellenirken bir hata oluştu.";
       })
 
-      // deleteBrand (Admin İşlemi)
       .addCase(deleteBrand.pending, (state) => {
         state.isProcessing = true;
         state.error = null;
@@ -170,7 +151,7 @@ const brandsSlice = createSlice({
         state.isProcessing = false;
         if (action.payload?.success && action.payload?.data?._id) {
           state.brandList = state.brandList.filter(
-            (brand) => brand._id !== action.payload.data._id // Silineni listeden çıkar
+            (brand) => brand._id !== action.payload.data._id
           );
         } else {
           state.error =

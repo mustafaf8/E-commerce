@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 
 const TransactionGuide = () => {
-  // Section data for easier maintenance
   const sections = [
     {
       id: "account",

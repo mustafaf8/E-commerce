@@ -107,7 +107,6 @@ const getUsersWithOrders = async (req, res) => {
       {
         $group: {
           _id: {
-            // Gruplama anahtarı
             $cond: {
               if: { $eq: ["$isGuestOrder", true] }, // Eğer misafir siparişiyse
               then: "GUEST_ORDERS_VIRTUAL_ID", // Sabit bir string ID ata
@@ -262,12 +261,8 @@ const getOrdersByUserIdForAdmin = async (req, res) => {
 const getAllGuestOrdersForAdmin = async (req, res) => {
   try {
     const guestOrders = await Order.find({ isGuestOrder: true })
-      .sort({ orderDate: -1 }) // En yeniden eskiye sırala
-      .lean(); // Performans için .lean()
-
-    // Misafir siparişlerinde `guestInfo` alanı önemli olacak.
-    // `userId` alanı olmayacak veya null olacak.
-
+      .sort({ orderDate: -1 })
+      .lean();
     res.status(200).json({
       success: true,
       data: guestOrders,
@@ -283,10 +278,10 @@ const getAllGuestOrdersForAdmin = async (req, res) => {
 };
 
 module.exports = {
-  getAllOrdersOfAllUsers, // Mevcut
-  getOrderDetailsForAdmin, // Mevcut
-  updateOrderStatus, // Mevcut
-  getUsersWithOrders, // Yeni
+  getAllOrdersOfAllUsers,
+  getOrderDetailsForAdmin,
+  updateOrderStatus,
+  getUsersWithOrders,
   getOrdersByUserIdForAdmin,
   getAllGuestOrdersForAdmin,
 };

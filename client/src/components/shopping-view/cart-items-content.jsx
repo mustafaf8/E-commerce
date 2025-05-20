@@ -1,22 +1,11 @@
 import { Minus, Plus, Trash } from "lucide-react";
 import { Button } from "../ui/button";
 import PropTypes from "prop-types";
-// *** YENİ Importlar ***
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useLocation } from "react-router-dom"; // useNavigate ve useLocation eklendi
-// ***---***
+import { useDispatch } from "react-redux";
 import { deleteCartItem, updateCartQuantity } from "@/store/shop/cart-slice";
 import { useToast } from "../ui/use-toast";
 
 function UserCartItemsContent({ cartItem, readOnly = false }) {
-  // readOnly prop eklendi
-  // *** YENİ Hook Kullanımları ***
-  const { user, isAuthenticated } = useSelector((state) => state.auth); // isAuthenticated eklendi
-  const navigate = useNavigate();
-  const location = useLocation();
-  // ***---***
-  const { cartItems } = useSelector((state) => state.shopCart);
-  const { productList } = useSelector((state) => state.shopProducts);
   const dispatch = useDispatch();
   const { toast } = useToast();
 
@@ -30,7 +19,7 @@ function UserCartItemsContent({ cartItem, readOnly = false }) {
 
     dispatch(
       updateCartQuantity({
-        productId: currentCartItem.productId, // productId string olmalı
+        productId: currentCartItem.productId,
         quantity: newQuantity,
       })
     )
@@ -47,7 +36,6 @@ function UserCartItemsContent({ cartItem, readOnly = false }) {
         // }
       })
       .catch((errorPayload) => {
-        // rejectWithValue ile gelen errorPayload
         if (errorPayload && errorPayload.isStockError) {
           toast({
             variant: "destructive",
@@ -67,7 +55,7 @@ function UserCartItemsContent({ cartItem, readOnly = false }) {
   function handleCartItemDelete(currentCartItem) {
     dispatch(
       deleteCartItem({
-        productId: currentCartItem.productId, // productId string olmalı
+        productId: currentCartItem.productId,
       })
     )
       .unwrap()
@@ -108,7 +96,7 @@ function UserCartItemsContent({ cartItem, readOnly = false }) {
               variant="outline"
               className="h-7 w-7 md:h-8 md:w-8 rounded-full p-0"
               size="icon"
-              disabled={cartItem?.quantity === 1} // Azaltma butonu 1'deyken disable olmalı
+              disabled={cartItem?.quantity === 1}
               onClick={() => handleUpdateQuantity(cartItem, "minus")}
             >
               <Minus className="w-3 h-3 md:w-4 md:h-4" />
@@ -121,8 +109,6 @@ function UserCartItemsContent({ cartItem, readOnly = false }) {
               variant="outline"
               className="h-7 w-7 md:h-8 md:w-8 rounded-full p-0"
               size="icon"
-              // Stok kontrolü artık thunk içinde yapıldığı için buradaki disabled kaldırılabilir
-              // VEYA anlık UI geri bildirimi için bırakılabilir, ancak thunk yine de son kararı verir.
               // disabled={cartItem.totalStock !== undefined && cartItem.quantity >= cartItem.totalStock}
               onClick={() => handleUpdateQuantity(cartItem, "plus")}
             >
@@ -169,7 +155,7 @@ UserCartItemsContent.propTypes = {
     price: PropTypes.number,
     salePrice: PropTypes.number,
     quantity: PropTypes.number.isRequired,
-    totalStock: PropTypes.number, // Bu alanın misafir sepetindeki item'larda da olması önemli
+    totalStock: PropTypes.number,
   }).isRequired,
   readOnly: PropTypes.bool,
 };

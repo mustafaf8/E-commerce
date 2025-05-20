@@ -1,14 +1,12 @@
-// client/src/components/admin-view/HomeSectionsManager.jsx
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  fetchAllHomeSections, // Admin için tüm bölümleri getir
+  fetchAllHomeSections,
   addHomeSection,
   updateHomeSection,
   deleteHomeSection,
-  // updateHomeSectionsOrder // Sıralama için eklenecek
 } from "@/store/common-slice/home-sections-slice";
-import { fetchAllCategories } from "@/store/common-slice/categories-slice"; // Kategori seçimi için
+import { fetchAllCategories } from "@/store/common-slice/categories-slice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,7 +31,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
@@ -47,7 +44,7 @@ import { updateHomeSectionsOrder } from "@/store/common-slice/home-sections-slic
 const initialSectionData = {
   title: "",
   displayOrder: 0,
-  contentType: "CATEGORY", // Varsayılan
+  contentType: "CATEGORY",
   contentValue: "",
   itemLimit: 10,
   isActive: true,
@@ -73,27 +70,20 @@ function HomeSectionsManager() {
   const { categoryList = [], isLoading: categoriesLoading } = useSelector(
     (state) => state.categories || { categoryList: [], isLoading: false }
   );
-  // Markaları da benzer şekilde çekebiliriz (eğer ayrı bir slice/state varsa)
-  // const { brandList = [], isLoading: brandsLoading } = useSelector(state => state.brands);
 
   const { toast } = useToast();
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentSection, setCurrentSection] = useState(initialSectionData);
   const [sectionToDelete, setSectionToDelete] = useState(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-
-  // Sıralanmış bölümleri state'te tutmak sıralama için iyi olabilir
   const [sortedSections, setSortedSections] = useState([]);
 
   useEffect(() => {
-    dispatch(fetchAllHomeSections()); // Admin için tüm bölümleri çek
-    dispatch(fetchAllCategories()); // Kategori dropdown için
-    // dispatch(fetchAllBrands()); // Marka dropdown için (varsa)
+    dispatch(fetchAllHomeSections());
+    dispatch(fetchAllCategories());
   }, [dispatch]);
 
-  // Backend'den gelen liste değiştiğinde local sıralı listeyi güncelle
   useEffect(() => {
     setSortedSections(
       [...homeSections].sort((a, b) => a.displayOrder - b.displayOrder)
@@ -129,7 +119,6 @@ function HomeSectionsManager() {
 
   const openModalForAdd = () => {
     setIsEditing(false);
-    // Yeni eklenenin sırasını mevcutların sonuna ayarla
     const nextOrder =
       homeSections.length > 0
         ? Math.max(...homeSections.map((s) => s.displayOrder)) + 1
@@ -176,7 +165,7 @@ function HomeSectionsManager() {
             title: `Bölüm başarıyla ${isEditing ? "güncellendi" : "eklendi"}.`,
           });
           closeModal();
-          dispatch(fetchAllHomeSections()); // Listeyi yenilemek için
+          dispatch(fetchAllHomeSections());
         } else {
           toast({
             variant: "destructive",
@@ -207,7 +196,7 @@ function HomeSectionsManager() {
         .then((payload) => {
           if (payload.success) {
             toast({ variant: "success", title: "Bölüm silindi." });
-            dispatch(fetchAllHomeSections()); // Listeyi yenile
+            dispatch(fetchAllHomeSections());
           } else {
             toast({
               variant: "destructive",
@@ -229,29 +218,23 @@ function HomeSectionsManager() {
     }
   };
 
-  // --- Sıralama Fonksiyonları (Basit Yukarı/Aşağı) ---
   const moveSection = async (index, direction) => {
     if (
       (direction === -1 && index === 0) ||
       (direction === 1 && index === sortedSections.length - 1)
     ) {
-      return; // Listenin başına veya sonuna gidemez
+      return;
     }
 
     const newSortedSections = [...sortedSections];
     const [movedSection] = newSortedSections.splice(index, 1);
     newSortedSections.splice(index + direction, 0, movedSection);
-
-    // Yeni displayOrder değerlerini ata
     const updatedSectionsWithOrder = newSortedSections.map((section, i) => ({
       ...section,
       displayOrder: i,
     }));
 
-    // Local state'i hemen güncelle (daha akıcı UI için)
     setSortedSections(updatedSectionsWithOrder);
-
-    // Backend'e sıralama bilgisini gönder (sadece ID'ler yeterli olabilir veya tüm güncellenmiş objeler)
     const orderedIds = updatedSectionsWithOrder.map((s) => s._id);
     try {
       await dispatch(updateHomeSectionsOrder(orderedIds)).unwrap();
@@ -259,9 +242,8 @@ function HomeSectionsManager() {
       // Backend başarılı yanıt dönerse Redux state'i zaten güncellenecek (thunk'ın fulfilled case'i)
       // Eğer backend sadece success dönerse, listeyi tekrar çekmek gerekebilir:
       // dispatch(fetchAllHomeSections());
-    } catch (err) {
+    } catch {
       toast({ variant: "destructive", title: "Sıralama güncellenemedi." });
-      // Hata durumunda eski sıralamaya geri dön (opsiyonel)
       setSortedSections(
         [...homeSections].sort((a, b) => a.displayOrder - b.displayOrder)
       );
@@ -301,7 +283,6 @@ function HomeSectionsManager() {
               <TableHead className="text-right">İşlemler</TableHead>
             </TableRow>
           </TableHeader>
-          {/* Sıralama için TableBody veya sürükle-bırak context */}
           <TableBody>
             {sortedSections.map((section, index) => (
               <TableRow key={section._id}>

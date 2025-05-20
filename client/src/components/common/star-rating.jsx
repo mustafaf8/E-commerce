@@ -3,7 +3,6 @@ import { Button } from "../ui/button";
 
 function StarRatingComponent({ rating, handleRatingChange }) {
   // console.log(rating, "rating star");
-
   return [1, 2, 3, 4, 5].map((star) => (
     <Button
       key={star}
@@ -20,10 +19,10 @@ function StarRatingComponent({ rating, handleRatingChange }) {
         className={`w-5 h-5 ${
           // Boyut
           star <= rating
-            ? "fill-yellow-500 stroke-yellow-500" // Seçiliyse: içi ve kenarlığı sarı
-            : "fill-transparent" // Seçili değilse: içi transparan (sadece kenarlık görünür)
+            ? "fill-yellow-500 stroke-yellow-500"
+            : "fill-transparent"
         }`}
-        strokeWidth={1.7} // Kenarlık kalınlığını ayarla (1, 1.5, 2 gibi değerler deneyebilirsin)
+        strokeWidth={1.7}
       />
     </Button>
   ));

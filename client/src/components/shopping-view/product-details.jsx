@@ -1,9 +1,7 @@
-import { Heart, StarIcon } from "lucide-react";
+import { Heart } from "lucide-react";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent } from "../ui/dialog";
-import { Separator } from "../ui/separator";
-import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -34,10 +32,8 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
     (state) => state.shopWishlist
   );
   const { toast } = useToast();
-
   const isWishlisted =
     productDetails?._id && wishlistItems.includes(productDetails._id);
-
   const handleWishlistToggle = () => {
     if (!isAuthenticated) {
       toast({ variant: "destructive", title: "Lütfen önce giriş yapın." });
@@ -166,10 +162,9 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
 
   useEffect(() => {
     if (productDetails?._id) {
-      // Sadece ID varsa çalıştır
       dispatch(getReviews(productDetails._id));
     }
-  }, [productDetails?._id, dispatch]); // productDetails yerine productDetails._id bağımlılığı
+  }, [productDetails?._id, dispatch]);
 
   const averageReview =
     reviews && reviews.length > 0
@@ -177,12 +172,10 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
         reviews.length
       : 0;
 
-  // productDetails null veya undefined ise boş içerik göster (veya yükleniyor)
   if (!productDetails) {
     return (
       <Dialog open={open} onOpenChange={handleDialogClose}>
         <DialogContent className="sm:max-w-[600px]">
-          {/* İsteğe bağlı: Yükleniyor göstergesi */}
           <p>Yükleniyor...</p>
         </DialogContent>
       </Dialog>
@@ -213,7 +206,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 flex-shrink-0 text-gray-500 hover:bg-red-100 hover:text-red-500 transition-colors" // Hover efekti
+                className="h-8 w-8 flex-shrink-0 text-gray-500 hover:bg-red-100 hover:text-red-500 transition-colors"
                 onClick={handleWishlistToggle}
                 disabled={wishlistLoading}
               >
@@ -230,7 +223,6 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
             <p className="text-sm text-gray-600 mb-4 leading-relaxed">
               {productDetails.description}
             </p>
-            {/* ------- FİYAT GÖSTERİMİ BAŞLANGIÇ*/}
             <div className="py-2">
               {productDetails?.salePrice !== undefined &&
               productDetails.salePrice !== null ? (
@@ -277,7 +269,6 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                 </div>
               )}
             </div>
-            {/* ------- FİYAT GÖSTERİMİ SON ------- */}
             <div className="flex items-center mt-1 mb-3">
               <div className="flex items-center gap-0.5 pointer-events-none">
                 <StarRatingComponent rating={averageReview} />
@@ -285,7 +276,6 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
               <span className="text-xs text-gray-500 font-medium ml-1.5">
                 ({averageReview.toFixed(1)})
               </span>
-              {/* Yorum sayısını gösterme (opsiyonel) */}
               {reviews && reviews.length > 0 && (
                 <span className="ml-2 text-xs text-gray-400">
                   ({reviews.length} yorum)
@@ -315,7 +305,6 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
               )}
             </div>
           </div>
-          {/* Alt Kısım: Yorumlar (Kaydırılabilir) */}
           <div className="flex-grow overflow-y-auto pt-2 pr-2 -mr-2 custom-scrollbar">
             <h2 className="text-base sm:text-lg font-semibold mb-3 text-gray-800">
               Yorumlar
@@ -353,14 +342,10 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                 </p>
               )}
             </div>
-            {/* Yorum Ekleme Formu */}
             <div className="mt-6 flex flex-col gap-2 border-t pt-4">
-              {" "}
-              {/* Daha az boşluk */}
               <Label className="text-sm font-medium text-gray-700">
                 Yorum Yaz
-              </Label>{" "}
-              {/* Label stili */}
+              </Label>
               <div className="flex gap-1">
                 <StarRatingComponent
                   rating={rating}
@@ -373,7 +358,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                 onChange={(event) => setReviewMsg(event.target.value)}
                 placeholder="Yorumunuzu buraya yazın..."
                 rows={3}
-                className="text-sm" // Font boyutu
+                className="text-sm"
               />
               <Button
                 onClick={handleAddReview}

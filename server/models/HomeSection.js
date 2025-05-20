@@ -1,6 +1,4 @@
-// server/models/HomeSection.js
 const mongoose = require("mongoose");
-
 const HomeSectionSchema = new mongoose.Schema(
   {
     title: {
@@ -9,25 +7,20 @@ const HomeSectionSchema = new mongoose.Schema(
       trim: true,
     },
     displayOrder: {
-      // Ana sayfadaki gösterim sırası
       type: Number,
       required: true,
       default: 0,
-      index: true, // Sıralama için index
+      index: true,
     },
     contentType: {
-      // Carousel içeriğinin türü
       type: String,
       required: true,
-      enum: ["BEST_SELLING", "CATEGORY", "BRAND", "TAG", "CUSTOM_FILTER"], // Olası türler
+      enum: ["BEST_SELLING", "CATEGORY", "BRAND", "TAG", "CUSTOM_FILTER"],
       default: "CATEGORY",
     },
     contentValue: {
-      // İçerik türüne bağlı değer (örn: category slug, brand slug, tag)
-      // CUSTOM_FILTER için { key: 'price', value: '>100' } gibi JSON olabilir
-      type: String, // Veya Mixed tip olabilir
+      type: String,
       required: function () {
-        // BEST_SELLING dışındakiler için zorunlu
         return this.contentType !== "BEST_SELLING";
       },
       trim: true,
@@ -38,12 +31,10 @@ const HomeSectionSchema = new mongoose.Schema(
     //   enum: ['Category', 'Brand', 'Tag'] // Product modelindeki alanlara göre
     // },
     itemLimit: {
-      // Carousel'da kaç ürün gösterilecek
       type: Number,
       default: 10,
     },
     isActive: {
-      // Ana sayfada gösterilsin mi?
       type: Boolean,
       default: true,
       index: true,

@@ -1,4 +1,4 @@
-import "react"; // React import'u eklendi
+import "react";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -15,9 +15,9 @@ import PropTypes from "prop-types";
 import StarRatingComponent from "../common/star-rating";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils"; // cn importu eklendi
+import { cn } from "@/lib/utils";
+import { useSelector } from "react-redux";
 
-// Detay satırları için yardımcı bileşen (okunabilirliği artırır)
 function DetailItem({ label, value, className = "", valueClassName = "" }) {
   return (
     <div
@@ -37,11 +37,25 @@ DetailItem.propTypes = {
 };
 
 function AdminProductDetailsDialog({ open, setOpen, productDetails }) {
+  const { categoryList = [] } = useSelector(
+    (state) => state.categories || { categoryList: [] }
+  );
+  const { brandList = [] } = useSelector(
+    (state) => state.brands || { brandList: [] }
+  );
   if (!productDetails) {
     return null;
   }
+  const categoryName =
+    categoryList.find((cat) => cat._id === productDetails.category)?.name ||
+    productDetails.category ||
+    "N/A";
 
-  // Güvenli tarih formatlama
+  const brandName =
+    brandList.find((brand) => brand._id === productDetails.brand)?.name ||
+    productDetails.brand ||
+    "N/A";
+
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -53,7 +67,6 @@ function AdminProductDetailsDialog({ open, setOpen, productDetails }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      {/* Dialog içeriği için max genişlik ve yükseklik ayarları */}
       <DialogContent className="sm:max-w-4xl max-h-[90vh] flex flex-col p-0">
         <DialogHeader className="p-6 pb-4 border-b">
           <DialogTitle className="text-xl font-bold">
@@ -61,8 +74,6 @@ function AdminProductDetailsDialog({ open, setOpen, productDetails }) {
           </DialogTitle>
           <DialogDescription>Admin Paneli - Ürün Detayları</DialogDescription>
         </DialogHeader>
-
-        {/* Ana İçerik Alanı (Kaydırılabilir) */}
         <ScrollArea className="flex-grow overflow-y-auto">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-6 p-6">
             <div className="md:col-span-2 relative overflow-hidden rounded-lg flex items-center justify-center bg-gray-100 border aspect-square">
@@ -84,23 +95,16 @@ function AdminProductDetailsDialog({ open, setOpen, productDetails }) {
                 </p>
               </div>
               <Separator />
-              {/* Temel Bilgiler */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
                 <DetailItem
                   label="Kategori"
                   value={
-                    <Badge variant="outline">
-                      {productDetails.category || "N/A"}
-                    </Badge>
+                    <Badge variant="outline">{categoryName || "N/A"}</Badge>
                   }
                 />
                 <DetailItem
                   label="Marka"
-                  value={
-                    <Badge variant="outline">
-                      {productDetails.brand || "N/A"}
-                    </Badge>
-                  }
+                  value={<Badge variant="outline">{brandName || "N/A"}</Badge>}
                 />
                 <DetailItem
                   label="Normal Fiyat"
@@ -130,7 +134,6 @@ function AdminProductDetailsDialog({ open, setOpen, productDetails }) {
                 />
               </div>
               <Separator />
-              {/* Puanlama ve ID */}
               <div className="grid grid-cols-1 sm:grid-cols-1 gap-x-6 gap-y-3 text-sm">
                 <div className="sm:col-span-2">
                   <p className="text-muted-foreground font-medium mb-1">
@@ -161,7 +164,6 @@ function AdminProductDetailsDialog({ open, setOpen, productDetails }) {
                 />
               </div>
               <Separator />
-              {/* Tarihler */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
                 <DetailItem
                   label="Oluşturulma"

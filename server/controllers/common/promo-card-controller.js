@@ -1,13 +1,10 @@
-// server/controllers/common/promo-card-controller.js
 const PromoCard = require("../../models/PromoCard");
 
-// Tüm (aktif) promosyon kartlarını getir
 const getPromoCards = async (req, res) => {
   try {
     // Sadece aktif olanları veya belirli bir sıraya göre getirmek isterseniz filtre/sort ekleyebilirsiniz.
     // Örneğin: const promoCards = await PromoCard.find({ isActive: true }).sort({ order: 1 });
-    const promoCards = await PromoCard.find({}).sort({ createdAt: -1 }); // Şimdilik eklenme tarihine göre sondan başa sırala
-
+    const promoCards = await PromoCard.find({}).sort({ createdAt: -1 }); // Şimdilik eklenme tarihine göre
     res.status(200).json({ success: true, data: promoCards });
   } catch (error) {
     console.error("Promosyon kartları getirilirken hata:", error);
@@ -15,12 +12,9 @@ const getPromoCards = async (req, res) => {
   }
 };
 
-// Yeni bir promosyon kartı ekle (Admin Yetkisi Gerekli)
 const addPromoCard = async (req, res) => {
-  // Yetki Kontrolü (Örnek - authMiddleware sonrası)
-  // Eğer authMiddleware kullanmıyorsanız, burada manuel token/session kontrolü yapmalısınız.
-  // if (req.user?.role !== 'admin') {
-  //     return res.status(403).json({ success: false, message: "Yetkisiz işlem." });
+  // if (req.user?.role !== "admin") {
+  //   return res.status(403).json({ success: false, message: "Yetkisiz işlem." });
   // }
 
   try {
@@ -43,7 +37,6 @@ const addPromoCard = async (req, res) => {
     });
   } catch (error) {
     console.error("Promosyon kartı eklenirken hata:", error);
-    // Doğrulama hatası olabilir
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -55,11 +48,9 @@ const addPromoCard = async (req, res) => {
   }
 };
 
-// Promosyon kartını sil (Admin Yetkisi Gerekli)
 const deletePromoCard = async (req, res) => {
-  // Yetki Kontrolü (Örnek)
-  // if (req.user?.role !== 'admin') {
-  //     return res.status(403).json({ success: false, message: "Yetkisiz işlem." });
+  // if (req.user?.role !== "admin") {
+  //   return res.status(403).json({ success: false, message: "Yetkisiz işlem." });
   // }
 
   try {
@@ -83,10 +74,9 @@ const deletePromoCard = async (req, res) => {
       success: true,
       message: "Promosyon kartı silindi.",
       data: { _id: cardId },
-    }); // Frontend'in beklediği gibi ID'yi döndür
+    });
   } catch (error) {
     console.error("Promosyon kartı silinirken hata:", error);
-    // Geçersiz ID formatı hatası olabilir
     if (error.name === "CastError") {
       return res
         .status(400)

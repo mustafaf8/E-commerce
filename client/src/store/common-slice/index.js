@@ -4,19 +4,18 @@ import axios from "axios";
 const initialState = {
   isLoading: false,
   featureImageList: [],
-  error: null, // Hata durumu ekleyelim
+  error: null,
 };
 
-// Mevcut Thunk: Bannerları Getirme
 export const getFeatureImages = createAsyncThunk(
-  "commonFeature/getFeatureImages", // Action type prefix güncellendi (sliceName/thunkName)
+  "commonFeature/getFeatureImages",
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get(
         `http://localhost:5000/api/common/feature/get`
       );
       if (response.data && response.data.success) {
-        return response.data; // {success: true, data: [...]}
+        return response.data;
       } else {
         return rejectWithValue(
           response.data || { message: "Banner verisi alınamadı." }
@@ -34,19 +33,16 @@ export const getFeatureImages = createAsyncThunk(
   }
 );
 
-// Güncellenmiş Thunk: Banner Ekleme (Başlık ve Link ile)
 export const addFeatureImage = createAsyncThunk(
   "commonFeature/addFeatureImage",
-  // Artık sadece image URL değil, bir obje bekliyor: { image, title, link }
   async (bannerData, { rejectWithValue }) => {
     try {
-      // !!! Backend endpoint'inizin bu veriyi alacak şekilde güncellendiğini varsayıyoruz !!!
       const response = await axios.post(
         `http://localhost:5000/api/common/feature/add`,
-        bannerData // { image: 'url', title: '...', link: '...' } gönderiliyor
+        bannerData
       );
       if (response.data && response.data.success) {
-        return response.data; // {success: true, data: { ...yeni banner... } }
+        return response.data;
       } else {
         return rejectWithValue(
           response.data || { message: "Banner eklenemedi." }
@@ -64,18 +60,14 @@ export const addFeatureImage = createAsyncThunk(
   }
 );
 
-// !!! YENİ THUNK: Banner Silme !!!
 export const deleteFeatureImage = createAsyncThunk(
   "commonFeature/deleteFeatureImage",
   async (bannerId, { rejectWithValue }) => {
     try {
-      // !!! BURAYI DEĞİŞTİRİN: Backend silme endpoint'inizin doğru adresini yazın !!!
       const response = await axios.delete(
         `http://localhost:5000/api/common/feature/delete/${bannerId}`
-        // Yetkilendirme gerekebilir: { headers: { Authorization: `Bearer ${token}` } }
       );
       if (response.data && response.data.success) {
-        // Başarılı silme sonrası ID'yi döndür
         return { success: true, data: { _id: bannerId } };
       } else {
         return rejectWithValue(
@@ -95,12 +87,11 @@ export const deleteFeatureImage = createAsyncThunk(
 );
 
 const commonSlice = createSlice({
-  name: "commonFeature", // Slice adı düzeltildi
+  name: "commonFeature",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // getFeatureImages
       .addCase(getFeatureImages.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -115,11 +106,9 @@ const commonSlice = createSlice({
         state.featureImageList = [];
       })
 
-      // addFeatureImage
       .addCase(addFeatureImage.fulfilled, (state, action) => {
-        // Yükleme durumunu ayrıca yönetmek isterseniz pending/rejected case'leri ekleyin
         if (action.payload?.success && action.payload?.data) {
-          state.featureImageList.push(action.payload.data); // Yeni banner'ı listeye ekle
+          state.featureImageList.push(action.payload.data);
           state.error = null;
         }
       })
@@ -128,10 +117,8 @@ const commonSlice = createSlice({
         console.error("Banner ekleme hatası (Redux):", state.error);
       })
 
-      // !!! YENİ CASE'LER: deleteFeatureImage !!!
       .addCase(deleteFeatureImage.fulfilled, (state, action) => {
         if (action.payload?.success && action.payload?.data?._id) {
-          // Silinen banner'ı listeden çıkar
           state.featureImageList = state.featureImageList.filter(
             (banner) => banner._id !== action.payload.data._id
           );

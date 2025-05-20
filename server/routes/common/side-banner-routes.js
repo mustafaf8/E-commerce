@@ -1,4 +1,3 @@
-// server/routes/common/side-banner-routes.js
 const express = require("express");
 const {
   getSideBanners,
@@ -9,7 +8,6 @@ const {
 
 const router = express.Router();
 
-// Herkes erişebilir
 router.get("/get", getSideBanners);
 
 // Admin erişimi (Middleware eklenmeli)

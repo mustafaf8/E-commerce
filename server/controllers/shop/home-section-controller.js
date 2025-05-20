@@ -1,7 +1,5 @@
-// server/controllers/shop/home-section-controller.js
 const HomeSection = require("../../models/HomeSection");
 
-// Aktif Ana Sayfa Bölümlerini Getir (Mağaza)
 const getActiveHomeSectionsShop = async (req, res) => {
   try {
     const sections = await HomeSection.find({ isActive: true }).sort({

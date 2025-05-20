@@ -1,6 +1,5 @@
-// server/controllers/admin/home-section-controller.js
-const HomeSection = require("../../models/HomeSection"); // HomeSection modelini import et
-const Category = require("../../models/Category"); // Gerekirse doğrulamalar için
+const HomeSection = require("../../models/HomeSection");
+const Category = require("../../models/Category");
 
 // Yeni Bölüm Ekle (Admin)
 const addHomeSectionAdmin = async (req, res) => {
@@ -21,12 +20,10 @@ const addHomeSectionAdmin = async (req, res) => {
         .json({ success: false, message: "Başlık ve İçerik Tipi zorunludur." });
     }
     if (contentType !== "BEST_SELLING" && !contentValue) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "İçerik Değeri (En Çok Satanlar hariç) zorunludur.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "İçerik Değeri (En Çok Satanlar hariç) zorunludur.",
+      });
     }
     // TODO: contentValue'nun geçerliliğini contentType'a göre kontrol et (örn: Kategori ise slug var mı?)
 
@@ -40,23 +37,19 @@ const addHomeSectionAdmin = async (req, res) => {
     });
 
     await newSection.save();
-    res
-      .status(201)
-      .json({
-        success: true,
-        message: "Ana sayfa bölümü eklendi.",
-        data: newSection,
-      });
+    res.status(201).json({
+      success: true,
+      message: "Ana sayfa bölümü eklendi.",
+      data: newSection,
+    });
   } catch (error) {
     console.error("Admin bölüm ekleme hatası:", error);
     if (error.name === "ValidationError") {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Doğrulama Hatası",
-          errors: error.errors,
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Doğrulama Hatası",
+        errors: error.errors,
+      });
     }
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
@@ -94,12 +87,10 @@ const updateHomeSectionAdmin = async (req, res) => {
         .json({ success: false, message: "Başlık ve İçerik Tipi zorunludur." });
     }
     if (contentType !== "BEST_SELLING" && !contentValue) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "İçerik Değeri (En Çok Satanlar hariç) zorunludur.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "İçerik Değeri (En Çok Satanlar hariç) zorunludur.",
+      });
     }
     // TODO: contentValue geçerlilik kontrolü
 
@@ -122,23 +113,19 @@ const updateHomeSectionAdmin = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Güncellenecek bölüm bulunamadı." });
     }
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Bölüm güncellendi.",
-        data: updatedSection,
-      });
+    res.status(200).json({
+      success: true,
+      message: "Bölüm güncellendi.",
+      data: updatedSection,
+    });
   } catch (error) {
     console.error("Admin bölüm güncelleme hatası:", error);
     if (error.name === "ValidationError") {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Doğrulama Hatası",
-          errors: error.errors,
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Doğrulama Hatası",
+        errors: error.errors,
+      });
     }
     if (error.name === "CastError") {
       return res
@@ -180,12 +167,10 @@ const updateHomeSectionsOrderAdmin = async (req, res) => {
     const { orderedIds } = req.body; // Frontend'den gelen sıralı ID dizisi
 
     if (!Array.isArray(orderedIds)) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Sıralanmış ID listesi (dizi) gerekli.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Sıralanmış ID listesi (dizi) gerekli.",
+      });
     }
 
     // Her bir ID için displayOrder'ı güncelle
@@ -195,17 +180,14 @@ const updateHomeSectionsOrderAdmin = async (req, res) => {
 
     const updatedSections = await Promise.all(updatePromises);
 
-    // Hata kontrolü (eğer bazıları null ise bulunamadı demektir)
     if (updatedSections.some((section) => section === null)) {
       console.warn("Sıralama güncellemede bazı bölümler bulunamadı.");
-      // İsteğe bağlı: Daha detaylı hata yönetimi
     }
 
     res.status(200).json({
       success: true,
       message: "Bölüm sıralaması güncellendi.",
-      // Güncellenmiş tüm listeyi döndürmek Redux state'ini kolayca günceller
-      data: await HomeSection.find({}).sort({ displayOrder: 1 }), // Tekrar çekip sıralı gönderelim
+      data: await HomeSection.find({}).sort({ displayOrder: 1 }),
     });
   } catch (error) {
     console.error("Admin bölüm sıralama hatası:", error);

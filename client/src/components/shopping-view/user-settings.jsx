@@ -1,4 +1,4 @@
-import React from "react";
+import "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "@/store/auth-slice";

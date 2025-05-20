@@ -1,8 +1,7 @@
-// server/routes/common/brand-routes.js
 const express = require("express");
 const {
   getActiveBrands,
-} = require("../../controllers/common/brand-controller"); // Birazdan oluşturacağız
+} = require("../../controllers/common/brand-controller");
 
 const router = express.Router();
 

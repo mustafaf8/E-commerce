@@ -1,15 +1,12 @@
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
-
 import { cn } from "@/lib/utils";
+import PropTypes from "prop-types";
 
 const Dialog = DialogPrimitive.Root;
-
 const DialogTrigger = DialogPrimitive.Trigger;
-
 const DialogPortal = DialogPrimitive.Portal;
-
 const DialogClose = DialogPrimitive.Close;
 
 const DialogOverlay = React.forwardRef(({ className, ...props }, ref) => (
@@ -23,6 +20,10 @@ const DialogOverlay = React.forwardRef(({ className, ...props }, ref) => (
   />
 ));
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
+
+DialogOverlay.propTypes = {
+  className: PropTypes.string,
+};
 
 const DialogContent = React.forwardRef(
   ({ className, children, ...props }, ref) => (
@@ -47,6 +48,11 @@ const DialogContent = React.forwardRef(
 );
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
+DialogContent.propTypes = {
+  className: PropTypes.string,
+  children: PropTypes.node,
+};
+
 const DialogHeader = ({ className, ...props }) => (
   <div
     className={cn(
@@ -58,6 +64,10 @@ const DialogHeader = ({ className, ...props }) => (
 );
 DialogHeader.displayName = "DialogHeader";
 
+DialogHeader.propTypes = {
+  className: PropTypes.string,
+};
+
 const DialogFooter = ({ className, ...props }) => (
   <div
     className={cn(
@@ -68,6 +78,10 @@ const DialogFooter = ({ className, ...props }) => (
   />
 );
 DialogFooter.displayName = "DialogFooter";
+
+DialogFooter.propTypes = {
+  className: PropTypes.string,
+};
 
 const DialogTitle = React.forwardRef(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
@@ -81,6 +95,10 @@ const DialogTitle = React.forwardRef(({ className, ...props }, ref) => (
 ));
 DialogTitle.displayName = DialogPrimitive.Title.displayName;
 
+DialogTitle.propTypes = {
+  className: PropTypes.string,
+};
+
 const DialogDescription = React.forwardRef(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
@@ -89,6 +107,10 @@ const DialogDescription = React.forwardRef(({ className, ...props }, ref) => (
   />
 ));
 DialogDescription.displayName = DialogPrimitive.Description.displayName;
+
+DialogDescription.propTypes = {
+  className: PropTypes.string,
+};
 
 export {
   Dialog,

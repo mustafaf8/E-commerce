@@ -1,4 +1,3 @@
-// client/src/store/common/categories-slice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
@@ -8,17 +7,14 @@ const initialState = {
   error: null,
 };
 
-// Tüm (aktif) kategorileri getirme (Mağaza ve Admin Kullanımı için)
 export const fetchAllCategories = createAsyncThunk(
   "categories/fetchAll",
   async (_, { rejectWithValue }) => {
     try {
-      // Backend'de tüm aktif kategorileri listeleyen endpoint'i çağır
-      // Bu endpoint hem admin ürün formu hem de gerekirse başka yerler için kullanılabilir
       const response = await axios.get(
-        `http://localhost:5000/api/common/categories/list` // Backend rotasını kontrol et
+        `http://localhost:5000/api/common/categories/list`
       );
-      return response.data; // { success: true, data: [...] } bekleniyor
+      return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data || { message: "Kategoriler getirilemedi." }
@@ -27,19 +23,15 @@ export const fetchAllCategories = createAsyncThunk(
   }
 );
 
-// --- Admin için CRUD Thunk'ları ---
-
-// Yeni Kategori Ekleme (Admin)
 export const addCategory = createAsyncThunk(
   "categories/add",
   async (categoryData, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `http://localhost:5000/api/admin/categories/add`, // Backend rotasını kontrol et
+        `http://localhost:5000/api/admin/categories/add`,
         categoryData
-        // Gerekirse admin token header'ı ekle
       );
-      return response.data; // { success: true, data: newCategory }
+      return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data || { message: "Kategori eklenemedi." }
@@ -48,15 +40,13 @@ export const addCategory = createAsyncThunk(
   }
 );
 
-// Kategori Güncelleme (Admin)
 export const updateCategory = createAsyncThunk(
   "categories/update",
   async ({ id, categoryData }, { rejectWithValue }) => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/admin/categories/update/${id}`, // Backend rotasını kontrol et
+        `http://localhost:5000/api/admin/categories/update/${id}`,
         categoryData
-        // Gerekirse admin token header'ı ekle
       );
       return response.data; // { success: true, data: updatedCategory }
     } catch (error) {
@@ -67,16 +57,14 @@ export const updateCategory = createAsyncThunk(
   }
 );
 
-// Kategori Silme (Admin)
 export const deleteCategory = createAsyncThunk(
   "categories/delete",
   async (id, { rejectWithValue }) => {
     try {
       const response = await axios.delete(
-        `http://localhost:5000/api/admin/categories/delete/${id}` // Backend rotasını kontrol et
-        // Gerekirse admin token header'ı ekle
+        `http://localhost:5000/api/admin/categories/delete/${id}`
       );
-      return response.data; // { success: true, data: { _id: id } }
+      return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data || { message: "Kategori silinemedi." }
@@ -95,7 +83,6 @@ const categoriesSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // fetchAllCategories
       .addCase(fetchAllCategories.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -112,28 +99,25 @@ const categoriesSlice = createSlice({
       // addCategory
       .addCase(addCategory.fulfilled, (state, action) => {
         if (action.payload?.success && action.payload?.data) {
-          state.categoryList.push(action.payload.data); // Yeni kategoriyi ekle
+          state.categoryList.push(action.payload.data);
         }
-        // Pending/Rejected isteğe bağlı eklenebilir (admin loading için)
       })
       .addCase(addCategory.rejected, (state, action) => {
         state.error = action.payload?.message || "Kategori eklenemedi.";
       })
-      // updateCategory
       .addCase(updateCategory.fulfilled, (state, action) => {
         if (action.payload?.success && action.payload?.data) {
           const index = state.categoryList.findIndex(
             (cat) => cat._id === action.payload.data._id
           );
           if (index !== -1) {
-            state.categoryList[index] = action.payload.data; // Güncellenmiş kategoriyi yerine koy
+            state.categoryList[index] = action.payload.data;
           }
         }
       })
       .addCase(updateCategory.rejected, (state, action) => {
         state.error = action.payload?.message || "Kategori güncellenemedi.";
       })
-      // deleteCategory
       .addCase(deleteCategory.fulfilled, (state, action) => {
         if (action.payload?.success && action.payload?.data?._id) {
           state.categoryList = state.categoryList.filter(

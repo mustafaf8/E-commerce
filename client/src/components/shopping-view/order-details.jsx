@@ -1,9 +1,8 @@
 import { useSelector } from "react-redux";
 import { Badge } from "../ui/badge";
-
+import PropTypes from "prop-types";
 import { Label } from "../ui/label";
 import { Separator } from "../ui/separator";
-// date-fns fonksiyonlarını import et
 import { format, parseISO, isValid } from "date-fns";
 
 function ShoppingOrderDetailsView({ orderDetails }) {
@@ -13,15 +12,12 @@ function ShoppingOrderDetailsView({ orderDetails }) {
     return <div></div>;
   }
 
-  // Güvenli tarih formatlama
   let formattedDate = "N/A";
   if (orderDetails.orderDate) {
-    // orderDate var mı?
     try {
-      const parsedDate = parseISO(orderDetails.orderDate); // ISO string'i parse et
+      const parsedDate = parseISO(orderDetails.orderDate);
       if (isValid(parsedDate)) {
-        // Geçerli bir tarih mi?
-        formattedDate = format(parsedDate, "dd.MM.yyyy HH:mm"); // Formatla
+        formattedDate = format(parsedDate, "dd.MM.yyyy HH:mm");
       }
     } catch (e) {
       console.error("Detayda tarih formatlama hatası:", e);
@@ -39,14 +35,8 @@ function ShoppingOrderDetailsView({ orderDetails }) {
   };
 
   return (
-    // DialogContent wrapper'ı kaldırıldı. Parent component sağlamalı.
     <div className="grid gap-2 pt-2 pl-2 ">
-      {" "}
-      {/* Padding/gap ayarları */}
-      {/* Sipariş Bilgileri */}
       <div className="grid gap-2 text-sm">
-        {" "}
-        {/* text-sm eklendi */}
         <div className="flex items-center justify-between">
           <p className="text-muted-foreground">Sipariş No</p>
           <Label>{orderDetails._id}</Label>
@@ -139,5 +129,30 @@ function ShoppingOrderDetailsView({ orderDetails }) {
     </div>
   );
 }
+ShoppingOrderDetailsView.propTypes = {
+  orderDetails: PropTypes.shape({
+    _id: PropTypes.string,
+    orderDate: PropTypes.string,
+    totalAmount: PropTypes.number,
+    paymentMethod: PropTypes.string,
+    paymentStatus: PropTypes.string,
+    orderStatus: PropTypes.string,
+    cartItems: PropTypes.arrayOf(
+      PropTypes.shape({
+        productId: PropTypes.string,
+        title: PropTypes.string,
+        quantity: PropTypes.number,
+        price: PropTypes.string,
+      })
+    ),
+    addressInfo: PropTypes.shape({
+      address: PropTypes.string,
+      city: PropTypes.string,
+      pincode: PropTypes.string,
+      phone: PropTypes.string,
+      notes: PropTypes.string,
+    }),
+  }),
+};
 
 export default ShoppingOrderDetailsView;

@@ -1,14 +1,14 @@
 import { FileIcon, UploadCloudIcon, XIcon } from "lucide-react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { useEffect, useRef } from "react"; // useEffect kaldırıldı (upload için)
+import { useRef } from "react";
+import PropTypes from "prop-types";
 import { Button } from "../ui/button";
-import { Skeleton } from "../ui/skeleton"; // Skeleton kalabilir (dosya seçimi sonrası için)
 
 function ProductImageUpload({
-  imageFile, // Seçilen dosya (File nesnesi)
-  setImageFile, // Dosyayı parent'a bildiren fonksiyon
-  isEditMode, // Düzenleme modunda mı?
+  imageFile,
+  setImageFile,
+  isEditMode,
   isCustomStyling = false,
   id,
 }) {
@@ -17,8 +17,7 @@ function ProductImageUpload({
   function handleImageFileChange(event) {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
-      // setUploadedImageUrl(""); // URL state'i kaldırıldı
-      setImageFile(selectedFile); // Sadece File nesnesini parent'a bildir
+      setImageFile(selectedFile);
     }
   }
 
@@ -30,43 +29,39 @@ function ProductImageUpload({
     event.preventDefault();
     const droppedFile = event.dataTransfer.files?.[0];
     if (droppedFile) {
-      // setUploadedImageUrl(""); // URL state'i kaldırıldı
-      setImageFile(droppedFile); // Sadece File nesnesini parent'a bildir
+      setImageFile(droppedFile);
     }
   }
 
   function handleRemoveImage() {
-    setImageFile(null); // Parent'taki File state'ini sıfırla
-    // setUploadedImageUrl(""); // URL state'i kaldırıldı
+    setImageFile(null);
     if (inputRef.current) {
-      inputRef.current.value = ""; // Input'u temizle
+      inputRef.current.value = "";
     }
   }
 
   return (
     <div className={`w-full mt-4 ${isCustomStyling ? "" : "max-w-md mx-auto"}`}>
-      <Label className="text-lg font-semibold mb-2 block">Resim Seç</Label>{" "}
-      {/* Başlık değişti */}
+      <Label className="text-lg font-semibold mb-2 block">Resim Seç</Label>
       <div
         onDragOver={handleDragOver}
         onDrop={handleDrop}
         className={`${
-          isEditMode ? "opacity-60 cursor-not-allowed" : "" // Disable stili eklendi
+          isEditMode ? "opacity-60 cursor-not-allowed" : ""
         } border-2 border-dashed rounded-lg p-4`}
       >
         <Input
-          id={id} // ID unique olmalı, gerekirse prop olarak alınabilir
+          id={id}
           type="file"
-          accept="image/*" // Sadece resim dosyaları
+          accept="image/*"
           className="hidden"
           ref={inputRef}
           onChange={handleImageFileChange}
           disabled={isEditMode}
         />
-        {/* Dosya seçiliyken veya seçilmemişken gösterilecekler */}
         {!imageFile ? (
           <Label
-            htmlFor={id} // ID ile eşleşmeli
+            htmlFor={id}
             className={`${
               isEditMode ? "cursor-not-allowed" : "cursor-pointer"
             } flex flex-col items-center justify-center h-32`}
@@ -75,18 +70,13 @@ function ProductImageUpload({
             <span>Sürükleyin veya tıklayarak resim seçin</span>
           </Label>
         ) : (
-          // Dosya seçilmişse göster (Yüklenme durumu artık parent'ta yönetilecek)
           <div className="flex items-center justify-between">
             <div className="flex items-center overflow-hidden mr-2">
-              {" "}
-              {/* Taşan ismi kısaltmak için */}
               <FileIcon className="w-8 h-8 text-primary mr-2 flex-shrink-0" />
               <p
                 className="text-sm font-medium truncate"
                 title={imageFile.name}
               >
-                {" "}
-                {/* truncate ve title */}
                 {imageFile.name}
               </p>
             </div>
@@ -95,7 +85,7 @@ function ProductImageUpload({
               size="icon"
               className="text-muted-foreground hover:text-foreground h-8 w-8 flex-shrink-0" // Boyut ve flex-shrink
               onClick={handleRemoveImage}
-              disabled={isEditMode} // Düzenleme modunda kaldırma
+              disabled={isEditMode}
             >
               <XIcon className="w-4 h-4" />
               <span className="sr-only">Dosyayı Kaldır</span>
@@ -106,5 +96,13 @@ function ProductImageUpload({
     </div>
   );
 }
+
+ProductImageUpload.propTypes = {
+  imageFile: PropTypes.instanceOf(File),
+  setImageFile: PropTypes.func.isRequired,
+  isEditMode: PropTypes.bool,
+  isCustomStyling: PropTypes.bool,
+  id: PropTypes.string.isRequired,
+};
 
 export default ProductImageUpload;

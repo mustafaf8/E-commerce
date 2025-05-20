@@ -1,8 +1,6 @@
 const AboutUs = () => {
   return (
     <div className="bg-white dark:bg-gray-900">
-      {/* Hero Section */}
-
       <div className="bg-gradient-to-r from-blue-700 to-indigo-800 text-white py-12 mb-6">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -17,7 +15,6 @@ const AboutUs = () => {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-12 md:py-16">
-        {/* Vision & Mission */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-20">
           <div className="bg-blue-50 dark:bg-blue-900/30 p-8 rounded-lg border-l-4 border-blue-600">
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">

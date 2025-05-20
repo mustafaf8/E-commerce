@@ -25,11 +25,12 @@ import {
   getOrderDetailsForAdmin,
   resetOrderDetails,
   clearSelectedUserOrders,
-  fetchAllGuestOrdersForAdmin, // <-- Eklendi
+  fetchAllGuestOrdersForAdmin,
 } from "@/store/admin/order-slice";
 import { Badge } from "../ui/badge";
 import { format, parseISO, isValid } from "date-fns";
 import { ArrowLeft, Loader2, Bell, Users } from "lucide-react";
+import PropTypes from "prop-types";
 
 const orderStatusMapping = {
   pending: {
@@ -148,6 +149,18 @@ function UserListTable({ users, onViewOrdersClick, isLoading }) {
 }
 
 function UserOrdersTable({ orders, onViewDetailsClick, isLoading }) {
+  UserOrdersTable.propTypes = {
+    orders: PropTypes.arrayOf(
+      PropTypes.shape({
+        _id: PropTypes.string.isRequired,
+        orderDate: PropTypes.string,
+        orderStatus: PropTypes.string,
+        totalAmount: PropTypes.number,
+      })
+    ).isRequired,
+    onViewDetailsClick: PropTypes.func.isRequired,
+    isLoading: PropTypes.bool.isRequired,
+  };
   const statusMapping = {
     pending: { label: "Beklemede", color: "bg-yellow-400" },
     inProcess: { label: "Hazırlanıyor", color: "bg-orange-500" },
@@ -177,14 +190,6 @@ function UserOrdersTable({ orders, onViewDetailsClick, isLoading }) {
           </TableRow>
         ) : orders && orders.length > 0 ? (
           orders.map((orderItem) => {
-            // const statusInfo =
-            //   statusMapping[orderItem?.orderStatus] || statusMapping.default;
-            // console.log(
-            //   "Order Status:",
-            //   orderItem?.orderStatus,
-            //   "Mapped Info:",
-            //   statusInfo
-            // );
             let formattedDate = "N/A";
             if (
               orderItem?.orderDate &&
@@ -241,8 +246,6 @@ function UserOrdersTable({ orders, onViewDetailsClick, isLoading }) {
 }
 
 function RegisteredUserOrdersTable({ orders, onViewDetailsClick, isLoading }) {
-  // İçerik UserOrdersTable ile aynı olabilir, gerekirse özelleştirin
-  // Bu sadece bir sarmalayıcı component de olabilir veya UserOrdersTable'ı direkt kullanabilirsiniz.
   return (
     <UserOrdersTable
       orders={orders}
@@ -252,13 +255,45 @@ function RegisteredUserOrdersTable({ orders, onViewDetailsClick, isLoading }) {
   );
 }
 
+RegisteredUserOrdersTable.propTypes = {
+  orders: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+      orderDate: PropTypes.string,
+      orderStatus: PropTypes.string,
+      totalAmount: PropTypes.number,
+    })
+  ).isRequired,
+  onViewDetailsClick: PropTypes.func.isRequired,
+  isLoading: PropTypes.bool.isRequired,
+};
+
 function GuestOrdersTable({ orders, onViewDetailsClick, isLoading }) {
+  GuestOrdersTable.propTypes = {
+    orders: PropTypes.arrayOf(
+      PropTypes.shape({
+        _id: PropTypes.string.isRequired,
+        orderDate: PropTypes.string,
+        orderStatus: PropTypes.string,
+        totalAmount: PropTypes.number,
+        guestInfo: PropTypes.shape({
+          fullName: PropTypes.string,
+          email: PropTypes.string,
+        }),
+        addressInfo: PropTypes.shape({
+          fullName: PropTypes.string,
+        }),
+      })
+    ).isRequired,
+    onViewDetailsClick: PropTypes.func.isRequired,
+    isLoading: PropTypes.bool.isRequired,
+  };
   return (
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead>Sipariş No</TableHead>
-          <TableHead>Alıcı (Misafir)</TableHead> {/* Misafir adı/epostası */}
+          <TableHead>Alıcı (Misafir)</TableHead>
           <TableHead>Sipariş Tarihi</TableHead>
           <TableHead>Durum</TableHead>
           <TableHead>Tutar</TableHead>
@@ -347,26 +382,6 @@ function AdminOrdersView() {
     useState(null);
 
   const dispatch = useDispatch();
-  // const {
-  //   userList,
-  //   selectedUserOrders,
-  //   orderDetails,
-  //   isUserListLoading,
-  //   isUserOrdersLoading,
-  //   isDetailsLoading,
-  //   error,
-  // } = useSelector(
-  //   (state) =>
-  //     state.adminOrder || {
-  //       userList: [],
-  //       selectedUserOrders: [],
-  //       orderDetails: null,
-  //       isUserListLoading: false,
-  //       isUserOrdersLoading: false,
-  //       isDetailsLoading: false,
-  //       error: null,
-  //     }
-  // );
   const {
     userList,
     selectedUserOrders,
@@ -375,8 +390,8 @@ function AdminOrdersView() {
     isUserOrdersLoading,
     isDetailsLoading,
     error,
-    guestOrderList, // YENİ state
-    isGuestOrdersLoading, // YENİ state
+    guestOrderList,
+    isGuestOrdersLoading,
   } = useSelector(
     (state) =>
       state.adminOrder || {
@@ -387,14 +402,14 @@ function AdminOrdersView() {
         isUserOrdersLoading: false,
         isDetailsLoading: false,
         error: null,
-        guestOrderList: [], // Varsayılan
-        isGuestOrdersLoading: false, // Varsayılan
+        guestOrderList: [],
+        isGuestOrdersLoading: false,
       }
   );
 
   useEffect(() => {
     dispatch(fetchUsersWithOrders());
-    dispatch(fetchAllGuestOrdersForAdmin()); // Misafir siparişlerini de çek
+    dispatch(fetchAllGuestOrdersForAdmin());
   }, [dispatch]);
 
   useEffect(() => {
@@ -435,8 +450,6 @@ function AdminOrdersView() {
           {error}
         </p>
       )}
-
-      {/* Başlık ve Geri Butonu */}
       {selectedUserId && (
         <div className="flex items-center gap-2 mb-0 px-1">
           <Button
@@ -457,10 +470,7 @@ function AdminOrdersView() {
           </h2>
         </div>
       )}
-
-      {/* Ana İçerik Alanı */}
       {!selectedUserId ? (
-        // Kullanıcı Listesi Gösterimi
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -469,7 +479,7 @@ function AdminOrdersView() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <UserListTable // Bu tablo artık "Misafir Siparişleri" satırını da içerecek (backend'den gelirse)
+            <UserListTable
               users={userList}
               onViewOrdersClick={handleViewUserOrders}
               isLoading={isUserListLoading}
@@ -491,11 +501,10 @@ function AdminOrdersView() {
           </CardContent>
         </Card>
       ) : (
-        // Seçili Kayıtlı Kullanıcının Siparişleri Gösterimi
         <Card>
           <CardHeader>{/* Başlık yukarıda zaten var */}</CardHeader>
           <CardContent>
-            <RegisteredUserOrdersTable // Veya direkt UserOrdersTable
+            <RegisteredUserOrdersTable
               orders={selectedUserOrders}
               onViewDetailsClick={handleViewOrderDetails}
               isLoading={isUserOrdersLoading}
@@ -503,8 +512,6 @@ function AdminOrdersView() {
           </CardContent>
         </Card>
       )}
-
-      {/* Sipariş Detay Dialog'u (Aynı kalabilir) */}
       <Dialog
         open={!!selectedOrderIdForDetails}
         onOpenChange={(isOpen) => !isOpen && handleDetailsDialogClose()}
@@ -538,5 +545,20 @@ function AdminOrdersView() {
     </div>
   );
 }
+UserListTable.propTypes = {
+  users: PropTypes.arrayOf(
+    PropTypes.shape({
+      userId: PropTypes.string.isRequired,
+      userName: PropTypes.string,
+      email: PropTypes.string,
+      phoneNumber: PropTypes.string,
+      orderCount: PropTypes.number,
+      lastOrderDate: PropTypes.string,
+      hasNewOrder: PropTypes.bool,
+    })
+  ),
+  onViewOrdersClick: PropTypes.func.isRequired,
+  isLoading: PropTypes.bool.isRequired,
+};
 
 export default AdminOrdersView;

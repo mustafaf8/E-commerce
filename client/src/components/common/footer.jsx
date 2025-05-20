@@ -1,20 +1,19 @@
-import { Link } from "react-router-dom"; // İç linkler için
+import { Link } from "react-router-dom";
 import {
   Instagram,
   Facebook,
-  MessageSquare, // WhatsApp/Destek ikonu
-  ArrowUpCircle, // Başa dön ikonu
+  MessageSquare,
+  ArrowUpCircle,
 } from "lucide-react";
 
 const Footer = () => {
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: "smooth", // Yumuşak kaydırma efekti
+      behavior: "smooth",
     });
   };
 
-  // Örnek Ödeme Logoları (Gerçek resim URL'leri veya importlar ile değiştirin)
   const paymentLogos = [
     { name: "Bonus", url: "/placeholder-logo.png" },
     { name: "Maximum", url: "/placeholder-logo.png" },
@@ -28,7 +27,6 @@ const Footer = () => {
     { name: "Troy", url: "/placeholder-logo.png" },
   ];
 
-  // Örnek Uygulama Mağazası Rozetleri
   const appBadges = [
     { store: "Google Play", url: "/placeholder-googleplay.png", link: "#" },
   ];
@@ -36,9 +34,7 @@ const Footer = () => {
   return (
     <footer className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 pt-10 pb-4 max-[1024px]:pb-16">
       <div className="container mx-auto px-4">
-        {/* Üst Kısım: Linkler, Sosyal Medya, Uygulamalar, Müşteri Hizmetleri */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-8">
-          {/* Kurumsal */}
           <div>
             <h5 className="font-semibold text-gray-800 dark:text-white mb-3">
               Şirketimiz
@@ -79,8 +75,6 @@ const Footer = () => {
               </li>
             </ul>
           </div>
-
-          {/* Deposun (Örnek, kendi linklerinizle değiştirin) */}
           <div>
             <h5 className="font-semibold text-gray-800 dark:text-white mb-3">
               Deposun
@@ -102,8 +96,6 @@ const Footer = () => {
                   Hesabım
                 </Link>
               </li>
-
-              {/* ... diğer linkler */}
               <li>
                 <Link
                   to="/shop/islem-rehberi"
@@ -114,8 +106,6 @@ const Footer = () => {
               </li>
             </ul>
           </div>
-
-          {/* Bizi Takip Edin */}
           <div>
             <h5 className="font-semibold text-gray-800 dark:text-white mb-3">
               Bizi Takip Edin
@@ -131,8 +121,6 @@ const Footer = () => {
                   <Instagram size={16} className="mr-2" /> Instagram
                 </a>
               </li>
-
-              {/* TikTok ikonu için SVG */}
               <li>
                 <a
                   href="https://www.facebook.com/rmr.enerji/?locale=tr_TR"
@@ -160,7 +148,6 @@ const Footer = () => {
                   rel="noopener noreferrer"
                   className="block"
                 >
-                  {/* Gerçek resimleri kullanın */}
                   <img
                     src={badge.url}
                     alt={`${badge.store}'dan İndirin`}

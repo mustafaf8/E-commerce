@@ -1,11 +1,7 @@
 const Feature = require("../../models/Feature");
 
-// Fonksiyonu güncelle: title ve link'i de al
 const addFeatureImage = async (req, res) => {
-  // !!! Admin Yetki Kontrolü Eklenmeli !!!
-  // if (req.user?.role !== 'admin') { ... }
   try {
-    // body'den image, title ve link'i al
     const { image, title, link } = req.body;
 
     if (!image) {
@@ -13,26 +9,22 @@ const addFeatureImage = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Resim URL'si gerekli." });
     }
-
-    console.log("Gelen Feature Data:", { image, title, link }); // Gelen veriyi logla
-
-    // Yeni Feature nesnesini oluştururken title ve link'i de ekle
+    console.log("Gelen Feature Data:", { image, title, link });
     const newFeatureImage = new Feature({
       image,
-      title, // Eklendi
-      link, // Eklendi
+      title,
+      link,
     });
 
-    await newFeatureImage.save(); // Veritabanına kaydet
+    await newFeatureImage.save();
 
-    // Başarılı yanıtı yeni oluşturulan veriyle döndür
     res.status(201).json({
       success: true,
-      message: "Banner başarıyla eklendi.", // Mesaj güncellendi
+      message: "Banner başarıyla eklendi.",
       data: newFeatureImage,
     });
   } catch (e) {
-    console.error("Banner eklenirken hata:", e); // Hata logu güncellendi
+    console.error("Banner eklenirken hata:", e);
     if (e.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -40,11 +32,10 @@ const addFeatureImage = async (req, res) => {
         errors: e.errors,
       });
     }
-    res.status(500).json({ success: false, message: "Sunucu hatası oluştu!" }); // Mesaj güncellendi
+    res.status(500).json({ success: false, message: "Sunucu hatası oluştu!" });
   }
 };
 
-// Bu fonksiyon genellikle değişmez
 const getFeatureImages = async (req, res) => {
   try {
     const images = await Feature.find({}).sort({ createdAt: -1 });
@@ -55,9 +46,7 @@ const getFeatureImages = async (req, res) => {
   }
 };
 
-// Bu fonksiyon da genellikle değişmez
 const deleteFeatureImage = async (req, res) => {
-  // !!! Admin Yetki Kontrolü Eklenmeli !!!
   try {
     const { imageId } = req.params;
     if (!imageId) {

@@ -1,5 +1,4 @@
-// client/src/pages/admin-view/brands.jsx
-import BrandManager from "@/components/admin-view/BrandManager"; // Birazdan oluşturacağız
+import BrandManager from "@/components/admin-view/BrandManager";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 function AdminBrands() {

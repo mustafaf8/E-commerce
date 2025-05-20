@@ -10,6 +10,7 @@ import {
 import { Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
+import PropTypes from "prop-types";
 
 const adminSidebarMenuItems = [
   {
@@ -30,28 +31,26 @@ const adminSidebarMenuItems = [
     path: "/admin/orders",
     icon: <BadgeCheck />,
   },
-  // --- YENİ MENÜ ÖĞESİ ---
   {
-    id: "brands", // Benzersiz bir id
-    label: "Markalar", // Menüde görünecek isim
-    path: "/admin/brands", // Gideceği yol (route)
-    icon: <Tags size={20} />, // İkonu ayarla
+    id: "brands",
+    label: "Markalar",
+    path: "/admin/brands",
+    icon: <Tags size={20} />,
   },
-  // --- KATEGORİ YÖNETİMİ (Eğer eklenmediyse bunu da ekle) ---
+
   {
     id: "categories",
     label: "Kategoriler",
     path: "/admin/categories",
-    icon: <LayoutGrid size={20} />, // Örneğin LayoutGrid ikonu
+    icon: <LayoutGrid size={20} />,
   },
-  // --- ANA SAYFA BÖLÜMLERİ (Eğer eklenmediyse bunu da ekle) ---
+
   {
     id: "home-sections",
     label: "AnaSayfa Yönetimi",
     path: "/admin/home-sections",
-    icon: <Home size={20} />, // Örneğin Home ikonu
+    icon: <Home size={20} />,
   },
-  // --- ---
 ];
 
 function MenuItems({ setOpen }) {
@@ -77,8 +76,6 @@ function MenuItems({ setOpen }) {
 }
 
 function AdminSideBar({ open, setOpen }) {
-  const navigate = useNavigate();
-
   return (
     <Fragment>
       <Sheet open={open} onOpenChange={setOpen}>
@@ -97,5 +94,12 @@ function AdminSideBar({ open, setOpen }) {
     </Fragment>
   );
 }
+AdminSideBar.propTypes = {
+  open: PropTypes.bool.isRequired,
+  setOpen: PropTypes.func.isRequired,
+};
+MenuItems.propTypes = {
+  setOpen: PropTypes.func.isRequired,
+};
 
 export default AdminSideBar;

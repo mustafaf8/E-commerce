@@ -1,11 +1,10 @@
-// server/routes/common/category-routes.js
 const express = require("express");
 const {
   getActiveCategories,
-} = require("../../controllers/common/category-controller"); // Birazdan oluşturacağız
+} = require("../../controllers/common/category-controller");
 
 const router = express.Router();
 
-router.get("/list", getActiveCategories); // Aktif kategorileri listele
+router.get("/list", getActiveCategories);
 
 module.exports = router;
