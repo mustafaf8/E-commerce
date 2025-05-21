@@ -57,12 +57,23 @@ function ProductFilter({
                             key={option.id}
                             className="flex font-normal items-center gap-2 cursor-pointer hover:text-primary transition-colors"
                           >
-                            <Checkbox
+                            {/* <Checkbox
                               id={`${section.id}-${option.id}`}
                               checked={
                                 filters &&
                                 filters[section.id] &&
                                 filters[section.id].includes(option.id)
+                              }
+                              onCheckedChange={() =>
+                                handleFilter(section.id, option.id)
+                              }
+                            /> */}
+                            <Checkbox
+                              id={`${section.id}-${option.id}`}
+                              checked={
+                                // Eğer filters[section.id] tanımsızsa, boş bir diziymiş gibi davranarak .includes() hatasını önler
+                                // ve sonuç her zaman true/false olur.
+                                (filters[section.id] || []).includes(option.id)
                               }
                               onCheckedChange={() =>
                                 handleFilter(section.id, option.id)

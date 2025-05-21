@@ -535,15 +535,13 @@ function AuthLogin() {
         <CardTitle className="text-xl font-bold">
           E-posta ile Giriş Yap
         </CardTitle>
-        <CardDescription>
-          <p className="p-2">veya</p>
-          <button
-            className="font-medium text-primary hover:underline"
-            onClick={() => setStep("select")}
-          >
-            başka bir yöntem seç
-          </button>
-        </CardDescription>
+        <CardDescription>veya</CardDescription>
+        <button
+          className="font-medium text-primary hover:underline"
+          onClick={() => setStep("select")}
+        >
+          başka bir yöntem seç
+        </button>
       </CardHeader>
       <CardContent>
         <CommonForm
@@ -552,7 +550,7 @@ function AuthLogin() {
           formData={emailPasswordFormData}
           setFormData={setEmailPasswordFormData}
           onSubmit={handleEmailPasswordLogin}
-          isBtnDisabled={emailLoading || loading} // Genel yükleme durumu da kontrol edilebilir
+          isBtnDisabled={emailLoading || loading}
         />
       </CardContent>
       <CardFooter className="text-xs text-center text-muted-foreground justify-center">

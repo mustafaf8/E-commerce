@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { addReview, getReviews } from "@/store/shop/review-slice";
 import { addToWishlist, removeFromWishlist } from "@/store/shop/wishlist-slice";
 import PropTypes from "prop-types";
+import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const [reviewMsg, setReviewMsg] = useState("");
@@ -73,16 +74,64 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
     setRating(getRating);
   }
 
-  function handleAddToCart(getCurrentProductId, getTotalStock) {
-    if (!isAuthenticated) {
-      toast({
-        title: "Lütfen giriş yapın",
-        description: "Sepete ürün eklemek için giriş yapmanız gerekmektedir.",
-        variant: "destructive",
+  function handleAddToCart(
+    getCurrentProductId,
+    getTotalStock,
+    currentProductDetails
+  ) {
+    // if (!isAuthenticated) {
+    //   toast({
+    //     title: "Lütfen giriş yapın",
+    //     description: "Sepete ürün eklemek için giriş yapmanız gerekmektedir.",
+    //     variant: "destructive",
+    //   });
+    //   navigate("/auth/login", { state: { from: location } });
+    //   return;
+    // }
+    const productDetailsForCart = {
+      price: currentProductDetails.price,
+      salePrice: currentProductDetails.salePrice,
+      title: currentProductDetails.title,
+      image: currentProductDetails.image,
+      totalStock: currentProductDetails.totalStock,
+    };
+
+    dispatch(
+      addToCart({
+        productId: getCurrentProductId,
+        quantity: 1,
+        productDetails: productDetailsForCart, // Hem misafir hem de giriş yapmış kullanıcı için gönderilebilir, thunk içinden yönetilir.
+      })
+    )
+      .unwrap() // unwrap() ile Redux Thunk'ın sonucunu (resolved veya rejected) yakala
+      .then((payload) => {
+        if (payload?.success) {
+          toast({
+            title: "Ürün sepete eklendi",
+            variant: "success",
+          });
+          // fetchCartItems çağrısına gerek yok, addToCart thunk'ı state'i güncelliyor.
+        } else {
+          // Stok hatası gibi özel durumlar için thunk'tan dönen mesajı kullan
+          toast({
+            variant: "destructive",
+            title: payload?.message || "Sepete eklenemedi",
+            description: payload?.isStockError
+              ? `En fazla ${payload.availableStock} adet eklenebilir.`
+              : undefined,
+          });
+        }
+      })
+      .catch((error) => {
+        // unwrap ile reject edilen durumlar buraya düşer
+        toast({
+          variant: "destructive",
+          title: error?.message || "Sepete ekleme sırasında bir hata oluştu.",
+          description: error?.isStockError
+            ? `En fazla ${error.availableStock} adet eklenebilir.`
+            : undefined,
+        });
       });
-      navigate("/auth/login", { state: { from: location } });
-      return;
-    }
 
     let getCartItems = cartItems.items || [];
     if (getCartItems.length) {
@@ -200,9 +249,12 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
         <div className="flex flex-col ">
           <div className="flex-shrink-0 pb-4 mb-4 border-b">
             <div className="flex justify-between items-start mb-2">
-              <h1 className="text-xl sm:text-2xl font-bold pr-2 text-gray-900">
-                {productDetails.title}
-              </h1>
+              <DialogTitle>
+                <p className="text-xl sm:text-2xl font-bold pr-2 text-gray-900">
+                  {productDetails.title}
+                </p>
+              </DialogTitle>
+
               <Button
                 variant="ghost"
                 size="icon"
@@ -296,7 +348,8 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                   onClick={() =>
                     handleAddToCart(
                       productDetails._id,
-                      productDetails.totalStock
+                      productDetails.totalStock,
+                      productDetails
                     )
                   }
                 >

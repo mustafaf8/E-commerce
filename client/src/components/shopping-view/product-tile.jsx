@@ -12,12 +12,10 @@ import PropTypes from "prop-types"; // PropTypes kütüphanesini import edin
 function ShoppingProductTile({ product, handleGetProductDetails }) {
   const dispatch = useDispatch();
   const { toast } = useToast();
-
   const { wishlistItems, isLoading: wishlistLoading } = useSelector(
     (state) => state.shopWishlist
   );
   const { user, isAuthenticated } = useSelector((state) => state.auth);
-
   const isWishlisted = product?._id && wishlistItems.includes(product._id);
 
   const handleWishlistToggle = (event) => {
@@ -57,8 +55,6 @@ function ShoppingProductTile({ product, handleGetProductDetails }) {
 
   const handleActualAddToCart = () => {
     if (!product || !product._id) return;
-
-    // Misafir kullanıcı için ürün detaylarını da gönderiyoruz
     const productDetailsForCart = {
       price: product.price,
       salePrice: product.salePrice,
@@ -78,12 +74,6 @@ function ShoppingProductTile({ product, handleGetProductDetails }) {
       .then((payload) => {
         if (payload.success) {
           toast({ title: "Ürün sepete eklendi", variant: "success" });
-          // Giriş yapmış kullanıcı için backend sepetini tekrar çekmeye gerek yok, slice zaten güncelliyor.
-          // Misafir için de slice güncelliyor.
-          if (isAuthenticated && user?.id && !payload.fromLocalStorage) {
-            // Eğer API'den geldiyse ve kullanıcı giriş yapmışsa, slice zaten backend'den dönen sepeti state'e yazar.
-            // Tekrar fetchCartItems'a gerek yok.
-          }
         } else {
           toast({
             variant: "destructive",

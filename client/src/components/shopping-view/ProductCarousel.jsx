@@ -135,14 +135,15 @@ function ProductCarousel({
           <Button
             size="icon"
             className={cn(
-              /* ... */ !internalLoading && canScrollLeft
+              "absolute left-0 top-1/2 -translate-y-1/2 z-10 rounded-full shadow-lg bg-white/60 hover:bg-white h-8 w-8 transition-opacity duration-300",
+              !internalLoading && canScrollLeft
                 ? "opacity-100"
                 : "opacity-0 pointer-events-none"
             )}
             onClick={() => scroll("left")}
             disabled={!canScrollLeft || internalLoading}
           >
-            <ChevronLeftIcon className="w-5 h-5 text-gray-700" />
+            <ChevronLeftIcon className="w-5 h-5 text-black" />
           </Button>
 
           <div
@@ -188,14 +189,15 @@ function ProductCarousel({
           <Button
             size="icon"
             className={cn(
-              /* ... */ !internalLoading && canScrollRight
+              "absolute right-0 top-1/2 -translate-y-1/2 z-10 rounded-full shadow-lg bg-white/60 hover:bg-white h-8 w-8 transition-opacity duration-300",
+              !internalLoading && canScrollRight
                 ? "opacity-100"
                 : "opacity-0 pointer-events-none"
             )}
             onClick={() => scroll("right")}
             disabled={!canScrollRight || internalLoading}
           >
-            <ChevronRightIcon className="w-5 h-5 text-gray-700" />
+            <ChevronRightIcon className="w-5 h-5 text-black" />
           </Button>
         </div>
       </div>

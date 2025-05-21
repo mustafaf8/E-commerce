@@ -77,21 +77,19 @@ function MenuItems({ setOpen }) {
 
 function AdminSideBar({ open, setOpen }) {
   return (
-    <Fragment>
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="left" className="w-72">
-          <div className="flex flex-col h-full">
-            <SheetHeader className="border-b">
-              <SheetTitle className="flex gap-2 mt-5 mb-5">
-                <ChartNoAxesCombined size={30} />
-                <h1 className="text-2xl font-extrabold">Admin Paneli</h1>
-              </SheetTitle>
-            </SheetHeader>
-            <MenuItems setOpen={setOpen} />
-          </div>
-        </SheetContent>
-      </Sheet>
-    </Fragment>
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetContent side="left" className="w-72">
+        <div className="flex flex-col h-full">
+          <SheetHeader className="border-b">
+            <SheetTitle className="flex text-2xl font-extrabold gap-2 mt-5 mb-5">
+              <ChartNoAxesCombined size={30} />
+              Admin Paneli
+            </SheetTitle>
+          </SheetHeader>
+          <MenuItems setOpen={setOpen} />
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }
 AdminSideBar.propTypes = {

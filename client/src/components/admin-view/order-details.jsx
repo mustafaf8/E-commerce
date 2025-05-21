@@ -60,7 +60,7 @@ function AdminOrderDetailsView({ orderDetails }) {
     : orderDetails?.userId?.email;
 
   return (
-    <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+    <div className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
       <div className="grid gap-6 ">
         <div className="grid gap-2 text-sm">
           <div className="flex items-center justify-between">
@@ -207,7 +207,7 @@ function AdminOrderDetailsView({ orderDetails }) {
           />
         </div>
       </div>
-    </DialogContent>
+    </div>
   );
 }
 AdminOrderDetailsView.propTypes = {
