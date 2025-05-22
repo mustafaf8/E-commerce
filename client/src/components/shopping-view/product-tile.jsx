@@ -2,12 +2,13 @@ import { Card, CardContent, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import StarRatingComponent from "../common/star-rating";
-import { Heart } from "lucide-react";
+import { Heart, ShoppingCart } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToWishlist, removeFromWishlist } from "@/store/shop/wishlist-slice";
 import { addToCart } from "@/store/shop/cart-slice";
 import { useToast } from "../ui/use-toast";
-import PropTypes from "prop-types"; // PropTypes kütüphanesini import edin
+import PropTypes from "prop-types";
+import { cn } from "@/lib/utils";
 
 function ShoppingProductTile({ product, handleGetProductDetails }) {
   const dispatch = useDispatch();
@@ -67,10 +68,10 @@ function ShoppingProductTile({ product, handleGetProductDetails }) {
       addToCart({
         productId: product._id,
         quantity: 1,
-        productDetails: productDetailsForCart, // Ürün detaylarını yolla
+        productDetails: productDetailsForCart,
       })
     )
-      .unwrap() // unwrap() ile promise sonucunu yakala
+      .unwrap()
       .then((payload) => {
         if (payload.success) {
           toast({ title: "Ürün sepete eklendi", variant: "success" });
@@ -82,8 +83,6 @@ function ShoppingProductTile({ product, handleGetProductDetails }) {
         }
       })
       .catch((error) => {
-        // Hata genellikle unwrap ile yakalanır ve payload'a message olarak gelir.
-        // Network hatası gibi durumlarda error.message kullanılabilir.
         toast({
           variant: "destructive",
           title: error.message || "Sepete ekleme sırasında bir hata oluştu.",
@@ -92,148 +91,148 @@ function ShoppingProductTile({ product, handleGetProductDetails }) {
   };
 
   return (
-    <Card className="w-[100%] max-w-sm mx-auto relative group flex flex-col h-full overflow-hidden">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute top-2 right-2 z-10 h-8 w-8 rounded-full bg-white/70 hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity"
-        onClick={handleWishlistToggle}
-        disabled={wishlistLoading}
-      >
-        <Heart
-          className={`w-5 h-5 ${
-            isWishlisted ? "fill-red-500 text-red-500" : "text-gray-500"
-          }`}
-        />
-        <span className="sr-only">
-          {isWishlisted ? "Favorilerden Çıkar" : "Favorilere Ekle"}
-        </span>
-      </Button>
-
-      <div
-        onClick={() => handleGetProductDetails(product?._id)}
-        className="flex flex-col flex-grow cursor-pointer"
-      >
-        <div className="relative">
-          <img
-            src={product?.image}
-            alt={product?.title}
-            className="w-full h-[230px] sm:h-[230px] object-contain rounded-t-lg p-0 min-[1024px]:p-3"
+    <Card className="shop-product-card h-full hover:shadow-md">
+      <div className="relative">
+        {/* Wishlist button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-2 right-2 z-10 h-7 w-7 rounded-full bg-white/70 hover:bg-white shadow-sm"
+          onClick={handleWishlistToggle}
+          disabled={wishlistLoading}
+        >
+          <Heart
+            className={cn(
+              "w-4 h-4", 
+              isWishlisted ? "fill-red-500 text-red-500" : "text-gray-500"
+            )}
           />
-          {product?.totalStock === 0 ? (
-            <Badge variant="destructive" className="absolute top-2 left-2">
-              Stokta Yok
-            </Badge>
-          ) : product?.totalStock < 10 ? (
-            <Badge variant="destructive" className="absolute top-2 left-2">
-              {`Sadece ${product?.totalStock} ürün kaldı`}
-            </Badge>
-          ) : product?.salePrice < product.price ? (
-            <Badge variant="destructive" className="absolute top-2 left-2">
-              İndirim
-            </Badge>
-          ) : null}
-        </div>
+          <span className="sr-only">
+            {isWishlisted ? "Favorilerden Çıkar" : "Favorilere Ekle"}
+          </span>
+        </Button>
 
-        <CardContent className="px-4 pt-0 pb-0 flex flex-col flex-grow">
-          <h2
-            className="text-md font-semibold mb-1 truncate"
-            title={product?.title}
-          >
-            {product?.title}
-          </h2>
-          {product?.averageReview !== undefined && (
-            <div className="flex items-center mb-1 pointer-events-none">
-              <StarRatingComponent rating={product.averageReview} />
-              <span className="ml-1 text-xs text-muted-foreground font-semibold">
-                ({product.averageReview.toFixed(1)})
-              </span>
+        {/* Product image with badges */}
+        <div
+          onClick={() => handleGetProductDetails(product?._id)}
+          className="cursor-pointer"
+        >
+          <div className="relative overflow-hidden">
+            <div className="flex items-center justify-center bg-secondary/20 p-2">
+              <img
+                src={product?.image}
+                alt={product?.title}
+                className="w-full h-[140px] sm:h-[160px] md:h-[180px] object-contain transition-transform hover:scale-105 duration-300 p-2"
+                loading="lazy"
+              />
             </div>
-          )}
-          <div className="py-2">
-            {product?.salePrice !== undefined && product.salePrice !== null ? (
-              <div
-                className={`flex flex-col items-baseline ${
-                  product?.price &&
-                  product.price > 0 &&
-                  product.price > product.salePrice
-                    ? "justify-between"
-                    : "justify-start"
-                } gap-x-2`}
-              >
-                {product?.price &&
-                  product.price > 0 &&
-                  product.price > product.salePrice && (
-                    <p className="line-through text-sm text-gray-400 font-medium">
-                      {`${product.price.toFixed(2)} TL`}
-                    </p>
-                  )}
+            
+            {/* Product badges */}
+            {product?.totalStock === 0 && (
+              <Badge variant="destructive" className="absolute top-2 left-2 bg-red-500">
+                Stokta Yok
+              </Badge>
+            )}
+            
+            {product?.totalStock > 0 && product?.totalStock < 10 && (
+              <Badge variant="outline" className="absolute top-2 left-2 bg-amber-500 text-white border-0">
+                Son {product?.totalStock} ürün
+              </Badge>
+            )}
+            
+            {product?.salePrice && product.salePrice < product.price && (
+             
+                <Badge className="absolute top-2 left-2 py-0.5 px-2 bg-[hsl(var(--shop-discount))]">
+                  İndirim
+                </Badge>
+           
+            )}
+          </div>
 
-                <p
-                  className={`font-semibold ${
-                    product?.price &&
-                    product.price > 0 &&
-                    product.price > product.salePrice
-                      ? "text-lg text-green-600"
-                      : "text-lg text-black"
-                  }`}
-                >
-                  {`${product.salePrice.toFixed(2)} TL`}
-                </p>
-              </div>
-            ) : product?.price && product.price > 0 ? (
-              <div className="flex justify-start">
-                <p className="text-lg font-semibold text-black">
-                  {`${product.price.toFixed(2)} TL`}
-                </p>
-              </div>
-            ) : (
-              <div className="flex justify-start">
-                <span className="text-sm text-muted-foreground">
-                  Fiyat Bilgisi Yok
+          {/* Product details */}
+          <CardContent className="p-3 space-y-1.5">
+            <h2
+              className="text-sm font-medium line-clamp-1"
+              title={product?.title}
+            >
+              {product?.title}
+            </h2>
+            
+            {/* Ratings */}
+            {product?.averageReview !== undefined && (
+              <div className="flex items-center space-x-1 pointer-events-none">
+                <StarRatingComponent 
+                  rating={product.averageReview} 
+                  className="scale-90 origin-left"
+                />
+                <span className="text-xs text-muted-foreground">
+                  ({product.averageReview.toFixed(1)})
                 </span>
               </div>
             )}
-          </div>
-        </CardContent>
+            
+            {/* Price */}
+            <div className="pt-1">
+              {product?.salePrice !== undefined && product.salePrice !== null ? (
+                <div className="flex items-baseline gap-2">
+                  {product?.price &&
+                    product.price > 0 &&
+                    product.price > product.salePrice && (
+                      <span className="line-through text-xs text-gray-400">
+                        {`${product.price.toFixed(2)} TL`}
+                      </span>
+                    )}
+                  <span className={cn(
+                    "font-medium text-base",
+                    product?.price &&
+                    product.price > 0 &&
+                    product.price > product.salePrice
+                      ? "text-[hsl(var(--shop-discount))]"
+                      : "text-primary"
+                  )}>
+                    {`${product.salePrice.toFixed(2)} TL`}
+                  </span>
+                </div>
+              ) : product?.price && product.price > 0 ? (
+                <span className="font-medium text-base text-primary">
+                  {`${product.price.toFixed(2)} TL`}
+                </span>
+              ) : (
+                <span className="text-xs text-muted-foreground">
+                  Fiyat Bilgisi Yok
+                </span>
+              )}
+            </div>
+          </CardContent>
+        </div>
       </div>
 
-      <CardFooter className="p-4 pt-0">
-        {product?.totalStock === 0 ? (
-          <Button
-            variant="outline"
-            className="w-full opacity-60 cursor-not-allowed"
-          >
-            Stokta Yok
-          </Button>
-        ) : (
-          <Button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleActualAddToCart();
-            }}
-            className="w-full"
-          >
-            Sepete Ekle
-          </Button>
-        )}
+      {/* Action buttons */}
+      <CardFooter className="p-3 pt-0">
+        <Button
+          onClick={handleActualAddToCart}
+          disabled={!product?.totalStock || product.totalStock <= 0}
+          className="w-full bg-primary/90 hover:bg-primary text-white transition-colors flex items-center gap-1.5 h-9"
+        >
+          <ShoppingCart className="h-4 w-4" />
+          <span className="text-sm">Sepete Ekle</span>
+        </Button>
       </CardFooter>
     </Card>
   );
 }
 
-// PropTypes tanımlaması
 ShoppingProductTile.propTypes = {
   product: PropTypes.shape({
     _id: PropTypes.string,
-    title: PropTypes.string,
     image: PropTypes.string,
-    totalStock: PropTypes.number,
-    averageReview: PropTypes.number,
+    title: PropTypes.string,
     price: PropTypes.number,
     salePrice: PropTypes.number,
+    totalStock: PropTypes.number,
+    averageReview: PropTypes.number,
   }),
-  handleGetProductDetails: PropTypes.func,
-  handleAddtoCart: PropTypes.func,
+  handleGetProductDetails: PropTypes.func.isRequired,
 };
+
 export default ShoppingProductTile;

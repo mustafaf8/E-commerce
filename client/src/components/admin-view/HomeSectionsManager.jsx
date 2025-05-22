@@ -7,6 +7,7 @@ import {
   deleteHomeSection,
 } from "@/store/common-slice/home-sections-slice";
 import { fetchAllCategories } from "@/store/common-slice/categories-slice";
+import { fetchAllBrands } from "@/store/common-slice/brands-slice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -70,6 +71,9 @@ function HomeSectionsManager() {
   const { categoryList = [], isLoading: categoriesLoading } = useSelector(
     (state) => state.categories || { categoryList: [], isLoading: false }
   );
+  const { brandList = [], isLoading: brandsLoading } = useSelector(
+    (state) => state.brands || { brandList: [], isLoading: false }
+  );
 
   const { toast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -82,6 +86,7 @@ function HomeSectionsManager() {
   useEffect(() => {
     dispatch(fetchAllHomeSections());
     dispatch(fetchAllCategories());
+    dispatch(fetchAllBrands());
   }, [dispatch]);
 
   useEffect(() => {
@@ -195,7 +200,10 @@ function HomeSectionsManager() {
         .unwrap()
         .then((payload) => {
           if (payload.success) {
-            toast({ variant: "success", title: "Bölüm silindi." });
+            toast({
+              variant: "success",
+              title: "Bölüm başarıyla silindi.",
+            });
             dispatch(fetchAllHomeSections());
           } else {
             toast({
@@ -205,56 +213,76 @@ function HomeSectionsManager() {
           }
         })
         .catch((err) => {
-          console.error("Bölüm silme hatası:", err);
+          console.error("Silme hatası:", err);
           toast({
             variant: "destructive",
             title: err.message || "Bir hata oluştu.",
           });
-        })
-        .finally(() => {
-          setSectionToDelete(null);
-          setIsConfirmModalOpen(false);
         });
     }
+    setIsConfirmModalOpen(false);
+    setSectionToDelete(null);
   };
 
-  const moveSection = async (index, direction) => {
-    if (
-      (direction === -1 && index === 0) ||
-      (direction === 1 && index === sortedSections.length - 1)
-    ) {
-      return;
-    }
+  const moveSection = (index, direction) => {
+    const newSections = [...sortedSections];
+    const temp = newSections[index];
+    newSections[index] = newSections[index + direction];
+    newSections[index + direction] = temp;
 
-    const newSortedSections = [...sortedSections];
-    const [movedSection] = newSortedSections.splice(index, 1);
-    newSortedSections.splice(index + direction, 0, movedSection);
-    const updatedSectionsWithOrder = newSortedSections.map((section, i) => ({
+    // Update display orders
+    const updatedSections = newSections.map((section, idx) => ({
       ...section,
-      displayOrder: i,
+      displayOrder: idx,
     }));
 
-    setSortedSections(updatedSectionsWithOrder);
-    const orderedIds = updatedSectionsWithOrder.map((s) => s._id);
-    try {
-      await dispatch(updateHomeSectionsOrder(orderedIds)).unwrap();
-      toast({ variant: "success", title: "Sıralama güncellendi." });
-      // Backend başarılı yanıt dönerse Redux state'i zaten güncellenecek (thunk'ın fulfilled case'i)
-      // Eğer backend sadece success dönerse, listeyi tekrar çekmek gerekebilir:
-      // dispatch(fetchAllHomeSections());
-    } catch {
-      toast({ variant: "destructive", title: "Sıralama güncellenemedi." });
-      setSortedSections(
-        [...homeSections].sort((a, b) => a.displayOrder - b.displayOrder)
-      );
+    setSortedSections(updatedSections);
+
+    // Send updates to backend
+    dispatch(
+      updateHomeSectionsOrder({
+        sectionIds: updatedSections.map((s) => s._id),
+      })
+    )
+      .unwrap()
+      .then((payload) => {
+        if (payload.success) {
+          dispatch(fetchAllHomeSections());
+        } else {
+          toast({
+            variant: "destructive",
+            title: payload.message || "Sıralama güncellenemedi.",
+          });
+        }
+      })
+      .catch((err) => {
+        console.error("Sıralama hatası:", err);
+        toast({
+          variant: "destructive",
+          title: err.message || "Bir hata oluştu.",
+        });
+      });
+  };
+
+  // Find the name of a brand or category based on its slug
+  const getContentValueName = (section) => {
+    if (section.contentType === "CATEGORY") {
+      const category = categoryList.find((c) => c.slug === section.contentValue);
+      return category?.name || section.contentValue;
+    } else if (section.contentType === "BRAND") {
+      const brand = brandList.find((b) => b.slug === section.contentValue);
+      return brand?.name || section.contentValue;
     }
+    return section.contentValue || "-";
   };
 
   return (
-    <div>
-      <div className="flex justify-end mb-4">
-        <Button onClick={openModalForAdd}>
-          <PlusCircle className="mr-2 h-4 w-4" /> Yeni Bölüm Ekle
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h1 className="text-lg font-semibold">Ana Sayfa Bölümleri</h1>
+        <Button onClick={openModalForAdd} className="flex items-center">
+          <PlusCircle className="h-4 w-4 mr-2" />
+          Bölüm Ekle
         </Button>
       </div>
 
@@ -317,29 +345,26 @@ function HomeSectionsManager() {
                   className="truncate max-w-[150px]"
                   title={section.contentValue}
                 >
-                  {section.contentType === "CATEGORY"
-                    ? categoryList.find((c) => c.slug === section.contentValue)
-                        ?.name || section.contentValue
-                    : section.contentValue || "-"}
+                  {getContentValueName(section)}
                 </TableCell>
                 <TableCell>{section.itemLimit}</TableCell>
                 <TableCell>{section.isActive ? "Aktif" : "Pasif"}</TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-right space-x-2">
                   <Button
                     variant="ghost"
-                    size="icon"
-                    className="mr-2"
+                    size="sm"
                     onClick={() => openModalForEdit(section)}
                   >
                     <Edit className="h-4 w-4" />
+                    <span className="sr-only">Düzenle</span>
                   </Button>
                   <Button
                     variant="ghost"
-                    size="icon"
-                    className="text-destructive hover:text-destructive"
+                    size="sm"
                     onClick={() => handleDeleteClick(section)}
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4 text-red-500" />
+                    <span className="sr-only">Sil</span>
                   </Button>
                 </TableCell>
               </TableRow>
@@ -349,14 +374,15 @@ function HomeSectionsManager() {
       )}
 
       {/* Ekleme/Düzenleme Modalı */}
-      <Dialog open={isModalOpen} onOpenChange={closeModal}>
-        <DialogContent className="sm:max-w-[500px]">
+      <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {isEditing ? "Bölümü Düzenle" : "Yeni Bölüm Ekle"}
+              {isEditing ? "Bölüm Düzenle" : "Yeni Bölüm Ekle"}
             </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Title */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="title" className="text-right">
@@ -443,8 +469,6 @@ function HomeSectionsManager() {
                       ) : (
                         categoryList.map((cat) => (
                           <SelectItem key={cat._id} value={cat.slug}>
-                            {" "}
-                            {/* Slug'ı değer olarak kullan */}
                             {cat.name}
                           </SelectItem>
                         ))
@@ -452,19 +476,32 @@ function HomeSectionsManager() {
                     </SelectContent>
                   </Select>
                 ) : currentSection.contentType === "BRAND" ? (
-                  <Input
-                    id="contentValue"
+                  <Select
                     name="contentValue"
                     value={currentSection.contentValue}
-                    onChange={handleInputChange}
-                    className="col-span-3"
-                    placeholder="Marka slug girin (örn: nike)"
+                    onValueChange={(value) =>
+                      handleSelectChange("contentValue", value)
+                    }
                     required
-                  />
+                  >
+                    <SelectTrigger className="col-span-3">
+                      <SelectValue placeholder="Marka seçin" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {brandsLoading ? (
+                        <SelectItem value="" disabled>
+                          Yükleniyor...
+                        </SelectItem>
+                      ) : (
+                        brandList.map((brand) => (
+                          <SelectItem key={brand._id} value={brand.slug}>
+                            {brand.name}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
                 ) : (
-                  /* Eğer marka listesi varsa Select kullan:
-                                    <Select name="contentValue" ...>...</Select>
-                                 */
                   <Input
                     id="contentValue"
                     name="contentValue"

@@ -119,12 +119,12 @@ function ShoppingHome() {
               Array.from({ length: 8 }).map((_, index) => (
                 <Card
                   key={`promo-skel-${index}`}
-                  className="promo-card px-2 relative flex-shrink-0 rounded-lg overflow-hidden  w-32 h-30 md:w-36 md:h-30"
+                  className="promo-card promo-card-skeleton relative rounded-lg overflow-hidden"
                 >
-                  <Skeleton className="w-full h-full bg-gray-300" />
-                  <div className="absolute bottom-0 left-0 right-0 p-5 pt-4">
-                    <Skeleton className="h-3 w-4/5 mb-1 " />
-                    <Skeleton className="h-3 w-3/5 " />
+                  <Skeleton className="w-full h-full bg-gray-200" />
+                  <div className="absolute bottom-0 left-0 right-0 p-3">
+                    <Skeleton className="h-2.5 w-4/5 mb-1" />
+                    <Skeleton className="h-2.5 w-3/5" />
                   </div>
                 </Card>
               ))
@@ -133,15 +133,15 @@ function ShoppingHome() {
                 <Card
                   key={promoCard._id}
                   onClick={() => handlePromoCardClick(promoCard.link)}
-                  className={`promo-card relative flex-shrink-0 rounded-lg overflow-hidden ${
+                  className={`promo-card relative rounded-lg overflow-hidden ${
                     promoCard.link ? "cursor-pointer" : ""
-                  }`}
+                  } hover:shadow-md transition-shadow duration-200`}
                 >
                   <CardContent className="p-0 h-full">
                     <img
                       src={promoCard.image}
                       alt={promoCard.title || "Promosyon"}
-                      className="w-full h-full object-contain transition-transform duration-300 max-[850px]:p-0"
+                      className="w-full h-full object-contain transition-transform duration-300 hover:scale-105 max-[850px]:p-0"
                       loading="lazy"
                     />
                   </CardContent>
@@ -154,7 +154,7 @@ function ShoppingHome() {
         </div>
       </section>
 
-      <section className=" my-4 md:my-4 container mx-auto px-20 max-[1024px]:px-1">
+      <section className="my-1 md:my-4 container mx-auto px-20 max-[1024px]:px-1">
         {featuresLoading || sideBannersLoading ? (
           <div className="flex flex-col md:flex-row gap-4 h-60  max-sm:h-[200px] max-md:h-[200px]">
             <Skeleton className="w-full md:w-[65%] h-full rounded-3xl bg-gray-200 animate-pulse max-sm:h-40" />
@@ -276,9 +276,9 @@ function ShoppingHome() {
         )}
       </section>
 
-      <div className="container mx-auto px-4 lg:px-20 space-y-0 pb-8">
+      <div className="container mx-auto px-4 space-y-0 pb-8 max-[1024px]:px-0">
         {sectionsLoading ? (
-          Array.from({ length: 3 }).map((_, sectionIndex) => (
+          Array.from({ length: 0 }).map((_, sectionIndex) => (
             <div key={`home-section-skel-${sectionIndex}`}>
               <Skeleton className="h-8 w-1/3 mb-4" />
               <div className="flex space-x-4 overflow-hidden pb-4">

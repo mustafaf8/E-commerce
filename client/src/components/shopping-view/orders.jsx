@@ -63,78 +63,138 @@ function ShoppingOrders() {
     confirmed: { label: "Onaylandı", color: "bg-green-600" },
     default: { label: "Bilinmiyor", color: "bg-black" },
   };
+  
+  // Format order date helper function
+  const formatOrderDate = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      const parsedDate = parseISO(dateString);
+      if (isValid(parsedDate)) {
+        return format(parsedDate, "dd.MM.yyyy");
+      }
+    } catch (e) {
+      console.error("Tarih formatlama hatası:", e);
+    }
+    return "N/A";
+  };
+  
   return (
     <Card>
       <CardHeader>
         <CardTitle>Sipariş Geçmişim</CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Sipariş No</TableHead>
-              <TableHead>Sipariş Tarihi</TableHead>
-              <TableHead>Durum</TableHead>
-              <TableHead>Tutar</TableHead>
-              <TableHead>
-                <span className="sr-only">Detaylar</span>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {orderList && orderList.length > 0 ? (
-              orderList.map((orderItem) => {
-                let formattedDate = "N/A";
-                if (orderItem?.orderDate) {
-                  try {
-                    const parsedDate = parseISO(orderItem.orderDate);
-                    if (isValid(parsedDate)) {
-                      formattedDate = format(parsedDate, "dd.MM.yyyy");
-                    }
-                  } catch (e) {
-                    console.error("Tarih formatlama hatası:", e);
-                  }
-                }
-
-                return (
-                  <TableRow key={orderItem?._id}>
-                    <TableCell>{orderItem?._id}</TableCell>
-                    <TableCell>{formattedDate}</TableCell>
-                    <TableCell>
-                      <Badge
-                        className={`p-1 px-3 w-24 justify-center ${
-                          statusMapping[orderItem?.orderStatus]?.color ||
-                          statusMapping.default.color
-                        }`}
-                      >
-                        {statusMapping[orderItem?.orderStatus]?.label ||
-                          statusMapping.default.label}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {orderItem?.totalAmount?.toFixed(2) || 0} TL
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleFetchOrderDetails(orderItem?._id)}
-                      >
-                        Detaylar
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            ) : (
+        {/* Mobile Card View (shown on small screens) */}
+        <div className="md:hidden space-y-4">
+          {orderList && orderList.length > 0 ? (
+            orderList.map((orderItem) => (
+              <Card key={orderItem?._id} className="border shadow-sm">
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Sipariş No</p>
+                      <p className="text-sm font-medium">{orderItem?._id}</p>
+                    </div>
+                    <Badge
+                      className={`p-1 px-3 text-xs ${
+                        statusMapping[orderItem?.orderStatus]?.color ||
+                        statusMapping.default.color
+                      }`}
+                    >
+                      {statusMapping[orderItem?.orderStatus]?.label ||
+                        statusMapping.default.label}
+                    </Badge>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Sipariş Tarihi</p>
+                      <p className="text-sm">{formatOrderDate(orderItem?.orderDate)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Tutar</p>
+                      <p className="text-sm font-medium">{orderItem?.totalAmount?.toFixed(2) || 0} TL</p>
+                    </div>
+                  </div>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full mt-1"
+                    onClick={() => handleFetchOrderDetails(orderItem?._id)}
+                  >
+                    Detaylar
+                  </Button>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              Sipariş geçmişiniz bulunmamaktadır.
+            </div>
+          )}
+        </div>
+        
+        {/* Desktop Table View (hidden on small screens) */}
+        <div className="hidden md:block">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={5} className="text-center">
-                  Sipariş geçmişiniz bulunmamaktadır.
-                </TableCell>
+                <TableHead >Sipariş No</TableHead>
+                <TableHead>Sipariş Tarihi</TableHead>
+                <TableHead>Durum</TableHead>
+                <TableHead>Tutar</TableHead>
+                <TableHead className="text-right">
+                  <span className="sr-only">Detaylar</span>
+                </TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {orderList && orderList.length > 0 ? (
+                orderList.map((orderItem) => {
+                  return (
+                    <TableRow key={orderItem?._id}>
+                      <TableCell className="font-medium">
+                        {orderItem?._id}
+                      </TableCell>
+                      <TableCell>{formatOrderDate(orderItem?.orderDate)}</TableCell>
+                      <TableCell>
+                        <Badge
+                          className={`p-1 px-3 w-24 justify-center ${
+                            statusMapping[orderItem?.orderStatus]?.color ||
+                            statusMapping.default.color
+                          }`}
+                        >
+                          {statusMapping[orderItem?.orderStatus]?.label ||
+                            statusMapping.default.label}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {orderItem?.totalAmount?.toFixed(2) || 0} TL
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleFetchOrderDetails(orderItem?._id)}
+                        >
+                          Detaylar
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center">
+                    Sipariş geçmişiniz bulunmamaktadır.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        
         <Dialog
           open={!!selectedOrderId}
           onOpenChange={(isOpen) => {
@@ -143,9 +203,9 @@ function ShoppingOrders() {
             }
           }}
         >
-          <DialogContent className="sm:max-w-[600px]">
+          <DialogContent className="sm:max-w-[600px] max-sm:w-[95%] max-sm:max-w-[95%]">
             <DialogHeader>
-              <DialogTitle>Sipariş Detayları ({selectedOrderId})</DialogTitle>
+              <DialogTitle className="max-sm:text-sm">Sipariş Detayları ({selectedOrderId ? selectedOrderId.substring(0, 8) + "..." : ""})</DialogTitle>
             </DialogHeader>
             {orderDetailsLoading ? (
               <div className="p-4 text-center">Yükleniyor...</div>

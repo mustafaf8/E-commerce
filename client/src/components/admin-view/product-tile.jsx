@@ -1,6 +1,7 @@
 import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter } from "../ui/card";
 import PropTypes from "prop-types";
+import { Edit, Trash2, Eye } from "lucide-react";
 
 function AdminProductTile({
   product,
@@ -9,68 +10,96 @@ function AdminProductTile({
   handleShowDetails,
 }) {
   return (
-    <Card className="w-full max-w-xs mx-auto flex flex-col h-full">
+    <Card className="w-full overflow-hidden border border-border bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow duration-200 h-full flex flex-col">
       <div
         onClick={handleShowDetails}
         className="cursor-pointer flex-grow flex flex-col"
       >
-        <div className="relative flex-shrink-0">
-          <img
-            src={product?.image || "/placeholder.png"}
-            alt={product?.title}
-            className="w-full h-[250px] object-contain rounded-t-lg p-2"
-          />
+        <div className="relative pt-3 px-3 pb-0 flex-shrink-0">
+          <div className="bg-secondary/30 rounded-md p-2 flex items-center justify-center h-[180px]">
+            <img
+              src={product?.image || "/placeholder.png"}
+              alt={product?.title}
+              className="max-h-full max-w-full object-contain"
+            />
+          </div>
+          {product?.salePrice && product.salePrice > 0 && product.salePrice < product.price && (
+            <div className="absolute top-5 right-5 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full">
+              İndirim
+            </div>
+          )}
         </div>
-        <CardContent className="flex-grow p-3">
+        <CardContent className="flex-grow p-4">
           <h2
-            className="text-base font-semibold mb-1 truncate"
+            className="text-base font-semibold mb-2 truncate"
             title={product?.title}
           >
             {product?.title}
           </h2>
-          <div className="flex justify-between items-center mb-2 text-sm">
+          <div className="flex justify-between items-center mb-3">
             <span
               className={`${
                 product?.salePrice &&
                 product.salePrice > 0 &&
                 product.salePrice < product.price
-                  ? "line-through text-gray-500"
-                  : "text-muted-foreground"
-              } font-semibold`}
+                  ? "line-through-red text-sm"
+                  : "text-primary font-medium"
+              }`}
             >
               {product?.price ? `${product.price.toFixed(2)} TL` : "N/A"}
             </span>
             {product?.salePrice &&
             product.salePrice > 0 &&
             product.salePrice < product.price ? (
-              <span className="font-bold text-green-600">{`${product.salePrice.toFixed(
+              <span className="font-bold text-primary">{`${product.salePrice.toFixed(
                 2
               )} TL`}</span>
             ) : null}
           </div>
 
-          <div className="flex justify-between items-center">
-            <p className="text-xs text-gray-500">
-              Stok: {product?.totalStock ?? "N/A"}
-            </p>
-            <p className="text-xs text-gray-500">
-              Satılan: {product?.salesCount ?? 0}
-            </p>
+          <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-1">
+              <span className="font-medium">Stok:</span> 
+              <span className={product?.totalStock > 0 ? "text-green-600 font-medium" : "text-red-500 font-medium"}>
+                {product?.totalStock ?? "N/A"}
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="font-medium">Satış:</span> 
+              <span>{product?.salesCount ?? 0}</span>
+            </div>
           </div>
         </CardContent>
       </div>
 
-      <CardFooter className="flex justify-between items-center p-3 border-t">
-        <Button onClick={handleEdit} size="sm">
-          Düzenle
-        </Button>
-        <Button
-          onClick={() => handleDelete(product?._id)}
-          size="sm"
-          variant="destructive"
+      <CardFooter className="flex justify-between items-center p-3 pt-2 border-t bg-secondary/20">
+        <Button 
+          onClick={handleEdit} 
+          size="sm" 
+          variant="outline"
+          className="flex items-center gap-1 h-8"
         >
-          Sil
+          <Edit size={14} />
+          <span>Düzenle</span>
         </Button>
+        <div className="flex gap-1">
+          <Button
+            onClick={handleShowDetails}
+            size="icon"
+            variant="ghost"
+            className="h-8 w-8 text-gray-500 hover:text-primary"
+          >
+            <Eye size={16} />
+          </Button>
+          <Button
+            onClick={() => handleDelete(product?._id)}
+            size="icon"
+            variant="ghost"
+            className="h-8 w-8 text-gray-500 hover:text-destructive"
+          >
+            <Trash2 size={16} />
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );

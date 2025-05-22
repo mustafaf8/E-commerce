@@ -4,7 +4,13 @@ import {
   Facebook,
   MessageSquare,
   ArrowUpCircle,
+  Mail,
+  Phone,
+  MapPin,
+  ChevronRight,
 } from "lucide-react";
+import { Button } from "../ui/button";
+import { cn } from "@/lib/utils";
 
 const Footer = () => {
   const scrollToTop = () => {
@@ -31,122 +37,108 @@ const Footer = () => {
     { store: "Google Play", url: "/placeholder-googleplay.png", link: "#" },
   ];
 
+  const footerLinks = [
+    {
+      title: "Şirketimiz",
+      links: [
+        { label: "Hakkımızda", href: "/shop/hakkimizda" },
+        { label: "İş Ortaklarımız", href: "/shop/ortaklarimiz" },
+        { label: "Kişisel Verilerin Korunması", href: "/shop/kvkk" },
+        { label: "Bilgi Güvenliği Politikası", href: "/shop/bilgi-guvenligi" }
+      ]
+    },
+    {
+      title: "Hesabım",
+      links: [
+        { label: "Siparişlerim", href: "/shop/account" },
+        { label: "Hesap Bilgilerim", href: "/shop/account" },
+        { label: "İşlem Rehberi", href: "/shop/islem-rehberi" }
+      ]
+    },
+    {
+      title: "Bizi Takip Edin",
+      links: [
+        { 
+          label: "Instagram", 
+          href: "https://www.instagram.com", 
+          icon: <Instagram size={16} />,
+          external: true
+        },
+        { 
+          label: "Facebook", 
+          href: "https://www.facebook.com", 
+          icon: <Facebook size={16} />,
+          external: true
+        }
+      ]
+    }
+  ];
+
   return (
-    <footer className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 pt-10 pb-4 max-[1024px]:pb-16">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-8">
-          <div>
-            <h5 className="font-semibold text-gray-800 dark:text-white mb-3">
-              Şirketimiz
-            </h5>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link
-                  to="/shop/hakkimizda"
-                  className="hover:text-primary dark:hover:text-secondary"
-                >
-                  Hakkımızda
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/shop/ortaklarimiz"
-                  className="hover:text-primary dark:hover:text-secondary"
-                >
-                  İş Ortaklarımız
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  to="/shop/kvkk"
-                  className="hover:text-primary dark:hover:text-secondary"
-                >
-                  Kişisel Verilerin Korunması
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/shop/bilgi-guvenligi"
-                  className="hover:text-primary dark:hover:text-secondary"
-                >
-                  Bilgi Güvenliği Politikası
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h5 className="font-semibold text-gray-800 dark:text-white mb-3">
-              Deposun
-            </h5>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link
-                  to="/shop/account"
-                  className="hover:text-primary dark:hover:text-secondary"
-                >
-                  Siparişlerim
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/shop/account"
-                  className="hover:text-primary dark:hover:text-secondary"
-                >
-                  Hesabım
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/shop/islem-rehberi"
-                  className="hover:text-primary dark:hover:text-secondary"
-                >
-                  İşlem Rehberi
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h5 className="font-semibold text-gray-800 dark:text-white mb-3">
-              Bizi Takip Edin
-            </h5>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <a
-                  href="https://www.instagram.com/rmrenerjisistemleri/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center hover:text-primary dark:hover:text-secondary"
-                >
-                  <Instagram size={16} className="mr-2" /> Instagram
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://www.facebook.com/rmr.enerji/?locale=tr_TR"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center hover:text-primary dark:hover:text-secondary"
-                >
-                  <Facebook size={16} className="mr-2" /> Facebook
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Mobil Uygulamalar */}
-          <div>
-            <h5 className="font-semibold text-gray-800 dark:text-white mb-3">
-              Mobil Uygulamalar
-            </h5>
-            <div className="space-y-3">
+    <footer className="bg-white dark:bg-gray-900 pt-2 pb-2 md:pb-4 border-t border-gray-100 mt-8">
+      {/* Back to top button */}
+      <div className="container mx-auto px-4 lg:px-8 mb-8 flex justify-center">
+        <Button 
+          variant="outline" 
+          onClick={scrollToTop}
+          className="rounded-full flex items-center gap-2 text-sm hover:bg-primary hover:text-white transition-colors"
+        >
+          <ArrowUpCircle size={16} />
+          <span>Başa Dön</span>
+        </Button>
+      </div>
+      
+      <div className="container mx-auto px-4 lg:px-20">
+        {/* Main footer content */}
+        <div className="mb-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 min-[640px]:ml-16 min-[699px]:ml-16 min-[1024px]:ml-32">
+          {/* First row - 3 columns */}
+          {footerLinks.map((section, index) => (
+            <div key={index} className="space-y-3">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-3 relative pl-3 before:absolute before:left-0 before:top-1 before:h-5 before:w-1 before:bg-primary before:rounded-full">
+                {section.title}
+              </h3>
+              <ul className="space-y-2">
+                {section.links.map((link, linkIndex) => (
+                  <li key={linkIndex}>
+                    {link.external ? (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary flex items-center gap-2"
+                      >
+                        {link.icon}
+                        <span>{link.label}</span>
+                      </a>
+                    ) : (
+                      <Link
+                        to={link.href}
+                        className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary flex items-center"
+                      >
+                        <ChevronRight size={14} className="mr-1" />
+                        <span>{link.label}</span>
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+          
+          {/* Second row - 3 columns */}
+          <div className="space-y-3">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-3 relative pl-3 before:absolute before:left-0 before:top-1 before:h-5 before:w-1 before:bg-primary before:rounded-full">
+              Mobil Uygulama
+            </h3>
+            
+            <div className="mb-4">
               {appBadges.map((badge) => (
                 <a
                   key={badge.store}
                   href={badge.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block"
+                  className="inline-block"
                 >
                   <img
                     src={badge.url}
@@ -157,65 +149,50 @@ const Footer = () => {
               ))}
             </div>
           </div>
-
-          {/* Aklınıza takılan bir soru mu var? */}
-          <div className="text-sm">
-            <h5 className="font-semibold text-gray-800 dark:text-white mb-3">
-              Aklınıza takılan bir soru mu var?
-            </h5>
-            <div className="space-y-3">
-              <p className="font-medium">Çağrı Merkezimizi arayın</p>
-              <a
-                href="tel:08502524000"
-                className="block text-lg font-bold text-gray-900 dark:text-white hover:text-primary dark:hover:text-secondary"
-              >
-                0000 000 00 00
-              </a>
-              <a
-                href="https://wa.me/+905347168754"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-start text-green-600 hover:text-green-700 font-medium"
-              >
-                <MessageSquare size={16} className="mr-1" /> WhatsApp Destek
-              </a>
-            </div>
+          
+          <div className="space-y-0">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2 relative pl-3 before:absolute before:left-0 before:top-1 before:h-5 before:w-1 before:bg-primary before:rounded-full">
+              Yardım Merkezi
+            </h3>
+            
+            <a
+              href="https://wa.me/+905347168754"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-2 py-1 rounded-full bg-green-500 text-white text-sm hover:bg-green-600 transition-colors"
+            >
+              <MessageSquare size={16} className="mr-2" /> 
+              WhatsApp Destek
+            </a>
+          </div>
+          
+          <div className="space-y-3">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-3 relative pl-3 before:absolute before:left-0 before:top-1 before:h-5 before:w-1 before:bg-primary before:rounded-full">
+              Hakkımızda
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              sizlere hizmet vermekten gurur duyuyoruz.
+            </p>
           </div>
         </div>
-
-        {/* Orta Kısım: Ödeme Logoları */}
-        <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6 border-t border-b border-gray-200 dark:border-gray-700 py-4 mb-6">
-          {paymentLogos.map((logo) => (
-            // Gerçek logoları ve boyutları ayarlayın
-            <img
-              key={logo.name}
-              src={logo.url}
-              alt={logo.name}
-              className="h-6 md:h-7 opacity-60"
-            />
-          ))}
-          {/* QR Kod veya diğer görseller eklenebilir */}
-          {/* <img src="/placeholder-qr.png" alt="QR Code" className="h-8 w-8 opacity-60" /> */}
-        </div>
-      </div>
-
-      {/* Alt Kısım: Copyright ve Başa Dön */}
-      <div className="bg-black text-gray-400 py-3 text-xs">
-        <div className="container mx-auto px-4 flex flex-col sm:flex-row justify-between items-center">
-          <span>
-            © Copyright 2013 - {new Date().getFullYear()} Deposun Tic. AŞ. Her
-            Hakkı Saklıdır.
-            <a href="#" className="ml-2 hover:text-white">
-              Site Haritası
-            </a>
-            {/* Linki güncelleyin */}
-          </span>
-          <button
-            onClick={scrollToTop}
-            className="flex items-center mt-2 sm:mt-0 text-gray-300 hover:text-white transition-colors"
-          >
-            <ArrowUpCircle size={16} className="mr-1" /> Başa Dön
-          </button>
+        
+        {/* Payment methods */}
+        <div className="mt-0 pt-6 border-t border-gray-100 dark:border-gray-800">
+          <div className="flex flex-wrap justify-center items-center gap-4 mb-6">
+            {paymentLogos.map((logo) => (
+              <img
+                key={logo.name}
+                src={logo.url}
+                alt={logo.name}
+                className="h-6 opacity-60"
+              />
+            ))}
+          </div>
+          
+          {/* Copyright */}
+          <div className="text-center text-xs text-gray-500 dark:text-gray-500">
+            <p>© {new Date().getFullYear()} MERN Shop. Tüm Hakları Saklıdır.</p>
+          </div>
         </div>
       </div>
     </footer>

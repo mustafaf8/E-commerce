@@ -1,16 +1,39 @@
-import { AlignJustify, LogOut } from "lucide-react";
+import { AlignJustify, BellRing, LogOut, Settings, User } from "lucide-react";
 import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "@/store/auth-slice";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
 
 function AdminHeader({ setOpen }) {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [newOrderCount, setNewOrderCount] = useState(0);
+  
+  // Get order data from store
+  const { 
+    userList = [],
+    guestOrderList = [] 
+  } = useSelector((state) => state.adminOrder || {});
+
+  // Calculate new order count
+  useEffect(() => {
+    // Check for new orders from registered users
+    const registeredNewOrders = userList.filter(user => user.hasNewOrder).length;
+    
+    // Check for new orders from guests
+    const newOrderStatuses = ['pending', 'pending_payment'];
+    const guestNewOrders = guestOrderList.filter(order => 
+      newOrderStatuses.includes(order.orderStatus) || order.isNew
+    ).length;
+    
+    // Set total count
+    setNewOrderCount(registeredNewOrders + guestNewOrders);
+  }, [userList, guestOrderList]);
 
   function handleLogout() {
     dispatch(logoutUser())
@@ -28,26 +51,56 @@ function AdminHeader({ setOpen }) {
       });
   }
 
+  function handleBellClick() {
+    navigate("/admin/orders");
+  }
+
   return (
-    <header className="flex items-center justify-between px-4 py-3 bg-background border-b">
-      <Button onClick={() => setOpen(true)}>
-        <AlignJustify />
-      </Button>
-      <div className="flex flex-1 justify-end items-center">
-        {user && (
-          <div className="hidden sm:flex items-center mr-4 px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-md shadow-sm">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-              Admin {user.userName}
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-white dark:bg-gray-900 px-4 md:px-6 shadow-sm">
+      <div className="flex items-center gap-2">
+        <Button 
+          onClick={() => setOpen(true)} 
+          variant="ghost" 
+          size="icon" 
+          className="lg:hidden"
+        >
+          <AlignJustify size={20} />
+          <span className="sr-only">Toggle menu</span>
+        </Button>
+        <h1 className="text-lg font-semibold text-primary hidden md:block">
+          Admin Dashboard
+        </h1>
+      </div>
+      
+      <div className="flex items-center gap-4">
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="rounded-full relative"
+          onClick={handleBellClick}
+        >
+          <BellRing size={18} />
+          {newOrderCount > 0 && (
+            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white">
+              {newOrderCount > 9 ? '9+' : newOrderCount}
             </span>
-          </div>
-        )}
+          )}
+          <span className="sr-only">Notifications</span>
+        </Button>
+        
+        <div className="hidden md:flex items-center gap-2 rounded-full bg-secondary/80 px-3 py-1.5 text-sm font-medium">
+          <User size={16} className="text-primary" />
+          <span>{user?.userName || "Admin"}</span>
+        </div>
 
         <Button
           onClick={handleLogout}
-          className="inline-flex gap-2 items-center rounded-md px-4 py-2 text-sm font-medium shadow"
+          variant="ghost"
+          size="sm"
+          className="gap-1 items-center text-gray-700 dark:text-gray-300"
         >
           <LogOut size={16} />
-          Çıkış
+          <span className="hidden md:inline">Çıkış</span>
         </Button>
       </div>
     </header>

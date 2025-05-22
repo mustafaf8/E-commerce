@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import ShoppingProductTile from "./product-tile";
 import ProductTileSkeleton from "./product-tile-skeleton.jsx";
 import { Button } from "@/components/ui/button";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, ArrowRight } from "lucide-react";
 import PropTypes from "prop-types";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
@@ -27,6 +27,7 @@ function ProductCarousel({
   const [internalLoading, setInternalLoading] = useState(true);
   const [internalError, setInternalError] = useState(null);
   const prevFetchConfigRef = useRef();
+
   const checkScroll = useCallback(() => {
     const container = scrollContainerRef.current;
     if (container) {
@@ -60,14 +61,12 @@ function ProductCarousel({
 
   useEffect(() => {
     if (fetchConfig && !isEqual(fetchConfig, prevFetchConfigRef.current)) {
-      // console.log(`Workspaceing for ${title} with key: ${fetchConfig.key}`);
       setInternalLoading(true);
       setInternalError(null);
       dispatch(
         fetchAllFilteredProducts({
           filterParams: fetchConfig.filterParams,
           sortParams: fetchConfig.sortParams,
-          // limit: fetchConfig.limit // Limit parametresini backend'e gönderme (opsiyonel)
         })
       )
         .unwrap()
@@ -77,13 +76,13 @@ function ProductCarousel({
               payload.data?.slice(0, fetchConfig.limit || 10) || []
             );
           } else {
-            console.error(`Workspace failed for ${title}:`, payload.message);
+            console.error(`Carousel fetch failed for ${title}:`, payload.message);
             setInternalError(payload.message || "Veri alınamadı.");
             setInternalProducts([]);
           }
         })
         .catch((error) => {
-          console.error(`Workspace error for ${title}:`, error);
+          console.error(`Carousel error for ${title}:`, error);
           setInternalError(error.message || "Bir hata oluştu.");
           setInternalProducts([]);
         })
@@ -98,7 +97,7 @@ function ProductCarousel({
       setInternalError("Fetch config eksik.");
       prevFetchConfigRef.current = fetchConfig;
     }
-  }, [dispatch, fetchConfig, checkScroll]);
+  }, [dispatch, fetchConfig, checkScroll, title]);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -118,24 +117,34 @@ function ProductCarousel({
   };
 
   return (
-    <section className="bg-transparent relative group/carousel ">
-      <div className="container mx-auto px-0 max-[1024px]:px-1 ">
-        <div className="flex items-center justify-between p-3 mb-0">
-          <h1 className="text-2xl md:text-xl font-bold mb-0 text-gray-800 max-[400px]:text-lg max-[400px]:font-semibold pl-2">
+    <section className="shop-section relative my-1 py-2">
+      <div className="shop-container max-[1024px]:px-2">
+        {/* Section header */}
+        <div className="flex items-center justify-between mb-2 px-1">
+          <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-800 flex items-center">
             {title}
-          </h1>
+          </h2>
+          
           {viewAllPath && (
-            <h1 className="flex items-end justify-center text-sm font-semibold text-red-600 cursor-pointer hover:text-gray-700 transition duration-200 ease-in-out">
-              <p onClick={handleViewAllClick}>Tümü</p>
-              <ChevronRightIcon className="w-4 h-4 font-semibold text-red-600 " />
-            </h1>
+            <Button 
+              variant="link" 
+              onClick={handleViewAllClick}
+              className="text-primary p-0 h-auto font-medium text-sm flex items-center gap-1"
+            >
+              <span>Tümünü Gör</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Button>
           )}
         </div>
-        <div className="flex items-center justify-start relative">
+        
+        {/* Carousel */}
+        <div className="relative">
+          {/* Left scroll button */}
           <Button
             size="icon"
             className={cn(
-              "absolute left-0 top-1/2 -translate-y-1/2 z-10 rounded-full shadow-lg bg-white/60 hover:bg-white h-8 w-8 transition-opacity duration-300",
+              "absolute -left-4 top-1/2 -translate-y-1/2 z-10 rounded-full shadow-md bg-white h-8 w-8 transition-all",
+              "max-md:h-7 max-md:w-7 max-md:-left-2",
               !internalLoading && canScrollLeft
                 ? "opacity-100"
                 : "opacity-0 pointer-events-none"
@@ -143,32 +152,36 @@ function ProductCarousel({
             onClick={() => scroll("left")}
             disabled={!canScrollLeft || internalLoading}
           >
-            <ChevronLeftIcon className="w-5 h-5 text-black" />
+            <ChevronLeftIcon className="h-4 w-4 text-gray-700" />
           </Button>
 
+          {/* Products container */}
           <div
             ref={scrollContainerRef}
             onScroll={checkScroll}
-            className="flex space-x-3 overflow-x-auto pb-4 no-scrollbar"
+            className="flex gap-3 overflow-x-auto py-1 pb-3 px-1 no-scrollbar"
           >
             {internalLoading ? (
+              // Skeleton loading state
               Array.from({ length: skeletonCount }).map((_, index) => (
                 <div
                   key={`skel-${fetchConfig?.key || title}-${index}`}
-                  className="flex-shrink-0 w-60 max-sm:w-48 max-md:w-48"
+                  className="product-carousel-item flex-shrink-0 w-[170px] sm:w-[185px] md:w-[200px]"
                 >
                   <ProductTileSkeleton />
                 </div>
               ))
             ) : internalError ? (
+              // Error state
               <div className="w-full text-center py-10 text-red-500">
                 Hata: {internalError}
               </div>
             ) : internalProducts && internalProducts.length > 0 ? (
+              // Products
               internalProducts.map((productItem) => (
                 <div
                   key={productItem._id}
-                  className="flex-shrink-0 w-60 max-sm:w-48 max-md:w-48"
+                  className="product-carousel-item flex-shrink-0 w-[170px] sm:w-[185px] md:w-[200px]"
                 >
                   <ShoppingProductTile
                     product={productItem}
@@ -180,16 +193,19 @@ function ProductCarousel({
                 </div>
               ))
             ) : (
+              // Empty state
               <div className="w-full text-center py-10 text-gray-500">
                 Bu bölümde gösterilecek ürün bulunamadı.
               </div>
             )}
           </div>
 
+          {/* Right scroll button */}
           <Button
             size="icon"
             className={cn(
-              "absolute right-0 top-1/2 -translate-y-1/2 z-10 rounded-full shadow-lg bg-white/60 hover:bg-white h-8 w-8 transition-opacity duration-300",
+              "absolute -right-4 top-1/2 -translate-y-1/2 z-10 rounded-full shadow-md bg-white h-8 w-8 transition-all",
+              "max-md:h-7 max-md:w-7 max-md:-right-2",
               !internalLoading && canScrollRight
                 ? "opacity-100"
                 : "opacity-0 pointer-events-none"
@@ -197,7 +213,7 @@ function ProductCarousel({
             onClick={() => scroll("right")}
             disabled={!canScrollRight || internalLoading}
           >
-            <ChevronRightIcon className="w-5 h-5 text-black" />
+            <ChevronRightIcon className="h-4 w-4 text-gray-700" />
           </Button>
         </div>
       </div>
@@ -208,14 +224,16 @@ function ProductCarousel({
 ProductCarousel.propTypes = {
   title: PropTypes.string.isRequired,
   handleGetProductDetails: PropTypes.func.isRequired,
-  handleAddtoCart: PropTypes.func.isRequired,
+  handleAddtoCart: PropTypes.func,
   viewAllPath: PropTypes.string,
+  products: PropTypes.array,
+  isLoading: PropTypes.bool,
   fetchConfig: PropTypes.shape({
-    key: PropTypes.string.isRequired,
+    key: PropTypes.string,
     filterParams: PropTypes.object,
-    sortParams: PropTypes.string,
+    sortParams: PropTypes.object,
     limit: PropTypes.number,
-  }).isRequired,
+  }),
 };
 
-export default React.memo(ProductCarousel);
+export default ProductCarousel;

@@ -4,6 +4,7 @@ import { Home, ShoppingCart, User, LayoutGrid, Heart } from "lucide-react";
 import { useSelector } from "react-redux";
 import { Sheet } from "../ui/sheet";
 import UserCartWrapper from "../shopping-view/cart-wrapper";
+import { cn } from "@/lib/utils";
 
 const BottomNavBar = () => {
   const location = useLocation();
@@ -13,19 +14,24 @@ const BottomNavBar = () => {
     (state) => state.shopCart.cartItems
   );
 
+  // Hide the navigation bar in admin routes
+  if (location.pathname.includes("/admin")) {
+    return null;
+  }
+
   const navItems = [
-    { to: "/shop/home", label: "Keşfet", icon: <Home size={24} /> },
-    { to: "/shop/wishlist", label: "Beğendiklerim", icon: <Heart size={24} /> },
-    { to: "/shop/cart", label: "Sepetim", icon: <ShoppingCart size={24} /> },
+    { to: "/shop/home", label: "Keşfet", icon: <Home strokeWidth={1.8} /> },
+    { to: "/shop/wishlist", label: "Favoriler", icon: <Heart strokeWidth={1.8} /> },
+    { to: "/shop/cart", label: "Sepetim", icon: <ShoppingCart strokeWidth={1.8} /> },
     {
       to: "/shop/listing",
       label: "Kategoriler",
-      icon: <LayoutGrid size={24} />,
+      icon: <LayoutGrid strokeWidth={1.8} />,
     },
-    { to: "/shop/account", label: "Hesabım", icon: <User size={24} /> },
+    { to: "/shop/account", label: "Hesabım", icon: <User strokeWidth={1.8} /> },
   ];
 
-  // Benzersiz ürün sayısını hesapla (doğrudan cartProductItems üzerinden)
+  // Calculate unique product count
   const uniqueProductCount = cartProductItems
     ? new Set(cartProductItems.map((item) => item.productId)).size
     : 0;
@@ -36,42 +42,53 @@ const BottomNavBar = () => {
         <UserCartWrapper setOpenCartSheet={setOpenCartSheet} />
       </Sheet>
 
-      <nav className="fixed bottom-0 left-0 w-full bg-white shadow-md z-50 bottom-nav ">
+      <div className="h-16 mb-0 md:mb-0 pb-safe-bottom"></div>
+      <nav className="fixed bottom-0 left-0 w-full bg-white dark:bg-gray-900 shadow-md z-50 bottom-nav border-t border-gray-100">
         <ul className="flex w-full justify-around items-center h-16">
-          {navItems.map((item) => (
-            <li
-              key={item.to}
-              className="flex flex-col items-center justify-center relative"
-            >
-              <div
-                onClick={() => {
-                  if (item.to === "/shop/cart") {
-                    setOpenCartSheet(true);
-                  } else {
-                    navigate(item.to);
-                  }
-                }}
-                className={`flex flex-col items-center justify-center h-full w-full text-gray-600 hover:text-orange-500 ${
-                  location.pathname.startsWith(item.to) ? "text-orange-500" : ""
-                } cursor-pointer`}
+          {navItems.map((item) => {
+            const isActive = location.pathname.startsWith(item.to);
+            return (
+              <li
+                key={item.to}
+                className="flex flex-1 items-center justify-center relative h-full"
               >
-                {item.icon}
-                {/* cartProductItems kullanarak kontrol et */}
-                {item.to === "/shop/cart" &&
-                  cartProductItems &&
-                  cartProductItems.length > 0 && (
-                    <span className="absolute top-0 right-0 transform translate-x-2 -translate-y-2 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5 font-bold">
-                      {uniqueProductCount > 0
-                        ? uniqueProductCount
-                        : cartProductItems.length > 0
-                        ? "!"
-                        : ""}
-                    </span>
+                <div
+                  onClick={() => {
+                    if (item.to === "/shop/cart") {
+                      setOpenCartSheet(true);
+                    } else {
+                      navigate(item.to);
+                    }
+                  }}
+                  className={cn(
+                    "flex flex-col items-center justify-center w-full h-full transition-colors",
+                    isActive 
+                      ? "text-primary" 
+                      : "text-gray-500 dark:text-gray-400"
                   )}
-                <span className="text-xs">{item.label}</span>
-              </div>
-            </li>
-          ))}
+                >
+                  <div className="relative">
+                    {item.icon}
+                    {item.to === "/shop/cart" &&
+                      uniqueProductCount > 0 && (
+                        <span className="cart-count-badge">
+                          {uniqueProductCount > 9 ? "9+" : uniqueProductCount}
+                        </span>
+                      )}
+                  </div>
+                  <span className={cn(
+                    "text-xs mt-1",
+                    isActive ? "font-medium" : "font-normal"
+                  )}>
+                    {item.label}
+                  </span>
+                  {isActive && (
+                    <div className="absolute top-0 w-1/2 h-0.5 bg-primary rounded-full"></div>
+                  )}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       </nav>
     </>

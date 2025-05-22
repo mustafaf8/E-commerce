@@ -87,18 +87,18 @@ function CategorySubMenu() {
 
   return (
     <nav className="flex flex-wrap items-center justify-center gap-x-3 md:gap-x-4 overflow-x-auto no-scrollbar px-4 md:px-6 h-10 bg-muted/30 dark:bg-muted/10">
-      {activeCategories.map((category) => (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => handleNavigateToCategory(category.id)}
-          className="text-sm font-medium text-muted-foreground hover:text-primary px-2 whitespace-nowrap"
-          key={category.id}
-        >
-          {category.label}
-        </Button>
-      ))}
-    </nav>
+    {activeCategories.map((category) => (
+      <Button
+        variant="mustafa"
+        size="sm"
+        onClick={() => handleNavigateToCategory(category.id)}
+        className="text-sm font-medium text-muted-foreground hover:text-primary px-2 whitespace-nowrap"
+        key={category.id}
+      >
+        {category.label}
+      </Button>
+    ))}
+  </nav>
   );
 }
 
@@ -143,11 +143,11 @@ function MainHeaderActions() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              variant="ghost"
+              variant="mustafa"
               className="flex items-center gap-2 px-2 md:px-3 py-1.5 h-auto"
             >
-              <Avatar className="h-7 w-7 md:h-8 md:w-8 border">
-                <AvatarFallback className="bg-muted text-xs md:text-sm font-semibold">
+            <Avatar className="h-7 w-7 md:h-8 md:w-8 border">
+                <AvatarFallback className="bg-secondary text-xs md:text-sm font-semibold text-primary">
                   {user.userName && user.userName.length > 0
                     ? user.userName[0].toUpperCase()
                     : "?"}
@@ -181,11 +181,11 @@ function MainHeaderActions() {
         </DropdownMenu>
       ) : (
         <Button
-          variant="ghost"
+          variant="mustafa"
           onClick={() => navigate("/auth/login")}
           className="flex flex-col items-center px-2 md:px-3 py-1 h-auto"
         >
-          <LogIn className="h-5 w-5 md:h-6 md:w-6 text-muted-foreground" />
+          <LogIn className="h-5 w-5 md:h- md:w-4 text-primary" />
           <span className="text-xs mt-0.5 text-muted-foreground">
             Giriş Yap
           </span>
@@ -197,7 +197,7 @@ function MainHeaderActions() {
             variant="secondary"
             className="flex items-center gap-2 px-3 md:px-4 py-2 h-auto max-lg:hidden"
           >
-            <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
+            <ShoppingCart className="w-5 h-5" />
             <span className="hidden md:inline text-sm font-medium">
               Sepetim
             </span>

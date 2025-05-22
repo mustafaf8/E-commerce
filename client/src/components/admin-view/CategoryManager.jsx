@@ -1,6 +1,13 @@
 import ConfirmationModal from "@/components/admin-view/ConfirmationModal";
 import { Button } from "@/components/ui/button";
-import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -9,24 +16,12 @@ import {
   fetchAllCategories,
   updateCategory,
 } from "@/store/common-slice/categories-slice";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogTitle,
-} from "@radix-ui/react-dialog";
-import { Label } from "@radix-ui/react-dropdown-menu";
-import {
-  Badge,
-  BadgeCheck,
-  BadgeX,
-  Edit,
-  PlusCircle,
-  Trash2,
-} from "lucide-react";
+import { Edit, Trash2, PlusCircle, BadgeCheck, BadgeX } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -120,6 +115,7 @@ function CategoryManager() {
             }.`,
           });
           closeModal();
+          dispatch(fetchAllCategories());
         } else {
           toast({
             variant: "destructive",
@@ -250,7 +246,7 @@ function CategoryManager() {
           ))
         )}
       </div>
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+      <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>
