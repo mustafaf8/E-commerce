@@ -88,6 +88,16 @@ function ShoppingHome() {
       }
     });
   }
+  useEffect(() => {
+    if (featureImageList?.length > 1) {
+      const timer = setInterval(() => {
+        setCurrentSlide(
+          (prevSlide) => (prevSlide + 1) % featureImageList.length
+        );
+      }, 5000);
+      return () => clearInterval(timer);
+    }
+  }, [featureImageList]);
 
   useEffect(() => {
     dispatch(fetchActiveHomeSections());
