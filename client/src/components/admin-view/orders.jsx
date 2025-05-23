@@ -29,7 +29,15 @@ import {
 } from "@/store/admin/order-slice";
 import { Badge } from "../ui/badge";
 import { format, parseISO, isValid } from "date-fns";
-import { ArrowLeft, Loader2, Bell, Users, UserCog, UserMinus, ShoppingBag } from "lucide-react";
+import {
+  ArrowLeft,
+  Loader2,
+  Bell,
+  Users,
+  UserCog,
+  UserMinus,
+  ShoppingBag,
+} from "lucide-react";
 import PropTypes from "prop-types";
 
 const orderStatusMapping = {
@@ -87,9 +95,12 @@ const orderStatusMapping = {
 
 function UserListTable({ users, onViewOrdersClick, isLoading }) {
   // Filter out any entries that might be guest/misafir related
-  const filteredUsers = users.filter(user => 
-    !(user.userName?.toLowerCase().includes('misafir') || 
-      user.userId === 'GUEST_ORDERS_VIRTUAL_ID')
+  const filteredUsers = users.filter(
+    (user) =>
+      !(
+        user.userName?.toLowerCase().includes("misafir") ||
+        user.userId === "GUEST_ORDERS_VIRTUAL_ID"
+      )
   );
 
   const [showAll, setShowAll] = useState(false);
@@ -104,7 +115,9 @@ function UserListTable({ users, onViewOrdersClick, isLoading }) {
             <TableHead className="py-1 text-xs">E-posta</TableHead>
             <TableHead className="text-center py-1 text-xs">Sip.</TableHead>
             <TableHead className="text-right py-1 text-xs">Tarih</TableHead>
-            <TableHead className="text-right py-1 text-xs w-20">İşlem</TableHead>
+            <TableHead className="text-right py-1 text-xs w-20">
+              İşlem
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -125,11 +138,17 @@ function UserListTable({ users, onViewOrdersClick, isLoading }) {
                         title="Yeni / İşlenmemiş Sipariş Var"
                       />
                     )}
-                    <span className="truncate max-w-[100px]">{user.userName || "N/A"}</span>
+                    <span className="truncate max-w-[100px]">
+                      {user.userName || "N/A"}
+                    </span>
                   </div>
                 </TableCell>
-                <TableCell className="py-1 text-xs truncate max-w-[120px]">{user.email || user.phoneNumber || "N/A"}</TableCell>
-                <TableCell className="text-center py-1 text-xs">{user.orderCount}</TableCell>
+                <TableCell className="py-1 text-xs truncate max-w-[120px]">
+                  {user.email || user.phoneNumber || "N/A"}
+                </TableCell>
+                <TableCell className="text-center py-1 text-xs">
+                  {user.orderCount}
+                </TableCell>
                 <TableCell className="text-right py-1 text-xs">
                   {user.lastOrderDate && isValid(parseISO(user.lastOrderDate))
                     ? format(parseISO(user.lastOrderDate), "dd.MM.yy")
@@ -157,12 +176,14 @@ function UserListTable({ users, onViewOrdersClick, isLoading }) {
           {filteredUsers.length > 12 && (
             <TableRow>
               <TableCell colSpan={5} className="text-center py-1">
-                <Button 
-                  variant="link" 
+                <Button
+                  variant="link"
                   className="text-xs text-muted-foreground h-5 p-0"
                   onClick={() => setShowAll(!showAll)}
                 >
-                  {showAll ? "Daha Az Göster" : `Tümünü Görüntüle (${filteredUsers.length})`}
+                  {showAll
+                    ? "Daha Az Göster"
+                    : `Tümünü Görüntüle (${filteredUsers.length})`}
                 </Button>
               </TableCell>
             </TableRow>
@@ -176,7 +197,7 @@ function UserListTable({ users, onViewOrdersClick, isLoading }) {
 function UserOrdersTable({ orders, onViewDetailsClick, isLoading }) {
   const [showAll, setShowAll] = useState(false);
   const displayOrders = showAll ? orders : orders.slice(0, 14);
-  
+
   return (
     <div className="overflow-visible">
       <Table className="border-collapse">
@@ -186,7 +207,9 @@ function UserOrdersTable({ orders, onViewDetailsClick, isLoading }) {
             <TableHead className="py-1 text-xs">Tarih</TableHead>
             <TableHead className="py-1 text-xs">Durum</TableHead>
             <TableHead className="py-1 text-xs">Tutar</TableHead>
-            <TableHead className="text-right py-1 text-xs w-16">Detay</TableHead>
+            <TableHead className="text-right py-1 text-xs w-16">
+              Detay
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -208,17 +231,23 @@ function UserOrdersTable({ orders, onViewDetailsClick, isLoading }) {
                   "dd.MM.yy"
                 );
               }
-              
+
               // Get status info
               const status = orderItem?.orderStatus || "default";
-              const statusInfo = orderStatusMapping[status] || orderStatusMapping.default;
+              const statusInfo =
+                orderStatusMapping[status] || orderStatusMapping.default;
 
               return (
-                <TableRow key={orderItem._id} className="border-b border-muted h-7">
+                <TableRow
+                  key={orderItem._id}
+                  className="border-b border-muted h-7"
+                >
                   <TableCell className="font-mono text-xs py-1 truncate max-w-[70px]">
                     {orderItem._id.substring(orderItem._id.length - 8)}
                   </TableCell>
-                  <TableCell className="py-1 text-xs">{formattedDate}</TableCell>
+                  <TableCell className="py-1 text-xs">
+                    {formattedDate}
+                  </TableCell>
                   <TableCell className="py-1">
                     <Badge
                       className={`p-0.5 px-1 text-[10px] justify-center min-w-[60px] ${statusInfo.color} ${statusInfo.textColor}`}
@@ -252,12 +281,14 @@ function UserOrdersTable({ orders, onViewDetailsClick, isLoading }) {
           {orders.length > 14 && (
             <TableRow>
               <TableCell colSpan={5} className="text-center py-1">
-                <Button 
-                  variant="link" 
+                <Button
+                  variant="link"
                   className="text-xs text-muted-foreground h-5 p-0"
                   onClick={() => setShowAll(!showAll)}
                 >
-                  {showAll ? "Daha Az Göster" : `Tümünü Görüntüle (${orders.length})`}
+                  {showAll
+                    ? "Daha Az Göster"
+                    : `Tümünü Görüntüle (${orders.length})`}
                 </Button>
               </TableCell>
             </TableRow>
@@ -294,10 +325,10 @@ RegisteredUserOrdersTable.propTypes = {
 function GuestOrdersTable({ orders, onViewDetailsClick, isLoading }) {
   const [showAll, setShowAll] = useState(false);
   const displayOrders = showAll ? orders : orders.slice(0, 14);
-  
+
   // Define which statuses are considered "new" and need notification
-  const newOrderStatuses = ['pending', 'pending_payment'];
-  
+  const newOrderStatuses = ["pending", "pending_payment"];
+
   return (
     <div className="overflow-visible">
       <Table className="border-collapse">
@@ -308,7 +339,9 @@ function GuestOrdersTable({ orders, onViewDetailsClick, isLoading }) {
             <TableHead className="py-1 text-xs">Tarih</TableHead>
             <TableHead className="py-1 text-xs">Durum</TableHead>
             <TableHead className="py-1 text-xs">Tutar</TableHead>
-            <TableHead className="text-right py-1 text-xs w-16">Detay</TableHead>
+            <TableHead className="text-right py-1 text-xs w-16">
+              Detay
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -330,14 +363,16 @@ function GuestOrdersTable({ orders, onViewDetailsClick, isLoading }) {
                   "dd.MM.yy"
                 );
               }
-              
+
               // Get status info
               const status = orderItem?.orderStatus || "default";
-              const statusInfo = orderStatusMapping[status] || orderStatusMapping.default;
-              
+              const statusInfo =
+                orderStatusMapping[status] || orderStatusMapping.default;
+
               // Check if this is a new order that needs attention
-              const isNewOrder = newOrderStatuses.includes(status) || orderItem.isNew;
-              
+              const isNewOrder =
+                newOrderStatuses.includes(status) || orderItem.isNew;
+
               const guestName =
                 orderItem.guestInfo?.fullName ||
                 orderItem.addressInfo?.fullName ||
@@ -345,10 +380,15 @@ function GuestOrdersTable({ orders, onViewDetailsClick, isLoading }) {
               const guestEmail = orderItem.guestInfo?.email;
 
               // Get the last 8 characters of the order ID
-              const shortOrderId = orderItem._id.substring(orderItem._id.length - 8);
+              const shortOrderId = orderItem._id.substring(
+                orderItem._id.length - 8
+              );
 
               return (
-                <TableRow key={orderItem._id} className="border-b border-muted h-7">
+                <TableRow
+                  key={orderItem._id}
+                  className="border-b border-muted h-7"
+                >
                   <TableCell className="font-mono text-xs py-1">
                     <div className="flex items-center gap-1">
                       {isNewOrder && (
@@ -368,7 +408,9 @@ function GuestOrdersTable({ orders, onViewDetailsClick, isLoading }) {
                       </div>
                     )}
                   </TableCell>
-                  <TableCell className="py-1 text-xs">{formattedDate}</TableCell>
+                  <TableCell className="py-1 text-xs">
+                    {formattedDate}
+                  </TableCell>
                   <TableCell className="py-1">
                     <Badge
                       className={`p-0.5 px-1 text-[10px] justify-center min-w-[60px] ${statusInfo.color} ${statusInfo.textColor}`}
@@ -402,12 +444,14 @@ function GuestOrdersTable({ orders, onViewDetailsClick, isLoading }) {
           {orders.length > 14 && (
             <TableRow>
               <TableCell colSpan={6} className="text-center py-1">
-                <Button 
-                  variant="link" 
+                <Button
+                  variant="link"
                   className="text-xs text-muted-foreground h-5 p-0"
                   onClick={() => setShowAll(!showAll)}
                 >
-                  {showAll ? "Daha Az Göster" : `Tümünü Görüntüle (${orders.length})`}
+                  {showAll
+                    ? "Daha Az Göster"
+                    : `Tümünü Görüntüle (${orders.length})`}
                 </Button>
               </TableCell>
             </TableRow>
@@ -420,7 +464,8 @@ function GuestOrdersTable({ orders, onViewDetailsClick, isLoading }) {
 
 function AdminOrdersView() {
   const [selectedUserId, setSelectedUserId] = useState(null);
-  const [selectedOrderIdForDetails, setSelectedOrderIdForDetails] = useState(null);
+  const [selectedOrderIdForDetails, setSelectedOrderIdForDetails] =
+    useState(null);
 
   const dispatch = useDispatch();
   const {
@@ -449,13 +494,19 @@ function AdminOrdersView() {
   );
 
   // Filter out guest users from registered users
-  const filteredUserList = userList.filter(user => 
-    !(user.userName?.toLowerCase().includes('misafir') || 
-      user.userId === 'GUEST_ORDERS_VIRTUAL_ID')
+  const filteredUserList = userList.filter(
+    (user) =>
+      !(
+        user.userName?.toLowerCase().includes("misafir") ||
+        user.userId === "GUEST_ORDERS_VIRTUAL_ID"
+      )
   );
 
   // Calculate total orders with filtered user list
-  const registeredUserOrdersCount = filteredUserList.reduce((acc, user) => acc + (user.orderCount || 0), 0);
+  const registeredUserOrdersCount = filteredUserList.reduce(
+    (acc, user) => acc + (user.orderCount || 0),
+    0
+  );
   const guestOrdersCount = guestOrderList.length || 0;
   const totalOrdersCount = registeredUserOrdersCount + guestOrdersCount;
 
@@ -492,11 +543,9 @@ function AdminOrdersView() {
   return (
     <div className="space-y-3">
       {error && (
-        <p className="text-red-600 text-xs p-2 bg-red-50 rounded-md">
-          {error}
-        </p>
+        <p className="text-red-600 text-xs p-2 bg-red-50 rounded-md">hata</p>
       )}
-      
+
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-semibold">Sipariş Yönetimi</h2>
         <Card className="p-2 shadow-sm">
@@ -513,7 +562,9 @@ function AdminOrdersView() {
               <UserCog className="h-3.5 w-3.5 text-indigo-600" />
               <div>
                 <div className="text-[10px] text-muted-foreground">Kayıtlı</div>
-                <div className="text-sm font-bold">{registeredUserOrdersCount}</div>
+                <div className="text-sm font-bold">
+                  {registeredUserOrdersCount}
+                </div>
               </div>
             </div>
             <div className="h-6 w-px bg-gray-200 dark:bg-gray-700"></div>
@@ -528,9 +579,9 @@ function AdminOrdersView() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
         {/* Registered Users Side */}
-        <Card className="shadow-sm">
+        <Card className="shadow-sm md:col-span-2">
           <CardHeader className="py-2 px-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <UserCog className="h-3.5 w-3.5" />
@@ -550,7 +601,8 @@ function AdminOrdersView() {
                     <ArrowLeft className="h-3 w-3" />
                   </Button>
                   <h3 className="text-xs font-medium">
-                    {userList.find((u) => u.userId === selectedUserId)?.userName || selectedUserId}
+                    {userList.find((u) => u.userId === selectedUserId)
+                      ?.userName || selectedUserId}
                   </h3>
                 </div>
                 <RegisteredUserOrdersTable
@@ -570,7 +622,7 @@ function AdminOrdersView() {
         </Card>
 
         {/* Guest Orders Side */}
-        <Card className="shadow-sm">
+        <Card className="shadow-sm md:col-span-3">
           <CardHeader className="py-2 px-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <UserMinus className="h-3.5 w-3.5" />
@@ -605,7 +657,9 @@ function AdminOrdersView() {
           {isDetailsLoading ? (
             <div className="p-8 text-center">
               <Loader2 className="mx-auto h-8 w-8 animate-spin text-muted-foreground" />
-              <p className="mt-2 text-sm text-muted-foreground">Sipariş detayları yükleniyor...</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Sipariş detayları yükleniyor...
+              </p>
             </div>
           ) : orderDetails ? (
             <div className="max-h-[70vh] overflow-y-auto px-6 py-4">
@@ -615,11 +669,12 @@ function AdminOrdersView() {
             <div className="p-8 text-center text-red-500">
               <p>Sipariş detayları yüklenemedi.</p>
               <p className="text-sm text-muted-foreground mt-1">
-                Lütfen daha sonra tekrar deneyin veya sistem yöneticisiyle iletişime geçin.
+                Lütfen daha sonra tekrar deneyin veya sistem yöneticisiyle
+                iletişime geçin.
               </p>
             </div>
           )}
-          
+
           <DialogFooter className="px-6 py-3 border-t bg-gray-50 dark:bg-gray-900">
             <DialogClose asChild>
               <Button type="button" variant="secondary">

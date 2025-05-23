@@ -15,6 +15,7 @@ import sideBannerReducer from "./common-slice/side-banner-slice";
 import categoriesReducer from "./common-slice/categories-slice"; // Yeni
 import homeSectionsReducer from "./common-slice/home-sections-slice"; // Yeni
 import brandsReducer from "./common-slice/brands-slice";
+import adminStatsSlice from "./admin/statsSlice";
 
 const store = configureStore({
   reducer: {
@@ -34,6 +35,7 @@ const store = configureStore({
     categories: categoriesReducer,
     homeSections: homeSectionsReducer,
     brands: brandsReducer,
+    adminStats: adminStatsSlice,
   },
 });
 

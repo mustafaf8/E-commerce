@@ -49,6 +49,12 @@ const adminSidebarMenuItems = [
     path: "/admin/home-sections",
     icon: <Home size={18} />,
   },
+  {
+    id: "stats",
+    label: "İstatistikler",
+    path: "/admin/stats",
+    icon: <ChartNoAxesCombined size={18} />,
+  },
 ];
 
 function MenuItems({ setOpen }) {

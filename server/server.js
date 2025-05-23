@@ -39,6 +39,7 @@ const commonCategoryRouter = require("./routes/common/category-routes"); // Yeni
 const shopHomeSectionRouter = require("./routes/shop/home-section-routes");
 const adminBrandRouter = require("./routes/admin/brand-routes"); // Yeni
 const commonBrandRouter = require("./routes/common/brand-routes");
+const adminStatsRouter = require("./routes/admin/statsAdminRoutes");
 
 require("./controllers/auth/auth-controller");
 
@@ -110,5 +111,6 @@ app.use("/api/common/categories", commonCategoryRouter);
 app.use("/api/shop/home-sections", shopHomeSectionRouter);
 app.use("/api/admin/brands", adminBrandRouter);
 app.use("/api/common/brands", commonBrandRouter);
+app.use("/api/admin/stats", adminStatsRouter);
 
 app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));

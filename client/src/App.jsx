@@ -39,6 +39,7 @@ import {
 } from "./store/shop/cart-slice"; // syncLocalCartToBackend ve clearCartState eklendi
 import { getGuestCart } from "./lib/guestCartUtils";
 import GuestCheckoutAddress from "./pages/shopping-view/GuestCheckoutAddress";
+import AdminStatsPage from "./pages/admin-view/AdminStatsPage";
 
 function App() {
   const {
@@ -112,6 +113,7 @@ function App() {
           <Route path="categories" element={<AdminCategories />} />
           <Route path="home-sections" element={<AdminHomeSections />} />
           <Route path="brands" element={<AdminBrands />} />
+          <Route path="stats" element={<AdminStatsPage />} />
         </Route>
 
         <Route path="/shop" element={<ShoppingLayout />}>
