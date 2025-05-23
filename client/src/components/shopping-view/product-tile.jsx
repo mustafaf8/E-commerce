@@ -214,7 +214,7 @@ function ShoppingProductTile({ product, handleGetProductDetails }) {
           disabled={!product?.totalStock || product.totalStock <= 0}
           className="w-full bg-primary/90 hover:bg-primary text-white transition-colors flex items-center gap-1.5 h-9"
         >
-          <ShoppingCart className="h-4 w-4" />
+         
           <span className="text-sm">Sepete Ekle</span>
         </Button>
       </CardFooter>

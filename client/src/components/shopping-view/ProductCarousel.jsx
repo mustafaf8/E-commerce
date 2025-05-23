@@ -231,7 +231,7 @@ ProductCarousel.propTypes = {
   fetchConfig: PropTypes.shape({
     key: PropTypes.string,
     filterParams: PropTypes.object,
-    sortParams: PropTypes.object,
+    sortParams: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     limit: PropTypes.number,
   }),
 };

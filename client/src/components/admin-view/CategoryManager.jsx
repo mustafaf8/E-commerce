@@ -115,7 +115,6 @@ function CategoryManager() {
             }.`,
           });
           closeModal();
-          dispatch(fetchAllCategories());
         } else {
           toast({
             variant: "destructive",

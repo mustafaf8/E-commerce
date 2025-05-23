@@ -13,7 +13,7 @@ export const fetchAllBrands = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/common/brands/list`
+        `http://localhost:5000/api/admin/brands/list`
       );
       return response.data;
     } catch (error) {

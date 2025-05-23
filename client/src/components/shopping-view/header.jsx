@@ -90,7 +90,7 @@ function CategorySubMenu() {
     {activeCategories.map((category) => (
       <Button
         variant="mustafa"
-        size="sm"
+        size="mustafa"
         onClick={() => handleNavigateToCategory(category.id)}
         className="text-sm font-medium text-muted-foreground hover:text-primary px-2 whitespace-nowrap"
         key={category.id}
@@ -143,7 +143,8 @@ function MainHeaderActions() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              variant="mustafa"
+              variant="outline"
+              size="mustafa"
               className="flex items-center gap-2 px-2 md:px-3 py-1.5 h-auto"
             >
             <Avatar className="h-7 w-7 md:h-8 md:w-8 border">
@@ -180,16 +181,18 @@ function MainHeaderActions() {
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
-        <Button
-          variant="mustafa"
-          onClick={() => navigate("/auth/login")}
-          className="flex flex-col items-center px-2 md:px-3 py-1 h-auto"
-        >
-          <LogIn className="h-5 w-5 md:h- md:w-4 text-primary" />
-          <span className="text-xs mt-0.5 text-muted-foreground">
-            Giriş Yap
-          </span>
-        </Button>
+        
+         <Button
+         onClick={() => navigate("/auth/login")}
+         variant="secondary"
+         className="flex items-center gap-2 px-3 md:px-4 py-2 h-auto max-lg:hidden"
+       >
+        <LogIn className="h-5 w-5 md:h- md:w-4 text-primary" />
+         <span className="hidden md:inline text-sm font-medium">
+         Giriş Yap
+         </span>
+       
+       </Button>
       )}
       <Sheet open={openCartSheet} onOpenChange={setOpenCartSheet}>
         <SheetTrigger asChild>

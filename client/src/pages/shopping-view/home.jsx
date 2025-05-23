@@ -141,7 +141,7 @@ function ShoppingHome() {
                     <img
                       src={promoCard.image}
                       alt={promoCard.title || "Promosyon"}
-                      className="w-full h-full object-contain transition-transform duration-300 hover:scale-105 max-[850px]:p-0"
+                      className="w-full h-full object-contain max-[850px]:p-0"
                       loading="lazy"
                     />
                   </CardContent>

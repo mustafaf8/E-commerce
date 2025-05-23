@@ -108,7 +108,6 @@ function BrandManager() {
             title: `Marka başarıyla ${isEditing ? "güncellendi" : "eklendi"}.`,
           });
           closeModal();
-          dispatch(fetchAllBrands());
         } else {
           toast({
             variant: "destructive",
@@ -163,6 +162,7 @@ function BrandManager() {
 
   return (
     <div>
+      
       <div className="flex justify-end mb-4">
         <Button onClick={openModalForAdd}>
           <PlusCircle className="mr-2 h-4 w-4" /> Yeni Marka Ekle
