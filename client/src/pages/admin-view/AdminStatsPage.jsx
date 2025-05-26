@@ -45,7 +45,6 @@ function AdminStatsPage() {
     userSummary,
     topCustomers,
     topLikedProducts,
-    productSummary,
     salesTrend,
     userRegistrationsTrend,
     isLoading,
@@ -404,46 +403,153 @@ function AdminStatsPage() {
         </div>
       )}
 
-      {/* Top Selling & Low Stock side-by-side */}
-      {(topSellingProducts?.length > 0 || lowStockProducts?.length > 0) && (
+      {/* Top Customers & Top Liked Products */}
+      {(topCustomers?.length > 0 || topLikedProducts?.length > 0) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Top Selling Products */}
-          {topSellingProducts?.length > 0 && (
+          {/* Top Customers */}
+          {topCustomers && topCustomers.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>En Çok Satan Ürünler</CardTitle>
+                <CardTitle>En Çok Sipariş Veren Müşteriler</CardTitle>
               </CardHeader>
+              <CardContent className="space-y-3">
+                {topCustomers.slice(0, 6).map((c, idx) => {
+                  const initials = (c.name || c.email || "M")[0].toUpperCase();
+                  return (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between rounded-md border p-3 hover:shadow-sm transition-shadow"
+                    >
+                      <span className="mr-3 text-lg font-bold text-muted-foreground">
+                        {idx + 1}.
+                      </span>
+                      <div className="mr-3 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
+                        {initials}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="truncate font-medium">
+                          {c.name || "Misafir"}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {c.email}
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-2">
+                        <span className="rounded-full bg-secondary px-2 py-0.5 text-xs">
+                          {c.orderCount} sip.
+                        </span>
+                        <span className="rounded-full bg-emerald-500/10 text-emerald-700 px-2 py-0.5 text-xs">
+                          ₺{c.totalSpent.toFixed(0)}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+          )}
 
-              <CardContent className="space-y-4">
-                {/*
+          {/* Top Selling & Low Stock side-by-side */}
+          {(topSellingProducts?.length > 0 || lowStockProducts?.length > 0) && (
+            <div className="grid grid-cols-1 gap-4">
+              {/* Top Selling Products */}
+              {topSellingProducts?.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>En Çok Satan Ürünler</CardTitle>
+                  </CardHeader>
+
+                  <CardContent className="space-y-4">
+                    {/*
                     Max değer – ilerleme barının oranını hesaplamamız için gerekir.
                     "salesCount" yoksa backend'de gönderdiğiniz "totalUnits" alanını kullanın.
                   */}
-                {(() => {
-                  const filteredTopProducts = topSellingProducts.filter(
-                    (p) => (p.salesCount || p.totalUnits || 0) > 0
-                  );
-                  if (filteredTopProducts.length === 0) return null;
-                  const maxSales = Math.max(
-                    ...filteredTopProducts.map(
-                      (p) => p.salesCount || p.totalUnits
-                    )
-                  );
+                    {(() => {
+                      const filteredTopProducts = topSellingProducts.filter(
+                        (p) => (p.salesCount || p.totalUnits || 0) > 0
+                      );
+                      if (filteredTopProducts.length === 0) return null;
+                      const maxSales = Math.max(
+                        ...filteredTopProducts.map(
+                          (p) => p.salesCount || p.totalUnits
+                        )
+                      );
 
-                  return filteredTopProducts.slice(0, 10).map((p, idx) => {
-                    const sales = p.salesCount || p.totalUnits;
-                    const ratio = (sales / maxSales) * 100; // % genişlik
+                      return filteredTopProducts.slice(0, 10).map((p, idx) => {
+                        const sales = p.salesCount || p.totalUnits;
+                        const ratio = (sales / maxSales) * 100; // % genişlik
+                        return (
+                          <div
+                            key={p._id || idx}
+                            className="flex items-center gap-4 overflow-hidden"
+                          >
+                            {/* Sıra Numarası */}
+                            <span className="w-5 text-sm font-semibold text-muted-foreground">
+                              {idx + 1}.
+                            </span>
+
+                            {/* Ürün Görseli */}
+                            {p.image && (
+                              <img
+                                src={p.image}
+                                alt={p.title}
+                                className="h-12 w-12 rounded object-cover"
+                              />
+                            )}
+
+                            {/* Başlık + Progress */}
+                            <div className="flex-1 min-w-0">
+                              <p className="truncate text-sm font-medium">
+                                {p.title}
+                                <span className="ml-1 text-[10px] text-muted-foreground">
+                                  ({p.productId || p._id})
+                                </span>
+                              </p>
+
+                              {/* İlerleme Çubuğu */}
+                              <div className="mt-1 h-2 w-full rounded bg-muted/40">
+                                <div
+                                  style={{ width: `${ratio}%` }}
+                                  className="h-full rounded bg-primary"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Satış Adedi */}
+                            <span className="ml-2 shrink-0 text-sm font-semibold">
+                              {sales}
+                            </span>
+                          </div>
+                        );
+                      });
+                    })()}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+
+          {/* Top Liked Products */}
+          {topLikedProducts && topLikedProducts.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>En Çok Beğenilen Ürünler</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {(() => {
+                  const maxLike = Math.max(
+                    ...topLikedProducts.map((p) => p.likeCount)
+                  );
+                  return topLikedProducts.map((p, idx) => {
+                    const ratio = (p.likeCount / maxLike) * 100;
                     return (
                       <div
-                        key={p._id || idx}
+                        key={p.productId || idx}
                         className="flex items-center gap-4 overflow-hidden"
                       >
-                        {/* Sıra Numarası */}
                         <span className="w-5 text-sm font-semibold text-muted-foreground">
                           {idx + 1}.
                         </span>
-
-                        {/* Ürün Görseli */}
                         {p.image && (
                           <img
                             src={p.image}
@@ -451,8 +557,6 @@ function AdminStatsPage() {
                             className="h-12 w-12 rounded object-cover"
                           />
                         )}
-
-                        {/* Başlık + Progress */}
                         <div className="flex-1 min-w-0">
                           <p className="truncate text-sm font-medium">
                             {p.title}
@@ -460,19 +564,15 @@ function AdminStatsPage() {
                               ({p.productId || p._id})
                             </span>
                           </p>
-
-                          {/* İlerleme Çubuğu */}
                           <div className="mt-1 h-2 w-full rounded bg-muted/40">
                             <div
                               style={{ width: `${ratio}%` }}
-                              className="h-full rounded bg-primary"
+                              className="h-full rounded bg-pink-500"
                             />
                           </div>
                         </div>
-
-                        {/* Satış Adedi */}
                         <span className="ml-2 shrink-0 text-sm font-semibold">
-                          {sales}
+                          {p.likeCount}
                         </span>
                       </div>
                     );
@@ -528,107 +628,6 @@ function AdminStatsPage() {
                     </div>
                   );
                 })}
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      )}
-
-      {/* Top Customers & Top Liked Products */}
-      {(topCustomers?.length > 0 || topLikedProducts?.length > 0) && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Top Customers */}
-          {topCustomers && topCustomers.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>En Çok Sipariş Veren Müşteriler</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {topCustomers.slice(0, 6).map((c, idx) => {
-                  const initials = (c.name || c.email || "M")[0].toUpperCase();
-                  return (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between rounded-md border p-3 hover:shadow-sm transition-shadow"
-                    >
-                      <span className="mr-3 text-lg font-bold text-muted-foreground">
-                        {idx + 1}.
-                      </span>
-                      <div className="mr-3 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-                        {initials}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="truncate font-medium">
-                          {c.name || "Misafir"}
-                        </p>
-                        <p className="truncate text-xs text-muted-foreground">
-                          {c.email}
-                        </p>
-                      </div>
-                      <div className="flex shrink-0 items-center gap-2">
-                        <span className="rounded-full bg-secondary px-2 py-0.5 text-xs">
-                          {c.orderCount} sip.
-                        </span>
-                        <span className="rounded-full bg-emerald-500/10 text-emerald-700 px-2 py-0.5 text-xs">
-                          ₺{c.totalSpent.toFixed(0)}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Top Liked Products */}
-          {topLikedProducts && topLikedProducts.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>En Çok Beğenilen Ürünler</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {(() => {
-                  const maxLike = Math.max(
-                    ...topLikedProducts.map((p) => p.likeCount)
-                  );
-                  return topLikedProducts.map((p, idx) => {
-                    const ratio = (p.likeCount / maxLike) * 100;
-                    return (
-                      <div
-                        key={p.productId || idx}
-                        className="flex items-center gap-4 overflow-hidden"
-                      >
-                        <span className="w-5 text-sm font-semibold text-muted-foreground">
-                          {idx + 1}.
-                        </span>
-                        {p.image && (
-                          <img
-                            src={p.image}
-                            alt={p.title}
-                            className="h-12 w-12 rounded object-cover"
-                          />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className="truncate text-sm font-medium">
-                            {p.title}
-                            <span className="ml-1 text-[10px] text-muted-foreground">
-                              ({p.productId || p._id})
-                            </span>
-                          </p>
-                          <div className="mt-1 h-2 w-full rounded bg-muted/40">
-                            <div
-                              style={{ width: `${ratio}%` }}
-                              className="h-full rounded bg-pink-500"
-                            />
-                          </div>
-                        </div>
-                        <span className="ml-2 shrink-0 text-sm font-semibold">
-                          {p.likeCount}
-                        </span>
-                      </div>
-                    );
-                  });
-                })()}
               </CardContent>
             </Card>
           )}

@@ -87,18 +87,18 @@ function CategorySubMenu() {
 
   return (
     <nav className="flex flex-wrap items-center justify-center gap-x-3 md:gap-x-4 overflow-x-auto no-scrollbar px-4 md:px-6 h-10 bg-muted/30 dark:bg-muted/10">
-    {activeCategories.map((category) => (
-      <Button
-        variant="mustafa"
-        size="mustafa"
-        onClick={() => handleNavigateToCategory(category.id)}
-        className="text-sm font-medium text-muted-foreground hover:text-primary px-2 whitespace-nowrap"
-        key={category.id}
-      >
-        {category.label}
-      </Button>
-    ))}
-  </nav>
+      {activeCategories.map((category) => (
+        <Button
+          variant="mustafa"
+          size="mustafa"
+          onClick={() => handleNavigateToCategory(category.id)}
+          className="text-sm font-medium text-muted-foreground hover:text-primary px-2 whitespace-nowrap"
+          key={category.id}
+        >
+          {category.label}
+        </Button>
+      ))}
+    </nav>
   );
 }
 
@@ -143,11 +143,11 @@ function MainHeaderActions() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              variant="outline"
+              variant="mustafa"
               size="mustafa"
               className="flex items-center gap-2 px-2 md:px-3 py-1.5 h-auto"
             >
-            <Avatar className="h-7 w-7 md:h-8 md:w-8 border">
+              <Avatar className="h-8 w-8 border">
                 <AvatarFallback className="bg-secondary text-xs md:text-sm font-semibold text-primary">
                   {user.userName && user.userName.length > 0
                     ? user.userName[0].toUpperCase()
@@ -181,18 +181,14 @@ function MainHeaderActions() {
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
-        
-         <Button
-         onClick={() => navigate("/auth/login")}
-         variant="secondary"
-         className="flex items-center gap-2 px-3 md:px-4 py-2 h-auto max-lg:hidden"
-       >
-        <LogIn className="h-5 w-5 md:h- md:w-4 text-primary" />
-         <span className="hidden md:inline text-sm font-medium">
-         Giriş Yap
-         </span>
-       
-       </Button>
+        <Button
+          onClick={() => navigate("/auth/login")}
+          variant="secondary"
+          className="flex items-center gap-2 px-3 md:px-4 py-2 h-auto "
+        >
+          <LogIn className="h-5 w-5 md:h- md:w-4 text-primary" />
+          <span className="md:inline text-sm font-medium">Giriş Yap</span>
+        </Button>
       )}
       <Sheet open={openCartSheet} onOpenChange={setOpenCartSheet}>
         <SheetTrigger asChild>
@@ -323,7 +319,7 @@ function ShoppingHeader() {
                 placeholder="Ürün, kategori veya marka ara..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full rounded-md bg-muted pl-10 pr-4 py-2.5 h-11 text-sm border-transparent focus:border-primary focus:bg-background focus:ring-1 focus:ring-primary max-lg:hidden"
+                className="w-full rounded-md bg-muted pl-10 pr-4 py-2.5 h-11 text-sm border-transparent focus:border-primary focus:bg-background focus:ring-1 focus:ring-primary max-md:hidden"
               />
               <button type="submit" className="hidden"></button>
             </div>
@@ -334,7 +330,7 @@ function ShoppingHeader() {
         </div>
       </div>
       {/* Arama Çubuğu (Sadece Küçük Ekranlarda Ayrı Satırda) */}
-      <div className="lg:hidden px-4 pb-1 pt-1 border-t dark:border-gray-700">
+      <div className="lg:hidden md:hidden px-4 pb-1 pt-1 border-t dark:border-gray-700">
         <form onSubmit={handleSearchSubmit} className="w-full">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />

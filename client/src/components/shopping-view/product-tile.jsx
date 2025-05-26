@@ -103,7 +103,7 @@ function ShoppingProductTile({ product, handleGetProductDetails }) {
         >
           <Heart
             className={cn(
-              "w-4 h-4", 
+              "w-4 h-4",
               isWishlisted ? "fill-red-500 text-red-500" : "text-gray-500"
             )}
           />
@@ -126,26 +126,30 @@ function ShoppingProductTile({ product, handleGetProductDetails }) {
                 loading="lazy"
               />
             </div>
-            
+
             {/* Product badges */}
             {product?.totalStock === 0 && (
-              <Badge variant="destructive" className="absolute top-2 left-2 bg-red-500">
+              <Badge
+                variant="destructive"
+                className="absolute top-2 left-2 bg-red-500"
+              >
                 Stokta Yok
               </Badge>
             )}
-            
+
             {product?.totalStock > 0 && product?.totalStock < 10 && (
-              <Badge variant="outline" className="absolute top-2 left-2 bg-amber-500 text-white border-0">
+              <Badge
+                variant="outline"
+                className="absolute top-2 left-2 bg-amber-500 text-white border-0"
+              >
                 Son {product?.totalStock} ürün
               </Badge>
             )}
-            
+
             {product?.salePrice && product.salePrice < product.price && (
-             
-                <Badge className="absolute top-2 left-2 py-0.5 px-2 bg-[hsl(var(--shop-discount))]">
-                  İndirim
-                </Badge>
-           
+              <Badge className="absolute top-2 left-2 py-0.5 px-2 bg-[hsl(var(--shop-discount))]">
+                İndirim
+              </Badge>
             )}
           </div>
 
@@ -157,12 +161,12 @@ function ShoppingProductTile({ product, handleGetProductDetails }) {
             >
               {product?.title}
             </h2>
-            
+
             {/* Ratings */}
             {product?.averageReview !== undefined && (
               <div className="flex items-center space-x-1 pointer-events-none">
-                <StarRatingComponent 
-                  rating={product.averageReview} 
+                <StarRatingComponent
+                  rating={product.averageReview}
                   className="scale-90 origin-left"
                 />
                 <span className="text-xs text-muted-foreground">
@@ -170,10 +174,11 @@ function ShoppingProductTile({ product, handleGetProductDetails }) {
                 </span>
               </div>
             )}
-            
+
             {/* Price */}
             <div className="pt-1">
-              {product?.salePrice !== undefined && product.salePrice !== null ? (
+              {product?.salePrice !== undefined &&
+              product.salePrice !== null ? (
                 <div className="flex items-baseline gap-2">
                   {product?.price &&
                     product.price > 0 &&
@@ -182,14 +187,16 @@ function ShoppingProductTile({ product, handleGetProductDetails }) {
                         {`${product.price.toFixed(2)} TL`}
                       </span>
                     )}
-                  <span className={cn(
-                    "font-medium text-base",
-                    product?.price &&
-                    product.price > 0 &&
-                    product.price > product.salePrice
-                      ? "text-[hsl(var(--shop-discount))]"
-                      : "text-primary"
-                  )}>
+                  <span
+                    className={cn(
+                      "font-medium text-base",
+                      product?.price &&
+                        product.price > 0 &&
+                        product.price > product.salePrice
+                        ? "text-green-600"
+                        : "txt-black"
+                    )}
+                  >
                     {`${product.salePrice.toFixed(2)} TL`}
                   </span>
                 </div>
@@ -214,7 +221,6 @@ function ShoppingProductTile({ product, handleGetProductDetails }) {
           disabled={!product?.totalStock || product.totalStock <= 0}
           className="w-full bg-primary/90 hover:bg-primary text-white transition-colors flex items-center gap-1.5 h-9"
         >
-         
           <span className="text-sm">Sepete Ekle</span>
         </Button>
       </CardFooter>
