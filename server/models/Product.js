@@ -59,6 +59,12 @@ const ProductSchema = new mongoose.Schema(
       default: 0,
       index: true,
     },
+    costPrice: {
+      type: Number,
+      required: false,
+      default: 0,
+      min: [0, "Maliyet negatif olamaz."],
+    },
   },
   { timestamps: true }
 );

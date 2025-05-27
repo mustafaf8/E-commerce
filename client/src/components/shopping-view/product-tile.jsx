@@ -128,29 +128,42 @@ function ShoppingProductTile({ product, handleGetProductDetails }) {
             </div>
 
             {/* Product badges */}
-            {product?.totalStock === 0 && (
-              <Badge
-                variant="destructive"
-                className="absolute top-2 left-2 bg-red-500"
-              >
-                Stokta Yok
-              </Badge>
-            )}
+            {(() => {
+              // Badge priority: out-of-stock > low-stock > discount
+              if (product?.totalStock === 0) {
+                return (
+                  <Badge
+                    variant="destructive"
+                    className="absolute top-2 left-2 bg-red-500"
+                  >
+                    Stokta Yok
+                  </Badge>
+                );
+              }
 
-            {product?.totalStock > 0 && product?.totalStock < 10 && (
-              <Badge
-                variant="outline"
-                className="absolute top-2 left-2 bg-amber-500 text-white border-0"
-              >
-                Son {product?.totalStock} ürün
-              </Badge>
-            )}
+              if (product?.totalStock > 0 && product.totalStock < 10) {
+                return (
+                  <Badge
+                    variant="outline"
+                    className="absolute top-2 left-2 bg-amber-500 text-white border-0"
+                  >
+                    Son {product.totalStock} ürün
+                  </Badge>
+                );
+              }
 
-            {product?.salePrice && product.salePrice < product.price && (
-              <Badge className="absolute top-2 left-2 py-0.5 px-2 bg-[hsl(var(--shop-discount))]">
-                İndirim
-              </Badge>
-            )}
+              if (
+                product?.salePrice &&
+                product.salePrice < product.price
+              ) {
+                return (
+                  <Badge className="absolute top-2 left-2 py-0.5 px-2 bg-[hsl(var(--shop-discount))]">
+                    İndirim
+                  </Badge>
+                );
+              }
+              return null;
+            })()}
           </div>
 
           {/* Product details */}

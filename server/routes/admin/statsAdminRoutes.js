@@ -34,4 +34,22 @@ router.get(
   require("../../controllers/admin/statsAdminController").getTopLikedProducts
 );
 
+// Profit Endpoints
+router.get(
+  "/profit-overview",
+  require("../../controllers/admin/statsAdminController").getProfitOverview
+);
+router.get(
+  "/profit-by-product",
+  require("../../controllers/admin/statsAdminController").getProfitByProduct
+);
+router.get(
+  "/profit-by-category",
+  require("../../controllers/admin/statsAdminController").getProfitByCategory
+);
+router.get(
+  "/profit-by-brand",
+  require("../../controllers/admin/statsAdminController").getProfitByBrand
+);
+
 module.exports = router;

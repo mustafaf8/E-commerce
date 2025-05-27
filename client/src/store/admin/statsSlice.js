@@ -144,6 +144,54 @@ export const fetchTopLikedProducts = createAsyncThunk(
   }
 );
 
+export const fetchProfitOverview = createAsyncThunk(
+  "adminStats/fetchProfitOverview",
+  async (period = "weekly", { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`${API_BASE}/profit-overview?period=${period}`);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || { message: err.message });
+    }
+  }
+);
+
+export const fetchProfitByProduct = createAsyncThunk(
+  "adminStats/fetchProfitByProduct",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`${API_BASE}/profit-by-product`);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || { message: err.message });
+    }
+  }
+);
+
+export const fetchProfitByCategory = createAsyncThunk(
+  "adminStats/fetchProfitByCategory",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`${API_BASE}/profit-by-category`);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || { message: err.message });
+    }
+  }
+);
+
+export const fetchProfitByBrand = createAsyncThunk(
+  "adminStats/fetchProfitByBrand",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`${API_BASE}/profit-by-brand`);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || { message: err.message });
+    }
+  }
+);
+
 const initialState = {
   salesOverview: null,
   orderStatusDistribution: null,
@@ -156,6 +204,10 @@ const initialState = {
   salesTrend: [],
   userRegistrationsTrend: [],
   topLikedProducts: [],
+  profitOverview: null,
+  profitByProduct: [],
+  profitByCategory: [],
+  profitByBrand: [],
   isLoading: false,
   error: null,
 };
@@ -299,6 +351,54 @@ const adminStatsSlice = createSlice({
         state.topLikedProducts = action.payload.data;
       })
       .addCase(fetchTopLikedProducts.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload?.message || action.error.message;
+      })
+      // Profit Overview
+      .addCase(fetchProfitOverview.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchProfitOverview.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.profitOverview = action.payload.data;
+      })
+      .addCase(fetchProfitOverview.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload?.message || action.error.message;
+      })
+      // Profit by Product
+      .addCase(fetchProfitByProduct.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchProfitByProduct.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.profitByProduct = action.payload.data;
+      })
+      .addCase(fetchProfitByProduct.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload?.message || action.error.message;
+      })
+      // Profit by Category
+      .addCase(fetchProfitByCategory.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchProfitByCategory.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.profitByCategory = action.payload.data;
+      })
+      .addCase(fetchProfitByCategory.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload?.message || action.error.message;
+      })
+      // Profit by Brand
+      .addCase(fetchProfitByBrand.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchProfitByBrand.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.profitByBrand = action.payload.data;
+      })
+      .addCase(fetchProfitByBrand.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload?.message || action.error.message;
       });

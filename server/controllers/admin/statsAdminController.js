@@ -449,6 +449,221 @@ const getTopLikedProducts = async (req, res) => {
   }
 };
 
+// === PROFIT ANALYSIS HELPERS ===
+function getCostAndRevenueAggregation(match = {}) {
+  return [
+    { $match: match },
+    { $unwind: "$cartItems" },
+    {
+      $addFields: {
+        productObjId: {
+          $cond: [
+            { $eq: [{ $type: "$cartItems.productId" }, "objectId"] },
+            "$cartItems.productId",
+            { $toObjectId: "$cartItems.productId" },
+          ],
+        },
+        cartItemPrice: { $toDouble: "$cartItems.price" },
+        cartQuantity: "$cartItems.quantity",
+      },
+    },
+    {
+      $lookup: {
+        from: "products",
+        localField: "productObjId",
+        foreignField: "_id",
+        as: "productInfo",
+      },
+    },
+    { $unwind: "$productInfo" },
+    {
+      $addFields: {
+        costPrice: "$productInfo.costPrice",
+      },
+    },
+  ];
+}
+
+// 12. Profit Overview
+const getProfitOverview = async (req, res) => {
+  try {
+    const { period } = req.query;
+    const match = { ...getPeriodMatch(period) };
+
+    const pipeline = [
+      ...getCostAndRevenueAggregation(match),
+      {
+        $group: {
+          _id: "$_id", // group per order first
+          orderRevenue: { $first: "$totalAmount" },
+          orderCost: {
+            $sum: { $multiply: ["$costPrice", "$cartQuantity"] },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalRevenue: { $sum: "$orderRevenue" },
+          totalCost: { $sum: "$orderCost" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalRevenue: 1,
+          totalCost: 1,
+          netProfit: { $subtract: ["$totalRevenue", "$totalCost"] },
+        },
+      },
+    ];
+
+    const result = await Order.aggregate(pipeline);
+    res.status(200).json({ success: true, data: result[0] || {} });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// 13. Profit by Product
+const getProfitByProduct = async (req, res) => {
+  try {
+    const { limit = 20 } = req.query;
+    const pipeline = [
+      ...getCostAndRevenueAggregation({}),
+      {
+        $group: {
+          _id: "$productInfo._id",
+          title: { $first: "$productInfo.title" },
+          image: { $first: "$productInfo.image" },
+          totalUnits: { $sum: "$cartQuantity" },
+          revenue: {
+            $sum: { $multiply: ["$cartItemPrice", "$cartQuantity"] },
+          },
+          cost: {
+            $sum: { $multiply: ["$costPrice", "$cartQuantity"] },
+          },
+        },
+      },
+      {
+        $addFields: {
+          profit: { $subtract: ["$revenue", "$cost"] },
+        },
+      },
+      { $sort: { profit: -1 } },
+      { $limit: Number(limit) },
+    ];
+    const data = await Order.aggregate(pipeline);
+    res.status(200).json({ success: true, data });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// 14. Profit by Category
+const getProfitByCategory = async (_req, res) => {
+  try {
+    const pipeline = [
+      ...getCostAndRevenueAggregation({}),
+      {
+        $group: {
+          _id: "$productInfo.category",
+          totalUnits: { $sum: "$cartQuantity" },
+          revenue: {
+            $sum: { $multiply: ["$cartItemPrice", "$cartQuantity"] },
+          },
+          cost: {
+            $sum: { $multiply: ["$costPrice", "$cartQuantity"] },
+          },
+        },
+      },
+      {
+        $addFields: {
+          profit: { $subtract: ["$revenue", "$cost"] },
+        },
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "_id",
+          foreignField: "_id",
+          as: "categoryInfo",
+        },
+      },
+      { $unwind: "$categoryInfo" },
+      {
+        $project: {
+          _id: 0,
+          category: "$categoryInfo.name",
+          revenue: 1,
+          cost: 1,
+          profit: 1,
+          totalUnits: 1,
+        },
+      },
+      { $sort: { profit: -1 } },
+    ];
+    const data = await Order.aggregate(pipeline);
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// 15. Profit by Brand
+const getProfitByBrand = async (_req, res) => {
+  try {
+    const pipeline = [
+      ...getCostAndRevenueAggregation({}),
+      {
+        $group: {
+          _id: "$productInfo.brand",
+          totalUnits: { $sum: "$cartQuantity" },
+          revenue: {
+            $sum: { $multiply: ["$cartItemPrice", "$cartQuantity"] },
+          },
+          cost: {
+            $sum: { $multiply: ["$costPrice", "$cartQuantity"] },
+          },
+        },
+      },
+      {
+        $addFields: {
+          profit: { $subtract: ["$revenue", "$cost"] },
+        },
+      },
+      {
+        $lookup: {
+          from: "brands",
+          localField: "_id",
+          foreignField: "_id",
+          as: "brandInfo",
+        },
+      },
+      { $unwind: "$brandInfo" },
+      {
+        $project: {
+          _id: 0,
+          brand: "$brandInfo.name",
+          revenue: 1,
+          cost: 1,
+          profit: 1,
+          totalUnits: 1,
+        },
+      },
+      { $sort: { profit: -1 } },
+    ];
+    const data = await Order.aggregate(pipeline);
+    res.status(200).json({ success: true, data });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 module.exports = {
   getSalesOverview,
   getOrderStatusDistribution,
@@ -461,4 +676,8 @@ module.exports = {
   getSalesTrend,
   getUserRegistrationsTrend,
   getTopLikedProducts,
+  getProfitOverview,
+  getProfitByProduct,
+  getProfitByCategory,
+  getProfitByBrand,
 };

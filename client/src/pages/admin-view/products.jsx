@@ -36,6 +36,7 @@ const initialFormData = {
   totalStock: "",
   averageReview: 0,
   image: "",
+  costPrice: "",
 };
 
 function AdminProducts() {

@@ -84,6 +84,13 @@ export const addProductFormElements = [
     placeholder: "Satış fiyatını girin (opsiyonel)",
   },
   {
+    label: "Alış Fiyatı (Maliyet)",
+    name: "costPrice",
+    componentType: "input",
+    type: "number",
+    placeholder: "Ürünün maliyetini girin",
+  },
+  {
     label: "Toplam Stok",
     name: "totalStock",
     componentType: "input",
