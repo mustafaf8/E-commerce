@@ -1,17 +1,11 @@
-import { FileImage, ImageIcon, UploadCloud, X } from "lucide-react";
+import { FileImage, UploadCloud, X } from "lucide-react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { useRef } from "react";
 import PropTypes from "prop-types";
 import { Button } from "../ui/button";
 
-function ProductImageUpload({
-  imageFile,
-  setImageFile,
-  isEditMode,
-  isCustomStyling = false,
-  id,
-}) {
+function ProductImageUpload({ imageFile, setImageFile, isEditMode, id }) {
   const inputRef = useRef(null);
 
   function handleImageFileChange(event) {
@@ -27,7 +21,7 @@ function ProductImageUpload({
       event.currentTarget.classList.add("border-primary", "bg-primary/5");
     }
   }
-  
+
   function handleDragLeave(event) {
     event.preventDefault();
     event.currentTarget.classList.remove("border-primary", "bg-primary/5");
@@ -50,17 +44,21 @@ function ProductImageUpload({
   }
 
   return (
-    <div className={`w-full ${isCustomStyling ? "" : "max-w-md"}`}>
-      <Label htmlFor={id} className="text-sm font-medium mb-1.5 block">Resim Seç</Label>
+    <div className="w-full">
+      <Label htmlFor={id} className="text-sm font-medium mb-1.5 block">
+        Resim Seç
+      </Label>
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={`
           border-2 border-dashed rounded-lg p-4 transition-colors duration-200
-          ${isEditMode 
-            ? "opacity-60 cursor-not-allowed border-gray-300 bg-gray-50" 
-            : "border-gray-300 hover:border-primary/70 hover:bg-primary/5"}
+          ${
+            isEditMode
+              ? "opacity-60 cursor-not-allowed border-gray-300 bg-gray-50"
+              : "border-gray-300 hover:border-primary/70 hover:bg-primary/5"
+          }
         `}
       >
         <Input
@@ -109,7 +107,7 @@ function ProductImageUpload({
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 flex-shrink-0" 
+              className="h-8 w-8 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 flex-shrink-0"
               onClick={handleRemoveImage}
               disabled={isEditMode}
             >

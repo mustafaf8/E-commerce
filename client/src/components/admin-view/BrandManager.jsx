@@ -23,6 +23,7 @@ import { useToast } from "@/components/ui/use-toast";
 import ConfirmationModal from "./ConfirmationModal";
 import { Skeleton } from "../ui/skeleton";
 import { Badge } from "../ui/badge";
+import { CardTitle } from "../ui/card";
 
 const initialBrandData = { name: "", slug: "", isActive: true };
 
@@ -162,8 +163,8 @@ function BrandManager() {
 
   return (
     <div>
-      
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-between items-center my-4">
+        <CardTitle>Marka Yönetimi</CardTitle>
         <Button onClick={openModalForAdd}>
           <PlusCircle className="mr-2 h-4 w-4" /> Yeni Marka Ekle
         </Button>

@@ -52,9 +52,6 @@ function AdminStatsPage() {
     salesTrend,
     userRegistrationsTrend,
     profitOverview,
-    profitByProduct,
-    profitByCategory,
-    profitByBrand,
     isLoading,
     error,
   } = useSelector((state) => state.adminStats);
@@ -271,74 +268,110 @@ function AdminStatsPage() {
       )}
 
       {/* Order Status & Profit Overview grid */}
-      {(Object.keys(orderStatusDistribution || {}).length > 0 || profitOverview) && (
+      {(Object.keys(orderStatusDistribution || {}).length > 0 ||
+        profitOverview) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Order Status Pie */}
-          {orderStatusDistribution && Object.keys(orderStatusDistribution).length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Sipariş Durumu Dağılımı</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {isLoading ? (
-                  <Skeleton className="h-[360px] w-full rounded-md" />
-                ) : (
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Tooltip />
-                      <Legend />
-                      {(() => {
-                        const pieData = Object.entries(orderStatusDistribution).map(([key, val]) => ({
-                          key,
-                          name: STATUS_INFO[key]?.label || key,
-                          value: val,
-                          fill: STATUS_INFO[key]?.color || "#D1D5DB",
-                        }));
-                        return (
-                          <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={60} outerRadius={100} label>
-                            {pieData.map((entry, idx) => (
-                              <Cell key={`cell-${idx}`} fill={entry.fill} />
-                            ))}
-                          </Pie>
-                        );
-                      })()}
-                    </PieChart>
-                  </ResponsiveContainer>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Profit Pie Chart */}
-          {profitOverview && (() => {
-            const total = (profitOverview.totalRevenue || 0) + (profitOverview.totalCost || 0);
-            if (total === 0) return null;
-            const pieData = [
-              { name: "Gelir", value: profitOverview.totalRevenue || 0, fill: "#4ade80" },
-              { name: "Maliyet", value: profitOverview.totalCost || 0, fill: "#f87171" },
-              { name: "Net Kar", value: profitOverview.netProfit || 0, fill: "#60a5fa" },
-            ];
-            return (
+          {orderStatusDistribution &&
+            Object.keys(orderStatusDistribution).length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Kar Dağılımı</CardTitle>
+                  <CardTitle>Sipariş Durumu Dağılımı</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Tooltip />
-                      <Legend />
-                      <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={60} outerRadius={100} label>
-                        {pieData.map((entry, idx) => (
-                          <Cell key={`cell-profit-${idx}`} fill={entry.fill} />
-                        ))}
-                      </Pie>
-                    </PieChart>
-                  </ResponsiveContainer>
+                  {isLoading ? (
+                    <Skeleton className="h-[360px] w-full rounded-md" />
+                  ) : (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Tooltip />
+                        <Legend />
+                        {(() => {
+                          const pieData = Object.entries(
+                            orderStatusDistribution
+                          ).map(([key, val]) => ({
+                            key,
+                            name: STATUS_INFO[key]?.label || key,
+                            value: val,
+                            fill: STATUS_INFO[key]?.color || "#D1D5DB",
+                          }));
+                          return (
+                            <Pie
+                              data={pieData}
+                              dataKey="value"
+                              nameKey="name"
+                              innerRadius={60}
+                              outerRadius={100}
+                              label
+                            >
+                              {pieData.map((entry, idx) => (
+                                <Cell key={`cell-${idx}`} fill={entry.fill} />
+                              ))}
+                            </Pie>
+                          );
+                        })()}
+                      </PieChart>
+                    </ResponsiveContainer>
+                  )}
                 </CardContent>
               </Card>
-            );
-          })()}
+            )}
+
+          {/* Profit Pie Chart */}
+          {profitOverview &&
+            (() => {
+              const total =
+                (profitOverview.totalRevenue || 0) +
+                (profitOverview.totalCost || 0);
+              if (total === 0) return null;
+              const pieData = [
+                {
+                  name: "Gelir",
+                  value: profitOverview.totalRevenue || 0,
+                  fill: "#4ade80",
+                },
+                {
+                  name: "Maliyet",
+                  value: profitOverview.totalCost || 0,
+                  fill: "#f87171",
+                },
+                {
+                  name: "Net Kar",
+                  value: profitOverview.netProfit || 0,
+                  fill: "#60a5fa",
+                },
+              ];
+              return (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Kar Dağılımı</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Tooltip />
+                        <Legend />
+                        <Pie
+                          data={pieData}
+                          dataKey="value"
+                          nameKey="name"
+                          innerRadius={60}
+                          outerRadius={100}
+                          label
+                        >
+                          {pieData.map((entry, idx) => (
+                            <Cell
+                              key={`cell-profit-${idx}`}
+                              fill={entry.fill}
+                            />
+                          ))}
+                        </Pie>
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              );
+            })()}
         </div>
       )}
 
@@ -353,12 +386,20 @@ function AdminStatsPage() {
               <Skeleton className="h-[360px] w-full rounded-md" />
             ) : (
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={userRegistrationsTrend} margin={{ top: 20, right: 20, bottom: 5, left: 0 }}>
+                <LineChart
+                  data={userRegistrationsTrend}
+                  margin={{ top: 20, right: 20, bottom: 5, left: 0 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="_id" />
                   <YAxis />
                   <Tooltip />
-                  <Line type="monotone" dataKey="registrations" stroke="#FF8042" name="Yeni Kullanıcı" />
+                  <Line
+                    type="monotone"
+                    dataKey="registrations"
+                    stroke="#FF8042"
+                    name="Yeni Kullanıcı"
+                  />
                 </LineChart>
               </ResponsiveContainer>
             )}
