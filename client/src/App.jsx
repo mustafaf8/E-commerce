@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import AuthLayout from "./components/auth/layout";
 import AuthLogin from "./pages/auth/login";
 import AuthRegister from "./pages/auth/register";
@@ -40,6 +40,7 @@ import {
 import { getGuestCart } from "./lib/guestCartUtils";
 import GuestCheckoutAddress from "./pages/shopping-view/GuestCheckoutAddress";
 import AdminStatsPage from "./pages/admin-view/AdminStatsPage";
+import CookieConsentBanner from "./components/common/CookieConsentBanner";
 
 function App() {
   const {
@@ -48,6 +49,7 @@ function App() {
     isLoading: authIsLoading,
   } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+  const location = useLocation();
 
   useEffect(() => {
     dispatch(checkAuth());
@@ -160,6 +162,8 @@ function App() {
         <Route path="/unauth-page" element={<UnauthPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+
+      {!isAdminPage && <CookieConsentBanner />}
       {!isAdminPage && (
         <div className="bottom-nav-container lg:hidden">
           <BottomNavBar />
