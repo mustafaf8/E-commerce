@@ -1,13 +1,12 @@
 const nodemailer = require("nodemailer");
 
-// E-posta taşıyıcısını .env değişkenlerinizle yapılandırın
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
   port: parseInt(process.env.EMAIL_PORT || "587"),
-  secure: process.env.EMAIL_SECURE === "true", // port 587 için false olmalı
+  secure: process.env.EMAIL_SECURE === "true",
   auth: {
-    user: process.env.EMAIL_USER, // .env'den gelen Brevo SMTP Login değeri
-    pass: process.env.EMAIL_PASS, // .env'den gelen Brevo SMTP Anahtarı
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
