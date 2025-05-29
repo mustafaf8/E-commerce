@@ -2,7 +2,7 @@ import { Card, CardContent, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import StarRatingComponent from "../common/star-rating";
-import { Heart, ShoppingCart } from "lucide-react";
+import { Heart } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToWishlist, removeFromWishlist } from "@/store/shop/wishlist-slice";
 import { addToCart } from "@/store/shop/cart-slice";
@@ -91,8 +91,8 @@ function ShoppingProductTile({ product, handleGetProductDetails }) {
   };
 
   return (
-    <Card className="shop-product-card h-full hover:shadow-md">
-      <div className="relative">
+    <Card className="shop-product-card h-full hover:shadow-md flex flex-col justify-between">
+      <div className="relative flex flex-col flex-grow">
         {/* Wishlist button */}
         <Button
           variant="ghost"
@@ -152,10 +152,7 @@ function ShoppingProductTile({ product, handleGetProductDetails }) {
                 );
               }
 
-              if (
-                product?.salePrice &&
-                product.salePrice < product.price
-              ) {
+              if (product?.salePrice && product.salePrice < product.price) {
                 return (
                   <Badge className="absolute top-2 left-2 py-0.5 px-2 bg-[hsl(var(--shop-discount))]">
                     İndirim
@@ -167,7 +164,7 @@ function ShoppingProductTile({ product, handleGetProductDetails }) {
           </div>
 
           {/* Product details */}
-          <CardContent className="p-3 space-y-1.5">
+          <CardContent className="p-3 space-y-1.5 flex-grow">
             <h2
               className="text-sm font-medium line-clamp-1"
               title={product?.title}
@@ -228,7 +225,7 @@ function ShoppingProductTile({ product, handleGetProductDetails }) {
       </div>
 
       {/* Action buttons */}
-      <CardFooter className="p-3 pt-0">
+      <CardFooter className="p-3 pt-0 mt-auto flex-shrink-0">
         <Button
           onClick={handleActualAddToCart}
           disabled={!product?.totalStock || product.totalStock <= 0}

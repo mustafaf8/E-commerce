@@ -19,11 +19,15 @@ import { cn } from "@/lib/utils";
 import { useSelector } from "react-redux";
 import { Calendar, DollarSign, Package, ShoppingCart, Tag } from "lucide-react";
 
-function DetailItem({ label, value, className = "", valueClassName = "", icon }) {
+function DetailItem({
+  label,
+  value,
+  className = "",
+  valueClassName = "",
+  icon,
+}) {
   return (
-    <div
-      className={cn("flex items-start gap-2", className)}
-    >
+    <div className={cn("flex items-start gap-2", className)}>
       {icon && <span className="text-primary/70 mt-0.5">{icon}</span>}
       <div className="flex-1">
         <p className="text-sm text-muted-foreground">{label}</p>
@@ -99,10 +103,11 @@ function AdminProductDetailsDialog({ open, setOpen, productDetails }) {
                   Açıklama
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-                  {productDetails.description || "Bu ürün için açıklama bulunmamaktadır."}
+                  {productDetails.description ||
+                    "Bu ürün için açıklama bulunmamaktadır."}
                 </p>
               </div>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-border">
                   <h3 className="text-sm font-semibold mb-3 text-primary flex items-center gap-2">
@@ -128,7 +133,7 @@ function AdminProductDetailsDialog({ open, setOpen, productDetails }) {
                     />
                   </div>
                 </div>
-                
+
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-border">
                   <h3 className="text-sm font-semibold mb-3 text-primary flex items-center gap-2">
                     <DollarSign size={16} />
@@ -155,7 +160,7 @@ function AdminProductDetailsDialog({ open, setOpen, productDetails }) {
                     />
                   </div>
                 </div>
-                
+
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-border">
                   <h3 className="text-sm font-semibold mb-3 text-primary flex items-center gap-2">
                     <Package size={16} />
@@ -165,16 +170,19 @@ function AdminProductDetailsDialog({ open, setOpen, productDetails }) {
                     <DetailItem
                       label="Stok Miktarı"
                       value={productDetails.totalStock ?? "N/A"}
-                      valueClassName={productDetails.totalStock > 0 ? "text-green-600 dark:text-green-400" : "text-red-500"}
+                      valueClassName={
+                        productDetails.totalStock > 0
+                          ? "text-green-600 dark:text-green-400"
+                          : "text-red-500"
+                      }
                     />
                     <DetailItem
                       label="Satış Sayısı"
                       value={productDetails.salesCount ?? 0}
-                      icon={<ShoppingCart size={16} />}
                     />
                   </div>
                 </div>
-                
+
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-border">
                   <h3 className="text-sm font-semibold mb-3 text-primary flex items-center gap-2">
                     <Calendar size={16} />
@@ -192,9 +200,11 @@ function AdminProductDetailsDialog({ open, setOpen, productDetails }) {
                   </div>
                 </div>
               </div>
-              
+
               <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-border">
-                <h3 className="text-sm font-semibold mb-3 text-primary">Değerlendirme</h3>
+                <h3 className="text-sm font-semibold mb-3 text-primary">
+                  Değerlendirme
+                </h3>
                 <div className="flex items-center">
                   {productDetails.averageReview !== undefined &&
                   productDetails.averageReview !== null ? (
@@ -213,7 +223,10 @@ function AdminProductDetailsDialog({ open, setOpen, productDetails }) {
                   )}
                 </div>
                 <div className="mt-2 pt-2 border-t border-border">
-                  <p className="text-xs text-muted-foreground">Ürün ID: <span className="font-mono">{productDetails._id}</span></p>
+                  <p className="text-xs text-muted-foreground">
+                    Ürün ID:{" "}
+                    <span className="font-mono">{productDetails._id}</span>
+                  </p>
                 </div>
               </div>
             </div>

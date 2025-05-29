@@ -45,8 +45,14 @@ function AdminOrderDetailsView({ orderDetails }) {
 
   const statusMapping = {
     pending: { label: "Beklemede", color: "bg-yellow-400 text-yellow-800" },
-    pending_payment: { label: "Ödeme Bekleniyor", color: "bg-amber-500 text-amber-800" },
-    inProcess: { label: "Hazırlanıyor", color: "bg-orange-500 text-orange-100" },
+    pending_payment: {
+      label: "Ödeme Bekleniyor",
+      color: "bg-amber-500 text-amber-800",
+    },
+    inProcess: {
+      label: "Hazırlanıyor",
+      color: "bg-orange-500 text-orange-100",
+    },
     inShipping: { label: "Kargoda", color: "bg-teal-500 text-teal-100" },
     delivered: { label: "Teslim Edildi", color: "bg-green-600 text-green-100" },
     rejected: { label: "Reddedildi", color: "bg-red-600 text-red-100" },
@@ -62,7 +68,7 @@ function AdminOrderDetailsView({ orderDetails }) {
   const recipientEmail = isGuest
     ? orderDetails?.guestInfo?.email
     : orderDetails?.userId?.email;
-  
+
   // Get current status information
   const currentStatus = orderDetails?.orderStatus || "default";
   const statusInfo = statusMapping[currentStatus] || statusMapping.default;
@@ -88,7 +94,7 @@ function AdminOrderDetailsView({ orderDetails }) {
           <Package className="h-4 w-4 text-primary" />
           <h3 className="font-semibold">Sipariş Bilgileri</h3>
         </div>
-        
+
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div>
             <div className="text-muted-foreground">Sipariş Tarihi</div>
@@ -99,28 +105,33 @@ function AdminOrderDetailsView({ orderDetails }) {
                     month: "long",
                     year: "numeric",
                     hour: "2-digit",
-                    minute: "2-digit"
+                    minute: "2-digit",
                   })
                 : "N/A"}
             </div>
           </div>
-          
+
           <div>
             <div className="text-muted-foreground">Sipariş No</div>
-            <div className="font-mono text-xs break-all">{orderDetails?._id}</div>
+            <div className="font-mono text-xs break-all">
+              {orderDetails?._id}
+            </div>
           </div>
-          
+
           <div>
             <div className="text-muted-foreground">Ödeme Yöntemi</div>
             <div className="font-medium capitalize flex items-center gap-1">
               <CreditCard className="h-3.5 w-3.5" />
-              {orderDetails?.paymentMethod?.replace("_", " ") || "Belirtilmemiş"}
+              {orderDetails?.paymentMethod?.replace("_", " ") ||
+                "Belirtilmemiş"}
             </div>
           </div>
-          
+
           <div>
             <div className="text-muted-foreground">Ödeme Durumu</div>
-            <div className="font-medium capitalize">{orderDetails?.paymentStatus || "Bilinmiyor"}</div>
+            <div className="font-medium capitalize">
+              {orderDetails?.paymentStatus || "Bilinmiyor"}
+            </div>
           </div>
         </div>
       </Card>
@@ -131,20 +142,20 @@ function AdminOrderDetailsView({ orderDetails }) {
           <User className="h-4 w-4 text-primary" />
           <h3 className="font-semibold">Alıcı Bilgileri</h3>
         </div>
-        
+
         <div className="grid gap-2 text-sm">
           <div>
             <div className="text-muted-foreground">Alıcı</div>
             <div className="font-medium">{recipientName || "N/A"}</div>
           </div>
-          
+
           {recipientEmail && (
             <div>
               <div className="text-muted-foreground">E-posta</div>
               <div className="font-medium">{recipientEmail}</div>
             </div>
           )}
-          
+
           <div>
             <div className="text-muted-foreground">Hesap Türü</div>
             <div className="font-medium">
@@ -160,45 +171,59 @@ function AdminOrderDetailsView({ orderDetails }) {
           <MapPin className="h-4 w-4 text-primary" />
           <h3 className="font-semibold">Teslimat Adresi</h3>
         </div>
-        
+
         {orderDetails?.addressInfo ? (
           <div className="grid gap-2 text-sm">
             <div>
               <div className="text-muted-foreground">Alıcı</div>
-              <div className="font-medium">{orderDetails.addressInfo.fullName || recipientName || "N/A"}</div>
+              <div className="font-medium">
+                {orderDetails.addressInfo.fullName || recipientName || "N/A"}
+              </div>
             </div>
-            
+
             <div>
               <div className="text-muted-foreground">Adres</div>
-              <div className="font-medium">{orderDetails.addressInfo.address}</div>
+              <div className="font-medium">
+                {orderDetails.addressInfo.address}
+              </div>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <div className="text-muted-foreground">Şehir</div>
-                <div className="font-medium">{orderDetails.addressInfo.city}</div>
+                <div className="font-medium">
+                  {orderDetails.addressInfo.city}
+                </div>
               </div>
-              
+
               <div>
                 <div className="text-muted-foreground">Posta Kodu</div>
-                <div className="font-medium">{orderDetails.addressInfo.pincode}</div>
+                <div className="font-medium">
+                  {orderDetails.addressInfo.pincode}
+                </div>
               </div>
             </div>
-            
+
             <div>
               <div className="text-muted-foreground">Telefon</div>
-              <div className="font-medium">{orderDetails.addressInfo.phone}</div>
+              <div className="font-medium">
+                {orderDetails.addressInfo.phone}
+              </div>
             </div>
-            
+
             {orderDetails.addressInfo.notes && (
               <div>
                 <div className="text-muted-foreground">Not</div>
-                <div className="font-medium italic">{orderDetails.addressInfo.notes}</div>
+                <div className="font-medium italic">
+                  {orderDetails.addressInfo.notes}
+                </div>
               </div>
             )}
           </div>
         ) : (
-          <div className="text-sm text-muted-foreground">Adres bilgisi bulunamadı.</div>
+          <div className="text-sm text-muted-foreground">
+            Adres bilgisi bulunamadı.
+          </div>
         )}
       </Card>
 
@@ -208,21 +233,26 @@ function AdminOrderDetailsView({ orderDetails }) {
           <ShoppingCart className="h-4 w-4 text-primary" />
           <h3 className="font-semibold">Sipariş Öğeleri</h3>
         </div>
-        
+
         {orderDetails?.cartItems && orderDetails.cartItems.length > 0 ? (
           <div className="space-y-3">
             {orderDetails.cartItems.map((item, index) => (
-              <div key={index} className="flex justify-between border-b pb-2 last:border-0 last:pb-0">
+              <div
+                key={index}
+                className="flex justify-between border-b pb-2 last:border-0 last:pb-0"
+              >
                 <div className="grid gap-1">
                   <div className="font-medium">{item.title}</div>
-                  <div className="text-xs text-muted-foreground">Birim: {item.price}₺ × {item.quantity}</div>
+                  <div className="text-xs text-muted-foreground">
+                    Birim: {item.price}₺ × {item.quantity}
+                  </div>
                 </div>
                 <div className="font-semibold text-right">
                   {(item.price * item.quantity).toFixed(2)}₺
                 </div>
               </div>
             ))}
-            
+
             <div className="flex justify-between pt-2 border-t">
               <div className="font-semibold">Toplam</div>
               <div className="font-bold text-right">
@@ -243,7 +273,7 @@ function AdminOrderDetailsView({ orderDetails }) {
           <Package className="h-4 w-4 text-primary" />
           <h3 className="font-semibold">Sipariş Durumunu Güncelle</h3>
         </div>
-        
+
         <CommonForm
           formControls={[
             {
