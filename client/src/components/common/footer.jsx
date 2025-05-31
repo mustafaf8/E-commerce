@@ -175,9 +175,7 @@ const Footer = () => {
 
           <div className="flex justify-center items-center">
             <div className="text-center text-xs text-gray-500 dark:text-gray-500">
-              <p>
-                © {new Date().getFullYear()} MERN Shop. Tüm Hakları Saklıdır.
-              </p>
+              <p>© {new Date().getFullYear()} Deposun. Tüm Hakları Saklıdır.</p>
             </div>
             <div className="lg:px-8 flex justify-center">
               <Button

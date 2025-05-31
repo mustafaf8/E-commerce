@@ -22,8 +22,8 @@ const ProductSchema = new mongoose.Schema(
     },
     salePrice: {
       type: Number,
-      required: [true, "Ürün fiyatı zorunludur."],
-      min: [0, "Fiyat negatif olamaz."],
+      required: false,
+      default: null,
     },
     totalStock: {
       type: Number,

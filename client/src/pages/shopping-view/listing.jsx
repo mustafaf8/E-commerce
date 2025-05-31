@@ -76,7 +76,7 @@ function ShoppingListing() {
     parseUrlParamsToFilters(searchParams)
   );
   const [sort, setSort] = useState(
-    searchParams.get("sortBy") || "salesCount-desc"
+    searchParams.get("sortBy") || "price-lowtohigh"
   );
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const isInitialMount = useRef(true);
@@ -203,7 +203,7 @@ function ShoppingListing() {
   useEffect(() => {
     const urlFilters = parseUrlParamsToFilters(searchParams);
     const urlFiltersString = createSearchParamsHelper(urlFilters);
-    const urlSortBy = searchParams.get("sortBy") || "salesCount-desc";
+    const urlSortBy = searchParams.get("sortBy") || "price-lowtohigh";
 
     if (
       (!isEqual(filters, urlFilters) &&
@@ -236,7 +236,7 @@ function ShoppingListing() {
     dispatch(fetchAllCategories());
     dispatch(fetchAllBrands());
     const initialUrlFilters = parseUrlParamsToFilters(searchParams);
-    const initialUrlSort = searchParams.get("sortBy") || "salesCount-desc";
+    const initialUrlSort = searchParams.get("sortBy") || "price-lowtohigh";
     dispatch(
       fetchAllFilteredProducts({
         filterParams: initialUrlFilters,

@@ -9,7 +9,7 @@ import {
 
 const InfoSecurityPolicy = () => {
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div className="bg-gray-50 dark:bg-gray-900">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-12 mb-6">
         <div className="container mx-auto px-4">

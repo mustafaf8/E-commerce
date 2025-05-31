@@ -230,42 +230,42 @@ export const orderStatusMapping = {
   confirmed: {
     label: "Onaylandı",
     color: "bg-blue-500",
-    textColor: "text-blue-100 dark:text-blue-200",
+    textColor: "text-blue-300 dark:text-blue-200",
   },
   inProcess: {
     label: "Hazırlanıyor",
     color: "bg-orange-500",
-    textColor: "text-orange-100 dark:text-orange-200",
+    textColor: "text-orange-300 dark:text-orange-200",
   },
   inShipping: {
     label: "Kargoda",
     color: "bg-teal-500",
-    textColor: "text-teal-100 dark:text-teal-200",
+    textColor: "text-teal-300 dark:text-teal-200",
   },
   delivered: {
     label: "Teslim Edildi",
     color: "bg-green-600",
-    textColor: "text-green-100 dark:text-green-200",
+    textColor: "text-green-300 dark:text-green-200",
   },
   rejected: {
     label: "Reddedildi",
     color: "bg-red-600",
-    textColor: "text-red-100 dark:text-red-200",
+    textColor: "text-red-300 dark:text-red-200",
   },
   cancelled: {
     label: "İptal Edildi",
     color: "bg-slate-500",
-    textColor: "text-slate-100 dark:text-slate-200",
+    textColor: "text-slate-300 dark:text-slate-200",
   },
   failed: {
     label: "Başarısız",
     color: "bg-red-700",
-    textColor: "text-red-100 dark:text-red-200",
+    textColor: "text-red-400 dark:text-red-200",
   },
   default: {
     label: "Bilinmiyor",
     color: "bg-gray-700",
-    textColor: "text-gray-100 dark:text-gray-200",
+    textColor: "text-gray-300 dark:text-gray-200",
   },
 };
 

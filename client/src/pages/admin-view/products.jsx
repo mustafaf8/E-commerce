@@ -242,13 +242,7 @@ function AdminProducts() {
   }, [dispatch, productIdToDelete, toast, closeConfirmationModal]);
 
   const isFormValid = useCallback(() => {
-    const requiredFields = [
-      "title",
-      "category",
-      "brand",
-      "price",
-      "totalStock",
-    ];
+    const requiredFields = ["title", "category", "price", "totalStock"];
     const allFieldsFilled = requiredFields.every(
       (key) => formData[key] !== "" && formData[key] !== null
     );

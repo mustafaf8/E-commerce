@@ -39,59 +39,7 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import PropTypes from "prop-types";
-
-const orderStatusMapping = {
-  pending: {
-    label: "Beklemede",
-    color: "bg-yellow-400",
-    textColor: "text-yellow-800 dark:text-yellow-200",
-  },
-  pending_payment: {
-    label: "Ödeme Bekleniyor",
-    color: "bg-amber-500",
-    textColor: "text-amber-800 dark:text-amber-200",
-  },
-  confirmed: {
-    label: "Onaylandı",
-    color: "bg-blue-500",
-    textColor: "text-blue-100 dark:text-blue-200",
-  },
-  inProcess: {
-    label: "Hazırlanıyor",
-    color: "bg-orange-500",
-    textColor: "text-orange-100 dark:text-orange-200",
-  },
-  inShipping: {
-    label: "Kargoda",
-    color: "bg-teal-500",
-    textColor: "text-teal-100 dark:text-teal-200",
-  },
-  delivered: {
-    label: "Teslim Edildi",
-    color: "bg-green-600",
-    textColor: "text-green-100 dark:text-green-200",
-  },
-  rejected: {
-    label: "Reddedildi",
-    color: "bg-red-600",
-    textColor: "text-red-100 dark:text-red-200",
-  },
-  cancelled: {
-    label: "İptal Edildi",
-    color: "bg-slate-500",
-    textColor: "text-slate-100 dark:text-slate-200",
-  },
-  failed: {
-    label: "Başarısız",
-    color: "bg-red-700",
-    textColor: "text-red-100 dark:text-red-200",
-  },
-  default: {
-    label: "Bilinmiyor",
-    color: "bg-gray-700",
-    textColor: "text-gray-100 dark:text-gray-200",
-  },
-};
+import { orderStatusMapping } from "@/config";
 
 function UserListTable({ users, onViewOrdersClick, isLoading }) {
   // Filter out any entries that might be guest/misafir related
@@ -157,7 +105,7 @@ function UserListTable({ users, onViewOrdersClick, isLoading }) {
                 <TableCell className="text-right py-1">
                   <Button
                     variant="outline"
-                    size="xs"
+                    size="sm"
                     className="h-5 px-2 text-xs"
                     onClick={() => onViewOrdersClick(user.userId)}
                   >
@@ -424,7 +372,7 @@ function GuestOrdersTable({ orders, onViewDetailsClick, isLoading }) {
                   <TableCell className="text-right py-1">
                     <Button
                       variant="outline"
-                      size="xs"
+                      size="sm"
                       className="h-5 px-1 text-xs"
                       onClick={() => onViewDetailsClick(orderItem._id)}
                     >

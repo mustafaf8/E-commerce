@@ -1,7 +1,5 @@
 import { useState } from "react";
 import CommonForm from "../common/form";
-import { Label } from "../ui/label";
-import { Separator } from "../ui/separator";
 import { Badge } from "../ui/badge";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -13,6 +11,7 @@ import { useToast } from "../ui/use-toast";
 import PropTypes from "prop-types";
 import { Package, CreditCard, MapPin, User, ShoppingCart } from "lucide-react";
 import { Card } from "../ui/card";
+import { orderStatusMapping } from "@/config";
 
 const initialFormData = {
   status: "",
@@ -20,46 +19,75 @@ const initialFormData = {
 
 function AdminOrderDetailsView({ orderDetails }) {
   const [formData, setFormData] = useState(initialFormData);
-  const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const { toast } = useToast();
+
+  // function handleUpdateStatus(event) {
+  //   event.preventDefault();
+  //   const { status } = formData;
+
+  //   dispatch(
+  //     updateOrderStatus({ id: orderDetails?._id, orderStatus: status })
+  //   ).then((data) => {
+  //     if (data?.payload?.success) {
+  //       dispatch(getOrderDetailsForAdmin(orderDetails?._id));
+  //       dispatch(getAllOrdersForAdmin());
+  //       setFormData(initialFormData);
+  //       toast({
+  //         title: data?.payload?.message,
+  //         variant: "info",
+  //       });
+  //     }
+  //   });
+  // }
 
   function handleUpdateStatus(event) {
     event.preventDefault();
     const { status } = formData;
 
-    dispatch(
-      updateOrderStatus({ id: orderDetails?._id, orderStatus: status })
-    ).then((data) => {
-      if (data?.payload?.success) {
-        dispatch(getOrderDetailsForAdmin(orderDetails?._id));
-        dispatch(getAllOrdersForAdmin());
-        setFormData(initialFormData);
-        toast({
-          title: data?.payload?.message,
-          variant: "info",
-        });
-      }
-    });
-  }
+    dispatch(updateOrderStatus({ id: orderDetails?._id, orderStatus: status }))
+      .unwrap() // unwrap() thunk sonucunu almak için
+      .then((payload) => {
+        // Başarılı payload
+        if (payload?.success) {
+          dispatch(getOrderDetailsForAdmin(orderDetails?._id));
+          // getAllOrdersForAdmin yerine adminOrderSlice içindeki listeyi güncelleyen thunk'lar kullanılmalı
+          // Örneğin, kullanıcı listesini veya misafir listesini yeniden çekmek gerekebilir.
+          // Şimdilik bu satırları yoruma alıyorum, çünkü tüm listeyi çekmek yerine
+          // sadece ilgili siparişin detayını güncellemek veya ana listedeki veriyi tazelemek daha verimli olabilir.
+          // dispatch(getAllOrdersForAdmin()); // Bu thunk admin-view/orders.jsx içinde genel listeyi çekiyor olabilir.
+          // Durum güncellemesi sonrası hangi listelerin yenilenmesi gerektiğine bağlı.
+          // Genellikle orderDetails güncellendiği için listedeki gösterim de (eğer varsa) dolaylı yoldan güncellenir.
+          // VEYA sipariş listesini (userList veya guestOrderList) yeniden çekmek için:
+          if (orderDetails?.userId?._id && !orderDetails.isGuestOrder) {
+            dispatch(fetchUsersWithOrders()); // Kayıtlı kullanıcı listesini güncelle
+          } else if (orderDetails.isGuestOrder) {
+            dispatch(fetchAllGuestOrdersForAdmin()); // Misafir sipariş listesini güncelle
+          }
 
-  const statusMapping = {
-    pending: { label: "Beklemede", color: "bg-yellow-400 text-yellow-800" },
-    pending_payment: {
-      label: "Ödeme Bekleniyor",
-      color: "bg-amber-500 text-amber-800",
-    },
-    inProcess: {
-      label: "Hazırlanıyor",
-      color: "bg-orange-500 text-orange-100",
-    },
-    inShipping: { label: "Kargoda", color: "bg-teal-500 text-teal-100" },
-    delivered: { label: "Teslim Edildi", color: "bg-green-600 text-green-100" },
-    rejected: { label: "Reddedildi", color: "bg-red-600 text-red-100" },
-    confirmed: { label: "Onaylandı", color: "bg-blue-500 text-blue-100" },
-    cancelled: { label: "İptal Edildi", color: "bg-slate-500 text-slate-100" },
-    default: { label: "Bilinmiyor", color: "bg-gray-700 text-gray-100" },
-  };
+          setFormData(initialFormData);
+          toast({
+            title: payload?.message || "Sipariş durumu güncellendi.",
+            variant: "success", // "info" yerine "success" olabilir
+          });
+        } else {
+          toast({
+            // Başarısız ama kontrollü dönen durum
+            title: payload?.message || "Sipariş durumu güncellenemedi.",
+            variant: "destructive",
+          });
+        }
+      })
+      .catch((error) => {
+        // Redux thunk rejectWithValue ile dönen veya network hatası
+        console.error("Sipariş durumu güncelleme hatası:", error);
+        toast({
+          title:
+            error?.message || "Sipariş durumu güncellenirken bir hata oluştu.",
+          variant: "destructive",
+        });
+      });
+  }
 
   const isGuest = orderDetails?.isGuestOrder;
   const recipientName = isGuest
@@ -69,14 +97,16 @@ function AdminOrderDetailsView({ orderDetails }) {
     ? orderDetails?.guestInfo?.email
     : orderDetails?.userId?.email;
 
-  // Get current status information
-  const currentStatus = orderDetails?.orderStatus || "default";
-  const statusInfo = statusMapping[currentStatus] || statusMapping.default;
+  const currentStatusKey = orderDetails?.orderStatus || "default";
+  const statusInfo =
+    orderStatusMapping[currentStatusKey] || orderStatusMapping.default; // Merkezi mapping'i kullan
 
   return (
     <div className="grid gap-6">
       <div className="flex flex-wrap gap-4 items-center justify-between">
-        <Badge className={`px-3 py-1 ${statusInfo.color}`}>
+        <Badge
+          className={`px-3 py-1 ${statusInfo.color} ${statusInfo.textColor}`}
+        >
           {statusInfo.label}
         </Badge>
 
@@ -282,12 +312,14 @@ function AdminOrderDetailsView({ orderDetails }) {
               componentType: "select",
               options: [
                 { id: "pending", label: "Beklemede" },
+                { id: "pending_payment", label: "Ödeme Bekleniyor" },
                 { id: "confirmed", label: "Onaylandı" },
                 { id: "inProcess", label: "Hazırlanıyor" },
                 { id: "inShipping", label: "Kargoda" },
                 { id: "delivered", label: "Teslim Edildi" },
                 { id: "rejected", label: "Reddedildi" },
                 { id: "cancelled", label: "İptal Edildi" },
+                { id: "failed", label: "Başarısız" },
               ],
             },
           ]}
@@ -324,6 +356,7 @@ AdminOrderDetailsView.propTypes = {
       notes: PropTypes.string,
     }),
     userId: PropTypes.shape({
+      _id: PropTypes.string,
       userName: PropTypes.string,
       email: PropTypes.string,
       phoneNumber: PropTypes.string,
@@ -333,7 +366,7 @@ AdminOrderDetailsView.propTypes = {
         productId: PropTypes.string,
         title: PropTypes.string,
         quantity: PropTypes.number,
-        price: PropTypes.number,
+        price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
       })
     ),
   }).isRequired,

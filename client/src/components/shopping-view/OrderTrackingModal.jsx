@@ -1,4 +1,261 @@
-import { useState } from "react";
+// import { useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import {
+//   Dialog,
+//   DialogContent,
+//   DialogHeader,
+//   DialogTitle,
+//   DialogDescription,
+//   DialogFooter,
+//   DialogClose,
+// } from "@/components/ui/dialog";
+// import { Input } from "@/components/ui/input";
+// import { Button } from "@/components/ui/button";
+// import { Label } from "@/components/ui/label";
+// import {
+//   AlertCircle,
+//   Loader2,
+//   LogIn,
+//   Search,
+//   PackageCheck,
+//   Truck,
+//   PackageX,
+// } from "lucide-react";
+// import axios from "axios";
+// import PropTypes from "prop-types";
+// import { format, parseISO, isValid } from "date-fns";
+// import { orderStatusMapping } from "@/config";
+
+// const OrderTrackingModal = ({ isOpen, onClose }) => {
+//   const navigate = useNavigate();
+//   const [orderIdInput, setOrderIdInput] = useState("");
+//   const [isLoading, setIsLoading] = useState(false);
+//   const [searchResult, setSearchResult] = useState(null);
+//   const [searchError, setSearchError] = useState("");
+
+//   const handleTrackOrder = async (e) => {
+//     e.preventDefault();
+//     if (!orderIdInput.trim()) {
+//       setSearchError("Lütfen Sipariş Numaranızı giriniz.");
+//       setSearchResult(null);
+//       return;
+//     }
+//     setIsLoading(true);
+//     setSearchError("");
+//     setSearchResult(null);
+
+//     try {
+//       const response = await axios.get(
+//         `http://localhost:5000/api/shop/order/track/${orderIdInput.trim()}`
+//       );
+//       if (response.data.success) {
+//         setSearchResult(response.data.data);
+//       } else {
+//         setSearchError(response.data.message || "Sipariş bulunamadı.");
+//       }
+//     } catch (error) {
+//       setSearchError(
+//         error.response?.data?.message ||
+//           "Sipariş sorgulanırken bir hata oluştu."
+//       );
+//       console.error("Sipariş sorgulama hatası:", error);
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   const handleLoginRedirect = () => {
+//     navigate("/auth/login");
+//     onClose();
+//   };
+
+//   // const getOrderStatusDisplay = (status) => {
+//   //   const statusMapping = {
+//   //     pending_payment: {
+//   //       label: "Ödeme Bekleniyor",
+//   //       icon: <AlertCircle className="w-5 h-5 text-yellow-500 mr-2" />,
+//   //       color: "text-yellow-600",
+//   //     },
+//   //     pending: {
+//   //       label: "Onay Bekleniyor",
+//   //       icon: <AlertCircle className="w-5 h-5 text-yellow-500 mr-2" />,
+//   //       color: "text-yellow-600",
+//   //     },
+//   //     confirmed: {
+//   //       label: "Onaylandı",
+//   //       icon: <PackageCheck className="w-5 h-5 text-blue-500 mr-2" />,
+//   //       color: "text-blue-600",
+//   //     },
+//   //     inProcess: {
+//   //       label: "Hazırlanıyor",
+//   //       icon: <PackageCheck className="w-5 h-5 text-blue-500 mr-2" />,
+//   //       color: "text-blue-600",
+//   //     },
+//   //     inShipping: {
+//   //       label: "Kargoda",
+//   //       icon: <Truck className="w-5 h-5 text-orange-500 mr-2" />,
+//   //       color: "text-orange-600",
+//   //     },
+//   //     delivered: {
+//   //       label: "Teslim Edildi",
+//   //       icon: <PackageCheck className="w-5 h-5 text-green-500 mr-2" />,
+//   //       color: "text-green-600",
+//   //     },
+//   //     cancelled: {
+//   //       label: "İptal Edildi",
+//   //       icon: <PackageX className="w-5 h-5 text-red-500 mr-2" />,
+//   //       color: "text-red-600",
+//   //     },
+//   //     failed: {
+//   //       label: "Başarısız Oldu",
+//   //       icon: <PackageX className="w-5 h-5 text-red-500 mr-2" />,
+//   //       color: "text-red-600",
+//   //     },
+//   //     default: {
+//   //       label: status || "Bilinmiyor",
+//   //       icon: <AlertCircle className="w-5 h-5 text-gray-500 mr-2" />,
+//   //       color: "text-gray-600",
+//   //     },
+//   //   };
+//   //   return statusMapping[status] || statusMapping.default;
+//   // };
+//   const statusInfo =
+//     orderStatusMapping[searchResult.orderStatus] || orderStatusMapping.default;
+//   const statusIcons = {
+//     // İkonları dinamik olarak da alabiliriz veya burada mapleyebiliriz.
+//     pending_payment: <AlertCircle className="w-5 h-5 mr-2" />,
+//     pending: <AlertCircle className="w-5 h-5 mr-2" />,
+//     confirmed: <PackageCheck className="w-5 h-5 mr-2" />,
+//     inProcess: <PackageCheck className="w-5 h-5 mr-2" />,
+//     inShipping: <Truck className="w-5 h-5 mr-2" />,
+//     delivered: <PackageCheck className="w-5 h-5 mr-2" />,
+//     cancelled: <PackageX className="w-5 h-5 mr-2" />,
+//     failed: <PackageX className="w-5 h-5 mr-2" />,
+//     default: <AlertCircle className="w-5 h-5 mr-2" />,
+//   };
+//   const formatDate = (dateString) => {
+//     if (!dateString || !isValid(parseISO(dateString))) return "N/A";
+//     return format(parseISO(dateString), "dd.MM.yyyy HH:mm");
+//   };
+
+//   return (
+//     <Dialog open={isOpen} onOpenChange={onClose}>
+//       <DialogContent className="sm:max-w-[500px]">
+//         <DialogHeader>
+//           <DialogTitle>Sipariş Takibi</DialogTitle>
+//           <DialogDescription>
+//             Siparişinizin durumunu sorgulayın veya siparişlerinizi görmek için
+//             giriş yapın.
+//           </DialogDescription>
+//         </DialogHeader>
+//         <form onSubmit={handleTrackOrder} className="grid gap-4 py-4">
+//           <div className="grid gap-2">
+//             <Label htmlFor="orderId">Sipariş Numaranız</Label>
+//             <Input
+//               id="orderId"
+//               placeholder="Sipariş numaranızı girin (örn: 662f...)"
+//               value={orderIdInput}
+//               onChange={(e) => setOrderIdInput(e.target.value)}
+//               required
+//             />
+//           </div>
+//           {searchError && (
+//             <p className="text-sm text-red-600 flex items-center">
+//               <AlertCircle className="w-4 h-4 mr-1" /> {searchError}
+//             </p>
+//           )}
+//           <Button type="submit" disabled={isLoading} className="w-full">
+//             {isLoading ? (
+//               <Loader2 className="h-4 w-4 animate-spin mr-2" />
+//             ) : (
+//               <Search className="h-4 w-4 mr-2" />
+//             )}
+//             Siparişimi Sorgula
+//           </Button>
+//         </form>
+
+//         {searchResult && (
+//           <div className="mt-4 p-4 border rounded-md bg-gray-50 dark:bg-gray-800">
+//             <h3 className="text-lg font-semibold mb-2">Sipariş Durumu</h3>
+//             <div className="space-y-1 text-sm">
+//               <p>
+//                 <strong>Sipariş No:</strong> {searchResult._id}
+//               </p>
+//               <p>
+//                 <strong>Tarih:</strong> {formatDate(searchResult.orderDate)}
+//               </p>
+//               <p className="flex items-center">
+//                 <strong>Durum:</strong>
+//                 <span
+//                   className={`ml-2 font-medium ${statusInfo.textColor} flex items-center`}
+//                 >
+//                   {React.cloneElement(
+//                     statusIcons[searchResult.orderStatus] ||
+//                       statusIcons.default,
+//                     {
+//                       className: `w-5 h-5 mr-2 ${
+//                         statusInfo.textColor.split(" ")[0]
+//                       }`,
+//                     }
+//                   )}{" "}
+//                   {/* İkon rengini de dinamik yapalım */}
+//                   {statusInfo.label}
+//                 </span>
+//               </p>
+
+//               <p>
+//                 <strong>Toplam Tutar:</strong>{" "}
+//                 {searchResult.totalAmount?.toFixed(2)} TL
+//               </p>
+//               {searchResult.guestInfo?.fullName && ( // Sadece misafir siparişi ise ve isim varsa göster
+//                 <p>
+//                   <strong>Alıcı:</strong>{" "}
+//                   {searchResult.guestInfo.fullName.substring(0, 1) +
+//                     "****" +
+//                     searchResult.guestInfo.fullName.substring(
+//                       searchResult.guestInfo.fullName.lastIndexOf(" ") - 1,
+//                       searchResult.guestInfo.fullName.lastIndexOf(" ")
+//                     ) +
+//                     "****"}
+//                 </p>
+//               )}
+//             </div>
+//           </div>
+//         )}
+
+//         <div className="mt-6 text-center">
+//           <p className="text-sm text-muted-foreground mb-2">veya</p>
+//           <Button
+//             variant="outline"
+//             onClick={handleLoginRedirect}
+//             className="w-full"
+//           >
+//             <LogIn className="h-4 w-4 mr-2" />
+//             Giriş Yaparak Tüm Siparişlerinizi Görün
+//           </Button>
+//         </div>
+//         <DialogFooter className="mt-4">
+//           <DialogClose asChild>
+//             <Button type="button" variant="secondary">
+//               Kapat
+//             </Button>
+//           </DialogClose>
+//         </DialogFooter>
+//       </DialogContent>
+//     </Dialog>
+//   );
+// };
+// OrderTrackingModal.propTypes = {
+//   isOpen: PropTypes.bool.isRequired,
+//   onClose: PropTypes.func.isRequired,
+// };
+
+// export default OrderTrackingModal;
+
+import {
+  useState,
+  useEffect /* useEffect'ü import etmeyi unutmayın */,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Dialog,
@@ -24,6 +281,22 @@ import {
 import axios from "axios";
 import PropTypes from "prop-types";
 import { format, parseISO, isValid } from "date-fns";
+import { orderStatusMapping } from "@/config"; // Merkezi mapping objesini import ediyoruz
+import React from "react"; // React.cloneElement için
+
+// İkonları durumlarla eşleştirmek için bir yardımcı obje
+const statusIcons = {
+  pending_payment: <AlertCircle className="w-5 h-5 mr-2" />,
+  pending: <AlertCircle className="w-5 h-5 mr-2" />,
+  confirmed: <PackageCheck className="w-5 h-5 mr-2" />,
+  inProcess: <PackageCheck className="w-5 h-5 mr-2" />,
+  inShipping: <Truck className="w-5 h-5 mr-2" />,
+  delivered: <PackageCheck className="w-5 h-5 mr-2" />,
+  cancelled: <PackageX className="w-5 h-5 mr-2" />,
+  failed: <PackageX className="w-5 h-5 mr-2" />,
+  rejected: <PackageX className="w-5 h-5 mr-2" />, // Eğer varsa
+  default: <AlertCircle className="w-5 h-5 mr-2" />,
+};
 
 const OrderTrackingModal = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -32,6 +305,7 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
   const [searchResult, setSearchResult] = useState(null);
   const [searchError, setSearchError] = useState("");
 
+  // handleTrackOrder ve handleLoginRedirect fonksiyonları olduğu gibi kalabilir.
   const handleTrackOrder = async (e) => {
     e.preventDefault();
     if (!orderIdInput.trim()) {
@@ -47,16 +321,19 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
       const response = await axios.get(
         `http://localhost:5000/api/shop/order/track/${orderIdInput.trim()}`
       );
-      if (response.data.success) {
+      if (response.data.success && response.data.data) {
+        // response.data.data null kontrolü eklendi
         setSearchResult(response.data.data);
       } else {
         setSearchError(response.data.message || "Sipariş bulunamadı.");
+        setSearchResult(null); // Sonucu null olarak ayarla
       }
     } catch (error) {
       setSearchError(
         error.response?.data?.message ||
           "Sipariş sorgulanırken bir hata oluştu."
       );
+      setSearchResult(null); // Hata durumunda sonucu null olarak ayarla
       console.error("Sipariş sorgulama hatası:", error);
     } finally {
       setIsLoading(false);
@@ -68,61 +345,20 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
     onClose();
   };
 
-  const getOrderStatusDisplay = (status) => {
-    const statusMapping = {
-      pending_payment: {
-        label: "Ödeme Bekleniyor",
-        icon: <AlertCircle className="w-5 h-5 text-yellow-500 mr-2" />,
-        color: "text-yellow-600",
-      },
-      pending: {
-        label: "Onay Bekleniyor",
-        icon: <AlertCircle className="w-5 h-5 text-yellow-500 mr-2" />,
-        color: "text-yellow-600",
-      },
-      confirmed: {
-        label: "Onaylandı",
-        icon: <PackageCheck className="w-5 h-5 text-blue-500 mr-2" />,
-        color: "text-blue-600",
-      },
-      inProcess: {
-        label: "Hazırlanıyor",
-        icon: <PackageCheck className="w-5 h-5 text-blue-500 mr-2" />,
-        color: "text-blue-600",
-      },
-      inShipping: {
-        label: "Kargoda",
-        icon: <Truck className="w-5 h-5 text-orange-500 mr-2" />,
-        color: "text-orange-600",
-      },
-      delivered: {
-        label: "Teslim Edildi",
-        icon: <PackageCheck className="w-5 h-5 text-green-500 mr-2" />,
-        color: "text-green-600",
-      },
-      cancelled: {
-        label: "İptal Edildi",
-        icon: <PackageX className="w-5 h-5 text-red-500 mr-2" />,
-        color: "text-red-600",
-      },
-      failed: {
-        label: "Başarısız Oldu",
-        icon: <PackageX className="w-5 h-5 text-red-500 mr-2" />,
-        color: "text-red-600",
-      },
-      default: {
-        label: status || "Bilinmiyor",
-        icon: <AlertCircle className="w-5 h-5 text-gray-500 mr-2" />,
-        color: "text-gray-600",
-      },
-    };
-    return statusMapping[status] || statusMapping.default;
-  };
-
   const formatDate = (dateString) => {
     if (!dateString || !isValid(parseISO(dateString))) return "N/A";
     return format(parseISO(dateString), "dd.MM.yyyy HH:mm");
   };
+
+  // Dialog kapandığında state'leri sıfırla
+  useEffect(() => {
+    if (!isOpen) {
+      setOrderIdInput("");
+      setSearchResult(null);
+      setSearchError("");
+      setIsLoading(false);
+    }
+  }, [isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -139,7 +375,7 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
             <Label htmlFor="orderId">Sipariş Numaranız</Label>
             <Input
               id="orderId"
-              placeholder="Sipariş numaranızı girin (örn: 662f...)"
+              placeholder="Sipariş numaranızı girin (örn: 6e3b16a08t72z4f03e52c743)"
               value={orderIdInput}
               onChange={(e) => setOrderIdInput(e.target.value)}
               required
@@ -160,33 +396,55 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
           </Button>
         </form>
 
-        {searchResult && (
+        {/* searchResult null değilse ve bir obje ise render et */}
+        {searchResult && typeof searchResult === "object" && (
           <div className="mt-4 p-4 border rounded-md bg-gray-50 dark:bg-gray-800">
             <h3 className="text-lg font-semibold mb-2">Sipariş Durumu</h3>
             <div className="space-y-1 text-sm">
               <p>
-                <strong>Sipariş No:</strong> {searchResult._id}
+                <strong>Sipariş No:</strong> {searchResult._id || "N/A"}
               </p>
               <p>
                 <strong>Tarih:</strong> {formatDate(searchResult.orderDate)}
               </p>
-              <p className="flex items-center">
-                <strong>Durum:</strong>
-                <span
-                  className={`ml-2 font-medium ${
-                    getOrderStatusDisplay(searchResult.orderStatus).color
-                  } flex items-center`}
-                >
-                  {getOrderStatusDisplay(searchResult.orderStatus).icon}
-                  {getOrderStatusDisplay(searchResult.orderStatus).label}
-                </span>
-              </p>
+              {/* Durum gösterimi standardize edildi */}
+              {(() => {
+                // searchResult.orderStatus var mı diye kontrol et
+                const statusKey = searchResult.orderStatus;
+                const statusInfo =
+                  (statusKey && orderStatusMapping[statusKey]) ||
+                  orderStatusMapping.default;
+                const iconElement =
+                  (statusKey && statusIcons[statusKey]) || statusIcons.default;
+
+                return (
+                  <p className="flex items-center">
+                    <strong>Durum:</strong>
+                    <span
+                      className={`ml-2 font-medium ${
+                        statusInfo.textColor ||
+                        orderStatusMapping.default.textColor
+                      } flex items-center`}
+                    >
+                      {React.cloneElement(iconElement, {
+                        className: `w-5 h-5 mr-2 ${
+                          (
+                            statusInfo.textColor ||
+                            orderStatusMapping.default.textColor
+                          ).split(" ")[0]
+                        }`,
+                      })}
+                      {statusInfo.label || orderStatusMapping.default.label}
+                    </span>
+                  </p>
+                );
+              })()}
 
               <p>
                 <strong>Toplam Tutar:</strong>{" "}
-                {searchResult.totalAmount?.toFixed(2)} TL
+                {searchResult.totalAmount?.toFixed(2) || "N/A"} TL
               </p>
-              {searchResult.guestInfo?.fullName && ( // Sadece misafir siparişi ise ve isim varsa göster
+              {searchResult.guestInfo?.fullName && (
                 <p>
                   <strong>Alıcı:</strong>{" "}
                   {searchResult.guestInfo.fullName.substring(0, 1) +
@@ -224,6 +482,7 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
     </Dialog>
   );
 };
+
 OrderTrackingModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
