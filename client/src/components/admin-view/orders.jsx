@@ -33,15 +33,29 @@ import {
   ArrowLeft,
   Loader2,
   Bell,
-  Users,
   UserCog,
   UserMinus,
   ShoppingBag,
 } from "lucide-react";
 import PropTypes from "prop-types";
-import { orderStatusMapping } from "@/config";
+import { orderStatusMappingAdmin } from "@/config";
 
 function UserListTable({ users, onViewOrdersClick, isLoading }) {
+  UserListTable.propTypes = {
+    users: PropTypes.arrayOf(
+      PropTypes.shape({
+        userId: PropTypes.string.isRequired,
+        userName: PropTypes.string,
+        email: PropTypes.string,
+        phoneNumber: PropTypes.string,
+        orderCount: PropTypes.number,
+        lastOrderDate: PropTypes.string,
+        hasNewOrder: PropTypes.bool,
+      })
+    ).isRequired,
+    onViewOrdersClick: PropTypes.func.isRequired,
+    isLoading: PropTypes.bool.isRequired,
+  };
   // Filter out any entries that might be guest/misafir related
   const filteredUsers = users.filter(
     (user) =>
@@ -143,6 +157,18 @@ function UserListTable({ users, onViewOrdersClick, isLoading }) {
 }
 
 function UserOrdersTable({ orders, onViewDetailsClick, isLoading }) {
+  UserOrdersTable.propTypes = {
+    orders: PropTypes.arrayOf(
+      PropTypes.shape({
+        _id: PropTypes.string.isRequired,
+        orderDate: PropTypes.string,
+        orderStatus: PropTypes.string,
+        totalAmount: PropTypes.number,
+      })
+    ).isRequired,
+    onViewDetailsClick: PropTypes.func.isRequired,
+    isLoading: PropTypes.bool.isRequired,
+  };
   const [showAll, setShowAll] = useState(false);
   const displayOrders = showAll ? orders : orders.slice(0, 14);
 
@@ -183,7 +209,8 @@ function UserOrdersTable({ orders, onViewDetailsClick, isLoading }) {
               // Get status info
               const status = orderItem?.orderStatus || "default";
               const statusInfo =
-                orderStatusMapping[status] || orderStatusMapping.default;
+                orderStatusMappingAdmin[status] ||
+                orderStatusMappingAdmin.default;
 
               return (
                 <TableRow
@@ -209,7 +236,7 @@ function UserOrdersTable({ orders, onViewDetailsClick, isLoading }) {
                   <TableCell className="text-right py-1">
                     <Button
                       variant="outline"
-                      size="xs"
+                      size="sm"
                       className="h-5 px-1 text-xs"
                       onClick={() => onViewDetailsClick(orderItem._id)}
                     >
@@ -271,12 +298,28 @@ RegisteredUserOrdersTable.propTypes = {
 };
 
 function GuestOrdersTable({ orders, onViewDetailsClick, isLoading }) {
+  GuestOrdersTable.propTypes = {
+    orders: PropTypes.arrayOf(
+      PropTypes.shape({
+        _id: PropTypes.string.isRequired,
+        orderDate: PropTypes.string,
+        orderStatus: PropTypes.string,
+        totalAmount: PropTypes.number,
+      })
+    ).isRequired,
+    onViewDetailsClick: PropTypes.func.isRequired,
+    isLoading: PropTypes.bool.isRequired,
+  };
   const [showAll, setShowAll] = useState(false);
   const displayOrders = showAll ? orders : orders.slice(0, 14);
 
   // Define which statuses are considered "new" and need notification
-  const newOrderStatuses = ["pending", "pending_payment"];
-
+  const newOrderStatuses = [
+    "pending",
+    "pending_payment",
+    "confirmed",
+    "failed",
+  ];
   return (
     <div className="overflow-visible">
       <Table className="border-collapse">
@@ -315,7 +358,8 @@ function GuestOrdersTable({ orders, onViewDetailsClick, isLoading }) {
               // Get status info
               const status = orderItem?.orderStatus || "default";
               const statusInfo =
-                orderStatusMapping[status] || orderStatusMapping.default;
+                orderStatusMappingAdmin[status] ||
+                orderStatusMappingAdmin.default;
 
               // Check if this is a new order that needs attention
               const isNewOrder =
@@ -527,9 +571,9 @@ function AdminOrdersView() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {/* Registered Users Side */}
-        <Card className="shadow-sm md:col-span-2">
+        <Card className="shadow-sm md:col-span-3">
           <CardHeader className="py-2 px-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <UserCog className="h-3.5 w-3.5" />

@@ -157,9 +157,9 @@ import { Badge } from "../ui/badge";
 import PropTypes from "prop-types";
 import { Separator } from "../ui/separator"; // Separator shadcn/ui'den import ediliyor
 import { format, parseISO, isValid } from "date-fns";
-import { orderStatusMapping } from "@/config";
+import { orderStatusMappingUser } from "@/config";
 import { Card } from "../ui/card"; // Card componentini import ediyoruz
-import { Package, CreditCard, MapPin, User, ShoppingCart } from "lucide-react"; // İkonları import ediyoruz
+import { Package, MapPin, User, ShoppingCart } from "lucide-react"; // İkonları import ediyoruz
 
 function ShoppingOrderDetailsView({ orderDetails }) {
   const { user, isAuthenticated } = useSelector((state) => state.auth); // isAuthenticated eklendi
@@ -183,7 +183,7 @@ function ShoppingOrderDetailsView({ orderDetails }) {
   const isGuest = orderDetails.isGuestOrder;
   const currentStatusKey = orderDetails.orderStatus || "default";
   const statusInfo =
-    orderStatusMapping[currentStatusKey] || orderStatusMapping.default;
+    orderStatusMappingUser[currentStatusKey] || orderStatusMappingUser.default;
 
   // Alıcı bilgilerini belirle
   const recipientName = isGuest

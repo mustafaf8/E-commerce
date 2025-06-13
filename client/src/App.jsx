@@ -41,6 +41,8 @@ import { getGuestCart } from "./lib/guestCartUtils";
 import GuestCheckoutAddress from "./pages/shopping-view/GuestCheckoutAddress";
 import AdminStatsPage from "./pages/admin-view/AdminStatsPage";
 import CookieConsentBanner from "./components/common/CookieConsentBanner";
+import { fetchMaintenanceStatus } from "./store/common-slice/maintenance-slice"; // YENİ SATIR
+import MaintenancePage from "./pages/MaintenancePage";
 
 function App() {
   const {
@@ -48,10 +50,15 @@ function App() {
     isAuthenticated,
     isLoading: authIsLoading,
   } = useSelector((state) => state.auth);
+
+  const { status: maintenanceStatus, isLoading: maintenanceLoading } =
+    useSelector((state) => state.maintenance);
+
   const dispatch = useDispatch();
   const location = useLocation();
 
   useEffect(() => {
+    dispatch(fetchMaintenanceStatus());
     dispatch(checkAuth());
   }, [dispatch]);
 
@@ -70,10 +77,13 @@ function App() {
     }
   }, [dispatch, user?.id, isAuthenticated, authIsLoading]);
 
-  if (authIsLoading)
+  if (authIsLoading || maintenanceLoading) {
     return <Skeleton className="w-full h-screen bg-gray-200" />;
+  }
   const isAdminPage = location.pathname.startsWith("/admin");
-
+  if (maintenanceStatus.isActive && !isAdminPage) {
+    return <MaintenancePage status={maintenanceStatus} />;
+  }
   // console.log("Auth Loading:", isLoading, "User:", user);
 
   return (

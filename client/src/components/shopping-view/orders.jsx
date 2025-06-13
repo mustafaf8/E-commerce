@@ -26,7 +26,7 @@ import {
 } from "@/store/shop/order-slice";
 import { Badge } from "../ui/badge";
 import { format, parseISO, isValid } from "date-fns";
-import { orderStatusMapping } from "@/config";
+import { orderStatusMappingUser } from "@/config";
 
 function ShoppingOrders() {
   const [selectedOrderId, setSelectedOrderId] = useState(null);
@@ -90,16 +90,16 @@ function ShoppingOrders() {
                     </div>
                     <Badge
                       className={`p-1 px-3 w-24 justify-center ${
-                        orderStatusMapping[orderItem?.orderStatus]?.color ||
-                        orderStatusMapping.default.color
+                        orderStatusMappingUser[orderItem?.orderStatus]?.color ||
+                        orderStatusMappingUser.default.color
                       } ${
                         // textColor eklendi
-                        orderStatusMapping[orderItem?.orderStatus]?.textColor ||
-                        orderStatusMapping.default.textColor
+                        orderStatusMappingUser[orderItem?.orderStatus] ||
+                        orderStatusMappingUser.default
                       }`}
                     >
-                      {orderStatusMapping[orderItem?.orderStatus]?.label ||
-                        orderStatusMapping.default.label}
+                      {orderStatusMappingUser[orderItem?.orderStatus]?.label ||
+                        orderStatusMappingUser.default.label}
                     </Badge>
                   </div>
 
@@ -164,28 +164,14 @@ function ShoppingOrders() {
                         {formatOrderDate(orderItem?.orderDate)}
                       </TableCell>
                       <TableCell>
-                        {/* <Badge
-                          className={`p-1 px-3 w-24 justify-center ${
-                            statusMapping[orderItem?.orderStatus]?.color ||
-                            statusMapping.default.color
-                          }`}
-                        >
-                          {statusMapping[orderItem?.orderStatus]?.label ||
-                            statusMapping.default.label}
-                        </Badge> */}
                         <Badge
                           className={`p-1 px-3 w-24 justify-center ${
-                            orderStatusMapping[orderItem?.orderStatus]?.color ||
-                            orderStatusMapping.default.color
-                          } ${
-                            // textColor eklendi
-                            orderStatusMapping[orderItem?.orderStatus]
-                              ?.textColor ||
-                            orderStatusMapping.default.textColor
+                            orderStatusMappingUser[orderItem?.orderStatus]
+                              ?.color || orderStatusMappingUser.default.color
                           }`}
                         >
-                          {orderStatusMapping[orderItem?.orderStatus]?.label ||
-                            orderStatusMapping.default.label}
+                          {orderStatusMappingUser[orderItem?.orderStatus]
+                            ?.label || orderStatusMappingUser.default.label}
                         </Badge>
                       </TableCell>
                       <TableCell>

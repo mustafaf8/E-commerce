@@ -35,6 +35,7 @@ import {
   Bar,
   Legend,
 } from "recharts";
+import MaintenanceManager from "@/components/admin-view/MaintenanceManager";
 
 function AdminStatsPage() {
   const dispatch = useDispatch();
@@ -698,6 +699,7 @@ function AdminStatsPage() {
           )}
         </div>
       )}
+      <MaintenanceManager />
     </div>
   );
 }

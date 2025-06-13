@@ -281,7 +281,7 @@ import {
 import axios from "axios";
 import PropTypes from "prop-types";
 import { format, parseISO, isValid } from "date-fns";
-import { orderStatusMapping } from "@/config"; // Merkezi mapping objesini import ediyoruz
+import { orderStatusMappingUser } from "@/config"; // Merkezi mapping objesini import ediyoruz
 import React from "react"; // React.cloneElement için
 
 // İkonları durumlarla eşleştirmek için bir yardımcı obje
@@ -412,8 +412,8 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
                 // searchResult.orderStatus var mı diye kontrol et
                 const statusKey = searchResult.orderStatus;
                 const statusInfo =
-                  (statusKey && orderStatusMapping[statusKey]) ||
-                  orderStatusMapping.default;
+                  (statusKey && orderStatusMappingUser[statusKey]) ||
+                  orderStatusMappingUser.default;
                 const iconElement =
                   (statusKey && statusIcons[statusKey]) || statusIcons.default;
 
@@ -423,18 +423,18 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
                     <span
                       className={`ml-2 font-medium ${
                         statusInfo.textColor ||
-                        orderStatusMapping.default.textColor
+                        orderStatusMappingUser.default.textColor
                       } flex items-center`}
                     >
                       {React.cloneElement(iconElement, {
                         className: `w-5 h-5 mr-2 ${
                           (
                             statusInfo.textColor ||
-                            orderStatusMapping.default.textColor
+                            orderStatusMappingUser.default.textColor
                           ).split(" ")[0]
                         }`,
                       })}
-                      {statusInfo.label || orderStatusMapping.default.label}
+                      {statusInfo.label || orderStatusMappingUser.default.label}
                     </span>
                   </p>
                 );

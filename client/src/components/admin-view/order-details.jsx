@@ -1,17 +1,18 @@
 import { useState } from "react";
 import CommonForm from "../common/form";
 import { Badge } from "../ui/badge";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
-  getAllOrdersForAdmin,
   getOrderDetailsForAdmin,
   updateOrderStatus,
+  fetchAllGuestOrdersForAdmin,
+  fetchUsersWithOrders,
 } from "@/store/admin/order-slice";
 import { useToast } from "../ui/use-toast";
 import PropTypes from "prop-types";
 import { Package, CreditCard, MapPin, User, ShoppingCart } from "lucide-react";
 import { Card } from "../ui/card";
-import { orderStatusMapping } from "@/config";
+import { orderStatusMappingAdmin } from "@/config";
 
 const initialFormData = {
   status: "",
@@ -22,43 +23,15 @@ function AdminOrderDetailsView({ orderDetails }) {
   const dispatch = useDispatch();
   const { toast } = useToast();
 
-  // function handleUpdateStatus(event) {
-  //   event.preventDefault();
-  //   const { status } = formData;
-
-  //   dispatch(
-  //     updateOrderStatus({ id: orderDetails?._id, orderStatus: status })
-  //   ).then((data) => {
-  //     if (data?.payload?.success) {
-  //       dispatch(getOrderDetailsForAdmin(orderDetails?._id));
-  //       dispatch(getAllOrdersForAdmin());
-  //       setFormData(initialFormData);
-  //       toast({
-  //         title: data?.payload?.message,
-  //         variant: "info",
-  //       });
-  //     }
-  //   });
-  // }
-
   function handleUpdateStatus(event) {
     event.preventDefault();
     const { status } = formData;
 
     dispatch(updateOrderStatus({ id: orderDetails?._id, orderStatus: status }))
-      .unwrap() // unwrap() thunk sonucunu almak için
+      .unwrap()
       .then((payload) => {
-        // Başarılı payload
         if (payload?.success) {
           dispatch(getOrderDetailsForAdmin(orderDetails?._id));
-          // getAllOrdersForAdmin yerine adminOrderSlice içindeki listeyi güncelleyen thunk'lar kullanılmalı
-          // Örneğin, kullanıcı listesini veya misafir listesini yeniden çekmek gerekebilir.
-          // Şimdilik bu satırları yoruma alıyorum, çünkü tüm listeyi çekmek yerine
-          // sadece ilgili siparişin detayını güncellemek veya ana listedeki veriyi tazelemek daha verimli olabilir.
-          // dispatch(getAllOrdersForAdmin()); // Bu thunk admin-view/orders.jsx içinde genel listeyi çekiyor olabilir.
-          // Durum güncellemesi sonrası hangi listelerin yenilenmesi gerektiğine bağlı.
-          // Genellikle orderDetails güncellendiği için listedeki gösterim de (eğer varsa) dolaylı yoldan güncellenir.
-          // VEYA sipariş listesini (userList veya guestOrderList) yeniden çekmek için:
           if (orderDetails?.userId?._id && !orderDetails.isGuestOrder) {
             dispatch(fetchUsersWithOrders()); // Kayıtlı kullanıcı listesini güncelle
           } else if (orderDetails.isGuestOrder) {
@@ -80,7 +53,7 @@ function AdminOrderDetailsView({ orderDetails }) {
       })
       .catch((error) => {
         // Redux thunk rejectWithValue ile dönen veya network hatası
-        console.error("Sipariş durumu güncelleme hatası:", error);
+        // console.error("Sipariş durumu güncelleme hatası:", error);
         toast({
           title:
             error?.message || "Sipariş durumu güncellenirken bir hata oluştu.",
@@ -99,7 +72,8 @@ function AdminOrderDetailsView({ orderDetails }) {
 
   const currentStatusKey = orderDetails?.orderStatus || "default";
   const statusInfo =
-    orderStatusMapping[currentStatusKey] || orderStatusMapping.default; // Merkezi mapping'i kullan
+    orderStatusMappingAdmin[currentStatusKey] ||
+    orderStatusMappingAdmin.default; // Merkezi mapping'i kullan
 
   return (
     <div className="grid gap-6">

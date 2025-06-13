@@ -16,6 +16,7 @@ import categoriesReducer from "./common-slice/categories-slice"; // Yeni
 import homeSectionsReducer from "./common-slice/home-sections-slice"; // Yeni
 import brandsReducer from "./common-slice/brands-slice";
 import adminStatsSlice from "./admin/statsSlice";
+import maintenanceReducer from "./common-slice/maintenance-slice";
 
 const store = configureStore({
   reducer: {
@@ -36,6 +37,7 @@ const store = configureStore({
     homeSections: homeSectionsReducer,
     brands: brandsReducer,
     adminStats: adminStatsSlice,
+    maintenance: maintenanceReducer,
   },
 });
 
