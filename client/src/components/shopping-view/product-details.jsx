@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import { addReview, getReviews } from "@/store/shop/review-slice";
 import { addToWishlist, removeFromWishlist } from "@/store/shop/wishlist-slice";
 import PropTypes from "prop-types";
-import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
+import { DialogTitle } from "@radix-ui/react-dialog";
 
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const [reviewMsg, setReviewMsg] = useState("");

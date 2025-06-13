@@ -27,6 +27,7 @@ import {
 import { Badge } from "../ui/badge";
 import { format, parseISO, isValid } from "date-fns";
 import { orderStatusMappingUser } from "@/config";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 function ShoppingOrders() {
   const [selectedOrderId, setSelectedOrderId] = useState(null);
@@ -210,27 +211,30 @@ function ShoppingOrders() {
             }
           }}
         >
-          <DialogContent className="sm:max-w-[600px] max-sm:w-[95%] max-sm:max-w-[95%]">
-            <DialogHeader>
-              <DialogTitle className="max-sm:text-sm">
-                Sipariş Detayları (
-                {selectedOrderId ? selectedOrderId.substring(0, 8) + "..." : ""}
-                )
+          <DialogContent className="sm:max-w-[600px] w-[95%] p-0 flex flex-col max-h-[90vh]">
+            <DialogHeader className="p-6 pb-4 border-b">
+              <DialogTitle>
+                Sipariş Detayları ({selectedOrderId ? selectedOrderId : ""})
               </DialogTitle>
             </DialogHeader>
-            {orderDetailsLoading ? (
-              <div className="p-4 text-center">Yükleniyor...</div>
-            ) : orderDetails ? (
-              <ShoppingOrderDetailsView orderDetails={orderDetails} />
-            ) : (
-              selectedOrderId && (
-                <div className="p-4 text-center text-red-500">
-                  Sipariş detayları yüklenemedi.
-                </div>
-              )
-            )}
 
-            <DialogFooter>
+            <ScrollArea className="flex-1 overflow-y-auto">
+              <div className="px-6 py-4">
+                {orderDetailsLoading ? (
+                  <div className="text-center">Yükleniyor...</div>
+                ) : orderDetails ? (
+                  <ShoppingOrderDetailsView orderDetails={orderDetails} />
+                ) : (
+                  selectedOrderId && (
+                    <div className="text-center text-red-500">
+                      Sipariş detayları yüklenemedi.
+                    </div>
+                  )
+                )}
+              </div>
+            </ScrollArea>
+
+            <DialogFooter className="p-6 pt-4 border-t bg-gray-50 dark:bg-gray-800">
               <DialogClose asChild>
                 <Button type="button" variant="secondary">
                   Kapat
