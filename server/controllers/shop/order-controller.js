@@ -313,7 +313,11 @@ const getAllOrdersByUser = async (req, res) => {
 const getOrderDetails = async (req, res) => {
   try {
     const { id } = req.params;
-
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Geçersiz Ürün ID formatı." });
+    }
     const order = await Order.findById(id);
 
     if (!order) {
@@ -532,7 +536,11 @@ const createGuestOrder = async (req, res) => {
 const trackGuestOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
-
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Geçersiz Ürün ID formatı." });
+    }
     if (!orderId) {
       return res.status(400).json({
         success: false,

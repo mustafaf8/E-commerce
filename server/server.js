@@ -111,9 +111,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   session({
-    secret:
-      process.env.SESSION_SECRET ||
-      "cok_guclu_bir_varsayilan_secret_kullanin_env_yoksa",
+    secret: process.env.SESSION_SECRET || "defaultSecretKeyForSession",
     resave: false,
     saveUninitialized: false,
     cookie: {

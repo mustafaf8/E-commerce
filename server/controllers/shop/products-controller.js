@@ -83,6 +83,11 @@ const getFilteredProducts = async (req, res) => {
 const getProductDetails = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Geçersiz Ürün ID formatı." });
+    }
     const product = await Product.findById(id)
       .populate("category", "name slug")
       .populate("brand", "name slug");

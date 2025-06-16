@@ -1,4 +1,5 @@
 const Order = require("../../models/Order");
+const mongoose = require("mongoose");
 
 const getAllOrdersOfAllUsers = async (req, res) => {
   try {
@@ -26,7 +27,12 @@ const getAllOrdersOfAllUsers = async (req, res) => {
 
 const getOrderDetailsForAdmin = async (req, res) => {
   try {
-    const { id } = req.params; // Siparişin _id'si
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Geçersiz Sipariş ID formatı." });
+    }
     let order = await Order.findById(id);
 
     if (!order) {
@@ -75,6 +81,11 @@ const getOrderDetailsForAdmin = async (req, res) => {
 const updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Geçersiz Sipariş ID formatı." });
+    }
     const { orderStatus } = req.body;
 
     const order = await Order.findById(id);
@@ -214,7 +225,11 @@ const getUsersWithOrders = async (req, res) => {
 const getOrdersByUserIdForAdmin = async (req, res) => {
   try {
     const { userId } = req.params; // Bu "GUEST_ORDERS_VIRTUAL_ID" olabilir
-
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Geçersiz Sipariş ID formatı." });
+    }
     if (!userId) {
       return res.status(400).json({
         success: false,
