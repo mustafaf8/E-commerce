@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../../api/axiosInstance";
 
 const initialState = {
   isLoading: false,
@@ -11,9 +11,7 @@ export const getFeatureImages = createAsyncThunk(
   "commonFeature/getFeatureImages",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/common/feature/get`
-      );
+      const response = await api.get(`/common/feature/get`);
       if (response.data && response.data.success) {
         return response.data;
       } else {
@@ -37,10 +35,7 @@ export const addFeatureImage = createAsyncThunk(
   "commonFeature/addFeatureImage",
   async (bannerData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `http://localhost:5000/api/common/feature/add`,
-        bannerData
-      );
+      const response = await api.post(`/common/feature/add`, bannerData);
       if (response.data && response.data.success) {
         return response.data;
       } else {
@@ -64,9 +59,7 @@ export const deleteFeatureImage = createAsyncThunk(
   "commonFeature/deleteFeatureImage",
   async (bannerId, { rejectWithValue }) => {
     try {
-      const response = await axios.delete(
-        `http://localhost:5000/api/common/feature/delete/${bannerId}`
-      );
+      const response = await api.delete(`/common/feature/delete/${bannerId}`);
       if (response.data && response.data.success) {
         return { success: true, data: { _id: bannerId } };
       } else {

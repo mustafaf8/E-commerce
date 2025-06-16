@@ -1,4 +1,7 @@
 const express = require("express");
+const { authMiddleware } = require("../../controllers/auth/auth-controller");
+const adminCheckMiddleware = require("../../middleware/adminCheckMiddleware");
+
 const {
   addHomeSectionAdmin,
   getAllHomeSectionsAdmin,
@@ -10,16 +13,30 @@ const {
 
 const router = express.Router();
 
-router.post("/add", /* adminCheckMiddleware, */ addHomeSectionAdmin);
-router.get("/list", /* adminCheckMiddleware, */ getAllHomeSectionsAdmin);
-router.put("/update/:id", /* adminCheckMiddleware, */ updateHomeSectionAdmin);
+router.post(
+  "/add",
+  [authMiddleware, adminCheckMiddleware],
+  addHomeSectionAdmin
+);
+router.get(
+  "/list",
+  [authMiddleware, adminCheckMiddleware],
+  getAllHomeSectionsAdmin
+);
+router.put(
+  "/update/:id",
+  [authMiddleware, adminCheckMiddleware],
+  updateHomeSectionAdmin
+);
 router.delete(
   "/delete/:id",
-  /* adminCheckMiddleware, */ deleteHomeSectionAdmin
+  [authMiddleware, adminCheckMiddleware],
+  deleteHomeSectionAdmin
 );
 router.put(
   "/reorder",
-  /* adminCheckMiddleware, */ updateHomeSectionsOrderAdmin
+  [authMiddleware, adminCheckMiddleware],
+  updateHomeSectionsOrderAdmin
 );
 
 module.exports = router;

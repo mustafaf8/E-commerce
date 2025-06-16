@@ -1,4 +1,6 @@
 const express = require("express");
+const { authMiddleware } = require("../../controllers/auth/auth-controller");
+const adminCheckMiddleware = require("../../middleware/adminCheckMiddleware");
 
 const {
   handleImageUpload,
@@ -11,6 +13,8 @@ const {
 const { upload } = require("../../helpers/cloudinary");
 
 const router = express.Router();
+
+router.use(authMiddleware, adminCheckMiddleware);
 
 router.post("/upload-image", upload.single("my_file"), handleImageUpload);
 router.post("/add", addProduct);

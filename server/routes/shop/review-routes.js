@@ -1,4 +1,5 @@
 const express = require("express");
+const { authMiddleware } = require("../../controllers/auth/auth-controller");
 
 const {
   addProductReview,
@@ -7,7 +8,7 @@ const {
 
 const router = express.Router();
 
-router.post("/add", addProductReview);
+router.post("/add", authMiddleware, addProductReview);
 router.get("/:productId", getProductReviews);
 
 module.exports = router;

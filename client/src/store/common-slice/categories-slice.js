@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../../api/axiosInstance";
 
 const initialState = {
   categoryList: [],
@@ -11,9 +11,7 @@ export const fetchAllCategories = createAsyncThunk(
   "categories/fetchAll",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/admin/categories/list`
-      );
+      const response = await api.get(`/common/categories/list`);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -27,10 +25,7 @@ export const addCategory = createAsyncThunk(
   "categories/add",
   async (categoryData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `http://localhost:5000/api/admin/categories/add`,
-        categoryData
-      );
+      const response = await api.post(`/admin/categories/add`, categoryData);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -44,8 +39,8 @@ export const updateCategory = createAsyncThunk(
   "categories/update",
   async ({ id, categoryData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(
-        `http://localhost:5000/api/admin/categories/update/${id}`,
+      const response = await api.put(
+        `/admin/categories/update/${id}`,
         categoryData
       );
       return response.data; // { success: true, data: updatedCategory }
@@ -61,9 +56,7 @@ export const deleteCategory = createAsyncThunk(
   "categories/delete",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.delete(
-        `http://localhost:5000/api/admin/categories/delete/${id}`
-      );
+      const response = await api.delete(`/admin/categories/delete/${id}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(

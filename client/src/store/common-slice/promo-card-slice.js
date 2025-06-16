@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../../api/axiosInstance";
 
 const initialState = {
   promoCardList: [],
@@ -11,9 +11,7 @@ export const fetchPromoCards = createAsyncThunk(
   "promoCards/fetchPromoCards",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/common/promo-cards/get`
-      );
+      const response = await api.get(`/common/promo-cards/get`);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -27,10 +25,7 @@ export const addPromoCard = createAsyncThunk(
   "promoCards/addPromoCard",
   async (promoData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `http://localhost:5000/api/common/promo-cards/add`,
-        promoData
-      );
+      const response = await api.post(`/common/promo-cards/add`, promoData);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -44,9 +39,7 @@ export const deletePromoCard = createAsyncThunk(
   "promoCards/deletePromoCard",
   async (cardId, { rejectWithValue }) => {
     try {
-      const response = await axios.delete(
-        `http://localhost:5000/api/common/promo-cards/delete/${cardId}`
-      );
+      const response = await api.delete(`/common/promo-cards/delete/${cardId}`);
       return { success: true, data: { _id: cardId } };
     } catch (error) {
       return rejectWithValue(

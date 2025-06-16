@@ -1,4 +1,7 @@
 const express = require("express");
+const { authMiddleware } = require("../../controllers/auth/auth-controller");
+const adminCheckMiddleware = require("../../middleware/adminCheckMiddleware");
+
 const {
   addFeatureImage,
   getFeatureImages,
@@ -10,10 +13,11 @@ const router = express.Router();
 
 router.get("/get", getFeatureImages);
 
-router.post("/add", /* adminCheckMiddleware, */ addFeatureImage);
+router.post("/add", [authMiddleware, adminCheckMiddleware], addFeatureImage);
 router.delete(
   "/delete/:imageId",
-  /* adminCheckMiddleware, */ deleteFeatureImage
+  [authMiddleware, adminCheckMiddleware],
+  deleteFeatureImage
 );
 
 module.exports = router;

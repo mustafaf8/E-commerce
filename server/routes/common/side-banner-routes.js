@@ -1,20 +1,22 @@
 const express = require("express");
+const { authMiddleware } = require("../../controllers/auth/auth-controller");
+const adminCheckMiddleware = require("../../middleware/adminCheckMiddleware");
+
 const {
   getSideBanners,
   addSideBanner,
   deleteSideBanner,
 } = require("../../controllers/common/side-banner-controller");
-// const { authMiddleware, adminCheckMiddleware } = require('../middleware/authAdmin'); // Opsiyonel middleware
 
 const router = express.Router();
 
 router.get("/get", getSideBanners);
 
-// Admin erişimi (Middleware eklenmeli)
-router.post("/add", /* adminCheckMiddleware, */ addSideBanner);
+router.post("/add", [authMiddleware, adminCheckMiddleware], addSideBanner);
 router.delete(
   "/delete/:bannerId",
-  /* adminCheckMiddleware, */ deleteSideBanner
-); // Parametre adı bannerId
+  [authMiddleware, adminCheckMiddleware],
+  deleteSideBanner
+);
 
 module.exports = router;

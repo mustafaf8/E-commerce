@@ -1,4 +1,6 @@
 const express = require("express");
+const { authMiddleware } = require("../../controllers/auth/auth-controller"); // Ekleyin
+const adminCheckMiddleware = require("../../middleware/adminCheckMiddleware");
 
 const {
   getAllOrdersOfAllUsers,
@@ -10,6 +12,8 @@ const {
 } = require("../../controllers/admin/order-controller");
 
 const router = express.Router();
+
+router.use(authMiddleware, adminCheckMiddleware);
 
 router.get("/get", getAllOrdersOfAllUsers);
 router.get("/details/:id", getOrderDetailsForAdmin);

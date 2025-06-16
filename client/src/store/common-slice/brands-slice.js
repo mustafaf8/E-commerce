@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../../api/axiosInstance";
 
 const initialState = {
   brandList: [],
@@ -12,9 +12,7 @@ export const fetchAllBrands = createAsyncThunk(
   "brands/fetchAll",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/admin/brands/list`
-      );
+      const response = await api.get(`/common/brands/list`);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -28,10 +26,7 @@ export const addBrand = createAsyncThunk(
   "brands/add",
   async (brandData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `http://localhost:5000/api/admin/brands/add`,
-        brandData
-      );
+      const response = await api.post(`/admin/brands/add`, brandData);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -45,10 +40,7 @@ export const updateBrand = createAsyncThunk(
   "brands/update",
   async ({ id, brandData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(
-        `http://localhost:5000/api/admin/brands/update/${id}`,
-        brandData
-      );
+      const response = await api.put(`/admin/brands/update/${id}`, brandData);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -62,9 +54,7 @@ export const deleteBrand = createAsyncThunk(
   "brands/delete",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.delete(
-        `http://localhost:5000/api/admin/brands/delete/${id}`
-      );
+      const response = await api.delete(`/admin/brands/delete/${id}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(

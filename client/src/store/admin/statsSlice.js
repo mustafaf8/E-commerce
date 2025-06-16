@@ -1,16 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../../api/axiosInstance";
 
-const API_BASE = "http://localhost:5000/api/admin/stats";
-
-// Thunks
 export const fetchSalesOverview = createAsyncThunk(
   "adminStats/fetchSalesOverview",
   async (period = "weekly", { rejectWithValue }) => {
     try {
-      const res = await axios.get(
-        `${API_BASE}/sales-overview?period=${period}`
-      );
+      const res = await api.get(`/admin/stats/sales-overview?period=${period}`);
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: err.message });
@@ -22,7 +17,7 @@ export const fetchOrderStatusDistribution = createAsyncThunk(
   "adminStats/fetchOrderStatusDistribution",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axios.get(`${API_BASE}/order-status-distribution`);
+      const res = await api.get(`/admin/stats/order-status-distribution`);
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: err.message });
@@ -34,8 +29,8 @@ export const fetchTopSellingProducts = createAsyncThunk(
   "adminStats/fetchTopSellingProducts",
   async ({ limit = 10, metric = "salesCount" } = {}, { rejectWithValue }) => {
     try {
-      const res = await axios.get(
-        `${API_BASE}/top-selling-products?limit=${limit}&metric=${metric}`
+      const res = await api.get(
+        `/admin/stats/top-selling-products?limit=${limit}&metric=${metric}`
       );
       return res.data;
     } catch (err) {
@@ -48,7 +43,7 @@ export const fetchSalesByCategory = createAsyncThunk(
   "adminStats/fetchSalesByCategory",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axios.get(`${API_BASE}/sales-by-category`);
+      const res = await api.get(`/admin/stats/sales-by-category`);
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: err.message });
@@ -60,7 +55,7 @@ export const fetchSalesByBrand = createAsyncThunk(
   "adminStats/fetchSalesByBrand",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axios.get(`${API_BASE}/sales-by-brand`);
+      const res = await api.get(`/admin/stats/sales-by-brand`);
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: err.message });
@@ -72,7 +67,7 @@ export const fetchUserSummary = createAsyncThunk(
   "adminStats/fetchUserSummary",
   async (period = "weekly", { rejectWithValue }) => {
     try {
-      const res = await axios.get(`${API_BASE}/user-summary?period=${period}`);
+      const res = await api.get(`/admin/stats/user-summary?period=${period}`);
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: err.message });
@@ -84,7 +79,7 @@ export const fetchTopCustomers = createAsyncThunk(
   "adminStats/fetchTopCustomers",
   async (limit = 10, { rejectWithValue }) => {
     try {
-      const res = await axios.get(`${API_BASE}/top-customers?limit=${limit}`);
+      const res = await api.get(`/admin/stats/top-customers?limit=${limit}`);
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: err.message });
@@ -96,7 +91,7 @@ export const fetchProductSummary = createAsyncThunk(
   "adminStats/fetchProductSummary",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axios.get(`${API_BASE}/product-summary`);
+      const res = await api.get(`/admin/stats/product-summary`);
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: err.message });
@@ -108,7 +103,7 @@ export const fetchSalesTrend = createAsyncThunk(
   "adminStats/fetchSalesTrend",
   async (period = "monthly", { rejectWithValue }) => {
     try {
-      const res = await axios.get(`${API_BASE}/sales-trend?period=${period}`);
+      const res = await api.get(`/admin/stats/sales-trend?period=${period}`);
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: err.message });
@@ -120,8 +115,8 @@ export const fetchUserRegistrationsTrend = createAsyncThunk(
   "adminStats/fetchUserRegistrationsTrend",
   async (period = "monthly", { rejectWithValue }) => {
     try {
-      const res = await axios.get(
-        `${API_BASE}/user-registrations-trend?period=${period}`
+      const res = await api.get(
+        `/admin/stats/user-registrations-trend?period=${period}`
       );
       return res.data;
     } catch (err) {
@@ -134,8 +129,8 @@ export const fetchTopLikedProducts = createAsyncThunk(
   "adminStats/fetchTopLikedProducts",
   async (limit = 10, { rejectWithValue }) => {
     try {
-      const res = await axios.get(
-        `${API_BASE}/top-liked-products?limit=${limit}`
+      const res = await api.get(
+        `/admin/stats/top-liked-products?limit=${limit}`
       );
       return res.data;
     } catch (err) {
@@ -148,7 +143,9 @@ export const fetchProfitOverview = createAsyncThunk(
   "adminStats/fetchProfitOverview",
   async (period = "weekly", { rejectWithValue }) => {
     try {
-      const res = await axios.get(`${API_BASE}/profit-overview?period=${period}`);
+      const res = await api.get(
+        `/admin/stats/profit-overview?period=${period}`
+      );
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: err.message });
@@ -160,7 +157,7 @@ export const fetchProfitByProduct = createAsyncThunk(
   "adminStats/fetchProfitByProduct",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axios.get(`${API_BASE}/profit-by-product`);
+      const res = await api.get(`/admin/stats/profit-by-product`);
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: err.message });
@@ -172,7 +169,7 @@ export const fetchProfitByCategory = createAsyncThunk(
   "adminStats/fetchProfitByCategory",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axios.get(`${API_BASE}/profit-by-category`);
+      const res = await api.get(`/admin/stats/profit-by-category`);
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: err.message });
@@ -184,7 +181,7 @@ export const fetchProfitByBrand = createAsyncThunk(
   "adminStats/fetchProfitByBrand",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axios.get(`${API_BASE}/profit-by-brand`);
+      const res = await api.get(`/admin/stats/profit-by-brand`);
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: err.message });

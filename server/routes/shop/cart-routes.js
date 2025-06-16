@@ -8,11 +8,10 @@ const {
   syncLocalCart,
 } = require("../../controllers/shop/cart-controller");
 
-// authMiddleware'ı da import etmeniz gerekecek
 const { authMiddleware } = require("../../controllers/auth/auth-controller");
 
 const router = express.Router();
-router.post("/add", addToCart);
+router.post("/add", authMiddleware, addToCart);
 router.get("/get/:userId", authMiddleware, fetchCartItems);
 router.put("/update-cart", authMiddleware, updateCartItemQty);
 router.delete("/:userId/:productId", authMiddleware, deleteCartItem);

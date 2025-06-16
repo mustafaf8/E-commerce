@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../../../api/axiosInstance";
 import { clearGuestCart } from "@/lib/guestCartUtils";
 
 const initialState = {
@@ -16,11 +16,9 @@ export const createNewOrder = createAsyncThunk(
   // async (orderData, { rejectWithValue }) => { // Hata yönetimi için rejectWithValue eklenebilir
   async (orderData) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/shop/order/create",
-        orderData,
-        { withCredentials: true }
-      );
+      const response = await api.post("/shop/order/create", orderData, {
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       console.error(
@@ -36,10 +34,9 @@ export const getAllOrdersByUserId = createAsyncThunk(
   "order/getAllOrdersByUserId",
   async (userId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/shop/order/list/${userId}`,
-        { withCredentials: true }
-      );
+      const response = await api.get(`/shop/order/list/${userId}`, {
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       console.error(
@@ -57,10 +54,9 @@ export const getOrderDetails = createAsyncThunk(
   "order/getOrderDetails",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/shop/order/details/${id}`,
-        { withCredentials: true }
-      );
+      const response = await api.get(`/shop/order/details/${id}`, {
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       console.error(
@@ -78,10 +74,7 @@ export const createGuestOrderThunk = createAsyncThunk(
   "order/createGuestOrder",
   async (orderData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/shop/order/guest-create",
-        orderData
-      );
+      const response = await api.post("/shop/order/guest-create", orderData);
       return response.data;
     } catch (error) {
       return rejectWithValue(

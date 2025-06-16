@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../../api/axiosInstance";
 
 const initialState = {
   sideBannerList: [],
@@ -11,9 +11,7 @@ export const fetchSideBanners = createAsyncThunk(
   "sideBanners/fetchSideBanners",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/common/side-banners/get`
-      );
+      const response = await api.get(`/common/side-banners/get`);
       if (response.data && response.data.success) {
         return response.data;
       } else {
@@ -37,10 +35,7 @@ export const addSideBanner = createAsyncThunk(
   "sideBanners/addSideBanner",
   async (bannerData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `http://localhost:5000/api/common/side-banners/add`,
-        bannerData
-      );
+      const response = await api.post(`/common/side-banners/add`, bannerData);
       if (response.data && response.data.success) {
         return response.data;
       } else {
@@ -63,8 +58,8 @@ export const deleteSideBanner = createAsyncThunk(
   "sideBanners/deleteSideBanner",
   async (bannerId, { rejectWithValue }) => {
     try {
-      const response = await axios.delete(
-        `http://localhost:5000/api/common/side-banners/delete/${bannerId}`
+      const response = await api.delete(
+        `/common/side-banners/delete/${bannerId}`
       );
       if (response.data && response.data.success) {
         return { success: true, data: { _id: bannerId } };

@@ -8,16 +8,49 @@ const session = require("express-session");
 const passport = require("passport");
 const admin = require("firebase-admin");
 
+// --- GÜVENLİ FIREBASE BAŞLATMA ---
 try {
-  const serviceAccount = require("./config/firebase-service-account.json");
+  // .env dosyasından Firebase bilgilerini al
+  const serviceAccount = {
+    type: process.env.FIREBASE_TYPE,
+    project_id: process.env.FIREBASE_PROJECT_ID,
+    private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+    // .env dosyasından gelen '\\n' karakterlerini gerçek newline karakterlerine dönüştür
+    private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+    client_email: process.env.FIREBASE_CLIENT_EMAIL,
+    client_id: process.env.FIREBASE_CLIENT_ID,
+    auth_uri: process.env.FIREBASE_AUTH_URI,
+    token_uri: process.env.FIREBASE_TOKEN_URI,
+    auth_provider_x509_cert_url:
+      process.env.FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
+    client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL,
+  };
+
+  // serviceAccount objesinin tüm alanlarının dolu olduğunu kontrol et
+  if (!serviceAccount.private_key || !serviceAccount.client_email) {
+    throw new Error(
+      "Firebase service account bilgileri .env dosyasında eksik veya hatalı."
+    );
+  }
 
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   });
   console.log("Firebase Admin SDK başarıyla başlatıldı.");
 } catch (error) {
-  console.error("Firebase Admin SDK başlatılamadı:", error);
+  console.error("Firebase Admin SDK başlatılamadı:", error.message);
 }
+// --- GÜVENLİ FIREBASE BAŞLATMA SONU ---
+// try {
+//   const serviceAccount = require("./config/firebase-service-account.json");
+
+//   admin.initializeApp({
+//     credential: admin.credential.cert(serviceAccount),
+//   });
+//   console.log("Firebase Admin SDK başarıyla başlatıldı.");
+// } catch (error) {
+//   console.error("Firebase Admin SDK başlatılamadı:", error);
+// }
 
 const authRouter = require("./routes/auth/auth-routes");
 const adminProductsRouter = require("./routes/admin/products-routes");
@@ -41,6 +74,7 @@ const adminBrandRouter = require("./routes/admin/brand-routes"); // Yeni
 const commonBrandRouter = require("./routes/common/brand-routes");
 const adminStatsRouter = require("./routes/admin/statsAdminRoutes");
 const maintenanceRouter = require("./routes/common/maintenance-routes");
+const errorHandler = require("./middleware/errorHandler");
 const { scheduleAbandonedCartEmails } = require("./jobs/abandonedCartJob");
 require("./controllers/auth/auth-controller");
 
@@ -114,6 +148,7 @@ app.use("/api/admin/brands", adminBrandRouter);
 app.use("/api/common/brands", commonBrandRouter);
 app.use("/api/admin/stats", adminStatsRouter);
 app.use("/api/maintenance", maintenanceRouter);
+app.use(errorHandler);
 if (process.env.NODE_ENV !== "test") {
   scheduleAbandonedCartEmails();
 }

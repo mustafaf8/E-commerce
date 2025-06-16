@@ -1,4 +1,7 @@
 const express = require("express");
+const { authMiddleware } = require("../../controllers/auth/auth-controller"); // Ekleyin
+const adminCheckMiddleware = require("../../middleware/adminCheckMiddleware");
+
 const {
   getMaintenanceStatus,
   updateMaintenanceStatus,
@@ -7,14 +10,12 @@ const {
 
 const router = express.Router();
 
-// Herkesin erişebileceği durum sorgulama endpoint'i
 router.get("/status", getMaintenanceStatus);
 
-// Sadece adminlerin erişmesi gereken güncelleme endpoint'i
-// TODO: Bu route'u admin middleware ile koruyun.
 router.put(
   "/status",
-  /* authMiddleware, adminCheckMiddleware, */ updateMaintenanceStatus
+  [authMiddleware, adminCheckMiddleware],
+  updateMaintenanceStatus
 );
 
 module.exports = router;

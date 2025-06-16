@@ -1,10 +1,10 @@
-import axios from "axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   getGuestCart,
   saveGuestCart,
   clearGuestCart,
 } from "@/lib/guestCartUtils";
+import api from "../../../api/axiosInstance";
 
 const initialState = {
   cartItems: { items: [], guestCartId: null, _id: null },
@@ -79,10 +79,11 @@ export const addToCart = createAsyncThunk(
       }
     } else {
       try {
-        const response = await axios.post(
-          "http://localhost:5000/api/shop/cart/add",
-          { userId: auth.user.id, productId, quantity }
-        );
+        const response = await api.post("/shop/cart/add", {
+          userId: auth.user.id,
+          productId,
+          quantity,
+        });
         return { ...response.data, fromLocalStorage: false };
       } catch (error) {
         const errorData = error.response?.data || {
@@ -120,10 +121,9 @@ export const fetchCartItems = createAsyncThunk(
             success: false,
             message: "Kullanıcı ID bulunamadı.",
           });
-        const response = await axios.get(
-          `http://localhost:5000/api/shop/cart/get/${idToFetch}`,
-          { withCredentials: true }
-        );
+        const response = await api.get(`/shop/cart/get/${idToFetch}`, {
+          withCredentials: true,
+        });
         return { ...response.data, fromLocalStorage: false };
       } catch (error) {
         return rejectWithValue(
@@ -161,10 +161,9 @@ export const deleteCartItem = createAsyncThunk(
     } else {
       try {
         const userId = auth.user.id;
-        const response = await axios.delete(
-          `http://localhost:5000/api/shop/cart/${userId}/${productId}`,
-          { withCredentials: true }
-        );
+        const response = await api.delete(`/shop/cart/${userId}/${productId}`, {
+          withCredentials: true,
+        });
         return { ...response.data, fromLocalStorage: false };
       } catch (error) {
         return rejectWithValue(
@@ -240,8 +239,8 @@ export const updateCartQuantity = createAsyncThunk(
       }
     } else {
       try {
-        const response = await axios.put(
-          "http://localhost:5000/api/shop/cart/update-cart",
+        const response = await api.put(
+          "/shop/cart/update-cart",
           { productId, quantity },
           { withCredentials: true }
         );
@@ -281,8 +280,8 @@ export const syncLocalCartToBackend = createAsyncThunk(
     }
 
     try {
-      const response = await axios.post(
-        `http://localhost:5000/api/shop/cart/sync-local`,
+      const response = await api.post(
+        `/shop/cart/sync-local`,
         { userId: auth.user.id, localCartItems: localCart.items },
         { withCredentials: true }
       );

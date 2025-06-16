@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../../api/axiosInstance";
 
 const initialState = {
   isAuthenticated: false,
@@ -14,11 +14,9 @@ export const registerUser = createAsyncThunk(
   "/auth/register",
   async (formData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/register",
-        formData,
-        { withCredentials: true }
-      );
+      const response = await api.post("/auth/register", formData, {
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -32,11 +30,9 @@ export const loginUser = createAsyncThunk(
   "/auth/login",
   async (formData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        formData,
-        { withCredentials: true }
-      );
+      const response = await api.post("/auth/login", formData, {
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -50,8 +46,8 @@ export const logoutUser = createAsyncThunk(
   "/auth/logout",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/logout",
+      const response = await api.post(
+        "/auth/logout",
         {},
         { withCredentials: true }
       );
@@ -69,16 +65,13 @@ export const checkAuth = createAsyncThunk(
   "/auth/checkauth",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        "http://localhost:5000/api/auth/check-auth",
-        {
-          withCredentials: true,
-          headers: {
-            "Cache-Control":
-              "no-store, no-cache, must-revalidate, proxy-revalidate",
-          },
-        }
-      );
+      const response = await api.get("/auth/check-auth", {
+        withCredentials: true,
+        headers: {
+          "Cache-Control":
+            "no-store, no-cache, must-revalidate, proxy-revalidate",
+        },
+      });
       return response.data;
     } catch (error) {
       console.log(
@@ -94,11 +87,9 @@ export const updateUserDetails = createAsyncThunk(
   "/auth/update",
   async (formData, { rejectWithValue }) => {
     try {
-      const response = await axios.put(
-        "http://localhost:5000/api/auth/update",
-        formData,
-        { withCredentials: true }
-      );
+      const response = await api.put("/auth/update", formData, {
+        withCredentials: true,
+      });
       if (response.data.success) {
         return response.data;
       } else {
@@ -116,8 +107,8 @@ export const verifyPhoneLogin = createAsyncThunk(
   "/auth/phone/verify",
   async ({ token }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/phone/verify",
+      const response = await api.post(
+        "/auth/phone/verify",
         { token },
         { withCredentials: true }
       );
@@ -134,8 +125,8 @@ export const registerPhoneUser = createAsyncThunk(
   "/auth/phone/register",
   async ({ token, userName }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/phone/register",
+      const response = await api.post(
+        "/auth/phone/register",
         { token, userName },
         { withCredentials: true }
       );

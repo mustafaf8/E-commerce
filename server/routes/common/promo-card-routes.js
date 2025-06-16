@@ -1,4 +1,7 @@
 const express = require("express");
+const { authMiddleware } = require("../../controllers/auth/auth-controller");
+const adminCheckMiddleware = require("../../middleware/adminCheckMiddleware");
+
 const {
   getPromoCards,
   addPromoCard,
@@ -11,11 +14,11 @@ const router = express.Router();
 
 router.get("/get", getPromoCards);
 
-// Sadece adminlerin erişebileceği endpoint'ler
-// Burada admin yetkisini kontrol eden bir middleware kullanmak en doğrusu olurdu.
-// Şimdilik middleware olmadan bırakıyorum, kontrolü controller içinde manuel yapabilirsiniz
-// veya authMiddleware + rol kontrolü yapabilirsiniz.
-router.post("/add", /* adminCheckMiddleware, */ addPromoCard);
-router.delete("/delete/:cardId", /* adminCheckMiddleware, */ deletePromoCard);
+router.post("/add", [authMiddleware, adminCheckMiddleware], addPromoCard);
+router.delete(
+  "/delete/:cardId",
+  [authMiddleware, adminCheckMiddleware],
+  deletePromoCard
+);
 
 module.exports = router;

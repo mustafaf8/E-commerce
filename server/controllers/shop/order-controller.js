@@ -9,7 +9,8 @@ const mongoose = require("mongoose");
 
 const createOrder = async (req, res) => {
   try {
-    const { userId, cartItems, addressInfo, cartId } = req.body;
+    const userId = req.user.id;
+    const { cartItems, addressInfo, cartId } = req.body;
 
     const user = await User.findById(userId);
     if (!user)
@@ -290,7 +291,7 @@ const handleIyzicoCallback = async (req, res) => {
 
 const getAllOrdersByUser = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const userId = req.user.id;
     const orders = await Order.find({
       userId,
       paymentStatus: "paid",

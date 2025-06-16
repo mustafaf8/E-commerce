@@ -1,4 +1,5 @@
 const express = require("express");
+
 const {
   getActiveHomeSectionsShop,
 } = require("../../controllers/shop/home-section-controller");

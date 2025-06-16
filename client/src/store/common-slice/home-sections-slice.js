@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-
+import api from "../../api/axiosInstance";
 const initialState = {
   homeSections: [],
   activeHomeSections: [],
@@ -12,9 +11,7 @@ export const fetchActiveHomeSections = createAsyncThunk(
   "homeSections/fetchActive",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/shop/home-sections/active`
-      );
+      const response = await api.get(`/shop/home-sections/active`);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -28,9 +25,7 @@ export const fetchAllHomeSections = createAsyncThunk(
   "homeSections/fetchAllAdmin",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/admin/home-sections/list`
-      );
+      const response = await api.get(`/admin/home-sections/list`);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -46,10 +41,7 @@ export const addHomeSection = createAsyncThunk(
   "homeSections/add",
   async (sectionData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `http://localhost:5000/api/admin/home-sections/add`,
-        sectionData
-      );
+      const response = await api.post(`/admin/home-sections/add`, sectionData);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -63,8 +55,8 @@ export const updateHomeSection = createAsyncThunk(
   "homeSections/update",
   async ({ id, sectionData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(
-        `http://localhost:5000/api/admin/home-sections/update/${id}`,
+      const response = await api.put(
+        `/admin/home-sections/update/${id}`,
         sectionData
       );
       return response.data;
@@ -80,9 +72,7 @@ export const deleteHomeSection = createAsyncThunk(
   "homeSections/delete",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.delete(
-        `http://localhost:5000/api/admin/home-sections/delete/${id}`
-      );
+      const response = await api.delete(`/admin/home-sections/delete/${id}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -96,10 +86,9 @@ export const updateHomeSectionsOrder = createAsyncThunk(
   "homeSections/reorder",
   async (orderedIds, { rejectWithValue }) => {
     try {
-      const response = await axios.put(
-        `http://localhost:5000/api/admin/home-sections/reorder`,
-        { orderedIds }
-      );
+      const response = await api.put(`/admin/home-sections/reorder`, {
+        orderedIds,
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(

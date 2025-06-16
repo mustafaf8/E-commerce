@@ -4,8 +4,8 @@ const ProductReview = require("../../models/Review");
 
 const addProductReview = async (req, res) => {
   try {
-    const { productId, userId, userName, reviewMessage, reviewValue } =
-      req.body;
+    const userId = req.user.id;
+    const { productId, userName, reviewMessage, reviewValue } = req.body;
 
     const order = await Order.findOne({
       userId,

@@ -1,13 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-
-const API_URL = "http://localhost:5000/api/maintenance";
+import api from "../../api/axiosInstance";
 
 export const fetchMaintenanceStatus = createAsyncThunk(
   "maintenance/fetchStatus",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/status`);
+      const response = await api.get(`/maintenance/status`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data);
@@ -19,7 +17,7 @@ export const updateMaintenanceStatus = createAsyncThunk(
   "maintenance/updateStatus",
   async (statusData, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${API_URL}/status`, statusData, {
+      const response = await api.put(`/maintenance/status`, statusData, {
         withCredentials: true,
       });
       return response.data;

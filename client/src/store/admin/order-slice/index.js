@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../../../api/axiosInstance";
 
 const initialState = {
   orderList: [],
@@ -19,9 +19,7 @@ export const fetchAllGuestOrdersForAdmin = createAsyncThunk(
   "adminOrder/fetchAllGuestOrdersForAdmin",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/admin/orders/guest-orders`
-      );
+      const response = await api.get(`/admin/orders/guest-orders`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data);
@@ -32,9 +30,7 @@ export const fetchAllGuestOrdersForAdmin = createAsyncThunk(
 export const getAllOrdersForAdmin = createAsyncThunk(
   "/order/getAllOrdersForAdmin",
   async () => {
-    const response = await axios.get(
-      `http://localhost:5000/api/admin/orders/get`
-    );
+    const response = await api.get(`/admin/orders/get`);
 
     return response.data;
   }
@@ -43,9 +39,7 @@ export const getAllOrdersForAdmin = createAsyncThunk(
 export const getOrderDetailsForAdmin = createAsyncThunk(
   "/order/getOrderDetailsForAdmin",
   async (id) => {
-    const response = await axios.get(
-      `http://localhost:5000/api/admin/orders/details/${id}`
-    );
+    const response = await api.get(`/admin/orders/details/${id}`);
 
     return response.data;
   }
@@ -54,12 +48,9 @@ export const getOrderDetailsForAdmin = createAsyncThunk(
 export const updateOrderStatus = createAsyncThunk(
   "/order/updateOrderStatus",
   async ({ id, orderStatus }) => {
-    const response = await axios.put(
-      `http://localhost:5000/api/admin/orders/update/${id}`,
-      {
-        orderStatus,
-      }
-    );
+    const response = await api.put(`/admin/orders/update/${id}`, {
+      orderStatus,
+    });
 
     return response.data;
   }
@@ -69,9 +60,7 @@ export const fetchUsersWithOrders = createAsyncThunk(
   "adminOrder/fetchUsersWithOrders",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/admin/orders/users-list`
-      );
+      const response = await api.get(`/admin/orders/users-list`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data);
@@ -83,9 +72,7 @@ export const fetchOrdersByUserIdForAdmin = createAsyncThunk(
   "adminOrder/fetchOrdersByUserIdForAdmin",
   async (userId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/admin/orders/user/${userId}`
-      );
+      const response = await api.get(`/admin/orders/user/${userId}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data);
