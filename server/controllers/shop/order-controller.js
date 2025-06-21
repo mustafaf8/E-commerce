@@ -333,7 +333,10 @@ const getOrderDetails = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Geçersiz Ürün ID formatı." });
     }
-    const order = await Order.findById(id);
+    // const order = await Order.findById(id);
+    const order = await Order.findById(id).select(
+      "-iyzicoToken -iyzicoConversationId -paymentId"
+    );
 
     if (!order) {
       return res.status(404).json({

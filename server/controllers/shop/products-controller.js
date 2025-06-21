@@ -65,8 +65,8 @@ const getFilteredProducts = async (req, res) => {
       .limit(parseInt(limit, 10))
       .populate("category", "name slug")
       .populate("brand", "name slug")
-      .select("-description");
-
+      .select("-description -costPrice");
+      
     res.status(200).json({
       success: true,
       data: products,
@@ -91,6 +91,7 @@ const getProductDetails = async (req, res) => {
     const product = await Product.findById(id)
       .populate("category", "name slug")
       .populate("brand", "name slug");
+      .select("-costPrice"); 
 
     if (!product)
       return res.status(404).json({
