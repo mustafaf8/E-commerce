@@ -1,3 +1,4 @@
+import React from "react";
 import { Card, CardContent, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -10,13 +11,16 @@ import { useToast } from "../ui/use-toast";
 import PropTypes from "prop-types";
 import { cn } from "@/lib/utils";
 
-function ShoppingProductTile({ product, handleGetProductDetails }) {
+const ShoppingProductTile = React.memo(function ShoppingProductTile({
+  product,
+  handleGetProductDetails,
+}) {
   const dispatch = useDispatch();
   const { toast } = useToast();
   const { wishlistItems, isLoading: wishlistLoading } = useSelector(
     (state) => state.shopWishlist
   );
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
   const isWishlisted = product?._id && wishlistItems.includes(product._id);
 
   const handleWishlistToggle = (event) => {
@@ -236,7 +240,7 @@ function ShoppingProductTile({ product, handleGetProductDetails }) {
       </CardFooter>
     </Card>
   );
-}
+});
 
 ShoppingProductTile.propTypes = {
   product: PropTypes.shape({
