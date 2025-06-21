@@ -1,5 +1,6 @@
 const Brand = require("../../models/Brand");
 const Product = require("../../models/Product");
+const mongoose = require("mongoose");
 
 const addBrandAdmin = async (req, res) => {
   try {
@@ -24,6 +25,7 @@ const addBrandAdmin = async (req, res) => {
       .status(201)
       .json({ success: true, message: "Marka eklendi.", data: newBrand });
   } catch (error) {
+    ("");
     console.error("Admin marka ekleme hatası:", error);
     if (error.name === "ValidationError") {
       return res.status(400).json({
@@ -40,6 +42,11 @@ const addBrandAdmin = async (req, res) => {
 const updateBrandAdmin = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Geçersiz Kategori ID formatı." });
+    }
     const { name, slug, isActive } = req.body;
 
     if (!name || !slug) {
@@ -97,6 +104,11 @@ const updateBrandAdmin = async (req, res) => {
 const deleteBrandAdmin = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Geçersiz Kategori ID formatı." });
+    }
     const productCount = await Product.countDocuments({ brand: id });
     if (productCount > 0) {
       return res.status(400).json({

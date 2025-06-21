@@ -75,8 +75,8 @@ function GuestCheckoutAddress() {
   useEffect(() => {
     if (paymentPageUrl) {
       console.log("PaymentPageUrl alındı, yönlendiriliyor:", paymentPageUrl);
-      window.location.href = paymentPageUrl;
       dispatch(resetPaymentPageUrl());
+      window.location.href = paymentPageUrl;
     }
   }, [paymentPageUrl, dispatch]);
 

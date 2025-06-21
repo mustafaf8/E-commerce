@@ -7,6 +7,24 @@ const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
 const admin = require("firebase-admin");
+const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 dakika
+  max: 100, // her IP'den 15 dakikada en fazla 100 istek
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: "Çok fazla istek yaptınız, lütfen 15 dakika sonra tekrar deneyin.",
+});
+
+// Giriş gibi daha hassas endpoint'ler için daha katı bir sınırlayıcı
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 dakika
+  max: 10, // 15 dakikada 10 giriş denemesi
+  message:
+    "Çok fazla giriş denemesi yapıldı, lütfen daha sonra tekrar deneyin.",
+});
 
 // --- GÜVENLİ FIREBASE BAŞLATMA ---
 try {
@@ -84,6 +102,7 @@ mongoose
   .catch((error) => console.log("MongoDB connection error:", error));
 
 const app = express();
+app.use(helmet());
 const PORT = process.env.PORT || 5000;
 
 app.use(
@@ -125,6 +144,9 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use("/api/", apiLimiter);
+app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/register", authLimiter);
 app.use("/api/auth", authRouter);
 app.use("/api/admin/products", adminProductsRouter);
 app.use("/api/admin/orders", adminOrderRouter);

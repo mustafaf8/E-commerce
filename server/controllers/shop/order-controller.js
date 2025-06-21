@@ -228,6 +228,21 @@ const handleIyzicoCallback = async (req, res) => {
             return res.redirect(redirectUrl);
           }
 
+          // STOK YENİDEN KONTROLÜ
+          for (const item of order.cartItems) {
+            const product = await Product.findById(item.productId);
+            if (!product || product.totalStock < item.quantity) {
+              console.error(
+                `Stok yetersiz! OrderID: ${orderId}, ProductID: ${item.productId}`
+              );
+              order.orderStatus = "failed";
+              order.paymentStatus = "stock_error"; // Yeni bir durum
+              await order.save();
+              redirectUrl = `http://localhost:5173/shop/payment-failure?status=stock_error&orderId=${orderId}`;
+              return res.redirect(redirectUrl);
+            }
+          }
+
           order.orderStatus = "confirmed";
           order.paymentStatus = "paid";
           order.paymentId = result.paymentId;
