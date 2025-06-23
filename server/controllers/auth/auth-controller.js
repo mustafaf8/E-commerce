@@ -159,7 +159,7 @@ const loginUser = async (req, res) => {
     res
       .cookie("token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: "Lax",
         path: "/",
       })
@@ -198,7 +198,7 @@ const logoutUser = (req, res, next) => {
         .clearCookie("token", {
           // Token cookie'sini temizle
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
+          secure: true,
           sameSite: "Lax",
           path: "/",
         })
@@ -248,7 +248,7 @@ const authMiddleware = async (req, res, next) => {
     );
     res.clearCookie("token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "Lax",
       path: "/",
     });
@@ -401,7 +401,7 @@ const verifyPhoneNumberLogin = async (req, res) => {
 
       res.cookie("token", jwtToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: "Lax",
         path: "/",
       });
@@ -482,7 +482,7 @@ const registerPhoneNumberUser = async (req, res) => {
       );
       res.cookie("token", jwtToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: "Lax",
         path: "/",
       });
@@ -524,7 +524,7 @@ const registerPhoneNumberUser = async (req, res) => {
 
     res.cookie("token", jwtToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "Lax",
       path: "/",
     });
@@ -546,10 +546,7 @@ const registerPhoneNumberUser = async (req, res) => {
     if (error.code === "auth/id-token-expired") {
       message = "Oturum süresi dolmuş, lütfen tekrar deneyin.";
     } else if (error.code === 11000) {
-      // Mongoose duplicate key error
       message = "Bu telefon numarası zaten kayıtlı.";
-      // Bu durumda belki login'e yönlendirmek daha iyi olabilir?
-      // Ama frontend'deki akış bunu engellemeliydi.
     }
     res
       .status(500)
