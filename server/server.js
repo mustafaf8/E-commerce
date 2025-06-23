@@ -102,6 +102,7 @@ mongoose
   .catch((error) => console.log("MongoDB connection error:", error));
 
 const app = express();
+app.set("trust proxy", 1);
 app.use(helmet());
 const PORT = process.env.PORT || 5000;
 
