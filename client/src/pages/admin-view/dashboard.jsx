@@ -21,8 +21,8 @@ import {
 import { Trash } from "lucide-react"; // Silme ikonu
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios"; // axios'u burada kullanacağız
 import ConfirmationModal from "@/components/admin-view/ConfirmationModal";
+import api from "@/api/axiosInstance";
 
 function AdminDashboard() {
   const [featureImageFile, setFeatureImageFile] = useState(null);
@@ -85,8 +85,8 @@ function AdminDashboard() {
     const data = new FormData();
     data.append("my_file", file);
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/admin/products/upload-image",
+      const response = await api.post(
+        "/admin/products/upload-image", // <--- DÜZELTİLMİŞ HALİ
         data
       );
       if (response?.data?.success) {

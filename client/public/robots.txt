@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Arama motorlarının taramasını istemediğimiz sayfalar
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /shop/checkout/
+Disallow: /shop/account/
+
+# Site haritasının konumu
+Sitemap: https://Deposun.com/sitemap.xml

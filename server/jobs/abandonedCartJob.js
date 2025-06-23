@@ -96,7 +96,8 @@ const scheduleAbandonedCartEmails = () => {
           salePrice: item.productId.salePrice,
         }));
 
-        const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+        const clientUrl =
+          process.env.CLIENT_BASE_URL || "http://localhost:5173";
         // Kullanıcıyı direkt sepetine veya bir "sepetinizi tamamlayın" sayfasına yönlendirebilirsiniz.
         const completePurchaseLink = `${clientUrl}/shop/cart`; // Veya /shop/checkout
 

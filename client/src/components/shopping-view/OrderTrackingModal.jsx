@@ -29,6 +29,7 @@ import PropTypes from "prop-types";
 import { format, parseISO, isValid } from "date-fns";
 import { orderStatusMappingUser } from "@/config"; // Merkezi mapping objesini import ediyoruz
 import React from "react"; // React.cloneElement için
+import api from "@/api/axiosInstance";
 
 // İkonları durumlarla eşleştirmek için bir yardımcı obje
 const statusIcons = {
@@ -64,8 +65,8 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
     setSearchResult(null);
 
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/shop/order/track/${orderIdInput.trim()}`
+      const response = await api.get(
+        `/shop/order/track/${orderIdInput.trim()}`
       );
       if (response.data.success && response.data.data) {
         // response.data.data null kontrolü eklendi

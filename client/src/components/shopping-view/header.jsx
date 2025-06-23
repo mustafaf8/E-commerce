@@ -300,13 +300,8 @@ function ShoppingHeader() {
       <TopStrip />
       <div className="container mx-auto px-4 md:px-20">
         <div className="flex h-20 items-center justify-between gap-4 md:gap-6">
-          {/* Logo */}
           <Link to="/shop/home" className="flex-shrink-0">
-            <img
-              className="h-10 md:h-12 w-auto"
-              src="/src/assets/dlogo2.png"
-              alt="logo"
-            />
+            <img className="h-10 md:h-12 w-auto" src="/dlogo2.png" alt="logo" />
           </Link>
           <form
             onSubmit={handleSearchSubmit}

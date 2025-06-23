@@ -39,10 +39,7 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect:
-      process.env.NODE_ENV === "production"
-        ? `${process.env.CLIENT_URL}/auth/login?error=google_auth_failed`
-        : "http://localhost:5173/auth/login?error=google_auth_failed",
+    failureRedirect: `${process.env.CLIENT_BASE_URL}/auth/login?error=google_auth_failed`,
     session: true,
   }),
   (req, res) => {
@@ -65,11 +62,7 @@ router.get(
       path: "/",
     });
 
-    const redirectUrl =
-      process.env.NODE_ENV === "production"
-        ? `${process.env.CLIENT_URL}/shop/home`
-        : "http://localhost:5173/shop/home";
-
+    const redirectUrl = `${process.env.CLIENT_BASE_URL}/shop/home`;
     res.redirect(redirectUrl);
   }
 );

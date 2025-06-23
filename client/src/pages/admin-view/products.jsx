@@ -25,6 +25,7 @@ import AdminProductDetailsDialog from "@/components/admin-view/AdminProductDetai
 import ProductTileSkeleton from "@/components/shopping-view/product-tile-skeleton.jsx";
 import { fetchAllBrands } from "@/store/common-slice/brands-slice";
 import { fetchAllCategories } from "@/store/common-slice/categories-slice";
+import api from "@/api/axiosInstance";
 
 const initialFormData = {
   title: "",
@@ -95,10 +96,7 @@ function AdminProducts() {
       data.append("my_file", file);
       setProductImageLoadingState(true);
       try {
-        const response = await axios.post(
-          "http://localhost:5000/api/admin/products/upload-image",
-          data
-        );
+        const response = await api.post("/admin/products/upload-image", data);
         if (response?.data?.success && response.data.result?.url) {
           return response.data.result.url;
         } else {

@@ -77,7 +77,7 @@ const createOrder = async (req, res) => {
       iyzicoConversationId: conversationId,
     });
     await pendingOrder.save();
-    const backendCallbackUrl = `http://localhost:5000/api/shop/order/iyzico-callback`;
+    const backendCallbackUrl = `${process.env.SERVER_BASE_URL}/api/shop/order/iyzico-callback`;
 
     const request = {
       locale: Iyzipay.LOCALE.TR,
@@ -171,7 +171,7 @@ const handleIyzicoCallback = async (req, res) => {
   if (!token) {
     console.error("Iyzico callback - Token eksik.");
     return res.redirect(
-      `http://localhost:5173/shop/payment-failure?status=error&message=InvalidCallback`
+      `${process.env.CLIENT_BASE_URL}/shop/payment-failure?status=error&message=InvalidCallback`
     );
   }
 
@@ -182,7 +182,7 @@ const handleIyzicoCallback = async (req, res) => {
     },
     async (err, result) => {
       let orderId = null;
-      let redirectUrl = `http://localhost:5173/shop/payment-failure?status=error&message=UnknownError`;
+      let redirectUrl = `${process.env.CLIENT_BASE_URL}/shop/payment-failure?status=error&message=UnknownError`;
 
       try {
         const order = await Order.findOne({ iyzicoToken: token });
@@ -192,7 +192,7 @@ const handleIyzicoCallback = async (req, res) => {
           console.error(
             `Iyzico callback - Token (${token}) ile eşleşen sipariş bulunamadı.`
           );
-          redirectUrl = `http://localhost:5173/shop/payment-failure?status=error&message=OrderNotFoundForToken`;
+          redirectUrl = `${process.env.CLIENT_BASE_URL}/shop/payment-failure?status=error&message=OrderNotFoundForToken`;
           return res.redirect(redirectUrl);
         }
 
@@ -203,7 +203,7 @@ const handleIyzicoCallback = async (req, res) => {
             paymentStatus: "callback_error",
             orderUpdateDate: new Date(),
           });
-          redirectUrl = `http://localhost:5173/shop/payment-failure?status=retrieval_error&orderId=${orderId}`;
+          redirectUrl = `${process.env.CLIENT_BASE_URL}/shop/payment-failure?status=retrieval_error&orderId=${orderId}`;
           return res.redirect(redirectUrl);
         }
 
@@ -224,7 +224,7 @@ const handleIyzicoCallback = async (req, res) => {
             console.log(
               `Sipariş zaten işlenmiş (Callback - Order ID: ${orderId})`
             );
-            redirectUrl = `http://localhost:5173/shop/payment-success?status=already_processed&orderId=${orderId}`;
+            redirectUrl = `${process.env.CLIENT_BASE_URL}/shop/payment-success?status=already_processed&orderId=${orderId}`;
             return res.redirect(redirectUrl);
           }
 
@@ -238,7 +238,7 @@ const handleIyzicoCallback = async (req, res) => {
               order.orderStatus = "failed";
               order.paymentStatus = "stock_error"; // Yeni bir durum
               await order.save();
-              redirectUrl = `http://localhost:5173/shop/payment-failure?status=stock_error&orderId=${orderId}`;
+              redirectUrl = `${process.env.CLIENT_BASE_URL}/shop/payment-failure?status=stock_error&orderId=${orderId}`;
               return res.redirect(redirectUrl);
             }
           }
@@ -273,7 +273,7 @@ const handleIyzicoCallback = async (req, res) => {
           console.log(
             `Iyzico callback - Ödeme başarılı, sipariş güncellendi (Order ID: ${orderId})`
           );
-          redirectUrl = `http://localhost:5173/shop/payment-success?status=success&orderId=${orderId}`;
+          redirectUrl = `${process.env.CLIENT_BASE_URL}/shop/payment-success?status=success&orderId=${orderId}`;
           return res.redirect(redirectUrl);
         } else {
           console.warn(
@@ -285,7 +285,9 @@ const handleIyzicoCallback = async (req, res) => {
             paymentStatus: "failed",
             orderUpdateDate: new Date(),
           });
-          redirectUrl = `http://localhost:5173/shop/payment-failure?status=failed&orderId=${orderId}&errorCode=${
+          redirectUrl = `${
+            process.env.CLIENT_BASE_URL
+          }/shop/payment-failure?status=failed&orderId=${orderId}&errorCode=${
             result.errorCode || "N/A"
           }`;
           return res.redirect(redirectUrl);
@@ -295,7 +297,9 @@ const handleIyzicoCallback = async (req, res) => {
           `Iyzico callback - Genel Hata (Token: ${token}, Order ID: ${orderId}):`,
           generalError
         );
-        redirectUrl = `http://localhost:5173/shop/payment-failure?status=server_error${
+        redirectUrl = `${
+          process.env.CLIENT_BASE_URL
+        }/shop/payment-failure?status=server_error${
           orderId ? "&orderId=" + orderId : ""
         }`;
         return res.redirect(redirectUrl);
@@ -459,7 +463,7 @@ const createGuestOrder = async (req, res) => {
     await pendingOrder.save();
 
     const backendCallbackUrl = `${
-      process.env.SERVER_URL || "http://localhost:5000"
+      process.env.SERVER_BASE_URL || "http://localhost:5000"
     }/api/shop/order/iyzico-callback`;
 
     const request = {
