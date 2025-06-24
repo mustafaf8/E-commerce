@@ -59,6 +59,7 @@ router.get(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Lax",
+      domain: ".rmrenerji.online",
       path: "/",
     });
 

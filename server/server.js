@@ -102,16 +102,31 @@ mongoose
   .catch((error) => console.log("MongoDB connection error:", error));
 
 const app = express();
-
+app.set("trust proxy", 1);
 app.use(helmet());
 const PORT = process.env.PORT || 5000;
 
+// app.use(
+//   cors({
+//     origin:
+//       process.env.NODE_ENV === "production"
+//         ? process.env.CLIENT_BASE_URL
+//         : "http://localhost:5173",
+//     methods: ["GET", "POST", "DELETE", "PUT"],
+//     allowedHeaders: [
+//       "Content-Type",
+//       "Authorization",
+//       "Cache-Control",
+//       "Expires",
+//       "Pragma",
+//     ],
+//     credentials: true,
+//   })
+// );
+
 app.use(
   cors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? process.env.CLIENT_BASE_URL
-        : "http://localhost:5173",
+    origin: process.env.CLIENT_BASE_URL || "https://www.rmrenerji.online",
     methods: ["GET", "POST", "DELETE", "PUT"],
     allowedHeaders: [
       "Content-Type",

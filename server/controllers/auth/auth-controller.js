@@ -161,6 +161,7 @@ const loginUser = async (req, res) => {
         httpOnly: true,
         secure: true,
         sameSite: "Lax",
+        domain: ".rmrenerji.online",
         path: "/",
       })
       .json({
@@ -200,6 +201,7 @@ const logoutUser = (req, res, next) => {
           httpOnly: true,
           secure: true,
           sameSite: "Lax",
+          domain: ".rmrenerji.online",
           path: "/",
         })
         .clearCookie("connect.sid", { path: "/" }) // Express-session cookie'sini temizle (genellikle adı budur)
@@ -250,6 +252,7 @@ const authMiddleware = async (req, res, next) => {
       httpOnly: true,
       secure: true,
       sameSite: "Lax",
+      domain: ".rmrenerji.online", // Eğer domain kullanıyorsanız, burada da belirtin
       path: "/",
     });
     res.status(401).json({
@@ -336,6 +339,7 @@ const updateUserDetails = async (req, res) => {
         httpOnly: true,
         secure: true,
         sameSite: "Lax",
+        domain: ".rmrenerji.online", // Eğer domain kullanıyorsanız, burada da belirtin
         path: "/",
       });
 
@@ -403,6 +407,7 @@ const verifyPhoneNumberLogin = async (req, res) => {
         httpOnly: true,
         secure: true,
         sameSite: "Lax",
+        domain: ".rmrenerji.online", // Eğer domain kullanıyorsanız, burada da belirtin
         path: "/",
       });
 
@@ -484,6 +489,7 @@ const registerPhoneNumberUser = async (req, res) => {
         httpOnly: true,
         secure: true,
         sameSite: "Lax",
+        domain: ".rmrenerji.online", // Eğer domain kullanıyorsanız, burada da belirtin
         path: "/",
       });
       return res.status(200).json({
@@ -526,6 +532,7 @@ const registerPhoneNumberUser = async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "Lax",
+      domain: ".rmrenerji.online", // Eğer domain kullanıyorsanız, burada da belirtin
       path: "/",
     });
 
