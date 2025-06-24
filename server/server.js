@@ -128,6 +128,7 @@ app.use(
   cors({
     origin: process.env.CLIENT_BASE_URL || "https://www.rmrenerji.online",
     methods: ["GET", "POST", "DELETE", "PUT"],
+    credentials: true,
     allowedHeaders: [
       "Content-Type",
       "Authorization",
@@ -135,7 +136,6 @@ app.use(
       "Expires",
       "Pragma",
     ],
-    credentials: true,
   })
 );
 

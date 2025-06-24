@@ -65,10 +65,16 @@ function App() {
     user,
     isAuthenticated,
     isLoading: authIsLoading,
-  } = useSelector((state) => state.auth);
+  } = useSelector(
+    (state) =>
+      state.auth || { isAuthenticated: false, isLoading: true, user: null }
+  );
 
   const { status: maintenanceStatus, isLoading: maintenanceLoading } =
-    useSelector((state) => state.maintenance);
+    useSelector(
+      (state) =>
+        state.maintenance || { status: { isActive: false }, isLoading: true }
+    );
 
   const dispatch = useDispatch();
   const location = useLocation();
