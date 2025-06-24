@@ -49,7 +49,11 @@ const maintenanceSlice = createSlice({
       })
       .addCase(fetchMaintenanceStatus.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.status = action.payload.data;
+        state.status = action.payload?.data || {
+          isActive: false,
+          message: "",
+          returnDate: null,
+        };
       })
       .addCase(fetchMaintenanceStatus.rejected, (state, action) => {
         state.isLoading = false;

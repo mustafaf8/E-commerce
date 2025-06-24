@@ -94,7 +94,8 @@ function App() {
   }, [dispatch, user?.id, isAuthenticated, authIsLoading]);
 
   // Auth veya bakım durumu kontrol edilirken yüklenme ekranı göster
-  if (authIsLoading || maintenanceLoading) {
+  // hesapla/client/src/App.jsx
+  if (authIsLoading || maintenanceLoading || !maintenanceStatus) {
     return <Skeleton className="w-full h-screen bg-gray-200" />;
   }
 
