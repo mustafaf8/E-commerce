@@ -155,7 +155,6 @@ const loginUser = async (req, res) => {
       process.env.CLIENT_SECRET_KEY || "DEFAULT_SECRET_KEY",
       { expiresIn: "1h" }
     );
-
     res
       .cookie("token", token, {
         httpOnly: true,

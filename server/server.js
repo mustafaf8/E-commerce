@@ -12,7 +12,7 @@ const helmet = require("helmet");
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 dakika
-  max: 400, // her IP'den 15 dakikada en fazla 100 istek
+  max: 40000, // her IP'den 15 dakikada en fazla 100 istek
   standardHeaders: true,
   legacyHeaders: false,
   message: "Çok fazla istek yaptınız, lütfen 15 dakika sonra tekrar deneyin.",
@@ -21,7 +21,7 @@ const apiLimiter = rateLimit({
 // Giriş gibi daha hassas endpoint'ler için daha katı bir sınırlayıcı
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 dakika
-  max: 10, // 15 dakikada 10 giriş denemesi
+  max: 1000, // 15 dakikada 10 giriş denemesi
   message:
     "Çok fazla giriş denemesi yapıldı, lütfen daha sonra tekrar deneyin.",
 });
@@ -106,27 +106,25 @@ app.set("trust proxy", 1);
 app.use(helmet());
 const PORT = process.env.PORT || 5000;
 
-// app.use(
-//   cors({
-//     origin:
-//       process.env.NODE_ENV === "production"
-//         ? process.env.CLIENT_BASE_URL
-//         : "http://localhost:5173",
-//     methods: ["GET", "POST", "DELETE", "PUT"],
-//     allowedHeaders: [
-//       "Content-Type",
-//       "Authorization",
-//       "Cache-Control",
-//       "Expires",
-//       "Pragma",
-//     ],
-//     credentials: true,
-//   })
-// );
+const allowedOrigins = [
+  process.env.CLIENT_BASE_URL, // "https://www.rmrenerji.online"
+  "https://rmrenerji.online", // www'siz versiyonu da ekleyelim
+  "http://localhost:5173", // Yerel geliştirme için
+];
 
 app.use(
   cors({
-    origin: process.env.CLIENT_BASE_URL || "https://www.rmrenerji.online",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(
+          new Error(
+            "Bu origin için CORS politikası tarafından izin verilmiyor."
+          )
+        );
+      }
+    },
     methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true,
     allowedHeaders: [
