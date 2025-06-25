@@ -13,6 +13,20 @@ const {
 
 const router = express.Router();
 
+// --- Cookie ayarları için yardımcı değişken ---
+const isProduction = process.env.NODE_ENV === "production";
+const cookieOptions = {
+  httpOnly: true,
+  // 'SameSite=None' bayrağı, 'secure=true' gerektirir. Bu, canlı (HTTPS) için çalışır.
+  // Yerel (HTTP) ortamında ise 'secure' true olamaz, bu yüzden 'Lax' kullanırız.
+  secure: isProduction,
+  sameSite: isProduction ? "None" : "Lax",
+  path: "/",
+  // Canlıda cookie'nin hangi domaine ait olacağını belirtiriz.
+  // Yerelde bu alanı boş bırakırız ki tarayıcı 'localhost' olarak ayarlasın.
+  domain: isProduction ? ".rmrenerji.online" : undefined,
+};
+
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
@@ -40,10 +54,10 @@ router.get(
   "/google/callback",
   passport.authenticate("google", {
     failureRedirect: `${process.env.CLIENT_BASE_URL}/auth/login?error=google_auth_failed`,
-    session: true,
+    session: true, // Passport session kullanıyorsanız bu kalmalı
   }),
   (req, res) => {
-    console.log("Google callback successful, user:", req.user);
+    // Oturum açan kullanıcı bilgisi req.user içinde gelir.
     const token = jwt.sign(
       {
         id: req.user._id,
@@ -55,14 +69,10 @@ router.get(
       { expiresIn: "1h" }
     );
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Lax",
-      domain: ".rmrenerji.online",
-      path: "/",
-    });
+    // DİNAMİK VE DOĞRU COOKIE AYARLARINI KULLANARAK COOKIE'Yİ AYARLA
+    res.cookie("token", token, cookieOptions);
 
+    // Kullanıcıyı frontend'e yönlendir
     const redirectUrl = `${process.env.CLIENT_BASE_URL}/shop/home`;
     res.redirect(redirectUrl);
   }
