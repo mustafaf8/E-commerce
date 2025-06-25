@@ -112,7 +112,16 @@ const allowedOrigins = [
   "http://localhost:5173", // Yerel geliştirme için
 ];
 
-app.use(
+// ...
+const IYZICO_CALLBACK_PATH = "/api/shop/order/iyzico-callback";
+
+app.use((req, res, next) => {
+  // Eğer istek Iyzico callback yoluna geliyorsa, CORS kontrolünü atla
+  if (req.path === IYZICO_CALLBACK_PATH) {
+    return next();
+  }
+
+  // Diğer tüm istekler için CORS middleware'ini çalıştır
   cors({
     origin: function (origin, callback) {
       if (!origin || allowedOrigins.indexOf(origin) !== -1) {
@@ -134,8 +143,9 @@ app.use(
       "Expires",
       "Pragma",
     ],
-  })
-);
+  })(req, res, next);
+});
+// ...
 
 app.use(cookieParser());
 
