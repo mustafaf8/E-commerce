@@ -558,7 +558,7 @@ const createGuestOrder = async (req, res) => {
 const trackGuestOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
       return res
         .status(400)
         .json({ success: false, message: "Geçersiz Ürün ID formatı." });

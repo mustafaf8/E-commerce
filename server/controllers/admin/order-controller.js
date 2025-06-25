@@ -225,7 +225,7 @@ const getUsersWithOrders = async (req, res) => {
 const getOrdersByUserIdForAdmin = async (req, res) => {
   try {
     const { userId } = req.params; // Bu "GUEST_ORDERS_VIRTUAL_ID" olabilir
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res
         .status(400)
         .json({ success: false, message: "Geçersiz Sipariş ID formatı." });
