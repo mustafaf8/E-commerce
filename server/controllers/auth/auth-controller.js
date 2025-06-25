@@ -5,6 +5,17 @@ const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const admin = require("firebase-admin");
 
+const isProduction = process.env.NODE_ENV === "production";
+
+const cookieOptions = {
+  httpOnly: true,
+  secure: isProduction, // Canlıda true, yerelde false
+  sameSite: "Lax", // "None" ve secure:true, cross-site istekler için gereklidir, Lax daha güvenli bir başlangıçtır.
+  path: "/",
+  // Canlıda domain belirt, yerelde belirtme ki tarayıcı varsayılanı (localhost) kullansın.
+  domain: isProduction ? ".rmrenerji.online" : undefined,
+};
+
 passport.use(
   new GoogleStrategy(
     {
@@ -155,25 +166,17 @@ const loginUser = async (req, res) => {
       process.env.CLIENT_SECRET_KEY || "DEFAULT_SECRET_KEY",
       { expiresIn: "1h" }
     );
-    res
-      .cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "Lax",
-        domain: ".rmrenerji.online",
-        path: "/",
-      })
-      .json({
-        success: true,
-        message: "Başarıyla giriş yapıldı",
-        user: {
-          email: checkUser.email,
-          role: checkUser.role,
-          id: checkUser._id,
-          userName: checkUser.userName,
-          phoneNumber: checkUser.phoneNumber,
-        },
-      });
+    res.cookie("token", token, cookieOptions).json({
+      success: true,
+      message: "Başarıyla giriş yapıldı",
+      user: {
+        email: checkUser.email,
+        role: checkUser.role,
+        id: checkUser._id,
+        userName: checkUser.userName,
+        phoneNumber: checkUser.phoneNumber,
+      },
+    });
   } catch (e) {
     console.log(e);
     res.status(500).json({
@@ -195,16 +198,9 @@ const logoutUser = (req, res, next) => {
         // Hata olsa bile devam et, çerezi temizle
       }
       res
-        .clearCookie("token", {
-          // Token cookie'sini temizle
-          httpOnly: true,
-          secure: true,
-          sameSite: "Lax",
-          domain: ".rmrenerji.online",
-          path: "/",
-        })
-        .clearCookie("connect.sid", { path: "/" }) // Express-session cookie'sini temizle (genellikle adı budur)
-        .status(200) // Başarılı durum kodu
+        .clearCookie("token", cookieOptions)
+        .clearCookie("connect.sid", { path: "/" })
+        .status(200)
         .json({
           success: true,
           message: "Başarıyla çıkış yapıldı!",
@@ -247,13 +243,7 @@ const authMiddleware = async (req, res, next) => {
       "authMiddleware -> Token verification failed:",
       error.message
     );
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "Lax",
-      domain: ".rmrenerji.online", // Eğer domain kullanıyorsanız, burada da belirtin
-      path: "/",
-    });
+    res.clearCookie("token", cookieOptions);
     res.status(401).json({
       success: false,
       message: "Yetkisiz kullanıcı! Geçersiz veya süresi dolmuş token.",
@@ -342,11 +332,12 @@ const updateUserDetails = async (req, res) => {
         path: "/",
       });
 
+      res.cookie("token", newToken, cookieOptions);
+
       res.status(200).json({
         success: true,
         message: "Kullanıcı bilgileri güncellendi",
         user: {
-          // Frontend'e güncel bilgileri gönder
           id: updatedUser._id,
           userName: updatedUser.userName,
           email: updatedUser.email,
@@ -402,18 +393,11 @@ const verifyPhoneNumberLogin = async (req, res) => {
         { expiresIn: "1h" }
       );
 
-      res.cookie("token", jwtToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "Lax",
-        domain: ".rmrenerji.online", // Eğer domain kullanıyorsanız, burada da belirtin
-        path: "/",
-      });
+      res.cookie("token", jwtToken, cookieOptions);
 
-      console.log(`Mevcut kullanıcı giriş yaptı (Telefon): ${phoneNumber}`);
       res.status(200).json({
         success: true,
-        isNewUser: false, // Mevcut kullanıcı
+        isNewUser: false,
         message: "Giriş başarılı",
         user: {
           id: user._id,
@@ -484,13 +468,7 @@ const registerPhoneNumberUser = async (req, res) => {
         process.env.CLIENT_SECRET_KEY || "DEFAULT_SECRET_KEY",
         { expiresIn: "1h" }
       );
-      res.cookie("token", jwtToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "Lax",
-        domain: ".rmrenerji.online", // Eğer domain kullanıyorsanız, burada da belirtin
-        path: "/",
-      });
+      res.cookie("token", jwtToken, cookieOptions);
       return res.status(200).json({
         success: true,
         message: "Kullanıcı zaten kayıtlı, giriş yapıldı.",
@@ -526,14 +504,7 @@ const registerPhoneNumberUser = async (req, res) => {
       process.env.CLIENT_SECRET_KEY || "DEFAULT_SECRET_KEY",
       { expiresIn: "1h" }
     );
-
-    res.cookie("token", jwtToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "Lax",
-      domain: ".rmrenerji.online", // Eğer domain kullanıyorsanız, burada da belirtin
-      path: "/",
-    });
+    res.cookie("token", jwtToken, cookieOptions);
 
     res.status(201).json({
       success: true,
