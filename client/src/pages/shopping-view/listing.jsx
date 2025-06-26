@@ -272,7 +272,8 @@ function ShoppingListing() {
   const skeletonCount = 8;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6 p-4 md:p-6 max-[600px]:p-0">
+ 
+    <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6 p-4 md:p-6 max-[600px]:p-0 container mx-auto px-20 max-[1024px]:px-1">
       <ProductFilter
         filters={filters}
         handleFilter={handleFilter}
@@ -333,7 +334,7 @@ function ShoppingListing() {
             </DropdownMenu>
           </div>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4 max-[600px]:p-1 max-[600px]:gap-2">
           {productsLoading ? (
             Array.from({ length: skeletonCount }).map((_, index) => (
               <ProductTileSkeleton key={`skeleton-${index}`} />
@@ -363,6 +364,7 @@ function ShoppingListing() {
         productDetails={productDetails}
       />
     </div>
+   
   );
 }
 

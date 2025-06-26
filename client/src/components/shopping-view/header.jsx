@@ -160,6 +160,12 @@ function MainHeaderActions() {
                   {user.userName}
                 </span>
               </div>
+              {/* Sadece küçük ekranlarda görünen bölüm (MD altı) */}
+              <div className="md:hidden">
+                <span className="text-sm font-medium line-clamp-1">
+                  {user.userName.split(" ")[0]}
+                </span>
+              </div>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end" className="w-56">
@@ -285,8 +291,11 @@ function ShoppingHeader() {
     const keywordFromUrl = searchParams.get("keyword");
     if (keywordFromUrl) {
       setSearchTerm(keywordFromUrl);
+    } else {
+      // Eğer URL'de 'keyword' yoksa, arama kutusunu temizle.
+      setSearchTerm("");
     }
-  }, [searchParams]);
+  }, [searchParams]); // Bu kanca URL'deki her değişiklikte çalışır.
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();

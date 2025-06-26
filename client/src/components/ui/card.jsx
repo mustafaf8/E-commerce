@@ -67,7 +67,7 @@ CardDescription.propTypes = {
 const CardContent = React.forwardRef(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("p-6 pt-0 max-[850px]:p-1", className)}
+    className={cn("p-6 pt-0 max-[850px]:p-4", className)}
     {...props}
   />
 ));

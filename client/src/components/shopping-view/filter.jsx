@@ -28,7 +28,7 @@ function ProductFilter({
       <div className="p-4 border-b">
         <h2 className="text-lg font-semibold">Filtrele</h2>
       </div>
-      <div className="p-4 flex flex-col max-[600px]:flex-row max-[600px]:flex-wrap max-[600px]:justify-between gap-6">
+      <div className="p-4 flex flex-col max-[767px]:flex-row max-[767px]:justify-between gap-6">
         {isLoading
           ? filterSections.map((section) => (
               <div

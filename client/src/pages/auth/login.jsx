@@ -530,7 +530,7 @@ function AuthLogin() {
   );
 
   const renderEmailPasswordLogin = () => (
-    <Card className="max-[510px]:w-full w-[450px] mx-auto">
+    <Card className="max-[510px]:w-full w-96 min-w-72 mx-auto">
       <CardHeader className="text-center">
         <CardTitle className="text-xl font-bold">
           E-posta ile Giriş Yap
