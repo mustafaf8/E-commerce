@@ -8,8 +8,7 @@ const {
   updateHomeSectionAdmin,
   deleteHomeSectionAdmin,
   updateHomeSectionsOrderAdmin,
-} = require("../../controllers/admin/home-section-controller"); // Birazdan oluşturacağız
-// const { authMiddleware, adminCheckMiddleware } = require('../../controllers/auth/auth-controller');
+} = require("../../controllers/admin/home-section-controller");
 
 const router = express.Router();
 

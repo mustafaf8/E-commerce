@@ -9,10 +9,9 @@ const isProduction = process.env.NODE_ENV === "production";
 
 const cookieOptions = {
   httpOnly: true,
-  secure: isProduction, // Canlıda true, yerelde false
-  sameSite: "Lax", // "None" ve secure:true, cross-site istekler için gereklidir, Lax daha güvenli bir başlangıçtır.
+  secure: isProduction,
+  sameSite: "Lax",
   path: "/",
-  // Canlıda domain belirt, yerelde belirtme ki tarayıcı varsayılanı (localhost) kullansın.
   domain: isProduction ? ".rmrenerji.online" : undefined,
 };
 
@@ -149,9 +148,6 @@ const loginUser = async (req, res) => {
           message: "Şifre yanlış! Lütfen tekrar deneyin.",
         });
     } else if (checkUser.phoneNumber && password) {
-      // console.warn(
-      //   `Google/telefon ile kayıtlı kullanıcı (${email}) şifre ile giriş yapmaya çalıştı.`
-      // );
       return res.status(400).json({
         success: false,
         message: "Bu kullanıcı telefon ile kayıtlı, şifre ile giriş yapamaz.",
@@ -193,11 +189,9 @@ const logoutUser = (req, res, next) => {
     if (err) {
       return next(err);
     }
-    // Session'ı yok et (isteğe bağlı ama önerilir)
     req.session.destroy((err) => {
       if (err) {
         console.error("Session yok etme hatası:", err);
-        // Hata olsa bile devam et, çerezi temizle
       }
       res
         .clearCookie("token", cookieOptions)
@@ -212,14 +206,11 @@ const logoutUser = (req, res, next) => {
 };
 
 const authMiddleware = async (req, res, next) => {
-  // Passport session kullanıyorsak, req.isAuthenticated() ile kontrol edebiliriz
   if (req.isAuthenticated()) {
     console.log("authMiddleware -> User is authenticated via session.");
-    // req.user zaten deserializeUser tarafından ayarlanmış olmalı
     return next();
   }
 
-  // Session yoksa veya geçerli değilse, token cookie'sini kontrol et (alternatif olarak)
   const token = req.cookies.token;
   console.log("authMiddleware -> Checking token cookie:", token);
   if (!token)
@@ -261,7 +252,6 @@ const updateUserDetails = async (req, res) => {
         .json({ success: false, message: "Yetkilendirme hatası." });
     }
     const userId = req.user.id;
-    // İstekten gelen veriyi al (sadece izin verilen alanlar)
     const { userName, email, phoneNumber } = req.body;
 
     const user = await User.findById(userId);
@@ -270,10 +260,8 @@ const updateUserDetails = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Kullanıcı bulunamadı" });
 
-    // Güncellenecek alanları tutacak obje
     const updatedFields = {};
 
-    // 1. Kullanıcı adı her zaman güncellenebilir (eğer gönderildiyse ve farklıysa)
     if (userName && userName !== user.userName) {
       updatedFields.userName = userName;
     }
@@ -285,7 +273,6 @@ const updateUserDetails = async (req, res) => {
           message: "Bu e-posta adresi zaten kullanımda.",
         });
       }
-      // Format kontrolü (Basit)
       if (!/\S+@\S+\.\S+/.test(email)) {
         return res
           .status(400)
@@ -320,7 +307,7 @@ const updateUserDetails = async (req, res) => {
           role: updatedUser.role,
           email: updatedUser.email,
           userName: updatedUser.userName,
-          phoneNumber: updatedUser.phoneNumber, // Token'a telefonu da ekle
+          phoneNumber: updatedUser.phoneNumber,
         },
         process.env.CLIENT_SECRET_KEY || "DEFAULT_SECRET_KEY",
         { expiresIn: "1h" }
@@ -330,7 +317,7 @@ const updateUserDetails = async (req, res) => {
         httpOnly: true,
         secure: true,
         sameSite: "Lax",
-        domain: ".rmrenerji.online", // Eğer domain kullanıyorsanız, burada da belirtin
+        domain: ".rmrenerji.online",
         path: "/",
       });
 
@@ -372,17 +359,15 @@ const verifyPhoneNumberLogin = async (req, res) => {
 
   try {
     const decodedToken = await admin.auth().verifyIdToken(token);
-    const phoneNumber = decodedToken.phone_number; // Doğrulanmış telefon numarası
+    const phoneNumber = decodedToken.phone_number;
 
     if (!phoneNumber) {
       throw new Error("Firebase token içinde telefon numarası bulunamadı.");
     }
 
-    // Veritabanında bu telefon numarasına sahip kullanıcı var mı?
     let user = await User.findOne({ phoneNumber: phoneNumber });
 
     if (user) {
-      // Kullanıcı var, giriş yap (JWT oluştur ve cookie'ye ata)
       const jwtToken = jwt.sign(
         {
           id: user._id,
@@ -410,13 +395,12 @@ const verifyPhoneNumberLogin = async (req, res) => {
         },
       });
     } else {
-      // Kullanıcı yok, frontend'e yeni kullanıcı olduğunu bildir
       console.log(`Yeni kullanıcı algılandı (Telefon): ${phoneNumber}`);
       res.status(200).json({
         success: true,
-        isNewUser: true, // Yeni kullanıcı
+        isNewUser: true,
         message: "Telefon numarası doğrulandı, kayıt gerekiyor.",
-        phoneNumber: phoneNumber, // İsim alma adımında lazım olabilir
+        phoneNumber: phoneNumber,
       });
     }
   } catch (error) {

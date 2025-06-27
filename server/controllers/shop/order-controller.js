@@ -583,16 +583,6 @@ const trackGuestOrder = async (req, res) => {
       "_id orderDate orderStatus totalAmount paymentStatus guestInfo.fullName isGuestOrder"
     );
 
-    // Giriş yapmış kullanıcıların siparişlerini de sorgulayabilmek için (opsiyonel):
-    // Veya, eğer giriş yapmış kullanıcıysa ve kendi siparişini sorguluyorsa:
-    // const order = await Order.findOne({
-    //   _id: orderId,
-    //   $or: [
-    //     { isGuestOrder: true, "guestInfo.email": email },
-    //     { userId: req.user?.id } // Eğer authMiddleware varsa ve giriş yapmışsa
-    //   ]
-    // }).select("_id orderDate orderStatus totalAmount paymentStatus");
-
     if (!order) {
       return res.status(404).json({
         success: false,
@@ -604,7 +594,6 @@ const trackGuestOrder = async (req, res) => {
   } catch (error) {
     console.error("Misafir sipariş takip hatası:", error);
     if (error.name === "CastError") {
-      // mongoose.Types.ObjectId.isValid() ile bu hata önlenmeli ama yine de
       return res
         .status(400)
         .json({ success: false, message: "Geçersiz Sipariş Kodu formatı." });

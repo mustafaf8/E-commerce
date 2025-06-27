@@ -32,7 +32,7 @@ function getPeriodMatch(period) {
 // 1. Satış Genel Bakışı
 const getSalesOverview = async (req, res) => {
   try {
-    const { period } = req.query; // daily, weekly, monthly
+    const { period } = req.query;
     const match = { ...getPeriodMatch(period) };
     const results = await Order.aggregate([
       { $match: match },
@@ -89,7 +89,6 @@ const getTopSellingProducts = async (req, res) => {
   try {
     const { limit = 10, metric = "salesCount" } = req.query;
     if (metric === "revenue") {
-      // Aggregate revenue based on orders
       const pipeline = [
         { $unwind: "$cartItems" },
         {
@@ -126,7 +125,6 @@ const getTopSellingProducts = async (req, res) => {
       const topProducts = await Order.aggregate(pipeline);
       return res.status(200).json({ success: true, data: topProducts });
     }
-    // Default metric: salesCount (from Product model)
     const products = await Product.find({})
       .sort({ salesCount: -1 })
       .limit(Number(limit))
@@ -323,12 +321,12 @@ const getProductSummary = async (_req, res) => {
 // 9. Satış Trendi (Zaman Serisi)
 const getSalesTrend = async (req, res) => {
   try {
-    const { period = "monthly" } = req.query; // daily, weekly, monthly
+    const { period = "monthly" } = req.query;
     const match = { ...getPeriodMatch(period) };
 
-    let dateFormat = "%Y-%m-%d"; // default day resolution
+    let dateFormat = "%Y-%m-%d";
     if (period === "daily") {
-      dateFormat = "%H:00"; // hour of day
+      dateFormat = "%H:00";
     }
 
     const data = await Order.aggregate([

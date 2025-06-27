@@ -1,9 +1,6 @@
-// hesapla/server/middleware/adminCheckMiddleware.js
-
 const adminCheckMiddleware = (req, res, next) => {
-  // Bu middleware'in her zaman authMiddleware'den sonra kullanıldığını varsayıyoruz.
   if (req.user && req.user.role === "admin") {
-    return next(); // Kullanıcı admin ise sonraki adıma geç
+    return next();
   }
   return res.status(403).json({
     success: false,

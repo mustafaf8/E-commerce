@@ -1,5 +1,5 @@
 const express = require("express");
-const { authMiddleware } = require("../../controllers/auth/auth-controller"); // Ekleyin
+const { authMiddleware } = require("../../controllers/auth/auth-controller");
 const adminCheckMiddleware = require("../../middleware/adminCheckMiddleware");
 
 const {

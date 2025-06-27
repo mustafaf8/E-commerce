@@ -7,7 +7,6 @@ const {
   getFeatureImages,
   deleteFeatureImage,
 } = require("../../controllers/common/feature-controller");
-// const { authMiddleware, adminCheckMiddleware } = require('../middleware/authAdmin'); // Opsiyonel Admin Middleware
 
 const router = express.Router();
 

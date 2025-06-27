@@ -63,7 +63,7 @@ const addToCart = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: { ...populatedCart._doc, items: finalPopulatedItems }, // Populate edilmiş sepeti döndür
+      data: { ...populatedCart._doc, items: finalPopulatedItems },
     });
   } catch (error) {
     console.log(error);
@@ -194,7 +194,7 @@ const updateCartItemQty = async (req, res) => {
     }
 
     if (quantity === 0) {
-      cart.items.splice(findCurrentProductIndex, 1); // Miktar 0 ise ürünü sil
+      cart.items.splice(findCurrentProductIndex, 1);
     } else {
       cart.items[findCurrentProductIndex].quantity = quantity;
     }
@@ -340,8 +340,6 @@ const syncLocalCart = async (req, res) => {
       );
 
       if (existingItemIndex > -1) {
-        // Ürün zaten DB sepetinde var, miktarı topla (veya en yükseğini al, stratejiye bağlı)
-        // Stok kontrolü burada da önemli!
         const newQuantity =
           userCart.items[existingItemIndex].quantity + localItem.quantity;
         userCart.items[existingItemIndex].quantity = Math.min(

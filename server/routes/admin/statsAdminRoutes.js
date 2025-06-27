@@ -34,7 +34,6 @@ router.get(
   require("../../controllers/admin/statsAdminController").getTopLikedProducts
 );
 
-// Profit Endpoints
 router.get(
   "/profit-overview",
   require("../../controllers/admin/statsAdminController").getProfitOverview

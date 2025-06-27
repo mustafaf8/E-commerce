@@ -6,8 +6,7 @@ const {
   updateBrandAdmin,
   deleteBrandAdmin,
   getAllBrandsAdmin,
-} = require("../../controllers/admin/brand-controller"); // Birazdan oluşturacağız
-// const { authMiddleware, adminCheckMiddleware } = require('../../controllers/auth/auth-controller');
+} = require("../../controllers/admin/brand-controller");
 
 const router = express.Router();
 

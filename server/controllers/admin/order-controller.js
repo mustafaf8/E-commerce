@@ -42,18 +42,15 @@ const getOrderDetailsForAdmin = async (req, res) => {
       });
     }
 
-    // Eğer kayıtlı kullanıcı siparişiyse ve User modeli varsa, kullanıcıyı populate et
-    // Misafir siparişlerinde order.userId null veya undefined olacaktır.
     if (!order.isGuestOrder && order.userId) {
       order = await Order.findById(id)
         .populate({
-          path: "userId", // User modeline referans olan alan
-          select: "userName email phoneNumber", // Almak istediğiniz kullanıcı bilgileri
+          path: "userId",
+          select: "userName email phoneNumber",
         })
-        .lean(); // .lean() performansı artırabilir ve mongoose objesi yerine plain JS objesi döndürür
+        .lean();
 
       if (!order) {
-        // Populate sonrası tekrar kontrol (nadiren de olsa)
         return res.status(404).json({
           success: false,
           message:
@@ -61,12 +58,10 @@ const getOrderDetailsForAdmin = async (req, res) => {
         });
       }
     }
-    // Misafir siparişiyse, guestInfo zaten order objesinde mevcut olacak (Order modelinize göre).
-    // Order modelinizde `guestInfo: { fullName: String, email: String, phone: String }` gibi bir alan olmalı.
 
     res.status(200).json({
       success: true,
-      data: order, // order objesi artık ya populate edilmiş userId'yi ya da guestInfo'yu içeriyor
+      data: order,
     });
   } catch (e) {
     console.error("getOrderDetailsForAdmin error:", e);
@@ -99,7 +94,7 @@ const updateOrderStatus = async (req, res) => {
 
     const updatedOrder = await Order.findByIdAndUpdate(
       id,
-      { orderStatus, orderUpdateDate: new Date() }, // orderUpdateDate'i de güncelleyelim
+      { orderStatus, orderUpdateDate: new Date() },
       { new: true }
     ).populate({
       path: "userId",
@@ -127,15 +122,14 @@ const getUsersWithOrders = async (req, res) => {
         $group: {
           _id: {
             $cond: {
-              if: { $eq: ["$isGuestOrder", true] }, // Eğer misafir siparişiyse
-              then: "GUEST_ORDERS_VIRTUAL_ID", // Sabit bir string ID ata
-              else: "$userId", // Değilse userId kullan
+              if: { $eq: ["$isGuestOrder", true] },
+              then: "GUEST_ORDERS_VIRTUAL_ID",
+              else: "$userId",
             },
           },
           orderCount: { $sum: 1 },
           lastOrderDate: { $max: "$orderDate" },
           statuses: { $addToSet: "$orderStatus" },
-          // Misafir siparişleri için ilk e-postayı veya bir tanımlayıcı alabiliriz
           firstGuestEmail: {
             $first: {
               $cond: {
@@ -158,54 +152,49 @@ const getUsersWithOrders = async (req, res) => {
       },
       {
         $lookup: {
-          // Kayıtlı kullanıcıların bilgilerini çekmek için (misafirler için bu boş gelecek)
-          from: "users", // "users" collection'ınızın adı
-          localField: "_id", // _id'nin userId olduğu durumlar için
+          from: "users",
+          localField: "_id",
           foreignField: "_id",
           as: "userInfo",
         },
       },
       {
         $unwind: {
-          // userInfo dizisini objeye çevir, misafirler için boş olsa da kaydı koru
           path: "$userInfo",
           preserveNullAndEmptyArrays: true,
         },
       },
       {
         $project: {
-          _id: 0, // _id'yi kaldır
-          userId: "$_id", // Bu, "GUEST_ORDERS_VIRTUAL_ID" veya gerçek userId olabilir
+          _id: 0,
+          userId: "$_id",
           userName: {
             $cond: {
               if: { $eq: ["$_id", "GUEST_ORDERS_VIRTUAL_ID"] },
-              then: "Misafir Siparişleri", // Misafir grubu için sabit isim
+              then: "Misafir Siparişleri",
               else: "$userInfo.userName",
             },
           },
           email: {
-            // E-posta alanını da benzer şekilde ayarla
             $cond: {
               if: { $eq: ["$_id", "GUEST_ORDERS_VIRTUAL_ID"] },
-              then: "$firstGuestEmail", // Veya genel bir ifade: "Misafir Kullanıcı"
+              then: "$firstGuestEmail",
               else: "$userInfo.email",
             },
           },
           phoneNumber: {
-            // Telefon numarası için de (varsa)
             $cond: {
               if: { $eq: ["$_id", "GUEST_ORDERS_VIRTUAL_ID"] },
-              then: null, // Misafirler için genel bir telefon yok, sipariş bazlı
+              then: null,
               else: "$userInfo.phoneNumber",
             },
           },
           orderCount: 1,
           lastOrderDate: 1,
           hasNewOrder: {
-            // Yeni sipariş kontrolü
             $or: [
               { $in: ["pending", { $ifNull: ["$statuses", []] }] },
-              { $in: ["pending_payment", { $ifNull: ["$statuses", []] }] }, // Ödeme bekleyenleri de yeni sayabiliriz
+              { $in: ["pending_payment", { $ifNull: ["$statuses", []] }] },
               { $in: ["confirmed", { $ifNull: ["$statuses", []] }] },
             ],
           },
@@ -232,7 +221,7 @@ const getUsersWithOrders = async (req, res) => {
 
 const getOrdersByUserIdForAdmin = async (req, res) => {
   try {
-    const { userId } = req.params; // Bu "GUEST_ORDERS_VIRTUAL_ID" olabilir
+    const { userId } = req.params;
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res
         .status(400)
@@ -247,23 +236,20 @@ const getOrdersByUserIdForAdmin = async (req, res) => {
 
     let query = {};
     if (userId === "GUEST_ORDERS_VIRTUAL_ID") {
-      query = { isGuestOrder: true }; // Tüm misafir siparişlerini bul
+      query = { isGuestOrder: true };
     } else {
       query = {
         userId: userId,
         $or: [{ isGuestOrder: false }, { isGuestOrder: { $exists: false } }],
-      }; // Belirli bir kayıtlı kullanıcının siparişlerini bul
+      };
     }
 
     const orders = await Order.find(query)
       .sort({ orderDate: -1 })
-      // Misafir siparişlerinde userId olmayacağı için populate etmeye gerek yok.
-      // Kayıtlı kullanıcı siparişleri için, müşteri adını listede göstermek isterseniz populate edebilirsiniz.
-      // Ancak detay görünümünde zaten populate edilecek.
       .populate({
-        path: "userId", // Sadece kayıtlı kullanıcılar için çalışır, misafirlerde null olur.
+        path: "userId",
         select: "userName email",
-        options: { omitUndefined: true }, // userId yoksa hata vermemesi için
+        options: { omitUndefined: true },
       })
       .lean();
 

@@ -24,7 +24,6 @@ const BrandSchema = new mongoose.Schema(
 
 BrandSchema.pre("save", function (next) {
   if (this.isModified("name") && (!this.slug || this.slug === "")) {
-    // Basit slugify
     this.slug = this.name
       .toString()
       .toLowerCase()

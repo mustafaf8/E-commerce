@@ -19,7 +19,7 @@ const AbandonedCartReminderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["sent", "failed", "user_completed_purchase"], // Kullanıcı e-postadan sonra satın aldı gibi durumlar eklenebilir.
+      enum: ["sent", "failed", "user_completed_purchase"],
       default: "sent",
     },
     // Tekrar gönderim mantığı için ek alanlar:
@@ -29,7 +29,6 @@ const AbandonedCartReminderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Aynı kullanıcıya aynı sepet için birden fazla aktif hatırlatma olmaması için
 AbandonedCartReminderSchema.index({ userId: 1, cartId: 1, status: 1 });
 
 module.exports = mongoose.model(

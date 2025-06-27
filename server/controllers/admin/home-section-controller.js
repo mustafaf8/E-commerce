@@ -1,7 +1,6 @@
 const HomeSection = require("../../models/HomeSection");
 const Category = require("../../models/Category");
 
-// Yeni Bölüm Ekle (Admin)
 const addHomeSectionAdmin = async (req, res) => {
   try {
     const {
@@ -13,7 +12,6 @@ const addHomeSectionAdmin = async (req, res) => {
       isActive,
     } = req.body;
 
-    // Temel doğrulamalar
     if (!title || !contentType) {
       return res
         .status(400)
@@ -25,15 +23,14 @@ const addHomeSectionAdmin = async (req, res) => {
         message: "İçerik Değeri (En Çok Satanlar hariç) zorunludur.",
       });
     }
-    // TODO: contentValue'nun geçerliliğini contentType'a göre kontrol et (örn: Kategori ise slug var mı?)
 
     const newSection = new HomeSection({
       title,
       displayOrder: displayOrder || 0,
       contentType,
-      contentValue: contentType === "BEST_SELLING" ? null : contentValue, // BEST_SELLING ise null yap
+      contentValue: contentType === "BEST_SELLING" ? null : contentValue,
       itemLimit: itemLimit || 10,
-      isActive: isActive !== undefined ? isActive : true, // Varsayılan true
+      isActive: isActive !== undefined ? isActive : true,
     });
 
     await newSection.save();
@@ -55,10 +52,8 @@ const addHomeSectionAdmin = async (req, res) => {
   }
 };
 
-// Tüm Bölümleri Getir (Admin)
 const getAllHomeSectionsAdmin = async (req, res) => {
   try {
-    // displayOrder'a göre sıralı getir
     const sections = await HomeSection.find({}).sort({ displayOrder: 1 });
     res.status(200).json({ success: true, data: sections });
   } catch (error) {
@@ -67,7 +62,6 @@ const getAllHomeSectionsAdmin = async (req, res) => {
   }
 };
 
-// Bölüm Güncelle (Admin)
 const updateHomeSectionAdmin = async (req, res) => {
   try {
     const { id } = req.params;
@@ -80,7 +74,6 @@ const updateHomeSectionAdmin = async (req, res) => {
       isActive,
     } = req.body;
 
-    // Temel doğrulamalar
     if (!title || !contentType) {
       return res
         .status(400)
@@ -92,7 +85,6 @@ const updateHomeSectionAdmin = async (req, res) => {
         message: "İçerik Değeri (En Çok Satanlar hariç) zorunludur.",
       });
     }
-    // TODO: contentValue geçerlilik kontrolü
 
     const updateData = {
       title,
@@ -136,7 +128,6 @@ const updateHomeSectionAdmin = async (req, res) => {
   }
 };
 
-// Bölüm Sil (Admin)
 const deleteHomeSectionAdmin = async (req, res) => {
   try {
     const { id } = req.params;
@@ -161,10 +152,9 @@ const deleteHomeSectionAdmin = async (req, res) => {
   }
 };
 
-// Bölüm Sıralamasını Güncelle (Admin)
 const updateHomeSectionsOrderAdmin = async (req, res) => {
   try {
-    const { orderedIds } = req.body; // Frontend'den gelen sıralı ID dizisi
+    const { orderedIds } = req.body;
 
     if (!Array.isArray(orderedIds)) {
       return res.status(400).json({
@@ -173,7 +163,6 @@ const updateHomeSectionsOrderAdmin = async (req, res) => {
       });
     }
 
-    // Her bir ID için displayOrder'ı güncelle
     const updatePromises = orderedIds.map((id, index) =>
       HomeSection.findByIdAndUpdate(id, { displayOrder: index }, { new: true })
     );

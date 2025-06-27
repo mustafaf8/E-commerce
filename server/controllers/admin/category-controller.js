@@ -104,7 +104,6 @@ const updateCategoryAdmin = async (req, res) => {
   }
 };
 
-// Kategori Sil (Admin) - GÜNCELLENDİ
 const deleteCategoryAdmin = async (req, res) => {
   try {
     const { id } = req.params;
@@ -113,15 +112,13 @@ const deleteCategoryAdmin = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Geçersiz Kategori ID formatı." });
     }
-    const productCount = await Product.countDocuments({ category: id }); //
+    const productCount = await Product.countDocuments({ category: id });
 
     if (productCount > 0) {
-      //
       return res.status(400).json({
-        //
-        success: false, //
-        message: `Bu kategori ${productCount} üründe kullanılıyor. Önce ürünleri düzenleyin veya kategoriyi pasif yapın.`, //
-        isUsedError: true, // Frontend'de özel işlem yapmak için bir flag
+        success: false,
+        message: `Bu kategori ${productCount} üründe kullanılıyor. Önce ürünleri düzenleyin veya kategoriyi pasif yapın.`,
+        isUsedError: true,
       });
     }
 
@@ -146,10 +143,9 @@ const deleteCategoryAdmin = async (req, res) => {
   }
 };
 
-// Tüm Kategorileri Getir (Admin - Aktif/Pasif Farketmez)
 const getAllCategoriesAdmin = async (req, res) => {
   try {
-    const categories = await Category.find({}).sort({ name: 1 }); // İsme göre sırala
+    const categories = await Category.find({}).sort({ name: 1 });
     res.status(200).json({ success: true, data: categories });
   } catch (error) {
     console.error("Admin tüm kategorileri getirme hatası:", error);

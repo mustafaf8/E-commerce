@@ -37,8 +37,6 @@ const addProduct = async (req, res) => {
       costPrice,
     } = req.body;
 
-    // console.log(averageReview, "averageReview");
-
     const newlyCreatedProduct = new Product({
       image,
       title,

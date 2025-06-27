@@ -4,7 +4,7 @@ const getPromoCards = async (req, res) => {
   try {
     // Sadece aktif olanları veya belirli bir sıraya göre getirmek isterseniz filtre/sort ekleyebilirsiniz.
     // Örneğin: const promoCards = await PromoCard.find({ isActive: true }).sort({ order: 1 });
-    const promoCards = await PromoCard.find({}).sort({ createdAt: -1 }); // Şimdilik eklenme tarihine göre
+    const promoCards = await PromoCard.find({}).sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: promoCards });
   } catch (error) {
     console.error("Promosyon kartları getirilirken hata:", error);
@@ -13,10 +13,6 @@ const getPromoCards = async (req, res) => {
 };
 
 const addPromoCard = async (req, res) => {
-  // if (req.user?.role !== "admin") {
-  //   return res.status(403).json({ success: false, message: "Yetkisiz işlem." });
-  // }
-
   try {
     const { image, title, link } = req.body;
     if (!image) {
@@ -49,10 +45,6 @@ const addPromoCard = async (req, res) => {
 };
 
 const deletePromoCard = async (req, res) => {
-  // if (req.user?.role !== "admin") {
-  //   return res.status(403).json({ success: false, message: "Yetkisiz işlem." });
-  // }
-
   try {
     const { cardId } = req.params;
 

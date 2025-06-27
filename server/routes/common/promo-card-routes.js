@@ -7,8 +7,6 @@ const {
   addPromoCard,
   deletePromoCard,
 } = require("../../controllers/common/promo-card-controller");
-// Admin yetkisi için middleware (opsiyonel ama önerilir)
-// const { authMiddleware, adminCheckMiddleware } = require('../middleware/authAdmin'); // Varsayımsal middleware
 
 const router = express.Router();
 

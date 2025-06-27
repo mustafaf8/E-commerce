@@ -6,8 +6,7 @@ const {
   updateCategoryAdmin,
   deleteCategoryAdmin,
   getAllCategoriesAdmin,
-} = require("../../controllers/admin/category-controller"); // Birazdan oluşturacağız
-// const { authMiddleware, adminCheckMiddleware } = require('../../controllers/auth/auth-controller'); // Yetkilendirme eklenebilir
+} = require("../../controllers/admin/category-controller");
 
 const router = express.Router();
 

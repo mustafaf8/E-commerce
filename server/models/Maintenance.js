@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 
 const MaintenanceSchema = new mongoose.Schema(
   {
-    // Yalnızca tek bir döküman olmasını sağlamak için sabit bir ID kullanabiliriz.
     singleton: {
       type: String,
       default: "maintenance_status",

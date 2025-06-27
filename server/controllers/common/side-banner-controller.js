@@ -11,8 +11,6 @@ const getSideBanners = async (req, res) => {
 };
 
 const addSideBanner = async (req, res) => {
-  // if (req.user?.role !== 'admin') { ... }
-
   try {
     const { image, title, link } = req.body;
     if (!image) {
@@ -41,10 +39,8 @@ const addSideBanner = async (req, res) => {
 };
 
 const deleteSideBanner = async (req, res) => {
-  // if (req.user?.role !== 'admin') { ... }
-
   try {
-    const { bannerId } = req.params; // Parametre adını kontrol et (bannerId?)
+    const { bannerId } = req.params;
     if (!bannerId) {
       return res
         .status(400)

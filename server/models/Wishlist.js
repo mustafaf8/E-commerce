@@ -6,8 +6,6 @@ const WishlistItemSchema = new mongoose.Schema(
       ref: "Product",
       required: true,
     },
-    // İstersen eklenme tarihi gibi ek bilgiler de tutabilirsin
-    // addedAt: { type: Date, default: Date.now }
   },
   { _id: false }
 );

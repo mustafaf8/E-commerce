@@ -12,28 +12,24 @@ const helmet = require("helmet");
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 dakika
-  max: 40000, // her IP'den 15 dakikada en fazla 100 istek
+  max: 200, // her IP'den 15 dakikada en fazla 100 istek
   standardHeaders: true,
   legacyHeaders: false,
   message: "Çok fazla istek yaptınız, lütfen 15 dakika sonra tekrar deneyin.",
 });
 
-// Giriş gibi daha hassas endpoint'ler için daha katı bir sınırlayıcı
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 dakika
-  max: 1000, // 15 dakikada 10 giriş denemesi
+  max: 15, // 15 dakikada 10 giriş denemesi
   message:
     "Çok fazla giriş denemesi yapıldı, lütfen daha sonra tekrar deneyin.",
 });
 
-// --- GÜVENLİ FIREBASE BAŞLATMA ---
 try {
-  // .env dosyasından Firebase bilgilerini al
   const serviceAccount = {
     type: process.env.FIREBASE_TYPE,
     project_id: process.env.FIREBASE_PROJECT_ID,
     private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-    // .env dosyasından gelen '\\n' karakterlerini gerçek newline karakterlerine dönüştür
     private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
     client_email: process.env.FIREBASE_CLIENT_EMAIL,
     client_id: process.env.FIREBASE_CLIENT_ID,
@@ -44,7 +40,6 @@ try {
     client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL,
   };
 
-  // serviceAccount objesinin tüm alanlarının dolu olduğunu kontrol et
   if (!serviceAccount.private_key || !serviceAccount.client_email) {
     throw new Error(
       "Firebase service account bilgileri .env dosyasında eksik veya hatalı."
@@ -58,17 +53,6 @@ try {
 } catch (error) {
   console.error("Firebase Admin SDK başlatılamadı:", error.message);
 }
-// --- GÜVENLİ FIREBASE BAŞLATMA SONU ---
-// try {
-//   const serviceAccount = require("./config/firebase-service-account.json");
-
-//   admin.initializeApp({
-//     credential: admin.credential.cert(serviceAccount),
-//   });
-//   console.log("Firebase Admin SDK başarıyla başlatıldı.");
-// } catch (error) {
-//   console.error("Firebase Admin SDK başlatılamadı:", error);
-// }
 
 const authRouter = require("./routes/auth/auth-routes");
 const adminProductsRouter = require("./routes/admin/products-routes");
@@ -107,21 +91,18 @@ app.use(helmet());
 const PORT = process.env.PORT || 5000;
 
 const allowedOrigins = [
-  process.env.CLIENT_BASE_URL, // "https://www.rmrenerji.online"
-  "https://rmrenerji.online", // www'siz versiyonu da ekleyelim
-  "http://localhost:5173", // Yerel geliştirme için
+  process.env.CLIENT_BASE_URL,
+  "https://rmrenerji.online",
+  "http://localhost:5173",
 ];
 
-// ...
 const IYZICO_CALLBACK_PATH = "/api/shop/order/iyzico-callback";
 
 app.use((req, res, next) => {
-  // Eğer istek Iyzico callback yoluna geliyorsa, CORS kontrolünü atla
   if (req.path === IYZICO_CALLBACK_PATH) {
     return next();
   }
 
-  // Diğer tüm istekler için CORS middleware'ini çalıştır
   cors({
     origin: function (origin, callback) {
       if (!origin || allowedOrigins.indexOf(origin) !== -1) {
@@ -145,7 +126,6 @@ app.use((req, res, next) => {
     ],
   })(req, res, next);
 });
-// ...
 
 app.use(cookieParser());
 
