@@ -10,7 +10,6 @@ const initialState = {
 export const getSearchResults = createAsyncThunk(
   "search/getSearchResults",
   async (keyword, { rejectWithValue }) => {
-    // rejectWithValue eklendi
     try {
       const response = await api.get(`/shop/search`, { params: { keyword } });
       if (response.data && response.data.success) {

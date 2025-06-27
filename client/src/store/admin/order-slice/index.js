@@ -162,9 +162,25 @@ const adminOrderSlice = createSlice({
       })
       .addCase(updateOrderStatus.fulfilled, (state, action) => {
         state.isLoading = false;
-        // Başarılı güncelleme sonrası state'i nasıl güncelleyeceğimize bağlı.
-        // Genellikle liste yeniden çekilir veya sadece orderDetails güncellenir.
-        // Şimdilik sadece loading'i kapatalım, component'te yeniden fetch tetiklenebilir.
+        const updatedOrder = action.payload?.data;
+
+        if (updatedOrder) {
+          if (state.orderDetails?._id === updatedOrder._id) {
+            state.orderDetails = updatedOrder;
+          }
+          const userOrderIndex = state.selectedUserOrders.findIndex(
+            (order) => order._id === updatedOrder._id
+          );
+          if (userOrderIndex > -1) {
+            state.selectedUserOrders[userOrderIndex] = updatedOrder;
+          }
+          const guestOrderIndex = state.guestOrderList.findIndex(
+            (order) => order._id === updatedOrder._id
+          );
+          if (guestOrderIndex > -1) {
+            state.guestOrderList[guestOrderIndex] = updatedOrder;
+          }
+        }
       })
       .addCase(updateOrderStatus.rejected, (state, action) => {
         state.isLoading = false;

@@ -97,10 +97,18 @@ const updateOrderStatus = async (req, res) => {
       });
     }
 
-    await Order.findByIdAndUpdate(id, { orderStatus });
+    const updatedOrder = await Order.findByIdAndUpdate(
+      id,
+      { orderStatus, orderUpdateDate: new Date() }, // orderUpdateDate'i de güncelleyelim
+      { new: true }
+    ).populate({
+      path: "userId",
+      select: "userName email phoneNumber",
+    });
 
     res.status(200).json({
       success: true,
+      data: updatedOrder,
       message: "Order status is updated successfully!",
     });
   } catch (e) {

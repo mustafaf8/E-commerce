@@ -65,6 +65,9 @@ const reviewSlice = createSlice({
       })
       .addCase(addReview.fulfilled, (state, action) => {
         state.isAddingReview = false;
+        if (action.payload?.success && action.payload?.data) {
+          state.reviews.push(action.payload.data);
+        }
       })
       .addCase(addReview.rejected, (state, action) => {
         state.isAddingReview = false;

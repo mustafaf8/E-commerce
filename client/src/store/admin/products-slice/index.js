@@ -4,6 +4,7 @@ import api from "../../../api/axiosInstance";
 const initialState = {
   isLoading: false,
   productList: [],
+  error: null,
 };
 
 export const addNewProduct = createAsyncThunk(
@@ -62,10 +63,13 @@ const AdminProductsSlice = createSlice({
       .addCase(fetchAllProducts.fulfilled, (state, action) => {
         state.isLoading = false;
         state.productList = action.payload.data;
+        state.error = null;
       })
       .addCase(fetchAllProducts.rejected, (state, action) => {
         state.isLoading = false;
         state.productList = [];
+        state.error =
+          action.error.message || "Ürünler alınırken bir hata oluştu.";
       });
   },
 });

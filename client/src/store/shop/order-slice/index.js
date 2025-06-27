@@ -13,19 +13,16 @@ const initialState = {
 
 export const createNewOrder = createAsyncThunk(
   "order/createNewOrder",
-  // async (orderData, { rejectWithValue }) => { // Hata yönetimi için rejectWithValue eklenebilir
-  async (orderData) => {
+  async (orderData, { rejectWithValue }) => {
     try {
       const response = await api.post("/shop/order/create", orderData, {
         withCredentials: true,
       });
       return response.data;
     } catch (error) {
-      console.error(
-        "createNewOrder API Hatası:",
-        error.response?.data || error.message
+      return rejectWithValue(
+        error.response?.data || { message: "Sipariş oluşturulamadı." }
       );
-      throw error;
     }
   }
 );

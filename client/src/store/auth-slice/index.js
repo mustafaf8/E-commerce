@@ -74,11 +74,9 @@ export const checkAuth = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      console.log(
-        "checkAuth failed (likely not logged in):",
-        error.response?.status
+      return rejectWithValue(
+        error.response?.data || { message: "Oturum bulunamadı veya geçersiz." }
       );
-      return { success: false };
     }
   }
 );
@@ -191,6 +189,7 @@ const authSlice = createSlice({
 
       .addCase(checkAuth.pending, (state) => {
         state.isLoading = true;
+        state.error = null;
       })
       .addCase(checkAuth.fulfilled, (state, action) => {
         state.isLoading = false;

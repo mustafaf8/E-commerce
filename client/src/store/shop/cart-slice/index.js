@@ -124,7 +124,7 @@ export const fetchCartItems = createAsyncThunk(
       } catch (error) {
         return rejectWithValue({
           success: false,
-          message: "Yerel sepet yüklenemedi.",
+          message: error.message || "Yerel sepet yüklenemedi.",
         });
       }
     } else {
@@ -212,14 +212,9 @@ export const updateCartQuantity = createAsyncThunk(
         const cartItemToUpdate = localCart.items[itemIndex];
 
         if (cartItemToUpdate.totalStock === undefined) {
-          // Eğer totalStock bilgisi bir şekilde kaydedilmemişse (bu bir hata durumudur),
-          // kullanıcıyı yanıltmamak adına işlemi reddetmek daha güvenli olabilir.
           console.warn(
             `Misafir sepetindeki ${productId} için stok bilgisi eksik.`
           );
-          // Veya shopProducts.productList'ten anlık olarak çekmeye çalışılabilir ama bu addToCart'ta çözülmeli.
-          // Şimdilik, eğer totalStock yoksa stok kontrolü yapılamaz.
-          // Bu durum, addToCart misafir path'inde totalStock'un kaydedildiğinden emin olunarak çözülmeli.
         } else if (quantity > cartItemToUpdate.totalStock) {
           return rejectWithValue({
             success: false,
@@ -349,9 +344,12 @@ const shoppingCartSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    const handlePending = (state) => {
+    const handlePending = (state, action) => {
       state.isLoading = true;
       state.error = null;
+      if (action.type === "cart/addToCart/pending") {
+        state.addingProductId = action.meta.arg.productId;
+      }
     };
     const handleFulfilled = (state, action) => {
       state.isLoading = false;
@@ -369,48 +367,34 @@ const shoppingCartSlice = createSlice({
     const handleRejected = (state, action) => {
       state.isLoading = false;
       state.addingProductId = null;
-      state.error =
-        action.payload?.message ||
-        action.error?.message ||
-        "Bilinmeyen bir sepet hatası oluştu.";
+      if (action.payload?.isStockError) {
+        state.error =
+          action.payload.message || "Stokta yeterli ürün bulunmamaktadır.";
+      } else {
+        state.error =
+          action.payload?.message ||
+          action.error?.message ||
+          "Bilinmeyen bir hata oluştu.";
+      }
     };
 
     builder
-      .addCase(addToCart.pending, (state, action) => {
-        state.isLoading = true;
-        state.error = null;
-        state.addingProductId = action.meta.arg.productId;
-      })
+      .addCase(addToCart.pending, handlePending)
       .addCase(addToCart.fulfilled, handleFulfilled)
-      .addCase(addToCart.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error =
-          action.payload?.message ||
-          action.error?.message ||
-          "Sepete eklenemedi.";
-        if (action.payload?.isStockError) {
-          // Toast mesajı burada veya component'te gösterilebilir.
-          // state.error = `Stokta yeterli ürün yok. En fazla ${action.payload.availableStock} adet eklenebilir.`;
-        }
-      })
+      .addCase(addToCart.rejected, handleRejected)
+
       .addCase(fetchCartItems.pending, handlePending)
       .addCase(fetchCartItems.fulfilled, handleFulfilled)
       .addCase(fetchCartItems.rejected, handleRejected)
+
       .addCase(updateCartQuantity.pending, handlePending)
       .addCase(updateCartQuantity.fulfilled, handleFulfilled)
-      .addCase(updateCartQuantity.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error =
-          action.payload?.message ||
-          action.error?.message ||
-          "Miktar güncellenemedi.";
-        if (action.payload?.isStockError) {
-          // state.error = `Stokta yeterli ürün yok. En fazla ${action.payload.availableStock} adet seçilebilir.`;
-        }
-      })
+      .addCase(updateCartQuantity.rejected, handleRejected)
+
       .addCase(deleteCartItem.pending, handlePending)
       .addCase(deleteCartItem.fulfilled, handleFulfilled)
       .addCase(deleteCartItem.rejected, handleRejected)
+
       .addCase(syncLocalCartToBackend.pending, handlePending)
       .addCase(syncLocalCartToBackend.fulfilled, handleFulfilled)
       .addCase(syncLocalCartToBackend.rejected, handleRejected);

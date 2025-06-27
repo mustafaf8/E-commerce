@@ -1,7 +1,7 @@
-import { Heart } from "lucide-react";
+import { Heart, Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Button } from "../ui/button";
-import { Dialog, DialogContent } from "../ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import { Textarea } from "../ui/textarea";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -13,18 +13,30 @@ import StarRatingComponent from "../common/star-rating";
 import { useEffect, useState } from "react";
 import { addReview, getReviews } from "@/store/shop/review-slice";
 import { addToWishlist, removeFromWishlist } from "@/store/shop/wishlist-slice";
+import { Skeleton } from "../ui/skeleton"; // Skeleton eklendi
 import PropTypes from "prop-types";
-import { DialogTitle } from "@radix-ui/react-dialog";
+
+const ProductDetailsSkeleton = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 p-6 sm:p-8 lg:p-10">
+    <Skeleton className="rounded-lg w-full h-80" />
+    <div className="space-y-4">
+      <Skeleton className="h-8 w-3/4" />
+      <Skeleton className="h-20 w-full" />
+      <Skeleton className="h-6 w-1/2" />
+      <Skeleton className="h-6 w-1/3" />
+      <Skeleton className="h-12 w-full" />
+    </div>
+  </div>
+);
 
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const [reviewMsg, setReviewMsg] = useState("");
   const [rating, setRating] = useState(0);
   const dispatch = useDispatch();
-  const {
-    user,
-    isAuthenticated,
-    isLoading: authLoading,
-  } = useSelector((state) => state.auth);
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const { isDetailsLoading, error } = useSelector(
+    (state) => state.shopProducts
+  );
   const navigate = useNavigate();
   const location = useLocation();
   const { cartItems } = useSelector((state) => state.shopCart);
@@ -79,15 +91,6 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
     getTotalStock,
     currentProductDetails
   ) {
-    // if (!isAuthenticated) {
-    //   toast({
-    //     title: "Lütfen giriş yapın",
-    //     description: "Sepete ürün eklemek için giriş yapmanız gerekmektedir.",
-    //     variant: "destructive",
-    //   });
-    //   navigate("/auth/login", { state: { from: location } });
-    //   return;
-    // }
     const productDetailsForCart = {
       price: currentProductDetails.price,
       salePrice: currentProductDetails.salePrice,
@@ -168,7 +171,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
 
   function handleDialogClose() {
     setOpen(false);
-    dispatch(setProductDetails());
+    dispatch(setProductDetails(null));
     setRating(0);
     setReviewMsg("");
   }

@@ -40,7 +40,7 @@ export const deletePromoCard = createAsyncThunk(
   async (cardId, { rejectWithValue }) => {
     try {
       const response = await api.delete(`/common/promo-cards/delete/${cardId}`);
-      return { success: true, data: { _id: cardId } };
+      return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data || { message: "Promosyon kartı silinemedi." }
