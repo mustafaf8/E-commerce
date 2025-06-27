@@ -8,6 +8,7 @@ import api from "../../../api/axiosInstance";
 
 const initialState = {
   cartItems: { items: [], guestCartId: null, _id: null },
+  addingProductId: null,
   isLoading: false,
   isCartOpen: false,
   error: null,
@@ -19,7 +20,7 @@ export const addToCart = createAsyncThunk(
     { productId, quantity, productDetails },
     { getState, rejectWithValue }
   ) => {
-    const { auth } = getState();
+    const { auth, shopCart } = getState();
 
     if (!auth.isAuthenticated) {
       try {
@@ -78,6 +79,19 @@ export const addToCart = createAsyncThunk(
         });
       }
     } else {
+      const existingItem = shopCart.cartItems.items.find(
+        (item) => item.productId === productId
+      );
+      const currentQuantityInCart = existingItem ? existingItem.quantity : 0;
+
+      if (currentQuantityInCart + quantity > productDetails.totalStock) {
+        return rejectWithValue({
+          success: false,
+          message: `Stokta yeterli ürün bulunmamaktadır. Sepetinizde ${currentQuantityInCart} adet var.`,
+          isStockError: true,
+          availableStock: productDetails.totalStock - currentQuantityInCart,
+        });
+      }
       try {
         const response = await api.post("/shop/cart/add", {
           userId: auth.user.id,
@@ -180,7 +194,7 @@ export const deleteCartItem = createAsyncThunk(
 export const updateCartQuantity = createAsyncThunk(
   "cart/updateCartQuantity",
   async ({ productId, quantity }, { getState, rejectWithValue }) => {
-    const { auth, shopProducts } = getState();
+    const { auth, shopCart } = getState();
     if (!auth.isAuthenticated) {
       try {
         const localCart = getGuestCart();
@@ -238,6 +252,20 @@ export const updateCartQuantity = createAsyncThunk(
         });
       }
     } else {
+      const itemToUpdate = shopCart.cartItems.items.find(
+        (item) => item.productId === productId
+      );
+
+      if (itemToUpdate && itemToUpdate.totalStock !== undefined) {
+        if (quantity > itemToUpdate.totalStock) {
+          return rejectWithValue({
+            success: false,
+            message: `Stokta yeterli ürün bulunmamaktadır. En fazla ${itemToUpdate.totalStock} adet eklenebilir.`,
+            isStockError: true,
+            availableStock: itemToUpdate.totalStock,
+          });
+        }
+      }
       try {
         const response = await api.put(
           "/shop/cart/update-cart",
@@ -327,6 +355,7 @@ const shoppingCartSlice = createSlice({
     };
     const handleFulfilled = (state, action) => {
       state.isLoading = false;
+      state.addingProductId = null;
       if (action.payload?.success) {
         state.cartItems = action.payload.data || {
           items: [],
@@ -339,6 +368,7 @@ const shoppingCartSlice = createSlice({
     };
     const handleRejected = (state, action) => {
       state.isLoading = false;
+      state.addingProductId = null;
       state.error =
         action.payload?.message ||
         action.error?.message ||
@@ -346,7 +376,11 @@ const shoppingCartSlice = createSlice({
     };
 
     builder
-      .addCase(addToCart.pending, handlePending)
+      .addCase(addToCart.pending, (state, action) => {
+        state.isLoading = true;
+        state.error = null;
+        state.addingProductId = action.meta.arg.productId;
+      })
       .addCase(addToCart.fulfilled, handleFulfilled)
       .addCase(addToCart.rejected, (state, action) => {
         state.isLoading = false;

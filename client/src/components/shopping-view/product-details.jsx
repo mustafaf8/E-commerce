@@ -380,7 +380,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                           {reviewItem?.userName || "Anonim"}
                         </h3>
                       </div>
-                      <div className="flex items-center gap-0.5">
+                      <div className="flex items-center gap-0.5 pointer-events-none">
                         <StarRatingComponent rating={reviewItem?.reviewValue} />
                       </div>
                       <p className="text-xs sm:text-sm text-gray-600 mt-0.5 leading-snug">

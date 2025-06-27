@@ -176,25 +176,6 @@ const AboutUs = () => {
             </div>
           </div>
         </div>
-
-        {/* CTA Section */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-8 md:p-12 text-white shadow-lg">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Hikayemizin Bir Parçası Olun
-            </h2>
-            <p className="mb-8 text-indigo-100">
-              Müşterilerimiz, iş ortaklarımız ve çalışanlarımızla birlikte
-              başarı hikayemizi yazıyoruz. Siz de bu yolculuğun bir parçası
-              olmak ister misiniz?
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="px-6 py-3 bg-transparent border-2 border-white text-white rounded-full font-medium hover:bg-white/10 transition-colors">
-                Bizimle İletişime Geçin
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

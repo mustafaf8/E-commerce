@@ -137,14 +137,14 @@ function ShoppingHome() {
                     promoCard.link ? "cursor-pointer" : ""
                   } hover:shadow-md transition-shadow duration-200`}
                 >
-                  <CardContent className="p-0 h-full">
+                  <div className="p-0 h-full">
                     <img
                       src={promoCard.image}
                       alt={promoCard.title || "Promosyon"}
                       className="w-full h-full object-contain max-[850px]:p-0"
                       loading="lazy"
                     />
-                  </CardContent>
+                  </div>
                 </Card>
               ))
             ) : (

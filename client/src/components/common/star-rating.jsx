@@ -16,7 +16,7 @@ function StarRatingComponent({ rating, handleRatingChange }) {
       onClick={handleRatingChange ? () => handleRatingChange(star) : null}
     >
       <StarIcon
-        className={`w-5 h-5 ${
+        className={`w-5 h-5 max-[640px]:w-4 max-[640px]:h-4 ${
           // Boyut
           star <= rating
             ? "fill-yellow-500 stroke-yellow-500"

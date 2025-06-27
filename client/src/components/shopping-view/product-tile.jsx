@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import StarRatingComponent from "../common/star-rating";
-import { Heart } from "lucide-react";
+import { Heart, Loader2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToWishlist, removeFromWishlist } from "@/store/shop/wishlist-slice";
 import { addToCart } from "@/store/shop/cart-slice";
@@ -21,8 +21,9 @@ const ShoppingProductTile = React.memo(function ShoppingProductTile({
     (state) => state.shopWishlist
   );
   const { user } = useSelector((state) => state.auth);
+  const { addingProductId } = useSelector((state) => state.shopCart);
   const isWishlisted = product?._id && wishlistItems.includes(product._id);
-
+  const isAdding = addingProductId === product?._id;
   const handleWishlistToggle = (event) => {
     event.stopPropagation();
 
@@ -59,7 +60,7 @@ const ShoppingProductTile = React.memo(function ShoppingProductTile({
   };
 
   const handleActualAddToCart = () => {
-    if (!product || !product._id) return;
+    if (!product || !product._id || isAdding) return;
     const productDetailsForCart = {
       price: product.price,
       salePrice: product.salePrice,
@@ -178,7 +179,7 @@ const ShoppingProductTile = React.memo(function ShoppingProductTile({
 
             {/* Ratings */}
             {product?.averageReview !== undefined && (
-              <div className="flex items-center space-x-1 pointer-events-none">
+              <div className="flex items-center space-x-1 pointer-events-none max-[640px]:space-x-1">
                 <StarRatingComponent
                   rating={product.averageReview}
                   className="scale-90 origin-left"
@@ -190,10 +191,10 @@ const ShoppingProductTile = React.memo(function ShoppingProductTile({
             )}
 
             {/* Price */}
-            <div className="pt-1">
+            <div className="pt-1 max-[640px]:pt-0">
               {product?.salePrice !== undefined &&
               product.salePrice !== null ? (
-                <div className="flex items-baseline gap-2">
+                <div className="flex items-baseline gap-2 max-[1200px]:flex-col max-[1200px]:gap-0">
                   {product?.price &&
                     product.price > 0 &&
                     product.price > product.salePrice && (
@@ -215,7 +216,7 @@ const ShoppingProductTile = React.memo(function ShoppingProductTile({
                   </span>
                 </div>
               ) : product?.price && product.price > 0 ? (
-                <span className="font-medium text-sm sm:text-base text-primary">
+                <span className="font-medium text-sm sm:text-base text-black">
                   {`${product.price.toFixed(2)} TL`}
                 </span>
               ) : (
@@ -224,7 +225,6 @@ const ShoppingProductTile = React.memo(function ShoppingProductTile({
                 </span>
               )}
             </div>
-             {/* --- GÜNCELLENEN FİYAT BÖLÜMÜ SONU --- */}
           </CardContent>
         </div>
       </div>

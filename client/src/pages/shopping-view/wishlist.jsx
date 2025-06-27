@@ -47,7 +47,7 @@ function ShoppingWishlist() {
   const isLoading = wishlistLoading || productsLoading;
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-20 py-8 max-[1024px]:px-1">
       <h1 className="text-xl font-bold mb-6 border-b pb-3">Favorilerim</h1>
 
       {isLoading ? (
@@ -69,7 +69,7 @@ function ShoppingWishlist() {
         </div>
       ) : favoriteProducts.length > 0 ? (
         // Favori ürünler varsa listele
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 max-[800px]:gap-2">
           {favoriteProducts.map((productItem) => (
             <ShoppingProductTile
               key={productItem._id} // key eklendi

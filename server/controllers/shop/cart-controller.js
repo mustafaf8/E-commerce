@@ -18,10 +18,17 @@ const addToCart = async (req, res) => {
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: "Product not found",
+        message: "Ürün bulunamadı.",
       });
     }
-
+    if (product.totalStock < quantity) {
+      return res.status(400).json({
+        success: false,
+        message: `Stokta yeterli ürün bulunmamaktadır. En fazla ${product.totalStock} adet eklenebilir.`,
+        isStockError: true,
+        availableStock: product.totalStock,
+      });
+    }
     let cart = await Cart.findOne({ userId });
 
     if (!cart) {

@@ -272,7 +272,6 @@ function ShoppingListing() {
   const skeletonCount = 8;
 
   return (
- 
     <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6 p-4 md:p-6 max-[600px]:p-0 container mx-auto px-20 max-[1024px]:px-1">
       <ProductFilter
         filters={filters}
@@ -364,7 +363,6 @@ function ShoppingListing() {
         productDetails={productDetails}
       />
     </div>
-   
   );
 }
 

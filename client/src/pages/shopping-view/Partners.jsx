@@ -100,21 +100,6 @@ const Partners = () => {
             </div>
           </div>
         ))}
-        <div className="mt-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-8 md:p-12 text-white shadow-lg">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Siz de İş Ortağımız Olmak İster misiniz?
-            </h2>
-            <p className="mb-8 text-blue-50">
-              Uzun vadeli ve karşılıklı fayda sağlayan işbirliklerine her zaman
-              açığız. İş modelinizi paylaşın, birlikte neler yapabileceğimizi
-              konuşalım.
-            </p>
-            <button className="px-8 py-3 bg-white text-blue-600 rounded-full font-medium hover:bg-blue-50 transition-colors shadow-md">
-              İletişime Geçin
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );
