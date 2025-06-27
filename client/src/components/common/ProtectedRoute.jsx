@@ -12,19 +12,10 @@ function ProtectedRoute({ children, adminOnly = false }) {
   }
 
   if (!isAuthenticated) {
-    console.log(
-      `ProtectedRoute (${
-        adminOnly ? "Admin" : "User"
-      }) -> Not authenticated, redirecting to login from ${location.pathname}`
-    );
     return <Navigate to="/auth/login" state={{ from: location }} replace />;
   }
 
   if (adminOnly && user?.role !== "admin") {
-    console.log(
-      `ProtectedRoute (Admin) -> Not an admin (role: ${user?.role}), redirecting to home from ${location.pathname}`
-    );
-
     return <Navigate to="/shop/home" replace />;
   }
 

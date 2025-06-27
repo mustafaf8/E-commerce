@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import ShoppingProductTile from "./product-tile";
 import ProductTileSkeleton from "./product-tile-skeleton.jsx";
 import { Button } from "@/components/ui/button";
@@ -76,7 +76,10 @@ function ProductCarousel({
               payload.data?.slice(0, fetchConfig.limit || 10) || []
             );
           } else {
-            console.error(`Carousel fetch failed for ${title}:`, payload.message);
+            console.error(
+              `Carousel fetch failed for ${title}:`,
+              payload.message
+            );
             setInternalError(payload.message || "Veri alınamadı.");
             setInternalProducts([]);
           }
@@ -124,10 +127,10 @@ function ProductCarousel({
           <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-800 flex items-center">
             {title}
           </h2>
-          
+
           {viewAllPath && (
-            <Button 
-              variant="link" 
+            <Button
+              variant="link"
               onClick={handleViewAllClick}
               className="text-primary p-0 h-auto font-medium text-sm flex items-center gap-1"
             >
@@ -136,7 +139,7 @@ function ProductCarousel({
             </Button>
           )}
         </div>
-        
+
         {/* Carousel */}
         <div className="relative">
           {/* Left scroll button */}

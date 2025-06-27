@@ -14,7 +14,7 @@ import ProductCarousel from "@/components/shopping-view/ProductCarousel";
 import { fetchActiveHomeSections } from "@/store/common-slice/home-sections-slice";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 
 function ShoppingHome() {
   const dispatch = useDispatch();

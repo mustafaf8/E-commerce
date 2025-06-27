@@ -33,27 +33,24 @@ function AdminOrderDetailsView({ orderDetails }) {
         if (payload?.success) {
           dispatch(getOrderDetailsForAdmin(orderDetails?._id));
           if (orderDetails?.userId?._id && !orderDetails.isGuestOrder) {
-            dispatch(fetchUsersWithOrders()); // Kayıtlı kullanıcı listesini güncelle
+            dispatch(fetchUsersWithOrders());
           } else if (orderDetails.isGuestOrder) {
-            dispatch(fetchAllGuestOrdersForAdmin()); // Misafir sipariş listesini güncelle
+            dispatch(fetchAllGuestOrdersForAdmin());
           }
 
           setFormData(initialFormData);
           toast({
             title: payload?.message || "Sipariş durumu güncellendi.",
-            variant: "success", // "info" yerine "success" olabilir
+            variant: "success",
           });
         } else {
           toast({
-            // Başarısız ama kontrollü dönen durum
             title: payload?.message || "Sipariş durumu güncellenemedi.",
             variant: "destructive",
           });
         }
       })
       .catch((error) => {
-        // Redux thunk rejectWithValue ile dönen veya network hatası
-        // console.error("Sipariş durumu güncelleme hatası:", error);
         toast({
           title:
             error?.message || "Sipariş durumu güncellenirken bir hata oluştu.",
@@ -73,7 +70,7 @@ function AdminOrderDetailsView({ orderDetails }) {
   const currentStatusKey = orderDetails?.orderStatus || "default";
   const statusInfo =
     orderStatusMappingAdmin[currentStatusKey] ||
-    orderStatusMappingAdmin.default; // Merkezi mapping'i kullan
+    orderStatusMappingAdmin.default;
 
   return (
     <div className="grid gap-6">

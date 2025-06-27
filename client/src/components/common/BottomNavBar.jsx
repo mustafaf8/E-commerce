@@ -14,15 +14,22 @@ const BottomNavBar = () => {
     (state) => state.shopCart.cartItems
   );
 
-  // Hide the navigation bar in admin routes
   if (location.pathname.includes("/admin")) {
     return null;
   }
 
   const navItems = [
     { to: "/shop/home", label: "Keşfet", icon: <Home strokeWidth={1.8} /> },
-    { to: "/shop/wishlist", label: "Favoriler", icon: <Heart strokeWidth={1.8} /> },
-    { to: "/shop/cart", label: "Sepetim", icon: <ShoppingCart strokeWidth={1.8} /> },
+    {
+      to: "/shop/wishlist",
+      label: "Favoriler",
+      icon: <Heart strokeWidth={1.8} />,
+    },
+    {
+      to: "/shop/cart",
+      label: "Sepetim",
+      icon: <ShoppingCart strokeWidth={1.8} />,
+    },
     {
       to: "/shop/listing",
       label: "Kategoriler",
@@ -62,24 +69,25 @@ const BottomNavBar = () => {
                   }}
                   className={cn(
                     "flex flex-col items-center justify-center w-full h-full transition-colors",
-                    isActive 
-                      ? "text-primary" 
+                    isActive
+                      ? "text-primary"
                       : "text-gray-500 dark:text-gray-400"
                   )}
                 >
                   <div className="relative">
                     {item.icon}
-                    {item.to === "/shop/cart" &&
-                      uniqueProductCount > 0 && (
-                        <span className="cart-count-badge">
-                          {uniqueProductCount > 9 ? "9+" : uniqueProductCount}
-                        </span>
-                      )}
+                    {item.to === "/shop/cart" && uniqueProductCount > 0 && (
+                      <span className="cart-count-badge">
+                        {uniqueProductCount > 9 ? "9+" : uniqueProductCount}
+                      </span>
+                    )}
                   </div>
-                  <span className={cn(
-                    "text-xs mt-1",
-                    isActive ? "font-medium" : "font-normal"
-                  )}>
+                  <span
+                    className={cn(
+                      "text-xs mt-1",
+                      isActive ? "font-medium" : "font-normal"
+                    )}
+                  >
                     {item.label}
                   </span>
                   {isActive && (

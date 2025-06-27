@@ -66,7 +66,7 @@ export const addProductFormElements = [
     name: "brand",
     componentType: "select",
     options: [],
-    placeholder: "Marka Seçin (Opsiyonel)", // Opsiyonel ise placeholder'ı güncelle
+    placeholder: "Marka Seçin (Opsiyonel)",
     required: false,
   },
   {
@@ -205,13 +205,14 @@ export const userInfoFormControls = [
     label: "E-posta",
     componentType: "input",
     type: "email",
+    disabled: true,
   },
   {
-    name: "phoneNumber", // state ve modeldeki alan adı ile eşleşmeli
+    name: "phoneNumber",
     label: "Telefon Numarası",
     componentType: "input",
-    type: "tel", // Telefon tipi
-    placeholder: "Telefon numaranız (varsa)", // Placeholder
+    type: "tel",
+    placeholder: "Telefon numaranız (varsa)",
     disabled: true,
   },
 ];

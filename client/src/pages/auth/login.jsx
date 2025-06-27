@@ -66,18 +66,20 @@ function AuthLogin() {
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {
-    let verifier = window.recaptchaVerifier;
-    if (step === "phone" && !verifier) {
+    if (step === "phone" && !window.recaptchaVerifier) {
       try {
-        console.log("Setting up reCAPTCHA...");
-        verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+        console.log("Setting up reCAPTCHA verifier...");
+
+        const verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
           size: "invisible",
-          callback: (response) => console.log("reCAPTCHA verified"),
+          callback: () => {
+            console.log("reCAPTCHA challenge passed.");
+          },
           "expired-callback": () => {
-            console.warn("reCAPTCHA expired.");
+            console.warn("reCAPTCHA expired. Please try again.");
             toast({
               variant: "warning",
-              title: "reCAPTCHA süresi doldu, tekrar deneyin.",
+              title: "Doğrulama süresi doldu, lütfen tekrar deneyin.",
             });
             if (window.recaptchaVerifier) {
               window.recaptchaVerifier.clear();
@@ -85,31 +87,27 @@ function AuthLogin() {
             }
           },
         });
-        verifier.render().catch((err) => {
-          console.error("reCAPTCHA render error:", err);
-          toast({ variant: "destructive", title: "reCAPTCHA yüklenemedi." });
-        });
+
+        verifier
+          .render()
+          .then((widgetId) => {
+            console.log("reCAPTCHA rendered. Widget ID:", widgetId);
+            window.recaptchaWidgetId = widgetId;
+          })
+          .catch((err) => {
+            console.error("reCAPTCHA render error:", err);
+            toast({ variant: "destructive", title: "reCAPTCHA yüklenemedi." });
+          });
         window.recaptchaVerifier = verifier;
       } catch (error) {
-        console.error("Error setting up reCAPTCHA:", error);
+        console.error("Error setting up RecaptchaVerifier:", error);
         toast({
           variant: "destructive",
           title: "Giriş sistemi başlatılamadı.",
+          description: "Lütfen sayfayı yenileyip tekrar deneyin.",
         });
       }
     }
-
-    return () => {
-      if (verifier && typeof verifier.clear === "function") {
-        try {
-          verifier.clear();
-          console.log("reCAPTCHA cleared.");
-          window.recaptchaVerifier = null;
-        } catch (e) {
-          console.warn("Could not clear reCAPTCHA:", e);
-        }
-      }
-    };
   }, [step, toast]);
 
   useEffect(() => {
@@ -155,16 +153,12 @@ function AuthLogin() {
         title: "SMS Gönderilemedi",
         description: error.message,
       });
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.clear(); // verifier'ı temizle
+        window.recaptchaVerifier = null; // Yeniden oluşturulması için null yap
+      }
       setResendDisabled(false);
       setResendTimer(0);
-
-      if (window.recaptchaVerifier && window.recaptchaWidgetId !== undefined) {
-        try {
-          grecaptcha.reset(window.recaptchaWidgetId);
-        } catch (e) {
-          console.error("Recaptcha reset failed", e);
-        }
-      }
     } finally {
       setOtpLoading(false);
       setLoading(false);
@@ -257,15 +251,9 @@ function AuthLogin() {
     }
   };
 
-  const handleResendOtp = () => {
-    if (window.recaptchaVerifier && window.recaptchaWidgetId !== undefined) {
-      try {
-        grecaptcha.reset(window.recaptchaWidgetId);
-      } catch (e) {
-        console.error("Recaptcha reset failed", e);
-      }
-    }
-    handleSendOtp({ preventDefault: () => {} });
+  const handleResendOtp = (event) => {
+    event.preventDefault();
+    handleSendOtp(event);
   };
 
   const handleEmailPasswordLogin = (event) => {
@@ -436,7 +424,7 @@ function AuthLogin() {
             <Input
               id="otp"
               type="text"
-              inputMode="numeric" // Mobil klavyeyi rakamlara ayarlar
+              inputMode="numeric"
               maxLength={6}
               value={otp}
               onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ""))}

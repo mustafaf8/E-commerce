@@ -9,7 +9,6 @@ import {
   DialogClose,
   DialogDescription,
 } from "../ui/dialog";
-import { Separator } from "../ui/separator";
 import { Badge } from "../ui/badge";
 import PropTypes from "prop-types";
 import StarRatingComponent from "../common/star-rating";
@@ -17,7 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useSelector } from "react-redux";
-import { Calendar, DollarSign, Package, ShoppingCart, Tag } from "lucide-react";
+import { Calendar, DollarSign, Package, Tag } from "lucide-react";
 
 function DetailItem({
   label,

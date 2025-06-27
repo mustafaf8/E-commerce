@@ -13,7 +13,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input"; // Arama çubuğu için
+import { Input } from "../ui/input";
 import { useDispatch, useSelector } from "react-redux";
 import {
   DropdownMenu,
@@ -37,7 +37,7 @@ import OrderTrackingModal from "./OrderTrackingModal";
 function CategorySubMenu() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams();
   const dispatch = useDispatch();
 
   const { categoryList = [], isLoading: categoriesLoading } = useSelector(
@@ -82,7 +82,7 @@ function CategorySubMenu() {
   }
 
   if (!activeCategories.length) {
-    return <div className="h-10 border-t"></div>; // Kategori yoksa boş bir satır (tasarıma göre ayarlanabilir)
+    return <div className="h-10 border-t"></div>;
   }
 
   return (
@@ -122,17 +122,6 @@ function MainHeaderActions() {
       });
   }
 
-  useEffect(() => {
-    if (isAuthenticated && user?.id) {
-      // console.log("Header: Authenticated, fetching cart for user:", user.id);
-      // dispatch(fetchCartItems(user.id)); // Giriş yapmış kullanıcı için
-    } else if (!isAuthenticated) {
-      // console.log("Header: Guest, fetching/initializing cart from localStorage");
-      // dispatch(fetchCartItems()); // Misafir kullanıcı için (userId olmadan)
-    }
-  }, [dispatch, user?.id, isAuthenticated]); // cartItems?.items?.length bağımlılığını kaldırdım, gereksiz döngüye neden olabilir.
-  // isAuthenticated ve user?.id yeterli olmalı.
-  // ...
   const uniqueProductCount = cartItems?.items
     ? new Set(cartItems.items.map((item) => item.productId)).size
     : 0;
@@ -285,7 +274,7 @@ function TopStrip() {
 function ShoppingHeader() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     const keywordFromUrl = searchParams.get("keyword");

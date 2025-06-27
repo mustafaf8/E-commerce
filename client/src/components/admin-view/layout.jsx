@@ -13,7 +13,18 @@ function AdminLayout() {
         <div className="h-full py-6 px-4">
           <div className="flex items-center gap-2 px-2 mb-8">
             <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-white"
+              >
                 <path d="M3 3v18h18"></path>
                 <path d="M7 12v5"></path>
                 <path d="M11 8v9"></path>
@@ -30,8 +41,6 @@ function AdminLayout() {
         </div>
       </div>
 
-      {/* Mobile/Tablet sidebar is rendered via Sheet component in AdminSideBar */}
-      
       {/* Main Content */}
       <div className="flex flex-1 flex-col min-w-0">
         <AdminHeader setOpen={setOpenSidebar} />

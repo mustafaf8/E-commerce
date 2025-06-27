@@ -138,66 +138,28 @@ function CategoryManager() {
     setIsConfirmModalOpen(true);
   };
 
-  // confirmDelete fonksiyonu güncellendi
   const confirmDelete = () => {
-    if (categoryToDelete) {
-      dispatch(deleteCategory(categoryToDelete._id))
-        .unwrap()
-        .then((payload) => {
-          if (payload.success) {
-            toast({ variant: "success", title: "Kategori silindi." });
-            // Kategori listesini güncellemek için fetchAllCategories çağrılabilir
-            // dispatch(fetchAllCategories()); // Eğer deleteCategory thunk'ı state'i otomatik güncellemiyorsa
-          } else {
-            // Eğer backend'den isUsedError: true gelirse, bu kategori kullanılıyor demektir.
-            if (payload.isUsedError) {
-              //
-              toast({
-                //
-                variant: "warning", // "destructive" yerine "warning" veya "info" olabilir
-                title: "Kategori Kullanımda",
-                description: payload.message, // Backend'den gelen mesajı göster
-              });
-            } else {
-              toast({
-                //
-                variant: "destructive",
-                title: payload.message || "Kategori silinemedi.",
-              });
-            }
-          }
-        })
-        .catch((err) => {
-          // Hata yakalama .catch() bloğu içine taşındı
-          // API isteği tamamen başarısız olursa (network hatası vb.) veya unwrap reject ederse
-          // err objesi rejectWithValue ile dönen payload'ı içerebilir (err.payload)
-          // veya standart bir Error objesi olabilir (err.message)
-          const errorMessage =
-            err?.payload?.message || err?.message || "Bir hata oluştu.";
-          const isUsedError = err?.payload?.isUsedError;
+    if (!categoryToDelete) return;
 
-          if (isUsedError) {
-            //
-            toast({
-              //
-              variant: "warning",
-              title: "Kategori Kullanımda",
-              description: errorMessage,
-            });
-          } else {
-            toast({
-              //
-              variant: "destructive",
-              title: "Kategori Silinemedi",
-              description: errorMessage,
-            });
-          }
-        })
-        .finally(() => {
-          setCategoryToDelete(null);
-          setIsConfirmModalOpen(false);
+    dispatch(deleteCategory(categoryToDelete._id))
+      .unwrap()
+      .then(() => {
+        toast({ variant: "success", title: "Kategori silindi." });
+      })
+      .catch((error) => {
+        const isUsedError = error?.isUsedError;
+        const errorMessage = error?.message || "Bir hata oluştu.";
+
+        toast({
+          variant: isUsedError ? "warning" : "destructive",
+          title: isUsedError ? "Kategori Kullanımda" : "Silme Başarısız",
+          description: errorMessage,
         });
-    }
+      })
+      .finally(() => {
+        setCategoryToDelete(null);
+        setIsConfirmModalOpen(false);
+      });
   };
 
   return (

@@ -169,6 +169,7 @@ function ShoppingListing() {
         .catch((error) => {
           toast({
             title: "Sepete ekleme sırasında bir hata oluştu",
+            description: error.message || "Lütfen daha sonra tekrar deneyin.",
             variant: "destructive",
           });
         });
@@ -268,7 +269,6 @@ function ShoppingListing() {
     [categoryList, brandList]
   );
 
-  const isLoading = productsLoading || categoriesLoading || brandsLoading;
   const skeletonCount = 8;
 
   return (

@@ -31,10 +31,9 @@ const Countdown = ({ targetDate }) => {
   const timerComponents = [];
   Object.keys(timeLeft).forEach((interval) => {
     if (!timeLeft[interval] && interval !== "saniye" && interval !== "dakika") {
-      // saniye ve dakika hep görünsün
       return;
     }
-    if (timeLeft[interval] < 0) return; // Negatifse gösterme
+    if (timeLeft[interval] < 0) return;
     timerComponents.push(
       <div key={interval} className="text-center">
         <span className="text-4xl md:text-6xl font-bold">

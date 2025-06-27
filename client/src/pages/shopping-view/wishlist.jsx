@@ -1,13 +1,12 @@
-// client/src/pages/shopping-view/wishlist.jsx
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchWishlist } from "@/store/shop/wishlist-slice";
-import { fetchAllFilteredProducts } from "@/store/shop/products-slice"; // Tüm ürünleri alıp filtrelemek için VEYA backend'den direkt favori ürün detaylarını alın
-import ShoppingProductTile from "@/components/shopping-view/product-tile"; // Ürün kartını tekrar kullan
+import { fetchAllFilteredProducts } from "@/store/shop/products-slice";
+import ShoppingProductTile from "@/components/shopping-view/product-tile";
 import { fetchProductDetails } from "@/store/shop/products-slice";
 import ProductDetailsDialog from "@/components/shopping-view/product-details";
-import { Skeleton } from "@/components/ui/skeleton"; // Skeleton ekle
-import { HeartOff } from "lucide-react"; // Boş liste ikonu
+import { Skeleton } from "@/components/ui/skeleton";
+import { HeartOff } from "lucide-react";
 
 function ShoppingWishlist() {
   const dispatch = useDispatch();
@@ -17,14 +16,12 @@ function ShoppingWishlist() {
     isLoading: wishlistLoading,
     error: wishlistError,
   } = useSelector((state) => state.shopWishlist);
-  // Tüm ürünleri alıp favori ID'lerine göre filtreleme yöntemi:
   const { productList, isLoading: productsLoading } = useSelector(
     (state) => state.shopProducts
   );
   const { productDetails } = useSelector((state) => state.shopProducts);
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 
-  // Ürün Detayları için
   const handleGetProductDetails = (getCurrentProductId) => {
     dispatch(fetchProductDetails(getCurrentProductId));
   };
@@ -51,7 +48,6 @@ function ShoppingWishlist() {
       <h1 className="text-xl font-bold mb-6 border-b pb-3">Favorilerim</h1>
 
       {isLoading ? (
-        // Yükleniyor durumu için Skeleton gösterimi
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {Array.from({ length: 4 }).map((_, index) => (
             <div key={index} className="w-full max-w-sm mx-auto space-y-3">
@@ -72,15 +68,13 @@ function ShoppingWishlist() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 max-[800px]:gap-2">
           {favoriteProducts.map((productItem) => (
             <ShoppingProductTile
-              key={productItem._id} // key eklendi
+              key={productItem._id}
               product={productItem}
               handleGetProductDetails={handleGetProductDetails}
-              // handleAddtoCart prop'u bu sayfada gereksiz olabilir
             />
           ))}
         </div>
       ) : (
-        // Favori ürün yoksa mesaj göster
         <div className="flex flex-col items-center justify-center text-center py-16 text-gray-500">
           <HeartOff className="w-16 h-16 mb-4" />
           <p className="text-lg">Favori listeniz henüz boş.</p>

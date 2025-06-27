@@ -14,16 +14,14 @@ import NoSearchResults from "./NoSearchResults";
 import ProductTileSkeleton from "@/components/shopping-view/product-tile-skeleton.jsx";
 
 function SearchProducts() {
-  const [keyword, setKeyword] = useState("");
+  const [, setKeyword] = useState("");
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const { searchResults, isLoading: searchLoading } = useSelector(
     (state) => state.shopSearch
   );
-  const { productDetails, isLoading: detailsLoading } = useSelector(
-    (state) => state.shopProducts
-  );
+  const { productDetails } = useSelector((state) => state.shopProducts);
   const { user } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.shopCart);
   const { toast } = useToast();

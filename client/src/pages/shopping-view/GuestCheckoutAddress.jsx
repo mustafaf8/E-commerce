@@ -35,11 +35,9 @@ function GuestCheckoutAddress() {
     guestCartId: null,
   });
   const { isAuthenticated } = useSelector((state) => state.auth);
-  const {
-    isLoading: orderIsLoading,
-    error: orderError,
-    paymentPageUrl,
-  } = useSelector((state) => state.shopOrder);
+  const { isLoading: orderIsLoading, paymentPageUrl } = useSelector(
+    (state) => state.shopOrder
+  );
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { toast } = useToast();

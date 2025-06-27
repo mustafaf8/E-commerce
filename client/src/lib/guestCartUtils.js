@@ -1,10 +1,6 @@
-// client/src/lib/guestCartUtils.js
-
-const GUEST_CART_KEY = "guestCartData"; // Anahtar adını değiştirdim, daha genel
+const GUEST_CART_KEY = "guestCartData";
 
 /**
- * Misafir sepetini localStorage'dan alır.
- * Eğer sepet yoksa veya geçersizse, boş bir sepet yapısı döndürür.
  * @returns {object} Misafir sepeti { items: [], guestCartId: string }
  */
 export const getGuestCart = () => {
@@ -12,12 +8,10 @@ export const getGuestCart = () => {
     const cartJson = localStorage.getItem(GUEST_CART_KEY);
     if (cartJson) {
       const parsedCart = JSON.parse(cartJson);
-      // Temel doğrulama: items alanı bir dizi mi?
       if (Array.isArray(parsedCart.items)) {
         return parsedCart;
       }
     }
-    // Geçerli sepet yoksa yeni bir tane oluştur
     return {
       items: [],
       guestCartId: `guest_${Date.now()}_${Math.random()
@@ -81,7 +75,6 @@ export const addProductToGuestCart = (productId, quantity, productDetails) => {
     cart.items.push({
       productId,
       quantity,
-      // Misafir sepetinde de fiyat gibi temel bilgileri tutmak, toplamı hesaplarken kolaylık sağlar
       price: productDetails.price,
       salePrice: productDetails.salePrice,
       title: productDetails.title,
@@ -106,7 +99,6 @@ export const updateGuestCartItemQuantity = (productId, newQuantity) => {
 
   if (itemIndex > -1) {
     if (newQuantity <= 0) {
-      // Miktar 0 veya daha az ise ürünü sil
       cart.items.splice(itemIndex, 1);
     } else {
       cart.items[itemIndex].quantity = newQuantity;

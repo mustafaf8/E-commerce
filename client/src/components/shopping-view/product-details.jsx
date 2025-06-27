@@ -1,4 +1,4 @@
-import { Heart, Loader2 } from "lucide-react";
+import { Heart } from "lucide-react";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
@@ -13,30 +13,13 @@ import StarRatingComponent from "../common/star-rating";
 import { useEffect, useState } from "react";
 import { addReview, getReviews } from "@/store/shop/review-slice";
 import { addToWishlist, removeFromWishlist } from "@/store/shop/wishlist-slice";
-import { Skeleton } from "../ui/skeleton"; // Skeleton eklendi
 import PropTypes from "prop-types";
-
-const ProductDetailsSkeleton = () => (
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 p-6 sm:p-8 lg:p-10">
-    <Skeleton className="rounded-lg w-full h-80" />
-    <div className="space-y-4">
-      <Skeleton className="h-8 w-3/4" />
-      <Skeleton className="h-20 w-full" />
-      <Skeleton className="h-6 w-1/2" />
-      <Skeleton className="h-6 w-1/3" />
-      <Skeleton className="h-12 w-full" />
-    </div>
-  </div>
-);
 
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const [reviewMsg, setReviewMsg] = useState("");
   const [rating, setRating] = useState(0);
   const dispatch = useDispatch();
   const { user, isAuthenticated } = useSelector((state) => state.auth);
-  const { isDetailsLoading, error } = useSelector(
-    (state) => state.shopProducts
-  );
   const navigate = useNavigate();
   const location = useLocation();
   const { cartItems } = useSelector((state) => state.shopCart);
@@ -103,19 +86,17 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
       addToCart({
         productId: getCurrentProductId,
         quantity: 1,
-        productDetails: productDetailsForCart, // Hem misafir hem de giriş yapmış kullanıcı için gönderilebilir, thunk içinden yönetilir.
+        productDetails: productDetailsForCart,
       })
     )
-      .unwrap() // unwrap() ile Redux Thunk'ın sonucunu (resolved veya rejected) yakala
+      .unwrap()
       .then((payload) => {
         if (payload?.success) {
           toast({
             title: "Ürün sepete eklendi",
             variant: "success",
           });
-          // fetchCartItems çağrısına gerek yok, addToCart thunk'ı state'i güncelliyor.
         } else {
-          // Stok hatası gibi özel durumlar için thunk'tan dönen mesajı kullan
           toast({
             variant: "destructive",
             title: payload?.message || "Sepete eklenemedi",
@@ -126,7 +107,6 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
         }
       })
       .catch((error) => {
-        // unwrap ile reject edilen durumlar buraya düşer
         toast({
           variant: "destructive",
           title: error?.message || "Sepete ekleme sırasında bir hata oluştu.",

@@ -109,7 +109,6 @@ function HomeSectionsManager() {
     setCurrentSection((prev) => ({
       ...prev,
       [name]: value,
-      // Eğer içerik türü değişiyorsa, contentValue'yu sıfırla
       ...(name === "contentType" && { contentValue: "" }),
     }));
   };
@@ -240,25 +239,17 @@ function HomeSectionsManager() {
 
     setSortedSections(updatedSectionsWithOrder);
 
-    // Send updates to backend
-    // Backend'e sadece ID dizisini gönderiyoruz.
-    const orderedIds = updatedSectionsWithOrder.map((s) => s._id); // Sadece ID'leri al
-    dispatch(updateHomeSectionsOrder(orderedIds)) // Thunk'a doğrudan ID dizisini gönder
+    const orderedIds = updatedSectionsWithOrder.map((s) => s._id);
+    dispatch(updateHomeSectionsOrder(orderedIds))
       .unwrap()
       .then((payload) => {
         if (payload.success) {
-          // Backend'den güncellenmiş tam listeyi alıp state'i set etmeyi tercih edebiliriz
-          // veya sadece fetchAllHomeSections() ile yeniden çekebiliriz.
-          // Şimdilik, backend'den dönen veriye göre (eğer sıralı geliyorsa) veya
-          // fetchAllHomeSections ile listeyi yenileyebiliriz.
-          // En güvenlisi fetchAllHomeSections ile yenilemek.
           dispatch(fetchAllHomeSections());
         } else {
           toast({
             variant: "destructive",
             title: payload.message || "Sıralama güncellenemedi.",
           });
-          // Hata durumunda eski sıralamaya geri dönmek isteyebilirsiniz:
           setSortedSections(
             [...homeSections].sort((a, b) => a.displayOrder - b.displayOrder)
           );
@@ -270,7 +261,6 @@ function HomeSectionsManager() {
           variant: "destructive",
           title: err.message || "Sıralama güncellenirken bir hata oluştu.",
         });
-        // Hata durumunda eski sıralamaya geri dön
         setSortedSections(
           [...homeSections].sort((a, b) => a.displayOrder - b.displayOrder)
         );

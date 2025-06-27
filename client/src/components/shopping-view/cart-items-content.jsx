@@ -26,14 +26,8 @@ function UserCartItemsContent({ cartItem, readOnly = false }) {
       .unwrap()
       .then((payload) => {
         if (payload?.success) {
-          // Başarılı olunca toast göstermeye gerek yok, UI zaten güncellenecek.
-          // İsterseniz yine de bir "Sepet güncellendi" mesajı gösterebilirsiniz.
           // toast({ title: "Sepet güncellendi", variant: "success" });
         }
-        // Thunk içinden success:false ile dönen durumlar (rejectWithValue kullanılmadıysa)
-        // else if (!payload?.success && payload?.message) {
-        //   toast({ variant: "destructive", title: payload.message });
-        // }
       })
       .catch((errorPayload) => {
         if (errorPayload && errorPayload.isStockError) {
@@ -66,9 +60,6 @@ function UserCartItemsContent({ cartItem, readOnly = false }) {
             variant: "success",
           });
         }
-        // else if (!payload?.success && payload?.message) {
-        //   toast({ variant: "destructive", title: payload.message });
-        // }
       })
       .catch((errorPayload) => {
         toast({
@@ -109,7 +100,6 @@ function UserCartItemsContent({ cartItem, readOnly = false }) {
               variant="outline"
               className="h-7 w-7 md:h-8 md:w-8 rounded-full p-0"
               size="icon"
-              // disabled={cartItem.totalStock !== undefined && cartItem.quantity >= cartItem.totalStock}
               onClick={() => handleUpdateQuantity(cartItem, "plus")}
             >
               <Plus className="w-3 h-3 md:w-4 md:h-4" />

@@ -56,7 +56,6 @@ function ShoppingOrders() {
     }
   }, [dispatch, user?.id]);
 
-  // Format order date helper function
   const formatOrderDate = (dateString) => {
     if (!dateString) return "N/A";
     try {

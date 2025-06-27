@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ShieldCheck, Info } from "lucide-react"; // Info ikonu eklendi
+import { Info } from "lucide-react"; // Info ikonu eklendi
 
 const COOKIE_CONSENT_KEY = "cookie_consent_status";
 
@@ -10,9 +10,7 @@ function CookieConsentBanner() {
 
   useEffect(() => {
     const consentStatus = localStorage.getItem(COOKIE_CONSENT_KEY);
-    // Eğer daha önce bir tercih yapılmamışsa veya durum "pending" (varsayılan) ise banner'ı göster
     if (!consentStatus) {
-      // Banner'ı küçük bir gecikmeyle göstererek sayfa yüklemesinin önüne geçmeyelim
       const timer = setTimeout(() => {
         setIsVisible(true);
       }, 1500); // 1.5 saniye sonra
@@ -52,7 +50,7 @@ function CookieConsentBanner() {
 
   return (
     <div
-      aria-hidden={!isVisible} // Erişilebilirlik için
+      aria-hidden={!isVisible}
       className={`fixed bottom-0 left-0 right-0 w-full bg-background border-t border-border shadow-xl p-3 md:p-4 z-[60] transition-all duration-500 ease-in-out transform ${
         isVisible
           ? "translate-y-0 opacity-100"

@@ -1,17 +1,17 @@
 import { useSelector } from "react-redux";
 import { Badge } from "../ui/badge";
 import PropTypes from "prop-types";
-import { Separator } from "../ui/separator"; // Separator shadcn/ui'den import ediliyor
+import { Separator } from "../ui/separator";
 import { format, parseISO, isValid } from "date-fns";
 import { orderStatusMappingUser } from "@/config";
-import { Card } from "../ui/card"; // Card componentini import ediyoruz
-import { Package, MapPin, User, ShoppingCart } from "lucide-react"; // İkonları import ediyoruz
+import { Card } from "../ui/card";
+import { Package, MapPin, User, ShoppingCart } from "lucide-react";
 
 function ShoppingOrderDetailsView({ orderDetails }) {
-  const { user, isAuthenticated } = useSelector((state) => state.auth); // isAuthenticated eklendi
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
 
   if (!orderDetails) {
-    return <div>Sipariş detayı bulunamadı.</div>; // Veya bir yükleniyor göstergesi
+    return <div>Sipariş detayı bulunamadı.</div>;
   }
 
   let formattedDate = "N/A";
@@ -31,7 +31,6 @@ function ShoppingOrderDetailsView({ orderDetails }) {
   const statusInfo =
     orderStatusMappingUser[currentStatusKey] || orderStatusMappingUser.default;
 
-  // Alıcı bilgilerini belirle
   const recipientName = isGuest
     ? orderDetails.guestInfo?.fullName ||
       orderDetails.addressInfo?.fullName ||
@@ -210,9 +209,8 @@ ShoppingOrderDetailsView.propTypes = {
     paymentMethod: PropTypes.string,
     paymentStatus: PropTypes.string,
     orderStatus: PropTypes.string,
-    isGuestOrder: PropTypes.bool, // Eklendi
+    isGuestOrder: PropTypes.bool,
     guestInfo: PropTypes.shape({
-      // Eklendi
       fullName: PropTypes.string,
       email: PropTypes.string,
     }),
@@ -221,7 +219,7 @@ ShoppingOrderDetailsView.propTypes = {
         productId: PropTypes.string,
         title: PropTypes.string,
         quantity: PropTypes.number,
-        price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), // price string veya number olabilir
+        price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
       })
     ),
     addressInfo: PropTypes.shape({

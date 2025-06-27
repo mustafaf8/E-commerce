@@ -1,7 +1,4 @@
-import {
-  useState,
-  useEffect /* useEffect'ü import etmeyi unutmayın */,
-} from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Dialog,
@@ -24,14 +21,12 @@ import {
   Truck,
   PackageX,
 } from "lucide-react";
-import axios from "axios";
 import PropTypes from "prop-types";
 import { format, parseISO, isValid } from "date-fns";
-import { orderStatusMappingUser } from "@/config"; // Merkezi mapping objesini import ediyoruz
-import React from "react"; // React.cloneElement için
+import { orderStatusMappingUser } from "@/config";
+import React from "react";
 import api from "@/api/axiosInstance";
 
-// İkonları durumlarla eşleştirmek için bir yardımcı obje
 const statusIcons = {
   pending_payment: <AlertCircle className="w-5 h-5 mr-2" />,
   pending: <AlertCircle className="w-5 h-5 mr-2" />,
@@ -41,7 +36,7 @@ const statusIcons = {
   delivered: <PackageCheck className="w-5 h-5 mr-2" />,
   cancelled: <PackageX className="w-5 h-5 mr-2" />,
   failed: <PackageX className="w-5 h-5 mr-2" />,
-  rejected: <PackageX className="w-5 h-5 mr-2" />, // Eğer varsa
+  rejected: <PackageX className="w-5 h-5 mr-2" />,
   default: <AlertCircle className="w-5 h-5 mr-2" />,
 };
 
@@ -52,7 +47,6 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
   const [searchResult, setSearchResult] = useState(null);
   const [searchError, setSearchError] = useState("");
 
-  // handleTrackOrder ve handleLoginRedirect fonksiyonları olduğu gibi kalabilir.
   const handleTrackOrder = async (e) => {
     e.preventDefault();
     if (!orderIdInput.trim()) {
@@ -69,18 +63,17 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
         `/shop/order/track/${orderIdInput.trim()}`
       );
       if (response.data.success && response.data.data) {
-        // response.data.data null kontrolü eklendi
         setSearchResult(response.data.data);
       } else {
         setSearchError(response.data.message || "Sipariş bulunamadı.");
-        setSearchResult(null); // Sonucu null olarak ayarla
+        setSearchResult(null);
       }
     } catch (error) {
       setSearchError(
         error.response?.data?.message ||
           "Sipariş sorgulanırken bir hata oluştu."
       );
-      setSearchResult(null); // Hata durumunda sonucu null olarak ayarla
+      setSearchResult(null);
       console.error("Sipariş sorgulama hatası:", error);
     } finally {
       setIsLoading(false);
@@ -97,7 +90,6 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
     return format(parseISO(dateString), "dd.MM.yyyy HH:mm");
   };
 
-  // Dialog kapandığında state'leri sıfırla
   useEffect(() => {
     if (!isOpen) {
       setOrderIdInput("");
@@ -156,7 +148,6 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
               </p>
               {/* Durum gösterimi standardize edildi */}
               {(() => {
-                // searchResult.orderStatus var mı diye kontrol et
                 const statusKey = searchResult.orderStatus;
                 const statusInfo =
                   (statusKey && orderStatusMappingUser[statusKey]) ||

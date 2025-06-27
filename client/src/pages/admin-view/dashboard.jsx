@@ -18,7 +18,7 @@ import {
   deleteSideBanner,
   fetchSideBanners,
 } from "@/store/common-slice/side-banner-slice";
-import { Trash } from "lucide-react"; // Silme ikonu
+import { Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ConfirmationModal from "@/components/admin-view/ConfirmationModal";
@@ -30,11 +30,7 @@ function AdminDashboard() {
     useState(false);
   const [featureImageTitle, setFeatureImageTitle] = useState("");
   const [featureImageLink, setFeatureImageLink] = useState("");
-  const {
-    featureImageList,
-    isLoading: featureListLoading,
-    error: featureListError,
-  } = useSelector(
+  const { featureImageList } = useSelector(
     (state) =>
       state.commonFeature || {
         featureImageList: [],
@@ -85,10 +81,7 @@ function AdminDashboard() {
     const data = new FormData();
     data.append("my_file", file);
     try {
-      const response = await api.post(
-        "/admin/products/upload-image", // <--- DÜZELTİLMİŞ HALİ
-        data
-      );
+      const response = await api.post("/admin/products/upload-image", data);
       if (response?.data?.success) {
         console.log(
           "--- [uploadImage] Başarılı. Dönen URL:",
@@ -201,10 +194,6 @@ function AdminDashboard() {
       };
       dispatch(addPromoCard(promoData))
         .then((data) => {
-          console.log(
-            "--- [handleUploadPromoCard] addPromoCard dispatch sonucu:",
-            data.payload
-          );
           if (data?.payload?.success) {
             setPromoCardImageFile(null);
             setPromoCardTitle("");
@@ -319,22 +308,6 @@ function AdminDashboard() {
     dispatch(fetchPromoCards());
     dispatch(fetchSideBanners());
   }, [dispatch]);
-
-  // console.log("--- RENDER ÖNCESİ STATE'LER ---", {
-  //   featureImageFile: featureImageFile?.name, // Sadece dosya adını logla
-  //   featureImageLoadingState,
-  //   featureImageTitle,
-  //   featureImageLink,
-  //   promoCardImageFile: promoCardImageFile?.name, // Sadece dosya adını logla
-  //   promoCardImageLoadingState,
-  //   promoCardTitle,
-  //   promoCardLink,
-  //   sideBannerImageFile: sideBannerImageFile?.name, // Sadece dosya adını logla
-  //   sideBannerImageLoadingState,
-  //   uploadedSideBannerImageUrl, // Yüklenen URL'yi de ekleyelim
-  //   sideBannerTitle,
-  //   sideBannerLink,
-  // });
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       <div className="border p-6 rounded-lg shadow-sm bg-white">

@@ -69,7 +69,7 @@ function AdminStatsPage() {
     if (!productList || productList.length === 0) {
       dispatch(fetchAllProducts());
     }
-  }, [dispatch, productList?.length]);
+  }, [dispatch, productList]);
 
   useEffect(() => {
     // Fetch stats whenever period changes
@@ -90,7 +90,6 @@ function AdminStatsPage() {
     dispatch(fetchProfitByBrand());
   }, [dispatch, period]);
 
-  // Durum -> {label, color} tam eşleşme tablosu (sabit renk için)
   const STATUS_INFO = {
     inShipping: {
       label: "Kargoda",

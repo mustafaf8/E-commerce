@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import StarRatingComponent from "../common/star-rating";
-import { Heart, Loader2 } from "lucide-react";
+import { Heart } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToWishlist, removeFromWishlist } from "@/store/shop/wishlist-slice";
 import { addToCart } from "@/store/shop/cart-slice";

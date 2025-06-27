@@ -18,7 +18,6 @@ import {
   editProduct,
   fetchAllProducts,
 } from "@/store/admin/products-slice";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import AdminProductCarousel from "@/components/admin-view/AdminProductCarousel";
 import AdminProductDetailsDialog from "@/components/admin-view/AdminProductDetailsDialog";
@@ -60,9 +59,7 @@ function AdminProducts() {
   const { categoryList = [], isLoading: categoriesLoading } = useSelector(
     (state) => state.categories || { categoryList: [], isLoading: false }
   );
-  const { brandList = [], isLoading: brandsLoading } = useSelector(
-    (state) => state.brands || {}
-  );
+  const { brandList = [] } = useSelector((state) => state.brands || {});
   const [dynamicFormControls, setDynamicFormControls] =
     useState(initialFormElements);
 
@@ -173,7 +170,6 @@ function AdminProducts() {
             variant: "warning",
             title: "İndirimli fiyat, normal fiyattan düşük olmalıdır.",
           });
-          // return; // İsteğe bağlı: İşlemi durdurabilir veya sadece uyarabiliriz
         }
 
         const dataToSend = {
@@ -308,7 +304,6 @@ function AdminProducts() {
       })
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [groupedProducts, categoryList]);
-  const categories = Object.keys(groupedProducts).sort();
 
   const handleEditClick = useCallback((product = null) => {
     if (product && product._id) {

@@ -14,11 +14,8 @@ function UserInfo() {
   const [formData, setFormData] = useState({
     userName: "",
     email: "",
-    phoneNumber: "", // Başlangıçta boş
+    phoneNumber: "",
   });
-
-  const [isEmailEditable, setIsEmailEditable] = useState(false);
-  const [isPhoneEditable, setIsPhoneEditable] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -32,46 +29,14 @@ function UserInfo() {
 
   function handleUpdateUserInfo(event) {
     event.preventDefault();
-    const dataToSend = {};
-    let hasChanges = false;
-    if (formData.userName !== (user?.userName || "")) {
-      dataToSend.userName = formData.userName;
-      hasChanges = true;
-    } else {
-      dataToSend.userName = formData.userName;
-    }
-    if (
-      isEmailEditable &&
-      formData.email &&
-      formData.email !== (user?.email || "")
-    ) {
-      if (!/\S+@\S+\.\S+/.test(formData.email)) {
-        toast({ variant: "destructive", title: "Geçersiz E-posta Formatı" });
-        return;
-      }
-      dataToSend.email = formData.email;
-      hasChanges = true;
-    }
-    if (
-      isPhoneEditable &&
-      formData.phoneNumber &&
-      formData.phoneNumber !== (user?.phoneNumber || "")
-    ) {
-      if (!/^\+?[1-9]\d{1,14}$/.test(formData.phoneNumber)) {
-        toast({
-          variant: "destructive",
-          title: "Geçersiz Telefon Numarası Formatı",
-        });
-        return;
-      }
-      dataToSend.phoneNumber = formData.phoneNumber;
-      hasChanges = true;
-    }
-    if (!hasChanges) {
+
+    if (formData.phoneNumber === (user?.phoneNumber || "")) {
       toast({ title: "Değişiklik yapılmadı.", variant: "info" });
       return;
     }
-    console.log("Gönderilecek veri:", dataToSend);
+
+    const dataToSend = { phoneNumber: formData.phoneNumber };
+
     dispatch(updateUserDetails(dataToSend))
       .unwrap()
       .then((result) => {
@@ -92,17 +57,6 @@ function UserInfo() {
         });
       });
   }
-  const dynamicallyDisabledFormControls = userInfoFormControls.map(
-    (control) => {
-      if (control.name === "email" && !isEmailEditable) {
-        return { ...control, disabled: true };
-      }
-      if (control.name === "phoneNumber" && !isPhoneEditable) {
-        return { ...control, disabled: true };
-      }
-      return control;
-    }
-  );
 
   if (isLoading && !user) {
     return (
@@ -120,7 +74,7 @@ function UserInfo() {
     <div className="p-6 sm:p-10 max-[1024px]:p-4">
       <h2 className="text-xl font-semibold mb-6">Kullanıcı Bilgileri</h2>{" "}
       <CommonForm
-        formControls={dynamicallyDisabledFormControls}
+        formControls={userInfoFormControls}
         formData={formData}
         setFormData={setFormData}
         onSubmit={handleUpdateUserInfo}

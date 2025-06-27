@@ -159,7 +159,7 @@ function Address({ setCurrentSelectedAddress, seciliAdresProp }) {
         {addressList && addressList.length > 0
           ? addressList.map((singleAddressItem) => (
               <AddressCard
-                key={singleAddressItem._id} // Add a unique key prop
+                key={singleAddressItem._id}
                 selectedId={seciliAdresProp}
                 handleDeleteAddress={handleDeleteAddress}
                 addressInfo={singleAddressItem}
