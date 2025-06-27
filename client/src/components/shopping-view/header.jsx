@@ -113,7 +113,7 @@ function MainHeaderActions() {
     dispatch(logoutUser())
       .unwrap()
       .then(() => {
-        navigate("/auth/login");
+        navigate("/shop/home");
         toast({ title: "Çıkış yapıldı", variant: "success" });
       })
       .catch((error) => {
@@ -281,10 +281,9 @@ function ShoppingHeader() {
     if (keywordFromUrl) {
       setSearchTerm(keywordFromUrl);
     } else {
-      // Eğer URL'de 'keyword' yoksa, arama kutusunu temizle.
       setSearchTerm("");
     }
-  }, [searchParams]); // Bu kanca URL'deki her değişiklikte çalışır.
+  }, [searchParams]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();

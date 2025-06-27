@@ -33,7 +33,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const handleWishlistToggle = () => {
     if (!isAuthenticated) {
       toast({ variant: "destructive", title: "Lütfen önce giriş yapın." });
-      navigate("/auth/login", { state: { from: location } });
+      navigate("/shop/home", { state: { from: location } });
       return;
     }
     if (isWishlisted) {
@@ -163,7 +163,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
         description: "Ürüne yorum yapmak için giriş yapmanız gerekmektedir.",
         variant: "destructive",
       });
-      navigate("/auth/login", { state: { from: location } });
+      navigate("/shop/home", { state: { from: location } });
       return;
     }
     try {

@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { addressFormControls } from "@/config";
-import { getGuestCart } from "@/lib/guestCartUtils";
 import {
   createGuestOrderThunk,
   resetPaymentPageUrl,
@@ -30,14 +29,12 @@ const initialAddressFormData = {
 
 function GuestCheckoutAddress() {
   const [formData, setFormData] = useState(initialAddressFormData);
-  const [cartForCheckout, setCartForCheckout] = useState({
-    items: [],
-    guestCartId: null,
-  });
   const { isAuthenticated } = useSelector((state) => state.auth);
   const { isLoading: orderIsLoading, paymentPageUrl } = useSelector(
     (state) => state.shopOrder
   );
+  const { cartItems: cartForCheckout } = useSelector((state) => state.shopCart);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -46,18 +43,19 @@ function GuestCheckoutAddress() {
     if (isAuthenticated) {
       navigate("/shop/checkout");
     }
-    const guestCart = getGuestCart();
-    if (!guestCart || guestCart.items.length === 0) {
+    if (
+      !cartForCheckout ||
+      !cartForCheckout.items ||
+      cartForCheckout.items.length === 0
+    ) {
       toast({
         title: "Sepetiniz Boş",
         description: "Ödeme yapmak için sepetinize ürün eklemelisiniz.",
         variant: "warning",
       });
       navigate("/shop/home");
-    } else {
-      setCartForCheckout(guestCart);
     }
-  }, [isAuthenticated, navigate, toast]);
+  }, [isAuthenticated, navigate, toast, cartForCheckout]);
 
   const isFormValid = () => {
     return (

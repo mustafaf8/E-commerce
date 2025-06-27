@@ -125,32 +125,57 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
+  // E-posta alanının boş olup olmadığını kontrol et
+  if (!email) {
+    return res
+      .status(400)
+      .json({ success: false, message: "E-posta alanı zorunludur." });
+  }
+
   try {
     const checkUser = await User.findOne({ email });
-    if (!checkUser)
+
+    // Kullanıcı bulunamazsa hata döndür
+    if (!checkUser) {
       return res.status(404).json({
         success: false,
-        message: "Kullanıcı mevcut değil! Lütfen önce kayıt olun.",
+        message: "Bu e-posta adresine sahip bir kullanıcı bulunamadı.",
       });
-    if (!checkUser.googleId && !checkUser.phoneNumber) {
+    }
+
+    // 1. Durum: Kullanıcının kayıtlı bir şifresi var (Normal e-posta/şifre kullanıcısı)
+    if (checkUser.password) {
+      // Şifre gönderilmemişse hata ver
       if (!password) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Şifre gereklidir." });
+        return res.status(400).json({
+          success: false,
+          message: "Şifre gereklidir.",
+        });
       }
+
+      // Şifreleri karşılaştır
       const checkPasswordMatch = await bcrypt.compare(
         password,
         checkUser.password
       );
-      if (!checkPasswordMatch)
+
+      // Şifre yanlışsa hata ver
+      if (!checkPasswordMatch) {
         return res.status(401).json({
           success: false,
-          message: "Şifre yanlış! Lütfen tekrar deneyin.",
+          message: "Girilen bilgiler eksik veya yanlış.",
         });
-    } else if (checkUser.phoneNumber && password) {
-      return res.status(400).json({
+      }
+    }
+    // 2. Durum: Kullanıcının kayıtlı bir şifresi YOK (Google/Telefon ile kayıt olmuş)
+    else {
+      let loginMethod = "Google"; // Varsayılan
+      if (checkUser.phoneNumber) {
+        loginMethod = "telefon numarası";
+      }
+      return res.status(401).json({
         success: false,
-        message: "Bu kullanıcı telefon ile kayıtlı, şifre ile giriş yapamaz.",
+        message: `Bu hesap şifre ile korunmuyor. Lütfen ${loginMethod} ile giriş yapmayı deneyin.`,
       });
     }
 
