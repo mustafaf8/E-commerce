@@ -92,7 +92,7 @@ const PORT = process.env.PORT || 5000;
 
 const allowedOrigins = [
   process.env.CLIENT_BASE_URL,
-  "https://rmrenerji.online",
+  "https://deposun.com",
   "http://localhost:5173",
 ];
 

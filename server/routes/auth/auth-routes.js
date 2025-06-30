@@ -19,7 +19,7 @@ const cookieOptions = {
   secure: isProduction,
   sameSite: isProduction ? "None" : "Lax",
   path: "/",
-  domain: isProduction ? ".rmrenerji.online" : undefined,
+  domain: isProduction ? ".deposun.com" : undefined,
 };
 
 router.post("/register", registerUser);

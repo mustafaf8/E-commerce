@@ -12,7 +12,7 @@ const cookieOptions = {
   secure: isProduction,
   sameSite: "Lax",
   path: "/",
-  domain: isProduction ? ".rmrenerji.online" : undefined,
+  domain: isProduction ? ".deposun.com" : undefined,
 };
 
 passport.use(
@@ -342,7 +342,7 @@ const updateUserDetails = async (req, res) => {
         httpOnly: true,
         secure: true,
         sameSite: "Lax",
-        domain: ".rmrenerji.online",
+        domain: ".deposun.com",
         path: "/",
       });
 
