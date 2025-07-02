@@ -1,49 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    <url>
-        <loc>https://Deposun.com/shop/home</loc>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    
+    <sitemap>
+        <loc>https://Deposun.com/shop/home-sitemap.xml</loc>
         <lastmod>2025-06-23</lastmod>
         <priority>1.0</priority>
-    </url>
-    <url>
-        <loc>https://Deposun.com/shop/listing</loc>
-        <lastmod>2025-06-23</lastmod>
-        <priority>0.9</priority>
-    </url>
-    <url>
-        <loc>https://Deposun.com/shop/hakkimizda</loc>
-        <lastmod>2025-06-23</lastmod>
-        <priority>0.7</priority>
-    </url>
-    <url>
-        <loc>https://Deposun.com/shop/ortaklarimiz</loc>
-        <lastmod>2025-06-23</lastmod>
-        <priority>0.6</priority>
-    </url>
-    <url>
-        <loc>https://Deposun.com/shop/kvkk</loc>
-        <lastmod>2025-06-23</lastmod>
-        <priority>0.5</priority>
-    </url>
-    <url>
-        <loc>https://Deposun.com/shop/bilgi-guvenligi</loc>
-        <lastmod>2025-06-23</lastmod>
-        <priority>0.5</priority>
-    </url>
-    <url>
-        <loc>https://Deposun.com/shop/islem-rehberi</loc>
-        <lastmod>2025-06-23</lastmod>
-        <priority>0.6</priority>
-    </url>
+    </sitemap>
+    
+    <sitemap>
+        <loc>https://deposun.com/product-sitemap.xml</loc>
+        <lastmod>2025-07-01T10:00:00+03:00</lastmod>
+    </sitemap>
 
-    <url>
-        <loc>https://Deposun.com/shop/listing?category=kategori-slug-1</loc>
-        <lastmod>2025-06-23</lastmod>
-        <priority>0.8</priority>
-    </url>
-    <url>
-        <loc>https://Deposun.com/shop/listing?category=kategori-slug-2</loc>
-        <lastmod>2025-06-23</lastmod>
-        <priority>0.8</priority>
-    </url>
-</urlset>
+    <sitemap>
+        <loc>https://deposun.com/category-sitemap.xml</loc>
+        <lastmod>2025-06-28T14:30:00+03:00</lastmod>
+    </sitemap>
+
+    <sitemap>
+        <loc>https://deposun.com/pages-sitemap.xml</loc>
+        <lastmod>2025-06-15T11:00:00+03:00</lastmod>
+    </sitemap>
+
+    <sitemap>
+        <loc>https://deposun.com/blog-sitemap.xml</loc>
+        <lastmod>2025-07-02T15:00:00+03:00</lastmod>
+    </sitemap>
+
+    <sitemap>
+        <loc>https://deposun.com/image-sitemap.xml</loc>
+        <lastmod>2025-07-01T10:00:00+03:00</lastmod>
+    </sitemap>
+
+</sitemapindex>

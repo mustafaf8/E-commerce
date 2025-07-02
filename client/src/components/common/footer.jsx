@@ -17,20 +17,24 @@ const Footer = () => {
   };
 
   const paymentLogos = [
-    { name: "Bonus", url: "/placeholder-logo.png" },
-    { name: "Maximum", url: "/placeholder-logo.png" },
-    { name: "World", url: "/placeholder-logo.png" },
-    { name: "Bankkart", url: "/placeholder-logo.png" },
-    { name: "CardFinans", url: "/placeholder-logo.png" },
-    { name: "Axess", url: "/placeholder-logo.png" },
-    { name: "Paraf", url: "/placeholder-logo.png" },
-    { name: "Visa", url: "/placeholder-logo.png" },
-    { name: "Mastercard", url: "/placeholder-logo.png" },
-    { name: "Troy", url: "/placeholder-logo.png" },
+    { name: "Bonus", url: "/indir.png" },
+    { name: "Maximum", url: "/indir (0).png" },
+    { name: "World", url: "/indir (7).png" },
+    { name: "Bankkart", url: "/indir (1).png" },
+    { name: "CardFinans", url: "/indir (8).png" },
+    { name: "Axess", url: "/indir (2).png" },
+    { name: "Paraf", url: "/indir (3).png" },
+    { name: "Visa", url: "/indir (4).png" },
+    { name: "Mastercard", url: "/indir (5).png" },
+    { name: "Troy", url: "/indir (6).png" },
   ];
 
   const appBadges = [
-    { store: "Google Play", url: "/Google_Play.svg", link: "#" },
+    {
+      store: "Google Play",
+      url: "/Google_Play.svg",
+      link: "https://play.google.com/store/apps/details?id=com.aliosmangok.rmrenerji&pli=1",
+    },
   ];
 
   const footerLinks = [
@@ -38,7 +42,6 @@ const Footer = () => {
       title: "Şirketimiz",
       links: [
         { label: "Hakkımızda", href: "/shop/hakkimizda" },
-        { label: "İş Ortaklarımız", href: "/shop/ortaklarimiz" },
         { label: "Kişisel Verilerin Korunması", href: "/shop/kvkk" },
         { label: "Bilgi Güvenliği Politikası", href: "/shop/bilgi-guvenligi" },
       ],
@@ -56,13 +59,13 @@ const Footer = () => {
       links: [
         {
           label: "Instagram",
-          href: "https://www.instagram.com",
+          href: "https://www.instagram.com/rmrenerjisistemleri/",
           icon: <Instagram size={16} />,
           external: true,
         },
         {
           label: "Facebook",
-          href: "https://www.facebook.com",
+          href: "https://www.facebook.com/rmr.enerji/",
           icon: <Facebook size={16} />,
           external: true,
         },
@@ -140,7 +143,7 @@ const Footer = () => {
             </h3>
 
             <a
-              href="https://wa.me/+905347168754"
+              href="https://wa.me/+905324712824"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center px-2 py-1 rounded-full bg-green-500 text-white text-sm hover:bg-green-600 transition-colors"
@@ -168,7 +171,7 @@ const Footer = () => {
                 key={logo.name}
                 src={logo.url}
                 alt={logo.name}
-                className="h-6 opacity-60"
+                className="h-10 opacity-60"
               />
             ))}
           </div>

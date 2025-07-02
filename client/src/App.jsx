@@ -48,7 +48,6 @@ const SearchProducts = lazy(() => import("./pages/shopping-view/search"));
 
 const ShoppingWishlist = lazy(() => import("./pages/shopping-view/wishlist"));
 const AboutUs = lazy(() => import("./components/shopping-view/about-us"));
-const Partners = lazy(() => import("./pages/shopping-view/Partners"));
 const KVKK = lazy(() => import("./pages/shopping-view/KVKK"));
 const InfoSecurityPolicy = lazy(() =>
   import("./pages/shopping-view/InfoSecurityPolicy")
@@ -161,7 +160,6 @@ function App() {
             <Route path="listing" element={<ShoppingListing />} />
             <Route path="search" element={<SearchProducts />} />
             <Route path="hakkimizda" element={<AboutUs />} />
-            <Route path="ortaklarimiz" element={<Partners />} />
             <Route path="kvkk" element={<KVKK />} />
             <Route path="bilgi-guvenligi" element={<InfoSecurityPolicy />} />
             <Route path="islem-rehberi" element={<TransactionGuide />} />

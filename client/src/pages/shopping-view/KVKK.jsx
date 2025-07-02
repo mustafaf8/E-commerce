@@ -33,7 +33,7 @@ const KVKK = () => {
             </h2>
           </div>
           <p className="text-gray-700 dark:text-gray-300 text-lg mb-4">
-            <span className="font-semibold">ShopName</span> olarak,
+            <span className="font-semibold">Deposun</span> olarak,
             müşterilerimizin ve kullanıcılarımızın kişisel verilerinin
             gizliliğine ve güvenliğine büyük önem veriyoruz. Kişisel
             verileriniz, 6698 sayılı Kişisel Verilerin Korunması Kanunu
@@ -99,16 +99,6 @@ const KVKK = () => {
               </h3>
               <p className="text-gray-700 dark:text-gray-400">
                 Sizlerle iletişim kurabilmek, bilgilendirmelerde bulunabilmek
-              </p>
-            </div>
-
-            <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
-              <h3 className="font-semibold text-purple-800 dark:text-purple-300 mb-2">
-                Pazarlama
-              </h3>
-              <p className="text-gray-700 dark:text-gray-400">
-                İzniniz dahilinde pazarlama ve tanıtım faaliyetlerini
-                gerçekleştirmek
               </p>
             </div>
 
@@ -199,7 +189,7 @@ const KVKK = () => {
           </h2>
 
           <p className="text-gray-700 dark:text-gray-300 text-lg mb-6">
-            ShopName olarak kişisel verilerinizin güvenliğini sağlamak için
+            Deposun olarak kişisel verilerinizin güvenliğini sağlamak için
             aşağıdaki teknik ve idari tedbirleri almaktayız:
           </p>
 

@@ -1,11 +1,54 @@
-User-agent: *
-Allow: /
+# ===================================================================
+# Deposun.com için robots.txt Dosyası
+# Rapor Referansı: Bölüm 1.1 - robots.txt Optimizasyon Protokolü
+# ===================================================================
 
-# Arama motorlarının taramasını istemediğimiz sayfalar
+# Tüm arama motoru botları için geçerli kurallar
+User-agent: *
+
+# -------------------------------------------------------------------
+# KULLANICIYA ÖZEL VE İŞLEVSEL SAYFALARIN ENGELLENMESİ
+# Bu alanlar arama sonuçlarında değer taşımaz ve taranmamalıdır.
+# -------------------------------------------------------------------
+
 Disallow: /admin/
 Disallow: /auth/
-Disallow: /shop/checkout/
-Disallow: /shop/account/
+Disallow: /hesabim/
+Disallow: /sepet/
+Disallow: /checkout/
+Disallow: /odeme/
+Disallow: /siparis-takip/
+Disallow: /favoriler/
+Disallow: /karsilastir/
 
-# Site haritasının konumu
-Sitemap: https://Deposun.com/sitemap.xml
+# -------------------------------------------------------------------
+# YİNELENEN İÇERİĞİ ÖNLEME
+# Dahili arama sonuçları ve parametre tabanlı URL'ler
+# taranarak tarama bütçesinin boşa harcanmasını engeller.
+# -------------------------------------------------------------------
+
+# Dahili arama sonuç sayfaları
+Disallow: /arama
+Disallow: /search
+
+# URL parametreleri (filtreleme, sıralama, izleme vb.)
+# Bu kural, '?' içeren tüm URL'leri engelleyerek en kapsamlı korumayı sağlar.
+Disallow: /*?
+
+# -------------------------------------------------------------------
+# TARAYICININ SAYFAYI DOĞRU RENDER ETMESİ İÇİN GEREKLİ İZİNLER
+# Google'ın sayfaları tam olarak görmesi için CSS ve JS dosyaları
+# gibi kaynaklara erişimine izin verilmelidir.
+# -------------------------------------------------------------------
+
+Allow: /assets/*.js
+Allow: /assets/*.css
+Allow: /*.js$
+Allow: /*.css$
+
+# -------------------------------------------------------------------
+# SİTE HARİTALARININ KONUMU
+# Ana site haritası indeksi burada belirtilir.
+# -------------------------------------------------------------------
+
+Sitemap: https://deposun.com/sitemap_index.xml
