@@ -79,12 +79,12 @@ const updateHomeSectionAdmin = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Başlık ve İçerik Tipi zorunludur." });
     }
-    if (contentType !== "BEST_SELLING" && !contentValue) {
-      return res.status(400).json({
-        success: false,
-        message: "İçerik Değeri (En Çok Satanlar hariç) zorunludur.",
-      });
-    }
+    // if (contentType !== "BEST_SELLING" && !contentValue) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "İçerik Değeri (En Çok Satanlar hariç) zorunludur.",
+    //   });
+    // }
 
     const updateData = {
       title,

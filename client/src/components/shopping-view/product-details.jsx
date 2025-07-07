@@ -230,10 +230,10 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
         </div>
 
         <div className="flex flex-col ">
-          <div className="flex-shrink-0 pb-4 mb-4 border-b">
+          <div className="flex-shrink-0 pb-2 mb-1 border-b">
             <div className="flex justify-between items-start mb-2">
               <DialogTitle>
-                <p className="text-xl sm:text-2xl font-bold pr-2 text-gray-900">
+                <p className="text-xl sm:text-lg font-semibold pr-2 text-gray-900">
                   {productDetails.title}
                 </p>
               </DialogTitle>
@@ -255,7 +255,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                 </span>
               </Button>
             </div>
-            <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+            <p className="text-sm text-gray-600">
               {productDetails.description}
             </p>
             <div className="py-2">
@@ -283,8 +283,8 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                       productDetails?.price &&
                       productDetails.price > 0 &&
                       productDetails.price > productDetails.salePrice
-                        ? "text-2xl text-green-600"
-                        : "text-2xl text-black"
+                        ? "text-xl text-green-600"
+                        : "text-xl text-black"
                     }`}
                   >
                     {`${productDetails.salePrice.toFixed(2)} TL`}
@@ -317,7 +317,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                 </span>
               )}
             </div>
-            <div className="mt-4 mb-1">
+            <div className="mt-4">
               {productDetails.totalStock === 0 ? (
                 <Button
                   className="w-full opacity-60 cursor-not-allowed"
@@ -341,8 +341,8 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
               )}
             </div>
           </div>
-          <div className="flex-grow overflow-y-auto pt-2 pr-2 -mr-2 custom-scrollbar">
-            <h2 className="text-base sm:text-lg font-semibold mb-3 text-gray-800">
+          <div className="flex-grow overflow-y-auto pr-2 -mr-2 custom-scrollbar">
+            <h2 className="text-base font-semibold mb-2 text-gray-800">
               Yorumlar
             </h2>
 
@@ -378,7 +378,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                 </p>
               )}
             </div>
-            <div className="mt-6 flex flex-col gap-2 border-t pt-4">
+            <div className="mt-4 flex flex-col gap-2 border-t pt-4">
               <Label className="text-sm font-medium text-gray-700">
                 Yorum Yaz
               </Label>
