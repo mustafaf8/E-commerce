@@ -1,11 +1,12 @@
 import CommonForm from "@/components/common/form";
+import AuthLayout from "@/components/auth/AuthLayout";
 import { useToast } from "@/components/ui/use-toast";
 import { registerFormControls } from "@/config";
 import { registerUser } from "@/store/auth-slice";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { Card } from "@/components/ui/card";
+import { UserPlus } from "lucide-react";
 
 const initialState = {
   userName: "",
@@ -15,12 +16,15 @@ const initialState = {
 
 function AuthRegister() {
   const [formData, setFormData] = useState(initialState);
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   function onSubmit(event) {
     event.preventDefault();
+    setIsLoading(true);
+    
     dispatch(registerUser(formData)).then((data) => {
       if (data?.payload?.success) {
         toast({
@@ -34,35 +38,50 @@ function AuthRegister() {
           variant: "destructive",
         });
       }
+    }).finally(() => {
+      setIsLoading(false);
     });
   }
 
-  console.log(formData);
+  const footerContent = (
+    <span>
+      Zaten hesabınız var mı?{" "}
+      <Link
+        className="font-medium text-primary hover:underline transition-colors"
+        to="/auth/login"
+      >
+        Giriş Yap
+      </Link>
+    </span>
+  );
 
   return (
-    <Card className="mx-auto w-full max-w-md space-y-6 px-6 py-4">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          Yeni hesap oluştur
-        </h1>
-        <p className="mt-2">
-          Zaten bir hesabınız var mı
-          <Link
-            className="font-medium ml-2 text-primary hover:underline"
-            to="/auth/login"
-          >
-            Giriş Yap
-          </Link>
-        </p>
-      </div>
+    <AuthLayout
+      title="Hesap Oluştur"
+      description="Hemen ücretsiz hesabınızı oluşturun"
+      footerContent={footerContent}
+    >
       <CommonForm
         formControls={registerFormControls}
-        buttonText={"Kayıt Ol"}
+        buttonText={
+          isLoading ? (
+            <div className="flex items-center">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              Kayıt Yapılıyor...
+            </div>
+          ) : (
+            <div className="flex items-center">
+              <UserPlus className="mr-2 h-4 w-4" />
+              Kayıt Ol
+            </div>
+          )
+        }
         formData={formData}
         setFormData={setFormData}
         onSubmit={onSubmit}
+        isBtnDisabled={isLoading}
       />
-    </Card>
+    </AuthLayout>
   );
 }
 
