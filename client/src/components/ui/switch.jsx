@@ -22,11 +22,7 @@ const Switch = React.forwardRef(({ className, ...props }, ref) => (
 Switch.displayName = SwitchPrimitives.Root.displayName;
 Switch.propTypes = {
   className: PropTypes.string,
-  props: PropTypes.object,
-  ref: PropTypes.oneOfType([
-    PropTypes.func,
-    PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
-  ]),
+ 
 };
 
 export { Switch };

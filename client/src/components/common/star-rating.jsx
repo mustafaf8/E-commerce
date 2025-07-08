@@ -1,10 +1,9 @@
 import { StarIcon } from "lucide-react";
-import { Button } from "../ui/button";
 
 function StarRatingComponent({ rating, handleRatingChange }) {
   // console.log(rating, "rating star");
   return [1, 2, 3, 4, 5].map((star) => (
-    <Button
+    <button
       key={star}
       className={` rounded-full transition-colors ${
         star <= rating
@@ -22,9 +21,9 @@ function StarRatingComponent({ rating, handleRatingChange }) {
             ? "fill-yellow-500 stroke-yellow-500"
             : "fill-transparent"
         }`}
-        strokeWidth={1.7}
+        strokeWidth={1.2}
       />
-    </Button>
+    </button>
   ));
 }
 

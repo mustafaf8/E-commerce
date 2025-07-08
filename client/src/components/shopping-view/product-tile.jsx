@@ -179,7 +179,7 @@ const ShoppingProductTile = React.memo(function ShoppingProductTile({
 
             {/* Ratings */}
             {product?.averageReview !== undefined && (
-              <div className="flex items-center space-x-1 pointer-events-none max-[640px]:space-x-1">
+              <div className="flex items-center space-x-0 pointer-events-none max-[640px]:space-x-1">
                 <StarRatingComponent
                   rating={product.averageReview}
                   className="scale-90 origin-left"

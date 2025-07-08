@@ -19,11 +19,7 @@ Input.displayName = "Input";
 Input.propTypes = {
   className: PropTypes.string,
   type: PropTypes.string,
-  props: PropTypes.object,
-  ref: PropTypes.oneOfType([
-    PropTypes.func,
-    PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
-  ]),
+ 
 };
 
 export { Input };

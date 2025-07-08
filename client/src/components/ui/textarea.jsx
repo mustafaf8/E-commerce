@@ -17,11 +17,7 @@ const Textarea = React.forwardRef(({ className, ...props }, ref) => {
 Textarea.displayName = "Textarea";
 Textarea.propTypes = {
   className: PropTypes.string,
-  props: PropTypes.object,
-  ref: PropTypes.oneOfType([
-    PropTypes.func,
-    PropTypes.shape({ current: PropTypes.any }),
-  ]),
+ 
 };
 
 export { Textarea };

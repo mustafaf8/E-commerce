@@ -85,18 +85,20 @@ const fetchCartItems = async (req, res) => {
       });
     }
 
-    const cart = await Cart.findOne({ userId }).populate({
+    let cart = await Cart.findOne({ userId }).populate({
       path: "items.productId",
-      select: "image title price salePrice",
+      select: "image title price salePrice totalStock",
     });
 
     if (!cart) {
-      return res.status(404).json({
-        success: false,
-        message: "Cart not found!",
+      const newCart = new Cart({ userId, items: [] });
+      await newCart.save();
+      console.log(`Yeni kullanıcı için boş sepet oluşturuldu: ${userId}`);
+      return res.status(200).json({
+        success: true,
+        data: { ...newCart._doc, items: [] },
       });
     }
-
     const validItems = cart.items.filter(
       (productItem) => productItem.productId
     );

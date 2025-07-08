@@ -241,7 +241,7 @@ const authMiddleware = async (req, res, next) => {
   const token = req.cookies.token;
   console.log("authMiddleware -> Checking token cookie:", token);
   if (!token)
-    return res.status(401).json({
+    return res.status(200).json({
       success: false,
       message: "Yetkisiz kullanıcı! Token bulunamadı.",
     });

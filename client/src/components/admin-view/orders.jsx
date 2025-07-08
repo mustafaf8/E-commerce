@@ -667,7 +667,7 @@ function AdminOrdersView() {
             </div>
           ) : orderDetails ? (
             <div className="max-h-[70vh] overflow-y-auto px-6 py-4">
-              <AdminOrderDetailsView orderDetails={orderDetails} />
+              <AdminOrderDetailsView orderDetails={orderDetails} canManage={canManage} />
             </div>
           ) : (
             <div className="p-8 text-center text-red-500">

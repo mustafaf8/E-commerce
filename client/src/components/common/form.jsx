@@ -150,7 +150,7 @@ CommonForm.propTypes = {
   formData: PropTypes.object.isRequired,
   setFormData: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  buttonText: PropTypes.string,
+  buttonText: PropTypes.node,
   isBtnDisabled: PropTypes.bool,
 };
 
