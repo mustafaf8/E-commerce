@@ -9,7 +9,7 @@ import { addToWishlist, removeFromWishlist } from "@/store/shop/wishlist-slice";
 import { addToCart } from "@/store/shop/cart-slice";
 import { useToast } from "../ui/use-toast";
 import PropTypes from "prop-types";
-import { cn } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 
 const ShoppingProductTile = React.memo(function ShoppingProductTile({
   product,
@@ -199,7 +199,7 @@ const ShoppingProductTile = React.memo(function ShoppingProductTile({
                     product.price > 0 &&
                     product.price > product.salePrice && (
                       <span className="line-through text-xs sm:text-sm text-gray-400">
-                        {`${product.price.toFixed(2)} TL`}
+                        {`${formatPrice(product.price)} TL`}
                       </span>
                     )}
                   <span
@@ -212,12 +212,12 @@ const ShoppingProductTile = React.memo(function ShoppingProductTile({
                         : "text-black"
                     )}
                   >
-                    {`${product.salePrice.toFixed(2)} TL`}
+                    {`${formatPrice(product.salePrice)} TL`}
                   </span>
                 </div>
               ) : product?.price && product.price > 0 ? (
                 <span className="font-medium text-sm sm:text-base text-black">
-                  {`${product.price.toFixed(2)} TL`}
+                  {`${formatPrice(product.price)} TL`}
                 </span>
               ) : (
                 <span className="text-xs text-muted-foreground">

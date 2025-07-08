@@ -6,11 +6,14 @@ import {
   LayoutGrid,
   ShoppingBasket,
   Tags,
+  UserCog,
 } from "lucide-react";
 import { Fragment } from "react";
+import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 import PropTypes from "prop-types";
+
 
 const adminSidebarMenuItems = [
   {
@@ -57,13 +60,37 @@ const adminSidebarMenuItems = [
   },
 ];
 
+// Authorization menu definition (only for Level1)
+const authorizationMenuItem = {
+  id: "authorization",
+  label: "Yetkilendirme",
+  path: "/admin/authorization",
+  icon: <UserCog size={18} />, // We'll need to import UserCog icon
+};
+
 function MenuItems({ setOpen }) {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const { user } = useSelector((state) => state.auth);
+
+  // Determine visible menu items based on permissions
+  const visibleMenuItems = adminSidebarMenuItems.filter((item) => {
+    if (user?.adminAccessLevel === 1 || user?.adminAccessLevel === undefined) return true; // Full access or not set
+
+    // For lower levels, check adminModulePermissions
+    const perms = user?.adminModulePermissions?.[item.id];
+    return perms?.view; // show if can view
+  });
+
+  // Add authorization menu only for Level 1 admins
+  if (user?.adminAccessLevel === 1 || user?.adminAccessLevel === undefined) {
+    visibleMenuItems.push(authorizationMenuItem);
+  }
+
   return (
     <nav className="flex flex-col space-y-1">
-      {adminSidebarMenuItems.map((menuItem) => {
+      {visibleMenuItems.map((menuItem) => {
         const isActive = location.pathname === menuItem.path;
         return (
           <div

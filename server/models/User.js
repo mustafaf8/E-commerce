@@ -29,6 +29,24 @@ const UserSchema = new mongoose.Schema(
       default: "user",
       enum: ["user", "admin"],
     },
+    // Admin yetkilendirme alanları
+    adminAccessLevel: {
+      type: Number,
+      enum: [1, 2, 3], // 1: Tam, 2: Orta, 3: Sınırlı
+      default: 3,
+    },
+    // Her modül için görüntüleme ve yönetme izinleri
+    adminModulePermissions: {
+      type: Map,
+      of: new mongoose.Schema(
+        {
+          view: { type: Boolean, default: false },
+          manage: { type: Boolean, default: false },
+        },
+        { _id: false }
+      ),
+      default: {},
+    },
     googleId: {
       type: String,
       unique: true,

@@ -37,6 +37,8 @@ router.get("/check-auth", authMiddleware, (req, res) => {
       userName: user.userName,
       role: user.role,
       phoneNumber: user.phoneNumber,
+      adminAccessLevel: user.adminAccessLevel,
+      adminModulePermissions: user.adminModulePermissions,
     },
   });
 });

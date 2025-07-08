@@ -24,10 +24,11 @@ import ConfirmationModal from "./ConfirmationModal";
 import { Skeleton } from "../ui/skeleton";
 import { Badge } from "../ui/badge";
 import { CardTitle } from "../ui/card";
+import PropTypes from "prop-types";
 
 const initialBrandData = { name: "", slug: "", isActive: true };
 
-function BrandManager() {
+function BrandManager({ canManage }) {
   const dispatch = useDispatch();
   const {
     brandList = [],
@@ -165,9 +166,9 @@ function BrandManager() {
     <div>
       <div className="flex justify-between items-center my-4">
         <CardTitle>Marka Yönetimi</CardTitle>
-        <Button onClick={openModalForAdd}>
+        {canManage && (<Button onClick={openModalForAdd}>
           <PlusCircle className="mr-2 h-4 w-4" /> Yeni Marka Ekle
-        </Button>
+        </Button>)}
       </div>
       <div className="space-y-3">
         {isLoading && !brandList.length ? (
@@ -219,7 +220,7 @@ function BrandManager() {
                   {brand.isActive ? "Aktif" : "Pasif"}
                 </Badge>
               </div>
-              <div className="flex-shrink-0 flex items-center gap-1">
+              {canManage && (<div className="flex-shrink-0 flex items-center gap-1">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -238,7 +239,7 @@ function BrandManager() {
                   <Trash2 className="h-4 w-4" />
                   <span className="sr-only">Sil</span>
                 </Button>
-              </div>
+              </div>)}
             </div>
           ))
         )}
@@ -314,5 +315,8 @@ function BrandManager() {
     </div>
   );
 }
+BrandManager.propTypes = {
+  canManage: PropTypes.bool.isRequired,
+};
 
 export default BrandManager;

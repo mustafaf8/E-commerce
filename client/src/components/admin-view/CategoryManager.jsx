@@ -25,10 +25,11 @@ import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CardTitle } from "../ui/card";
+import PropTypes from "prop-types";
 
 const initialCategoryData = { name: "", slug: "", isActive: true };
 
-function CategoryManager() {
+function CategoryManager({ canManage }) {
   const dispatch = useDispatch();
   const {
     categoryList = [],
@@ -166,9 +167,9 @@ function CategoryManager() {
     <div>
       <div className="flex justify-between items-center my-4">
         <CardTitle>Kategori Yönetimi</CardTitle>
-        <Button onClick={openModalForAdd}>
+        {canManage && (<Button onClick={openModalForAdd}>
           <PlusCircle className="mr-2 h-4 w-4" /> Yeni Kategori Ekle
-        </Button>
+        </Button>)}
       </div>
       <div className="space-y-3">
         {isLoading && !categoryList.length ? (
@@ -220,7 +221,7 @@ function CategoryManager() {
                   {category.isActive ? "Aktif" : "Pasif"}
                 </Badge>
               </div>
-              <div className="flex-shrink-0 flex items-center gap-1">
+              {canManage && ( <div className="flex-shrink-0 flex items-center gap-1">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -239,7 +240,7 @@ function CategoryManager() {
                   <Trash2 className="h-4 w-4" />
                   <span className="sr-only">Sil</span>
                 </Button>
-              </div>
+              </div>)}
             </div>
           ))
         )}
@@ -313,5 +314,8 @@ function CategoryManager() {
     </div>
   );
 }
+CategoryManager.propTypes = {
+  canManage: PropTypes.bool.isRequired,
+};
 
 export default CategoryManager;

@@ -39,6 +39,7 @@ import {
 } from "lucide-react";
 import PropTypes from "prop-types";
 import { orderStatusMappingAdmin } from "@/config";
+import useAdminPermission from "@/hooks/useAdminPermission";
 
 function UserListTable({ users, onViewOrdersClick, isLoading }) {
   UserListTable.propTypes = {
@@ -455,6 +456,8 @@ function GuestOrdersTable({ orders, onViewDetailsClick, isLoading }) {
 }
 
 function AdminOrdersView() {
+  const canView = useAdminPermission("orders");
+  const canManage = useAdminPermission("orders", "manage");
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [selectedOrderIdForDetails, setSelectedOrderIdForDetails] =
     useState(null);
@@ -503,9 +506,11 @@ function AdminOrdersView() {
   const totalOrdersCount = registeredUserOrdersCount + guestOrdersCount;
 
   useEffect(() => {
-    dispatch(fetchUsersWithOrders());
-    dispatch(fetchAllGuestOrdersForAdmin());
-  }, [dispatch]);
+    if (canView) {
+      dispatch(fetchUsersWithOrders());
+      dispatch(fetchAllGuestOrdersForAdmin());
+    }
+  }, [dispatch, canView]);
 
   useEffect(() => {
     if (selectedUserId) {
@@ -531,6 +536,13 @@ function AdminOrdersView() {
     setSelectedOrderIdForDetails(null);
     dispatch(resetOrderDetails());
   };
+  if (!canView) {
+    return (
+      <div className="p-4 text-center bg-red-50 text-red-700 rounded-md">
+        Bu sayfayı görüntüleme yetkiniz yok.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">

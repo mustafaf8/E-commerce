@@ -36,10 +36,23 @@ import {
   Legend,
 } from "recharts";
 import MaintenanceManager from "@/components/admin-view/MaintenanceManager";
+import useAdminPermission from "@/hooks/useAdminPermission";
+
 
 function AdminStatsPage() {
   const dispatch = useDispatch();
   const [period, setPeriod] = useState("monthly");
+
+  const canView = useAdminPermission('stats');
+  const canManage = useAdminPermission('stats', 'manage');
+
+  if (!canView) {
+    return (
+      <div className="p-4 text-center bg-red-50 text-red-700 rounded-md">
+        Bu sayfayı görüntüleme yetkiniz yok.
+      </div>
+    );
+  }
 
   const {
     salesOverview,
@@ -72,23 +85,33 @@ function AdminStatsPage() {
   }, [dispatch, productList]);
 
   useEffect(() => {
-    // Fetch stats whenever period changes
-    dispatch(fetchSalesOverview(period));
-    dispatch(fetchSalesTrend(period));
-    dispatch(fetchOrderStatusDistribution());
-    dispatch(fetchTopSellingProducts({ limit: 10 }));
-    dispatch(fetchSalesByCategory());
-    dispatch(fetchSalesByBrand());
-    dispatch(fetchUserSummary(period));
-    dispatch(fetchUserRegistrationsTrend(period));
-    dispatch(fetchTopCustomers());
-    dispatch(fetchTopLikedProducts());
-    dispatch(fetchProductSummary());
-    dispatch(fetchProfitOverview(period));
-    dispatch(fetchProfitByProduct());
-    dispatch(fetchProfitByCategory());
-    dispatch(fetchProfitByBrand());
-  }, [dispatch, period]);
+    if(canView) {
+      dispatch(fetchSalesOverview(period));
+      dispatch(fetchSalesTrend(period));
+      dispatch(fetchOrderStatusDistribution());
+      dispatch(fetchTopSellingProducts({ limit: 10 }));
+      dispatch(fetchSalesByCategory());
+      dispatch(fetchSalesByBrand());
+      dispatch(fetchUserSummary(period));
+      dispatch(fetchUserRegistrationsTrend(period));
+      dispatch(fetchTopCustomers());
+      dispatch(fetchTopLikedProducts());
+      dispatch(fetchProductSummary());
+      dispatch(fetchProfitOverview(period));
+      dispatch(fetchProfitByProduct());
+      dispatch(fetchProfitByCategory());
+      dispatch(fetchProfitByBrand());
+    }
+  }, [dispatch, period, canView]);
+
+
+  if (!canView) {
+    return (
+      <div className="p-4 text-center bg-red-50 text-red-700 rounded-md">
+        Bu sayfayı görüntüleme yetkiniz yok.
+      </div>
+    );
+  }
 
   const STATUS_INFO = {
     inShipping: {
@@ -698,9 +721,10 @@ function AdminStatsPage() {
           )}
         </div>
       )}
-      <MaintenanceManager />
+      {canManage && <MaintenanceManager canManage={canManage}/>}
     </div>
   );
 }
+
 
 export default AdminStatsPage;

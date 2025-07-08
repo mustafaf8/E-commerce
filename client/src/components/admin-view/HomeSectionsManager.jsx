@@ -5,7 +5,7 @@ import {
   addHomeSection,
   updateHomeSection,
   deleteHomeSection,
-  updateHomeSectionsOrder, // Bu satır zaten var
+  updateHomeSectionsOrder, 
 } from "@/store/common-slice/home-sections-slice";
 import { fetchAllCategories } from "@/store/common-slice/categories-slice";
 import { fetchAllBrands } from "@/store/common-slice/brands-slice";
@@ -42,7 +42,9 @@ import { useToast } from "@/components/ui/use-toast";
 import ConfirmationModal from "@/components/admin-view/ConfirmationModal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CardTitle } from "../ui/card";
-// updateHomeSectionsOrder zaten import edilmiş olmalı, değilse yukarı ekleyin.
+import useAdminPermission from "@/hooks/useAdminPermission";
+import PropTypes from 'prop-types';
+
 
 const initialSectionData = {
   title: "",
@@ -61,7 +63,7 @@ const contentTypeOptions = [
   // { value: 'CUSTOM_FILTER', label: 'Özel Filtre' }, // İleride eklenebilir
 ];
 
-function HomeSectionsManager() {
+function HomeSectionsManager({ canManage }) {
   const dispatch = useDispatch();
   const {
     homeSections = [],
@@ -285,10 +287,10 @@ function HomeSectionsManager() {
     <div className="space-y-4">
       <div className="flex justify-between items-center my-4">
         <CardTitle>Ana Sayfa Bölüm Yönetimi</CardTitle>
-        <Button onClick={openModalForAdd} className="flex items-center">
+        {canManage && (<Button onClick={openModalForAdd} className="flex items-center">
           <PlusCircle className="h-4 w-4 mr-2" />
           Bölüm Ekle
-        </Button>
+        </Button>)}
       </div>
 
       {isLoading && !sortedSections.length ? (
@@ -307,19 +309,19 @@ function HomeSectionsManager() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Sıra</TableHead>
+              {canManage && <TableHead>Sıra</TableHead>}
               <TableHead>Başlık</TableHead>
               <TableHead>Tip</TableHead>
               <TableHead>Değer</TableHead>
               <TableHead>Limit</TableHead>
               <TableHead>Durum</TableHead>
-              <TableHead className="text-right">İşlemler</TableHead>
+              {canManage && <TableHead className="text-right">İşlemler</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
             {sortedSections.map((section, index) => (
               <TableRow key={section._id}>
-                <TableCell className="flex items-center gap-1">
+                {canManage && (<TableCell className="flex items-center gap-1">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -339,7 +341,7 @@ function HomeSectionsManager() {
                   >
                     <ArrowUpDown className="h-4 w-4 transform rotate-[135deg]" />
                   </Button>
-                </TableCell>
+                </TableCell>)}
                 <TableCell className="font-medium">{section.title}</TableCell>
                 <TableCell>
                   {contentTypeOptions.find(
@@ -354,7 +356,7 @@ function HomeSectionsManager() {
                 </TableCell>
                 <TableCell>{section.itemLimit}</TableCell>
                 <TableCell>{section.isActive ? "Aktif" : "Pasif"}</TableCell>
-                <TableCell className="text-right space-x-2">
+                {canManage && (<TableCell className="text-right space-x-2">
                   <Button
                     variant="ghost"
                     size="sm"
@@ -371,7 +373,7 @@ function HomeSectionsManager() {
                     <Trash2 className="h-4 w-4 text-red-500" />
                     <span className="sr-only">Sil</span>
                   </Button>
-                </TableCell>
+                </TableCell>)}
               </TableRow>
             ))}
           </TableBody>
@@ -574,5 +576,8 @@ function HomeSectionsManager() {
     </div>
   );
 }
+HomeSectionsManager.propTypes = {
+  canManage: PropTypes.bool.isRequired,
+};
 
 export default HomeSectionsManager;

@@ -15,8 +15,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
+import PropTypes from 'prop-types';
 
-function MaintenanceManager() {
+function MaintenanceManager({ canManage }) {
   const dispatch = useDispatch();
   const { toast } = useToast();
   const { status, isLoading } = useSelector((state) => state.maintenance);
@@ -40,6 +41,14 @@ function MaintenanceManager() {
   }, [status]);
 
   const handleSave = () => {
+    if (!canManage) {
+      toast({
+        title: "Yetkiniz Yok",
+        description: "Bu ayarları değiştirme yetkiniz bulunmamaktadır.",
+        variant: "destructive",
+      });
+      return;
+    }
     const dataToSend = {
       isActive: localStatus.isActive,
       message: localStatus.message,
@@ -87,6 +96,7 @@ function MaintenanceManager() {
             onCheckedChange={(checked) =>
               setLocalStatus((prev) => ({ ...prev, isActive: checked }))
             }
+            disabled={!canManage}
             aria-readonly
           />
         </div>
@@ -100,6 +110,7 @@ function MaintenanceManager() {
             onChange={(e) =>
               setLocalStatus((prev) => ({ ...prev, message: e.target.value }))
             }
+            disabled={!canManage}
             rows={3}
           />
         </div>
@@ -118,10 +129,11 @@ function MaintenanceManager() {
                 returnDate: e.target.value,
               }))
             }
+            disabled={!canManage}
           />
         </div>
 
-        <Button onClick={handleSave} disabled={isLoading}>
+        <Button onClick={handleSave} disabled={isLoading || !canManage}>
           {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
           Değişiklikleri Kaydet
         </Button>
@@ -129,5 +141,8 @@ function MaintenanceManager() {
     </Card>
   );
 }
+MaintenanceManager.propTypes = {
+  canManage: PropTypes.bool.isRequired,
+};
 
 export default MaintenanceManager;

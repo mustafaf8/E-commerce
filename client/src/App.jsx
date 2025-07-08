@@ -39,6 +39,7 @@ const AdminHomeSections = lazy(() =>
 );
 const AdminBrands = lazy(() => import("./pages/admin-view/brands"));
 const AdminStatsPage = lazy(() => import("./pages/admin-view/AdminStatsPage"));
+const AdminAuthorization = lazy(() => import("./pages/admin-view/authorization"));
 
 const NotFound = lazy(() => import("./pages/not-found"));
 const ShoppingListing = lazy(() => import("./pages/shopping-view/listing"));
@@ -153,6 +154,14 @@ function App() {
             <Route path="home-sections" element={<AdminHomeSections />} />
             <Route path="brands" element={<AdminBrands />} />
             <Route path="stats" element={<AdminStatsPage />} />
+            <Route
+              path="authorization"
+              element={
+                <ProtectedRoute adminOnly={true} level1Only={true}>
+                  <AdminAuthorization />
+                </ProtectedRoute>
+              }
+            />
           </Route>
 
           <Route path="/shop" element={<ShoppingLayout />}>

@@ -18,7 +18,7 @@ const initialFormData = {
   status: "",
 };
 
-function AdminOrderDetailsView({ orderDetails }) {
+function AdminOrderDetailsView({ orderDetails, canManage}) {
   const [formData, setFormData] = useState(initialFormData);
   const dispatch = useDispatch();
   const { toast } = useToast();
@@ -269,7 +269,7 @@ function AdminOrderDetailsView({ orderDetails }) {
       </Card>
 
       {/* Durum Güncelleme */}
-      <Card className="p-4">
+      {canManage && <Card className="p-4">
         <div className="flex items-center gap-2 mb-3">
           <Package className="h-4 w-4 text-primary" />
           <h3 className="font-semibold">Sipariş Durumunu Güncelle</h3>
@@ -299,7 +299,7 @@ function AdminOrderDetailsView({ orderDetails }) {
           buttonText={"Güncelle"}
           onSubmit={handleUpdateStatus}
         />
-      </Card>
+      </Card>}
     </div>
   );
 }
@@ -341,6 +341,7 @@ AdminOrderDetailsView.propTypes = {
       })
     ),
   }).isRequired,
+  canManage: PropTypes.bool.isRequired,
 };
 
 export default AdminOrderDetailsView;

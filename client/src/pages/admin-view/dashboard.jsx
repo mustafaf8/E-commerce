@@ -23,8 +23,12 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ConfirmationModal from "@/components/admin-view/ConfirmationModal";
 import api from "@/api/axiosInstance";
+import useAdminPermission from "@/hooks/useAdminPermission";
 
 function AdminDashboard() {
+
+  const canView = useAdminPermission('dashboard');
+  const canManage = useAdminPermission('dashboard', 'manage');
   const [featureImageFile, setFeatureImageFile] = useState(null);
   const [featureImageLoadingState, setFeatureImageLoadingState] =
     useState(false);
@@ -304,16 +308,29 @@ function AdminDashboard() {
     });
   }
   useEffect(() => {
-    dispatch(getFeatureImages());
-    dispatch(fetchPromoCards());
-    dispatch(fetchSideBanners());
-  }, [dispatch]);
+    if(canView) {
+      dispatch(getFeatureImages());
+      dispatch(fetchPromoCards());
+      dispatch(fetchSideBanners());
+    }
+  }, [dispatch, canView]);
+
+  if (!canView) {
+    return (
+      <div className="p-4 text-center bg-red-50 text-red-700 rounded-md">
+        Bu sayfayı görüntüleme yetkiniz yok.
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       <div className="border p-6 rounded-lg shadow-sm bg-white">
         <h2 className="text-xl font-semibold mb-4 border-b pb-2">
           Fırsat Kartları Yönetimi
         </h2>
+        {canManage && (
+          <>
         <ProductImageUpload
           id="promo-card-image-upload"
           imageFile={promoCardImageFile}
@@ -350,7 +367,8 @@ function AdminDashboard() {
             ? "Yükleniyor..."
             : "Yeni Fırsat Kartı Ekle"}
         </Button>
-
+        </>
+        )}
         <div className="mt-6 space-y-3 max-h-96 overflow-y-auto">
           <h3 className="text-md font-medium">Mevcut Fırsat Kartları:</h3>
           {promoLoading ? (
@@ -382,14 +400,14 @@ function AdminDashboard() {
                     {card.link || "Link Yok"}
                   </p>
                 </div>
-                <Button
+                {canManage && (<Button
                   variant="ghost"
                   size="icon"
                   className="text-red-500 hover:bg-red-100 h-7 w-7 flex-shrink-0"
                   onClick={() => handleDeletePromoCard(card._id)}
                 >
                   <Trash size={16} />
-                </Button>
+                </Button>)}
               </div>
             ))
           ) : (
@@ -404,6 +422,8 @@ function AdminDashboard() {
         <h2 className="text-xl font-semibold mb-4 border-b pb-2">
           Ana Banner Yönetimi
         </h2>
+        {canManage && (
+          <>
         <ProductImageUpload
           id="feature-image-upload"
           imageFile={featureImageFile}
@@ -436,6 +456,8 @@ function AdminDashboard() {
         >
           {featureImageLoadingState ? "Yükleniyor..." : "Yeni Banner Ekle"}
         </Button>
+        </>
+        )}
         <div className="mt-6 space-y-3 max-h-96 overflow-y-auto">
           <h3 className="text-md font-medium">Mevcut Bannerlar:</h3>
           {featureImageList && featureImageList.length > 0 ? (
@@ -465,14 +487,14 @@ function AdminDashboard() {
                     </p>
                   </div>
                   {/* Silme Butonu */}
-                  <Button
+                  {canManage && (<Button
                     variant="ghost"
                     size="icon"
                     className="text-red-500 hover:bg-red-100 h-7 w-7 flex-shrink-0"
                     onClick={() => handleDeleteFeatureImage(featureImgItem._id)}
                   >
                     <Trash size={16} />
-                  </Button>
+                  </Button>)}
                 </div>
               </div>
             ))
@@ -486,6 +508,8 @@ function AdminDashboard() {
         <h2 className="text-xl font-semibold mb-4 border-b pb-2">
           Küçük Banner Yönetimi (Manuel Slider)
         </h2>
+        {canManage && (
+        <>
         <ProductImageUpload
           id="side-banner-upload"
           imageFile={sideBannerImageFile}
@@ -524,6 +548,8 @@ function AdminDashboard() {
             ? "Yükleniyor..."
             : "Yeni Yan Banner Ekle"}
         </Button>
+        </>
+        )}
 
         {/* Mevcut Yan Bannerlar Listesi */}
         <div className="mt-6 space-y-3 max-h-96 overflow-y-auto">
@@ -557,14 +583,14 @@ function AdminDashboard() {
                     {banner.link || "Link Yok"}
                   </p>
                 </div>
-                <Button
+                {canManage && (<Button
                   variant="ghost"
                   size="icon"
                   className="text-red-500 hover:bg-red-100 h-7 w-7 flex-shrink-0"
                   onClick={() => handleDeleteSideBanner(banner._id)}
                 >
                   <Trash size={16} />
-                </Button>
+                </Button>)}
               </div>
             ))
           ) : (

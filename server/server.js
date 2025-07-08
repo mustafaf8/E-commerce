@@ -75,6 +75,7 @@ const shopHomeSectionRouter = require("./routes/shop/home-section-routes");
 const adminBrandRouter = require("./routes/admin/brand-routes"); // Yeni
 const commonBrandRouter = require("./routes/common/brand-routes");
 const adminStatsRouter = require("./routes/admin/statsAdminRoutes");
+const adminAuthorizationRouter = require("./routes/admin/authorization-routes");
 const maintenanceRouter = require("./routes/common/maintenance-routes");
 const errorHandler = require("./middleware/errorHandler");
 const { scheduleAbandonedCartEmails } = require("./jobs/abandonedCartJob");
@@ -171,6 +172,7 @@ app.use("/api/shop/home-sections", shopHomeSectionRouter);
 app.use("/api/admin/brands", adminBrandRouter);
 app.use("/api/common/brands", commonBrandRouter);
 app.use("/api/admin/stats", adminStatsRouter);
+app.use("/api/admin/authorization", adminAuthorizationRouter);
 app.use("/api/maintenance", maintenanceRouter);
 app.use(errorHandler);
 if (process.env.NODE_ENV !== "test") {

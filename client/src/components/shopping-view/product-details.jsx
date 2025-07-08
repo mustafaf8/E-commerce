@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { addReview, getReviews } from "@/store/shop/review-slice";
 import { addToWishlist, removeFromWishlist } from "@/store/shop/wishlist-slice";
 import PropTypes from "prop-types";
+import { formatPrice } from "@/lib/utils";
 
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const [reviewMsg, setReviewMsg] = useState("");
@@ -274,7 +275,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                     productDetails.price > 0 &&
                     productDetails.price > productDetails.salePrice && (
                       <p className="line-through text-lg text-gray-400 ">
-                        {`${productDetails.price.toFixed(2)} TL`}
+                        {`${formatPrice(productDetails.price)} TL`}
                       </p>
                     )}
 
@@ -287,13 +288,13 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                         : "text-xl text-black"
                     }`}
                   >
-                    {`${productDetails.salePrice.toFixed(2)} TL`}
+                    {`${formatPrice(productDetails.salePrice)} TL`}
                   </p>
                 </div>
               ) : productDetails?.price && productDetails.price > 0 ? (
                 <div className="flex justify-start">
                   <p className="text-lg font-semibold text-black">
-                    {`${productDetails.price.toFixed(2)} TL`}
+                    {`${formatPrice(productDetails.price)} TL`}
                   </p>
                 </div>
               ) : (

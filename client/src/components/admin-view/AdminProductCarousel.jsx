@@ -13,6 +13,7 @@ function AdminProductCarousel({
   handleEditProduct,
   handleDeleteProduct,
   handleShowAdminDetails,
+  canManage,
 }) {
   const skeletonCount = 5;
   const scrollContainerRef = useRef(null);
@@ -110,6 +111,7 @@ function AdminProductCarousel({
                   handleEdit={() => handleEditProduct(product)}
                   handleDelete={() => handleDeleteProduct(product._id)}
                   handleShowDetails={() => handleShowAdminDetails(product)}
+                  canManage={canManage}
                 />
               </div>
             ))
@@ -145,6 +147,7 @@ AdminProductCarousel.propTypes = {
   handleEditProduct: PropTypes.func.isRequired,
   handleDeleteProduct: PropTypes.func.isRequired,
   handleShowAdminDetails: PropTypes.func.isRequired,
+  canManage: PropTypes.bool.isRequired,
 };
 
 export default AdminProductCarousel;

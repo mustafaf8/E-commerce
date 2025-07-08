@@ -18,6 +18,7 @@ import {
   editProduct,
   fetchAllProducts,
 } from "@/store/admin/products-slice";
+import { hasManagePermission } from "@/lib/utils";
 import { useDispatch, useSelector } from "react-redux";
 import AdminProductCarousel from "@/components/admin-view/AdminProductCarousel";
 import AdminProductDetailsDialog from "@/components/admin-view/AdminProductDetailsDialog";
@@ -55,6 +56,8 @@ function AdminProducts() {
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [selectedProductDetails, setSelectedProductDetails] = useState(null);
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const canManage = hasManagePermission(user, "products");
   const { toast } = useToast();
   const { categoryList = [], isLoading: categoriesLoading } = useSelector(
     (state) => state.categories || { categoryList: [], isLoading: false }
@@ -122,6 +125,12 @@ function AdminProducts() {
   const onSubmit = useCallback(
     async (event) => {
       event.preventDefault();
+
+      if (!canManage) {
+        toast({ variant: "destructive", title: "Bu işlem için yetkiniz yok." });
+        return;
+      }
+
       let finalImageUrl = formData.image;
       try {
         if (productImageFile) {
@@ -205,7 +214,7 @@ function AdminProducts() {
         });
       }
     },
-    [dispatch, formData, productImageFile, currentEditedId, toast, uploadImage]
+    [dispatch, formData, productImageFile, currentEditedId, toast, uploadImage, canManage]
   );
 
   const openDeleteConfirmation = useCallback((productId) => {
@@ -305,28 +314,48 @@ function AdminProducts() {
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [groupedProducts, categoryList]);
 
-  const handleEditClick = useCallback((product = null) => {
-    if (product && product._id) {
-      setCurrentEditedId(product._id);
-      setOpenCreateProductsDialog(true);
-    } else {
-      setCurrentEditedId(null);
-      setFormData(initialFormData);
-      setProductImageFile(null);
-      setOpenCreateProductsDialog(true);
-    }
-  }, []);
+  const handleEditClick = useCallback(
+    (product = null) => {
+      if (!canManage) {
+        toast({ variant: "destructive", title: "Bu işlem için yetkiniz yok." });
+        return;
+      }
+      if (product && product._id) {
+        setCurrentEditedId(product._id);
+        setOpenCreateProductsDialog(true);
+      } else {
+        setCurrentEditedId(null);
+        setFormData(initialFormData);
+        setProductImageFile(null);
+        setOpenCreateProductsDialog(true);
+      }
+    },
+    [canManage, toast]
+  );
 
   const handleShowDetailsClick = useCallback((product) => {
     setSelectedProductDetails(product);
     setIsDetailsDialogOpen(true);
   }, []);
 
+  const handleDeleteAction = (id) => {
+    if (!canManage) {
+      toast({ variant: "destructive", title: "Bu işlem için yetkiniz yok." });
+      return;
+    }
+    setProductIdToDelete(id);
+    setShowConfirmModal(true);
+  };
+
+  const floatingActionButton = canManage ? (
+    <div className="mb-4 w-full flex justify-end">
+      <Button onClick={() => handleEditClick(null)}>Yeni Ürün Ekle</Button>
+    </div>
+  ) : null;
+
   return (
     <Fragment>
-      <div className="mb-4 w-full flex justify-end">
-        <Button onClick={() => handleEditClick(null)}>Yeni Ürün Ekle</Button>
-      </div>
+      {floatingActionButton}
 
       <div className="w-full overflow-hidden">
         <div className="space-y-6">
@@ -357,8 +386,9 @@ function AdminProducts() {
                 products={categoryGroup.products}
                 isLoading={false}
                 handleEditProduct={handleEditClick}
-                handleDeleteProduct={openDeleteConfirmation}
+                handleDeleteProduct={handleDeleteAction}
                 handleShowAdminDetails={handleShowDetailsClick}
+                canManage={canManage}
               />
             ))
           ) : (

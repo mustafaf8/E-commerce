@@ -198,6 +198,8 @@ const loginUser = async (req, res) => {
         id: checkUser._id,
         userName: checkUser.userName,
         phoneNumber: checkUser.phoneNumber,
+        adminAccessLevel: checkUser.adminAccessLevel,
+        adminModulePermissions: checkUser.adminModulePermissions,
       },
     });
   } catch (e) {
