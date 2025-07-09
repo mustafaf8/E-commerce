@@ -56,6 +56,18 @@ const InfoSecurityPolicy = lazy(() =>
 const TransactionGuide = lazy(() =>
   import("./pages/shopping-view/TransactionGuide")
 );
+const SSLCertificate = lazy(() =>
+  import("./pages/shopping-view/SSLCertificate")
+);
+const DeliveryReturnTerms = lazy(() =>
+  import("./pages/shopping-view/DeliveryReturnTerms")
+);
+const PrivacyPolicy = lazy(() =>
+  import("./pages/shopping-view/PrivacyPolicy")
+);
+const DistanceSalesContract = lazy(() =>
+  import("./pages/shopping-view/DistanceSalesContract")
+);
 const GuestCheckoutAddress = lazy(() =>
   import("./pages/shopping-view/GuestCheckoutAddress")
 );
@@ -176,6 +188,10 @@ function App() {
             <Route path="kvkk" element={<KVKK />} />
             <Route path="bilgi-guvenligi" element={<InfoSecurityPolicy />} />
             <Route path="islem-rehberi" element={<TransactionGuide />} />
+            <Route path="ssl-sertifikasi" element={<SSLCertificate />} />
+            <Route path="teslimat-iade" element={<DeliveryReturnTerms />} />
+            <Route path="gizlilik-sozlesmesi" element={<PrivacyPolicy />} />
+            <Route path="mesafeli-satis" element={<DistanceSalesContract />} />
             <Route
               path="guest-checkout-address"
               element={<GuestCheckoutAddress />}

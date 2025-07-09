@@ -17,16 +17,7 @@ const Footer = () => {
   };
 
   const paymentLogos = [
-    { name: "Bonus", url: "/indir.png" },
-    { name: "Maximum", url: "/indir (0).png" },
-    { name: "World", url: "/indir (7).png" },
-    { name: "Bankkart", url: "/indir (1).png" },
-    { name: "CardFinans", url: "/indir (8).png" },
-    { name: "Axess", url: "/indir (2).png" },
-    { name: "Paraf", url: "/indir (3).png" },
-    { name: "Visa", url: "/indir (4).png" },
-    { name: "Mastercard", url: "/indir (5).png" },
-    { name: "Troy", url: "/indir (6).png" },
+    { name: "Bonus", url: "/logo_band_colored@2x.png" },
   ];
 
   const appBadges = [
@@ -44,6 +35,7 @@ const Footer = () => {
         { label: "Hakkımızda", href: "/shop/hakkimizda" },
         { label: "Kişisel Verilerin Korunması", href: "/shop/kvkk" },
         { label: "Bilgi Güvenliği Politikası", href: "/shop/bilgi-guvenligi" },
+        { label: "SSL Sertifikası", href: "/shop/ssl-sertifikasi" },
       ],
     },
     {
@@ -52,6 +44,14 @@ const Footer = () => {
         { label: "Siparişlerim", href: "/shop/account" },
         { label: "Hesap Bilgilerim", href: "/shop/account" },
         { label: "İşlem Rehberi", href: "/shop/islem-rehberi" },
+      ],
+    },
+    {
+      title: "Yasal Bilgiler",
+      links: [
+        { label: "Teslimat ve İade Şartları", href: "/shop/teslimat-iade" },
+        { label: "Gizlilik Sözleşmesi", href: "/shop/gizlilik-sozlesmesi" },
+        { label: "Mesafeli Satış Sözleşmesi", href: "/shop/mesafeli-satis" },
       ],
     },
     {
@@ -77,7 +77,7 @@ const Footer = () => {
     <footer className="bg-white dark:bg-gray-900 pt-2 pb-2 md:pb-4 border-t border-gray-100 mt-6">
       <div className="mt-4 container mx-auto px-4 lg:px-20">
         {/* Main footer content */}
-        <div className="mb-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 min-[640px]:ml-16 min-[699px]:ml-16 min-[1024px]:ml-32">
+        <div className="mb-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 min-[640px]:ml-16 min-[699px]:ml-16 min-[1024px]:ml-32">
           {/* First row - 3 columns */}
           {footerLinks.map((section, index) => (
             <div key={index} className="space-y-3">
@@ -171,7 +171,7 @@ const Footer = () => {
                 key={logo.name}
                 src={logo.url}
                 alt={logo.name}
-                className="h-10 opacity-60"
+                className="h-10 opacity-90"
               />
             ))}
           </div>
