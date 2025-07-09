@@ -136,6 +136,30 @@ export const registerPhoneUser = createAsyncThunk(
     }
   }
 );
+export const forgotPassword = createAsyncThunk(
+  "/auth/forgot-password",
+  async ({ email }, { rejectWithValue }) => {
+    try {
+      const response = await api.post("/auth/forgot-password", { email });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+
+export const resetPassword = createAsyncThunk(
+  "/auth/reset-password",
+  async ({ token, password }, { rejectWithValue }) => {
+    try {
+      const response = await api.post(`/auth/reset-password/${token}`, { password });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+
 
 const authSlice = createSlice({
   name: "auth",

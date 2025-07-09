@@ -100,4 +100,46 @@ const sendAbandonedCartEmail = async (
   }
 };
 
-module.exports = { sendAbandonedCartEmail };
+/**
+ * Şifre sıfırlama e-postası gönderir.
+ * @param {string} toEmail Alıcının e-posta adresi
+ * @param {string} token Sıfırlama token'ı
+ * @returns {Promise<boolean>} E-posta başarıyla gönderildiyse true döner.
+ */
+const sendPasswordResetEmail = async (toEmail, token) => {
+  const resetLink = `${process.env.CLIENT_BASE_URL}/auth/reset-password/${token}`;
+
+  const emailHtml = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+      <h2 style="color: #333;">Şifre Sıfırlama Talebi</h2>
+      <p>Merhaba,</p>
+      <p>Hesabınız için bir şifre sıfırlama talebi aldık. Şifrenizi sıfırlamak için lütfen aşağıdaki butona tıklayın:</p>
+      <div style="text-align: center; margin: 20px 0;">
+        <a href="${resetLink}" style="background-color: #007bff; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Şifreyi Sıfırla</a>
+      </div>
+      <p>Bu link 1 saat boyunca geçerlidir.</p>
+      <p>Eğer bu talebi siz yapmadıysanız, bu e-postayı görmezden gelebilirsiniz. Şifreniz değiştirilmeyecektir.</p>
+      <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+      <p style="font-size: 12px; color: #888;">Teşekkürler,<br/>Deposun Ekibi</p>
+    </div>
+  `;
+
+  const mailOptions = {
+    from: `"Deposun Destek" <${process.env.EMAIL_USER}>`,
+    to: toEmail,
+    subject: "Deposun - Şifre Sıfırlama Talebiniz",
+    html: emailHtml,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Şifre sıfırlama e-postası başarıyla gönderildi: ${toEmail}`);
+    return true;
+  } catch (error) {
+    console.error(`E-posta gönderilemedi ${toEmail}:`, error);
+    return false;
+  }
+};
+
+
+module.exports = { sendAbandonedCartEmail, sendPasswordResetEmail };

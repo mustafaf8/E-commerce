@@ -9,6 +9,8 @@ const {
   updateUserDetails,
   verifyPhoneNumberLogin,
   registerPhoneNumberUser,
+  forgotPassword,
+  resetPassword,
 } = require("../../controllers/auth/auth-controller");
 
 const router = express.Router();
@@ -22,6 +24,8 @@ const cookieOptions = {
   domain: isProduction ? ".deposun.com" : undefined,
 };
 
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password/:token", resetPassword);
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);

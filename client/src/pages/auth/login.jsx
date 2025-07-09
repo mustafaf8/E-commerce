@@ -550,7 +550,14 @@ function AuthLogin() {
             onSubmit={handleEmailPasswordLogin}
             isBtnDisabled={emailLoading || loading}
           />
-
+              <div className="text-right mt-4">
+            <Link
+                to="/auth/forgot-password"
+                        className="text-sm font-medium text-primary hover:underline"
+                   >
+                  Şifremi Unuttum?
+             </Link>
+               </div>
           <Button
             type="button"
             variant="ghost"

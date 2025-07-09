@@ -59,6 +59,8 @@ const TransactionGuide = lazy(() =>
 const GuestCheckoutAddress = lazy(() =>
   import("./pages/shopping-view/GuestCheckoutAddress")
 );
+const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/auth/ResetPassword"));
 
 function App() {
   const {
@@ -136,6 +138,8 @@ function App() {
           >
             <Route path="login" element={<AuthLogin />} />
             <Route path="register" element={<AuthRegister />} />
+            <Route path="forgot-password" element={<ForgotPassword />} />
+            <Route path="reset-password/:token" element={<ResetPassword />} />
           </Route>
 
           <Route

@@ -52,6 +52,12 @@ const UserSchema = new mongoose.Schema(
       unique: true,
       sparse: true,
     },
+    resetPasswordToken: {
+      type: String,
+  },
+  resetPasswordExpires: {
+      type: Date,
+  },
     // İleride eklenebilecek diğer alanlar:
     // profilePicture: String,
     // isPhoneNumberVerified: { type: Boolean, default: false },

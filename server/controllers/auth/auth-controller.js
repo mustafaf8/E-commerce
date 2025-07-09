@@ -4,6 +4,9 @@ const User = require("../../models/User");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const admin = require("firebase-admin");
+const { sendPasswordResetEmail } = require("../../helpers/emailHelper");
+const crypto = require("crypto");
+
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -544,6 +547,73 @@ const registerPhoneNumberUser = async (req, res) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "Bu e-posta adresiyle kayıtlı kullanıcı bulunamadı." });
+    }
+
+    // Sıfırlama token'ı oluştur
+    const resetToken = crypto.randomBytes(20).toString('hex');
+
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 saat geçerli
+
+    await user.save();
+
+    // E-posta gönder
+    const emailSent = await sendPasswordResetEmail(user.email, resetToken);
+
+    if (emailSent) {
+      res.status(200).json({ success: true, message: "Şifre sıfırlama bağlantısı e-posta adresinize gönderildi." });
+    } else {
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save();
+      res.status(500).json({ success: false, message: "E-posta gönderilirken bir hata oluştu." });
+    }
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.status(500).json({ success: false, message: "Sunucu hatası." });
+  }
+};
+
+const resetPassword = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const { password } = req.body;
+
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: Date.now() },
+        });
+
+        if (!user) {
+            return res.status(400).json({ success: false, message: "Şifre sıfırlama linki geçersiz veya süresi dolmuş." });
+        }
+
+        if (password.length < 4) {
+            return res.status(400).json({ success: false, message: "Şifre en az 4 karakter olmalıdır." });
+        }
+
+        const hashPassword = await bcrypt.hash(password, 12);
+        user.password = hashPassword;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+
+        await user.save();
+
+        res.status(200).json({ success: true, message: "Şifreniz başarıyla güncellendi." });
+
+    } catch (error) {
+        console.error("Reset password error:", error);
+        res.status(500).json({ success: false, message: "Sunucu hatası." });
+    }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -552,4 +622,6 @@ module.exports = {
   updateUserDetails,
   verifyPhoneNumberLogin,
   registerPhoneNumberUser,
+  forgotPassword,
+  resetPassword,
 };
