@@ -6,9 +6,15 @@ import { format, parseISO, isValid } from "date-fns";
 import { orderStatusMappingUser } from "@/config";
 import { Card } from "../ui/card";
 import { Package, MapPin, User, ShoppingCart } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { cancelOrder } from "@/store/shop/order-slice";
+import { useState } from "react";
+import ConfirmationModal from "@/components/admin-view/ConfirmationModal";
 
 function ShoppingOrderDetailsView({ orderDetails }) {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   if (!orderDetails) {
     return <div>Sipariş detayı bulunamadı.</div>;
@@ -44,6 +50,16 @@ function ShoppingOrderDetailsView({ orderDetails }) {
     : isAuthenticated && user
     ? user.email
     : "E-posta Yok";
+
+  // İptal edilebilir mi?
+  const cancellableStatuses = ["pending", "pending_payment", "confirmed"];
+  const canCancel = cancellableStatuses.includes(orderDetails.orderStatus);
+
+  const handleCancelOrder = () => {
+    dispatch(cancelOrder(orderDetails._id)).then(() => {
+      setShowCancelConfirm(false);
+    });
+  };
 
   return (
     <div className="flex flex-col gap-4 pt-2">
@@ -197,6 +213,22 @@ function ShoppingOrderDetailsView({ orderDetails }) {
           </p>
         )}
       </Card>
+
+      {canCancel && (
+        <button
+          className="mt-2 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded"
+          onClick={() => setShowCancelConfirm(true)}
+        >
+          Siparişi İptal Et
+        </button>
+      )}
+
+      <ConfirmationModal
+        isOpen={showCancelConfirm}
+        message="Bu siparişi iptal etmek istediğinize emin misiniz?"
+        onConfirm={handleCancelOrder}
+        onCancel={() => setShowCancelConfirm(false)}
+      />
     </div>
   );
 }

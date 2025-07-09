@@ -81,6 +81,22 @@ export const createGuestOrderThunk = createAsyncThunk(
   }
 );
 
+export const cancelOrder = createAsyncThunk(
+  "order/cancelOrder",
+  async (orderId, { rejectWithValue }) => {
+    try {
+      const response = await api.put(`/shop/order/cancel/${orderId}`, {}, {
+        withCredentials: true,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || { message: "Sipariş iptal edilemedi." }
+      );
+    }
+  }
+);
+
 const shoppingOrderSlice = createSlice({
   name: "shopOrder",
   initialState,
@@ -198,6 +214,36 @@ const shoppingOrderSlice = createSlice({
           "Misafir siparişi oluşturulurken bir hata oluştu.";
         state.paymentPageUrl = null;
         state.orderId = null;
+      })
+
+      // ---- İPTAL SİPARİŞ ----
+      .addCase(cancelOrder.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(cancelOrder.fulfilled, (state, action) => {
+        state.isLoading = false;
+        const updatedOrder = action.payload?.data;
+        if (updatedOrder) {
+          // orderList güncelle
+          state.orderList = state.orderList.map((o) =>
+            o._id === updatedOrder._id ? updatedOrder : o
+          );
+          // orderDetails güncelle
+          if (state.orderDetails && state.orderDetails._id === updatedOrder._id) {
+            state.orderDetails = updatedOrder;
+          }
+        }
+        state.error = !action.payload?.success
+          ? action.payload?.message || "Sipariş iptal edilemedi."
+          : null;
+      })
+      .addCase(cancelOrder.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error =
+          action.payload?.message ||
+          action.error.message ||
+          "Sipariş iptali sırasında bir hata oluştu.";
       });
   },
 });

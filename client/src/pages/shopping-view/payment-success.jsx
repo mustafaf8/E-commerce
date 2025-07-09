@@ -76,7 +76,7 @@ const PaymentSuccessPage = () => {
                       to="/shop/account"
                       className="text-blue-600 hover:underline"
                     >
-                      Hesabım &gt; Siparişlerim
+                     &nbsp; Hesabım &gt; Siparişlerim &nbsp;
                     </Link>
                     bölümünden
                   </>

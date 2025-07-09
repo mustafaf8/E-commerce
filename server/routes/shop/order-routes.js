@@ -6,6 +6,8 @@ const {
   handleIyzicoCallback,
   createGuestOrder,
   trackGuestOrder,
+  cancelOrder,
+  cancelGuestOrder,
 } = require("../../controllers/shop/order-controller");
 
 const { authMiddleware } = require("../../controllers/auth/auth-controller");
@@ -18,4 +20,6 @@ router.post("/iyzico-callback", handleIyzicoCallback);
 router.get("/list/:userId", authMiddleware, getAllOrdersByUser);
 router.get("/details/:id", getOrderDetails);
 router.get("/track/:orderId", trackGuestOrder);
+router.put("/cancel/:id", authMiddleware, cancelOrder);
+router.put("/guest-cancel/:orderId", cancelGuestOrder);
 module.exports = router;

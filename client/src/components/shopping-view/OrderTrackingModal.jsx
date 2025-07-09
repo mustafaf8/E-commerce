@@ -26,6 +26,8 @@ import { format, parseISO, isValid } from "date-fns";
 import { orderStatusMappingUser } from "@/config";
 import React from "react";
 import api from "@/api/axiosInstance";
+import ConfirmationModal from "@/components/admin-view/ConfirmationModal";
+import { useToast } from "@/components/ui/use-toast";
 
 const statusIcons = {
   pending_payment: <AlertCircle className="w-5 h-5 mr-2" />,
@@ -46,6 +48,10 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchResult, setSearchResult] = useState(null);
   const [searchError, setSearchError] = useState("");
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const { toast } = useToast();
+
+  const cancellableStatuses = ["pending", "pending_payment", "confirmed"];
 
   const handleTrackOrder = async (e) => {
     e.preventDefault();
@@ -83,6 +89,23 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
   const handleLoginRedirect = () => {
     navigate("/auth/login");
     onClose();
+  };
+
+  const handleGuestCancel = async () => {
+    if (!searchResult?._id) return;
+    try {
+      const resp = await api.put(`/shop/order/guest-cancel/${searchResult._id}`);
+      if (resp.data?.success) {
+        setSearchResult(resp.data.data);
+        toast({ title: "Başarılı", description: "Siparişiniz başarıyla iptal edildi.", variant: "success" });
+      } else {
+        toast({ title: "Hata", description: resp.data?.message || "Sipariş iptal edilemedi.", variant: "destructive" });
+      }
+    } catch (err) {
+      toast({ title: "Hata", description: err.response?.data?.message || "Sipariş iptal edilemedi.", variant: "destructive" });
+    } finally {
+      setShowCancelConfirm(false);
+    }
   };
 
   const formatDate = (dateString) => {
@@ -187,6 +210,26 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
             </div>
           </div>
         )}
+
+        {/* İptal butonu */}
+        {searchResult && cancellableStatuses.includes(searchResult.orderStatus) && (
+          <div className="mt-4">
+            <Button
+              variant="destructive"
+              className="w-full"
+              onClick={() => setShowCancelConfirm(true)}
+            >
+              Siparişi İptal Et
+            </Button>
+          </div>
+        )}
+
+        <ConfirmationModal
+          isOpen={showCancelConfirm}
+          message="Bu siparişi iptal etmek istediğinizden emin misiniz?"
+          onConfirm={handleGuestCancel}
+          onCancel={() => setShowCancelConfirm(false)}
+        />
 
         <div className="mt-6 text-center">
           <p className="text-sm text-muted-foreground mb-2">veya</p>

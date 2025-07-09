@@ -605,6 +605,103 @@ const trackGuestOrder = async (req, res) => {
   }
 };
 
+// Yeni: Kullanıcının siparişi iptal etmesine olanak tanıyan fonksiyon
+const cancelOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    // ID doğrulaması
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Geçersiz Sipariş ID formatı." });
+    }
+
+    // Siparişi bul
+    const order = await Order.findById(id);
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Sipariş bulunamadı." });
+    }
+
+    // Kullanıcının kendi siparişi mi?
+    if (order.userId?.toString() !== userId) {
+      return res.status(403).json({ success: false, message: "Bu siparişi iptal etme yetkiniz yok." });
+    }
+
+    // Zaten iptal edilmiş mi?
+    if (order.orderStatus === "cancelled") {
+      return res.status(400).json({ success: false, message: "Sipariş zaten iptal edilmiş." });
+    }
+
+    // İptale uygun durumlar
+    const cancellableStatuses = ["pending", "pending_payment", "confirmed"];
+    if (!cancellableStatuses.includes(order.orderStatus)) {
+      return res.status(400).json({ success: false, message: "Bu sipariş iptal edilemez." });
+    }
+
+    // Stok iadesi – yalnızca daha önce stoktan düşülmüş olabileceği varsayımıyla iade yapıyoruz.
+    for (const item of order.cartItems) {
+      await Product.findByIdAndUpdate(item.productId, {
+        $inc: { totalStock: item.quantity, salesCount: -item.quantity },
+      });
+    }
+
+    // Sipariş durumunu güncelle
+    order.orderStatus = "cancelled";
+    order.orderUpdateDate = new Date();
+    await order.save();
+
+    return res.status(200).json({ success: true, data: order, message: "Sipariş başarıyla iptal edildi." });
+  } catch (error) {
+   // console.error("cancelOrder error:", error);
+    return res.status(500).json({ success: false, message: "Sipariş iptal edilirken bir hata oluştu." });
+  }
+};
+
+// Misafir sipariş iptal fonksiyonu
+const cancelGuestOrder = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Geçersiz Sipariş ID formatı." });
+    }
+
+    const order = await Order.findById(orderId);
+    if (!order || !order.isGuestOrder) {
+      return res.status(404).json({ success: false, message: "Misafir siparişi bulunamadı." });
+    }
+
+    if (order.orderStatus === "cancelled") {
+      return res.status(400).json({ success: false, message: "Sipariş zaten iptal edilmiş." });
+    }
+
+    const cancellableStatuses = ["pending", "pending_payment", "confirmed"];
+    if (!cancellableStatuses.includes(order.orderStatus)) {
+      return res.status(400).json({ success: false, message: "Bu sipariş iptal edilemez." });
+    }
+
+    // Stok iadesi
+    for (const item of order.cartItems) {
+      await Product.findByIdAndUpdate(item.productId, {
+        $inc: { totalStock: item.quantity, salesCount: -item.quantity },
+      });
+    }
+
+    order.orderStatus = "cancelled";
+    order.orderUpdateDate = new Date();
+    await order.save();
+
+    return res.status(200).json({ success: true, data: order, message: "Sipariş başarıyla iptal edildi." });
+  } catch (error) {
+   // console.error("cancelGuestOrder error:", error);
+    return res.status(500).json({ success: false, message: "Sipariş iptal edilirken bir hata oluştu." });
+  }
+};
+
 module.exports = {
   createOrder,
   handleIyzicoCallback,
@@ -612,4 +709,6 @@ module.exports = {
   getOrderDetails,
   createGuestOrder,
   trackGuestOrder,
+  cancelOrder,
+  cancelGuestOrder,
 };
