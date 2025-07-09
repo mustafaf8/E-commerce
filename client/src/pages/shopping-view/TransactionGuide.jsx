@@ -233,6 +233,22 @@ const TransactionGuide = () => {
             </p>
           ),
         },
+        {
+          title: "Siparişimi Nasıl İptal Edebilirim?",
+          content: (
+            <ul className="list-disc pl-5 space-y-2">
+              <li>
+                <span className="font-medium">Giriş Yapmış Kullanıcı:</span> "Hesabım &gt; Siparişlerim" bölümünden iptal edilebilir statüdeki (Beklemede, Ödeme Bekleniyor, Onaylandı) bir siparişin <span className="font-medium">Detaylar</span> ekranına gidin ve <span className="font-medium">“Siparişi İptal Et”</span> butonuna tıklayın.
+              </li>
+              <li>
+                <span className="font-medium">Misafir Kullanıcı:</span> Ana sayfada veya sepet sayfasındaki <span className="font-medium">“Sipariş Takip”</span> butonuna tıklayın. Sipariş numaranızı girerek sorgulama yaptıktan sonra uygun durumdaysa <span className="font-medium">“Siparişi İptal Et”</span> butonu görünür.
+              </li>
+              <li>
+                İptal onayı sonrası stoklar otomatik olarak güncellenir ve ödemeniz henüz çekilmemişse provizyon serbest bırakılır.
+              </li>
+            </ul>
+          ),
+        },
       ],
     },
     {
