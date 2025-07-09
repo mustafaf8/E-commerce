@@ -32,6 +32,8 @@ import { fetchAllCategories } from "@/store/common-slice/categories-slice";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "../ui/use-toast";
 import OrderTrackingModal from "./OrderTrackingModal";
+import api from "@/api/axiosInstance";
+import { useRef } from "react";
 
 // Kategori Menüsü (Header'ın Alt Satırı İçin)
 function CategorySubMenu() {
@@ -274,6 +276,9 @@ function TopStrip() {
 function ShoppingHeader() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  const [suggestions, setSuggestions] = useState({ products: [], categories: [], brands: [] });
+  const [showSuggest, setShowSuggest] = useState(false);
+  const debounceRef = useRef();
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -284,6 +289,42 @@ function ShoppingHeader() {
       setSearchTerm("");
     }
   }, [searchParams]);
+
+  const fetchSuggestions = (keyword) => {
+    if (!keyword) {
+      setSuggestions({ products: [], categories: [], brands: [] });
+      return;
+    }
+    api
+      .get(`/shop/search/suggest?keyword=${encodeURIComponent(keyword)}`)
+      .then((resp) => {
+        if (resp.data?.success) {
+          setSuggestions(resp.data.data);
+        }
+      })
+      .catch(() => {});
+  };
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    clearTimeout(debounceRef.current);
+    if (value.trim() === "") {
+      setShowSuggest(false);
+      setSuggestions({ products: [], categories: [], brands: [] });
+      return;
+    }
+    debounceRef.current = setTimeout(() => {
+      fetchSuggestions(value.trim());
+      setShowSuggest(true);
+    }, 300);
+  };
+
+  const handleSuggestionClick = (path) => {
+    setShowSuggest(false);
+    setSearchTerm("");
+    navigate(path);
+  };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -314,9 +355,41 @@ function ShoppingHeader() {
                 type="search"
                 placeholder="Ürün, kategori veya marka ara..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={handleSearchChange}
                 className="w-full rounded-md bg-muted pl-10 pr-4 py-2.5 h-11 text-sm border-transparent focus:border-primary focus:bg-background focus:ring-1 focus:ring-primary max-md:hidden"
               />
+              {/* Suggestions Dropdown */}
+              {showSuggest && (suggestions.products.length > 0 || suggestions.categories.length > 0 || suggestions.brands.length > 0) && (
+                <div className="absolute z-50 mt-1 w-full bg-background border shadow-lg rounded-md max-h-80 overflow-y-auto">
+                  {suggestions.products.map((p) => (
+                    <div
+                      key={`prod-${p._id}`}
+                      className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
+                      onClick={() => handleSuggestionClick(`/shop/search?keyword=${encodeURIComponent(p.title)}`)}
+                    >
+                      Ürün: {p.title}
+                    </div>
+                  ))}
+                  {suggestions.categories.map((c) => (
+                    <div
+                      key={`cat-${c.slug}`}
+                      className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
+                      onClick={() => handleSuggestionClick(`/shop/listing?category=${c.slug}`)}
+                    >
+                      Kategori: {c.name}
+                    </div>
+                  ))}
+                  {suggestions.brands.map((b) => (
+                    <div
+                      key={`brand-${b.slug}`}
+                      className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
+                      onClick={() => handleSuggestionClick(`/shop/listing?brand=${b.slug}`)}
+                    >
+                      Marka: {b.name}
+                    </div>
+                  ))}
+                </div>
+              )}
               <button type="submit" className="hidden"></button>
             </div>
           </form>
@@ -334,9 +407,41 @@ function ShoppingHeader() {
               type="search"
               placeholder="Ne aramıştınız?"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
               className="w-full rounded-md bg-muted/70 dark:bg-muted/30 pl-10 pr-4 py-2 h-10 text-sm border-transparent focus:border-primary focus:bg-background focus:ring-1 focus:ring-primary"
             />
+            {/* Suggestions Dropdown */}
+            {showSuggest && (suggestions.products.length > 0 || suggestions.categories.length > 0 || suggestions.brands.length > 0) && (
+              <div className="absolute z-50 mt-1 w-full bg-background border shadow-lg rounded-md max-h-80 overflow-y-auto">
+                {suggestions.products.map((p) => (
+                  <div
+                    key={`prod-${p._id}`}
+                    className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
+                    onClick={() => handleSuggestionClick(`/shop/search?keyword=${encodeURIComponent(p.title)}`)}
+                  >
+                    Ürün: {p.title}
+                  </div>
+                ))}
+                {suggestions.categories.map((c) => (
+                  <div
+                    key={`cat-${c.slug}`}
+                    className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
+                    onClick={() => handleSuggestionClick(`/shop/listing?category=${c.slug}`)}
+                  >
+                    Kategori: {c.name}
+                  </div>
+                ))}
+                {suggestions.brands.map((b) => (
+                  <div
+                    key={`brand-${b.slug}`}
+                    className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
+                    onClick={() => handleSuggestionClick(`/shop/listing?brand=${b.slug}`)}
+                  >
+                    Marka: {b.name}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </form>
       </div>

@@ -9,9 +9,37 @@ const getFilteredProducts = async (req, res) => {
       brand: brandSlugs = [],
       sortBy = "salesCount-desc",
       limit = 30,
+      minPrice,
+      maxPrice,
+      minRating,
+      inStock,
     } = req.query;
 
     let filters = {};
+
+    // Sayısal parametreleri kontrol et
+    const parsedMinPrice = parseFloat(minPrice);
+    const parsedMaxPrice = parseFloat(maxPrice);
+    const parsedMinRating = parseFloat(minRating);
+    const parsedInStock = inStock === "true";
+
+    if (!isNaN(parsedMinPrice) || !isNaN(parsedMaxPrice)) {
+      filters.price = {};
+      if (!isNaN(parsedMinPrice)) {
+        filters.price.$gte = parsedMinPrice;
+      }
+      if (!isNaN(parsedMaxPrice)) {
+        filters.price.$lte = parsedMaxPrice;
+      }
+    }
+
+    if (!isNaN(parsedMinRating)) {
+      filters.averageReview = { $gte: parsedMinRating };
+    }
+
+    if (parsedInStock) {
+      filters.totalStock = { $gt: 0 };
+    }
 
     if (categorySlugs.length > 0) {
       const Category = mongoose.model("Category");

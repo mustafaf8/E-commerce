@@ -93,4 +93,37 @@ const searchProducts = async (req, res) => {
   }
 };
 
-module.exports = { searchProducts };
+const suggestSearch = async (req, res) => {
+  try {
+    const { keyword } = req.query;
+    if (!keyword || typeof keyword !== "string" || keyword.trim() === "") {
+      return res.status(200).json({ success: true, data: { products: [], categories: [], brands: [] } });
+    }
+
+    const trimmedKeyword = keyword.trim();
+    const escapedKeyword = trimmedKeyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regEx = new RegExp(escapedKeyword, "i");
+
+    const [productRes, categoryRes, brandRes] = await Promise.all([
+      Product.find({ title: regEx })
+        .select("title slug image")
+        .limit(5)
+        .lean(),
+      Category.find({ name: regEx }).select("name slug").limit(3).lean(),
+      Brand.find({ name: regEx }).select("name slug").limit(3).lean(),
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        products: productRes,
+        categories: categoryRes,
+        brands: brandRes,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Öneriler getirilirken hata oluştu." });
+  }
+};
+
+module.exports = { searchProducts, suggestSearch };

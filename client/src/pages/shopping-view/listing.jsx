@@ -33,10 +33,13 @@ function createSearchParamsHelper(filterParams) {
 
   for (const key of sortedKeys) {
     const value = filterParams[key];
-    if (Array.isArray(value) && value.length > 0) {
-      const sortedValue = [...value].sort();
-      const paramValue = sortedValue.join(",");
-      queryParams.push(`${key}=${encodeURIComponent(paramValue)}`);
+    if (Array.isArray(value)) {
+      if (value.length > 0) {
+        const sortedValue = [...value].sort();
+        queryParams.push(`${key}=${encodeURIComponent(sortedValue.join(","))}`);
+      }
+    } else if (value !== undefined && value !== "" && value !== null) {
+      queryParams.push(`${key}=${encodeURIComponent(value)}`);
     }
   }
   return queryParams.join("&");
@@ -44,12 +47,12 @@ function createSearchParamsHelper(filterParams) {
 
 function parseUrlParamsToFilters(searchParams) {
   const filters = {};
-  const sortedKeys = Array.from(searchParams.keys()).sort();
-
-  for (const key of sortedKeys) {
-    const value = searchParams.get(key);
-    if (value) {
+  for (const [key, value] of searchParams.entries()) {
+    if (value === "") continue;
+    if (key === "category" || key === "brand") {
       filters[key] = value.split(",").sort();
+    } else {
+      filters[key] = value; // scalar
     }
   }
   return filters;
@@ -108,6 +111,16 @@ function ShoppingListing() {
         return cpyFilters;
       }
       return prevFilters;
+    });
+  }, []);
+
+  const handleScalarFilter = useCallback((key, value) => {
+    setFilters((prev) => {
+      const newFilters = { ...prev, [key]: value };
+      if (value === "" || value === undefined) {
+        delete newFilters[key];
+      }
+      return newFilters;
     });
   }, []);
 
@@ -184,8 +197,12 @@ function ShoppingListing() {
     if (newFiltersString !== lastFiltersPushedToUrl.current) {
       const currentParams = new URLSearchParams(searchParams);
       Object.keys(filters).forEach((key) => {
-        if (filters[key].length > 0) {
-          currentParams.set(key, filters[key].join(","));
+        const value = filters[key];
+        if (Array.isArray(value)) {
+          if (value.length > 0) currentParams.set(key, value.join(","));
+          else currentParams.delete(key);
+        } else if (value !== undefined && value !== "") {
+          currentParams.set(key, value);
         } else {
           currentParams.delete(key);
         }
@@ -276,6 +293,7 @@ function ShoppingListing() {
       <ProductFilter
         filters={filters}
         handleFilter={handleFilter}
+        handleScalarFilter={handleScalarFilter}
         dynamicFilterOptions={dynamicFilterOptions}
         isLoading={categoriesLoading || brandsLoading}
       />

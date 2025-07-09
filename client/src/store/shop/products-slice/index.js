@@ -13,11 +13,18 @@ export const fetchAllFilteredProducts = createAsyncThunk(
   "products/fetchAllProducts",
   async ({ filterParams, sortParams }, { rejectWithValue }) => {
     try {
-      const query = new URLSearchParams({
-        ...filterParams,
-        sortBy: sortParams,
-      }).toString();
+      const params = {};
+      Object.keys(filterParams || {}).forEach((key) => {
+        const value = filterParams[key];
+        if (Array.isArray(value)) {
+          if (value.length > 0) params[key] = value.join(",");
+        } else if (value !== undefined && value !== "") {
+          params[key] = value;
+        }
+      });
+      params.sortBy = sortParams;
 
+      const query = new URLSearchParams(params).toString();
       const response = await api.get(`/shop/products/get?${query}`);
       return response.data;
     } catch (error) {
