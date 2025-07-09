@@ -55,7 +55,7 @@ const addProductReview = async (req, res) => {
       data: newReview,
     });
   } catch (e) {
-    console.log(e);
+   // console.log(e);
     res.status(500).json({
       success: false,
       message: "Error",
@@ -73,7 +73,7 @@ const getProductReviews = async (req, res) => {
       data: reviews,
     });
   } catch (e) {
-    console.log(e);
+   // console.log(e);
     res.status(500).json({
       success: false,
       message: "Error",

@@ -40,7 +40,7 @@ const addHomeSectionAdmin = async (req, res) => {
       data: newSection,
     });
   } catch (error) {
-    console.error("Admin bölüm ekleme hatası:", error);
+    //console.error("Admin bölüm ekleme hatası:", error);
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -57,7 +57,7 @@ const getAllHomeSectionsAdmin = async (req, res) => {
     const sections = await HomeSection.find({}).sort({ displayOrder: 1 });
     res.status(200).json({ success: true, data: sections });
   } catch (error) {
-    console.error("Admin tüm bölümleri getirme hatası:", error);
+    //console.error("Admin tüm bölümleri getirme hatası:", error);
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
 };
@@ -111,7 +111,7 @@ const updateHomeSectionAdmin = async (req, res) => {
       data: updatedSection,
     });
   } catch (error) {
-    console.error("Admin bölüm güncelleme hatası:", error);
+    //console.error("Admin bölüm güncelleme hatası:", error);
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -142,7 +142,7 @@ const deleteHomeSectionAdmin = async (req, res) => {
       .status(200)
       .json({ success: true, message: "Bölüm silindi.", data: { _id: id } });
   } catch (error) {
-    console.error("Admin bölüm silme hatası:", error);
+    //console.error("Admin bölüm silme hatası:", error);
     if (error.name === "CastError") {
       return res
         .status(400)
@@ -170,7 +170,7 @@ const updateHomeSectionsOrderAdmin = async (req, res) => {
     const updatedSections = await Promise.all(updatePromises);
 
     if (updatedSections.some((section) => section === null)) {
-      console.warn("Sıralama güncellemede bazı bölümler bulunamadı.");
+      //console.warn("Sıralama güncellemede bazı bölümler bulunamadı.");
     }
 
     res.status(200).json({
@@ -179,7 +179,7 @@ const updateHomeSectionsOrderAdmin = async (req, res) => {
       data: await HomeSection.find({}).sort({ displayOrder: 1 }),
     });
   } catch (error) {
-    console.error("Admin bölüm sıralama hatası:", error);
+    //console.error("Admin bölüm sıralama hatası:", error);
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
 };

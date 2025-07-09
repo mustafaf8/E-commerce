@@ -19,7 +19,7 @@ export const getGuestCart = () => {
         .substring(2, 7)}`,
     };
   } catch (error) {
-    console.error("Error reading guest cart from localStorage:", error);
+   // console.error("Error reading guest cart from localStorage:", error);
     return {
       items: [],
       guestCartId: `guest_${Date.now()}_${Math.random()
@@ -38,10 +38,10 @@ export const saveGuestCart = (cart) => {
     if (cart && Array.isArray(cart.items) && cart.guestCartId) {
       localStorage.setItem(GUEST_CART_KEY, JSON.stringify(cart));
     } else {
-      console.warn("Attempted to save an invalid guest cart structure:", cart);
+     // console.warn("Attempted to save an invalid guest cart structure:", cart);
     }
   } catch (error) {
-    console.error("Error saving guest cart to localStorage:", error);
+   // console.error("Error saving guest cart to localStorage:", error);
   }
 };
 
@@ -52,7 +52,7 @@ export const clearGuestCart = () => {
   try {
     localStorage.removeItem(GUEST_CART_KEY);
   } catch (error) {
-    console.error("Error clearing guest cart from localStorage:", error);
+  //  console.error("Error clearing guest cart from localStorage:", error);
   }
 };
 

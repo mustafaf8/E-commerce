@@ -166,7 +166,7 @@ export const deleteCartItem = createAsyncThunk(
         saveGuestCart(newGuestCart);
         return { success: true, data: newGuestCart, fromLocalStorage: true };
       } catch (error) {
-        console.error("Yerel sepetten silme hatası:", error);
+       // console.error("Yerel sepetten silme hatası:", error);
         return rejectWithValue({
           success: false,
           message: error.message || "Yerel sepetten silinemedi.",
@@ -212,9 +212,9 @@ export const updateCartQuantity = createAsyncThunk(
         const cartItemToUpdate = localCart.items[itemIndex];
 
         if (cartItemToUpdate.totalStock === undefined) {
-          console.warn(
-            `Misafir sepetindeki ${productId} için stok bilgisi eksik.`
-          );
+         // console.warn(
+         //   `Misafir sepetindeki ${productId} için stok bilgisi eksik.`
+         // );
         } else if (quantity > cartItemToUpdate.totalStock) {
           return rejectWithValue({
             success: false,
@@ -240,7 +240,7 @@ export const updateCartQuantity = createAsyncThunk(
         saveGuestCart(newGuestCart);
         return { success: true, data: newGuestCart, fromLocalStorage: true };
       } catch (error) {
-        console.error("Yerel sepet güncelleme hatası:", error);
+       // console.error("Yerel sepet güncelleme hatası:", error);
         return rejectWithValue({
           success: false,
           message: error.message || "Yerel sepet güncellenemedi.",

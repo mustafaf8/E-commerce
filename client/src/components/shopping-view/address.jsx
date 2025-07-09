@@ -84,7 +84,7 @@ function Address({ setCurrentSelectedAddress, seciliAdresProp }) {
       setAddressIdToDelete(getCurrentAddress._id);
       setShowConfirmModal(true);
     } else {
-      console.error("Silinecek adres ID'si bulunamadı.");
+     // console.error("Silinecek adres ID'si bulunamadı.");
       toast({
         variant: "destructive",
         title: "Hata",
@@ -146,12 +146,12 @@ function Address({ setCurrentSelectedAddress, seciliAdresProp }) {
     dispatch(fetchAllAddresses(user?.id));
   }, [dispatch, user?.id]);
 
-  console.log(
-    "Address Component Render - Received selectedId:",
-    seciliAdresProp
-  );
+  //console.log(
+  //  "Address Component Render - Received selectedId:",
+  //  seciliAdresProp
+  //);
 
-  console.log(addressList, "addressList prop in Address component");
+  //console.log(addressList, "addressList prop in Address component");
 
   return (
     <Card>

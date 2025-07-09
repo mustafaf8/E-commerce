@@ -105,7 +105,7 @@ function AdminProducts() {
           );
         }
       } catch (error) {
-        console.error("Ürün resmi yükleme hatası:", error);
+       // console.error("Ürün resmi yükleme hatası:", error);
         toast({
           variant: "destructive",
           title: "Resim Yükleme Hatası",
@@ -187,7 +187,7 @@ function AdminProducts() {
           brand: formData.brand || null,
           image: finalImageUrl,
         };
-        console.log("Gönderilen Veri (Brand Kontrol):", dataToSend);
+       // console.log("Gönderilen Veri (Brand Kontrol):", dataToSend);
         const action =
           currentEditedId !== null
             ? editProduct({ id: currentEditedId, formData: dataToSend })
@@ -203,7 +203,7 @@ function AdminProducts() {
         });
         setOpenCreateProductsDialog(false);
       } catch (error) {
-        console.error("onSubmit sırasında hata:", error);
+       // console.error("onSubmit sırasında hata:", error);
         toast({
           variant: "destructive",
           title: "İşlem Başarısız",

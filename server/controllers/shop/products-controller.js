@@ -72,7 +72,7 @@ const getFilteredProducts = async (req, res) => {
       data: products,
     });
   } catch (error) {
-    console.error("getFilteredProducts error:", error);
+   // console.error("getFilteredProducts error:", error);
     res.status(500).json({
       success: false,
       message: "Ürünler getirilirken bir hata oluştu.",
@@ -104,7 +104,7 @@ const getProductDetails = async (req, res) => {
       data: product,
     });
   } catch (error) {
-    console.error("getProductDetails error:", error);
+   // console.error("getProductDetails error:", error);
     res.status(500).json({
       success: false,
       message: "Ürün detayı alınırken bir hata oluştu.",

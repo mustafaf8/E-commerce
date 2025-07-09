@@ -21,9 +21,9 @@ function AddressCard({
     e.stopPropagation();
     handleDeleteAddress(addressInfo);
   };
-  console.log(
-    `AddressCard ID: ${addressInfo?._id}, Selected ID: ${selectedId?._id}, isSelected: ${isSelected}`
-  );
+  //console.log(
+  //  `AddressCard ID: ${addressInfo?._id}, Selected ID: ${selectedId?._id}, isSelected: ${isSelected}`
+  //);
 
   const cardClasses = `
     cursor-pointer

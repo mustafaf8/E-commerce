@@ -60,7 +60,7 @@ const getSalesOverview = async (req, res) => {
     ]);
     res.status(200).json({ success: true, data: results[0] || {} });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -79,7 +79,7 @@ const getOrderStatusDistribution = async (_req, res) => {
     }, {});
     res.status(200).json({ success: true, data: distribution });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -131,7 +131,7 @@ const getTopSellingProducts = async (req, res) => {
       .select("_id title image salesCount salePrice");
     res.status(200).json({ success: true, data: products });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -161,7 +161,7 @@ const getSalesByCategory = async (_req, res) => {
     const stats = await Product.aggregate(pipeline);
     res.status(200).json({ success: true, data: stats });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -191,7 +191,7 @@ const getSalesByBrand = async (_req, res) => {
     const stats = await Product.aggregate(pipeline);
     res.status(200).json({ success: true, data: stats });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -230,7 +230,7 @@ const getUserSummary = async (req, res) => {
 
     res.status(200).json({ success: true, data: { totalUsers, newUsers } });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -287,7 +287,7 @@ const getTopCustomers = async (req, res) => {
     const customers = await Order.aggregate(pipeline);
     res.status(200).json({ success: true, data: customers });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -313,7 +313,7 @@ const getProductSummary = async (_req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -349,7 +349,7 @@ const getSalesTrend = async (req, res) => {
 
     res.status(200).json({ success: true, data });
   } catch (e) {
-    console.error(e);
+    //console.error(e);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -401,7 +401,7 @@ const getUserRegistrationsTrend = async (req, res) => {
 
     res.status(200).json({ success: true, data });
   } catch (e) {
-    console.error(e);
+    //console.error(e);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -442,7 +442,7 @@ const getTopLikedProducts = async (req, res) => {
     const liked = await Wishlist.aggregate(pipeline);
     res.status(200).json({ success: true, data: liked });
   } catch (e) {
-    console.error(e);
+    //console.error(e);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -519,7 +519,7 @@ const getProfitOverview = async (req, res) => {
     const result = await Order.aggregate(pipeline);
     res.status(200).json({ success: true, data: result[0] || {} });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -555,7 +555,7 @@ const getProfitByProduct = async (req, res) => {
     const data = await Order.aggregate(pipeline);
     res.status(200).json({ success: true, data });
   } catch (e) {
-    console.error(e);
+    //console.error(e);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -606,7 +606,7 @@ const getProfitByCategory = async (_req, res) => {
     const data = await Order.aggregate(pipeline);
     res.status(200).json({ success: true, data });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -657,7 +657,7 @@ const getProfitByBrand = async (_req, res) => {
     const data = await Order.aggregate(pipeline);
     res.status(200).json({ success: true, data });
   } catch (e) {
-    console.error(e);
+    //console.error(e);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

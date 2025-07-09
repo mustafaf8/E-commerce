@@ -7,7 +7,7 @@ const getActiveHomeSectionsShop = async (req, res) => {
     });
     res.status(200).json({ success: true, data: sections });
   } catch (error) {
-    console.error("Aktif ana sayfa bölümlerini getirme hatası:", error);
+   // console.error("Aktif ana sayfa bölümlerini getirme hatası:", error);
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
 };

@@ -36,10 +36,10 @@ export const getAllOrdersByUserId = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      console.error(
-        "getAllOrdersByUserId API Hatası:",
-        error.response?.data || error.message
-      );
+    //  console.error(
+      //  "getAllOrdersByUserId API Hatası:",
+      //  error.response?.data || error.message
+     // );
       return rejectWithValue(
         error.response?.data || { message: "Siparişler alınamadı." }
       );
@@ -56,10 +56,10 @@ export const getOrderDetails = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      console.error(
-        "getOrderDetails API Hatası:",
-        error.response?.data || error.message
-      );
+    //  console.error(
+    //    "getOrderDetails API Hatası:",
+    //    error.response?.data || error.message
+    //  );
       return rejectWithValue(
         error.response?.data || { message: "Sipariş detayı alınamadı." }
       );

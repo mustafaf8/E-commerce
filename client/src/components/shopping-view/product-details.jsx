@@ -184,7 +184,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
         title: "Yorum Başarıyla Eklendi!",
       });
     } catch (error) {
-      console.error("Yorum ekleme hatası yakalandı:", error);
+     // console.error("Yorum ekleme hatası yakalandı:", error);
       toast({
         variant: "destructive",
         title: "Yorum Eklenemedi",

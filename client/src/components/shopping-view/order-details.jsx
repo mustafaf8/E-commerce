@@ -22,7 +22,7 @@ function ShoppingOrderDetailsView({ orderDetails }) {
         formattedDate = format(parsedDate, "dd.MM.yyyy HH:mm");
       }
     } catch (e) {
-      console.error("Detayda tarih formatlama hatası:", e);
+     // console.error("Detayda tarih formatlama hatası:", e);
     }
   }
 

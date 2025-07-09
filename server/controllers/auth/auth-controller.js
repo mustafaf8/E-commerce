@@ -117,7 +117,7 @@ const registerUser = async (req, res) => {
       message: "Kayıt işlemi başarılı",
     });
   } catch (e) {
-    console.log(e);
+   // console.log(e);
     res.status(500).json({
       success: false,
       message: "Kayıt sırasında bir hata oluştu.",
@@ -206,7 +206,7 @@ const loginUser = async (req, res) => {
       },
     });
   } catch (e) {
-    console.log(e);
+   // console.log(e);
     res.status(500).json({
       success: false,
       message: "Giriş sırasında bir hata oluştu.",
@@ -221,7 +221,7 @@ const logoutUser = (req, res, next) => {
     }
     req.session.destroy((err) => {
       if (err) {
-        console.error("Session yok etme hatası:", err);
+       // console.error("Session yok etme hatası:", err);
       }
       res
         .clearCookie("token", cookieOptions)
@@ -237,12 +237,12 @@ const logoutUser = (req, res, next) => {
 
 const authMiddleware = async (req, res, next) => {
   if (req.isAuthenticated()) {
-    console.log("authMiddleware -> User is authenticated via session.");
+   // console.log("authMiddleware -> User is authenticated via session.");
     return next();
   }
 
   const token = req.cookies.token;
-  console.log("authMiddleware -> Checking token cookie:", token);
+  //console.log("authMiddleware -> Checking token cookie:", token);
   if (!token)
     return res.status(200).json({
       success: false,
@@ -259,13 +259,13 @@ const authMiddleware = async (req, res, next) => {
       throw new Error("Token'daki kullanıcı bulunamadı.");
     }
     req.user = userFromToken;
-    console.log("authMiddleware -> User authenticated via token.");
+   // console.log("authMiddleware -> User authenticated via token.");
     next();
   } catch (error) {
-    console.error(
-      "authMiddleware -> Token verification failed:",
-      error.message
-    );
+   // console.error(
+   //   "authMiddleware -> Token verification failed:",
+   //   error.message
+   // );
     res.clearCookie("token", cookieOptions);
     res.status(401).json({
       success: false,
@@ -329,7 +329,7 @@ const updateUserDetails = async (req, res) => {
     }
     if (Object.keys(updatedFields).length > 0) {
       await User.updateOne({ _id: userId }, { $set: updatedFields });
-      console.log(`Kullanıcı ${userId} güncellendi:`, updatedFields);
+     // console.log(`Kullanıcı ${userId} güncellendi:`, updatedFields);
       const updatedUser = await User.findById(userId).select("-password");
       const newToken = jwt.sign(
         {
@@ -370,7 +370,7 @@ const updateUserDetails = async (req, res) => {
         .json({ success: true, message: "Güncellenecek değişiklik yok." });
     }
   } catch (error) {
-    console.error("Kullanıcı güncelleme hatası:", error);
+   // console.error("Kullanıcı güncelleme hatası:", error);
     res.status(500).json({
       success: false,
       message: "Kullanıcı bilgileri güncellenirken hata oluştu.",
@@ -425,7 +425,7 @@ const verifyPhoneNumberLogin = async (req, res) => {
         },
       });
     } else {
-      console.log(`Yeni kullanıcı algılandı (Telefon): ${phoneNumber}`);
+     // console.log(`Yeni kullanıcı algılandı (Telefon): ${phoneNumber}`);
       res.status(200).json({
         success: true,
         isNewUser: true,
@@ -434,10 +434,10 @@ const verifyPhoneNumberLogin = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error(
-      "Firebase token doğrulama veya kullanıcı kontrol hatası:",
-      error
-    );
+   // console.error(
+   //   "Firebase token doğrulama veya kullanıcı kontrol hatası:",
+   //   error
+   // );
     let message = "Telefon numarası doğrulama başarısız.";
     if (error.code === "auth/id-token-expired") {
       message = "Oturum süresi dolmuş, lütfen tekrar giriş yapın.";
@@ -470,9 +470,9 @@ const registerPhoneNumberUser = async (req, res) => {
 
     const existingUser = await User.findOne({ phoneNumber: phoneNumber });
     if (existingUser) {
-      console.warn(
-        `Register attempt for existing phone number: ${phoneNumber}. Logging in instead.`
-      );
+     // console.warn(
+     //   `Register attempt for existing phone number: ${phoneNumber}. Logging in instead.`
+     // );
       const jwtToken = jwt.sign(
         {
           id: existingUser._id,
@@ -505,9 +505,9 @@ const registerPhoneNumberUser = async (req, res) => {
     });
 
     await newUser.save();
-    console.log(
-      `Yeni kullanıcı kaydedildi (Telefon): ${phoneNumber}, Ad: ${newUser.userName}`
-    );
+   // console.log(
+   //   `Yeni kullanıcı kaydedildi (Telefon): ${phoneNumber}, Ad: ${newUser.userName}`
+   // );
 
     const jwtToken = jwt.sign(
       {
@@ -534,7 +534,7 @@ const registerPhoneNumberUser = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Telefon numarası ile kullanıcı kaydı hatası:", error);
+   // console.error("Telefon numarası ile kullanıcı kaydı hatası:", error);
     let message = "Kullanıcı kaydı sırasında bir hata oluştu.";
     if (error.code === "auth/id-token-expired") {
       message = "Oturum süresi dolmuş, lütfen tekrar deneyin.";
@@ -576,7 +576,7 @@ const forgotPassword = async (req, res) => {
       res.status(500).json({ success: false, message: "E-posta gönderilirken bir hata oluştu." });
     }
   } catch (error) {
-    console.error("Forgot password error:", error);
+   // console.error("Forgot password error:", error);
     res.status(500).json({ success: false, message: "Sunucu hatası." });
   }
 };
@@ -609,7 +609,7 @@ const resetPassword = async (req, res) => {
         res.status(200).json({ success: true, message: "Şifreniz başarıyla güncellendi." });
 
     } catch (error) {
-        console.error("Reset password error:", error);
+       // console.error("Reset password error:", error);
         res.status(500).json({ success: false, message: "Sunucu hatası." });
     }
 };

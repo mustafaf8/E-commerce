@@ -76,16 +76,16 @@ function ProductCarousel({
               payload.data?.slice(0, fetchConfig.limit || 10) || []
             );
           } else {
-            console.error(
-              `Carousel fetch failed for ${title}:`,
-              payload.message
-            );
+         //   console.error(
+         //     `Carousel fetch failed for ${title}:`,
+        //      payload.message
+          //  );
             setInternalError(payload.message || "Veri alınamadı.");
             setInternalProducts([]);
           }
         })
         .catch((error) => {
-          console.error(`Carousel error for ${title}:`, error);
+         // console.error(`Carousel error for ${title}:`, error);
           setInternalError(error.message || "Bir hata oluştu.");
           setInternalProducts([]);
         })
@@ -116,7 +116,7 @@ function ProductCarousel({
 
   const handleViewAllClick = () => {
     if (viewAllPath) navigate(viewAllPath);
-    else console.warn("ProductCarousel: viewAllPath prop'u tanımlanmamış.");
+    else  console.warn("ProductCarousel: viewAllPath prop'u tanımlanmamış.");
   };
 
   return (

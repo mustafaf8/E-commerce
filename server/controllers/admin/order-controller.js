@@ -17,7 +17,7 @@ const getAllOrdersOfAllUsers = async (req, res) => {
       data: orders,
     });
   } catch (e) {
-    console.log(e);
+    //console.log(e);
     res.status(500).json({
       success: false,
       message: "Some error occured!",
@@ -64,7 +64,7 @@ const getOrderDetailsForAdmin = async (req, res) => {
       data: order,
     });
   } catch (e) {
-    console.error("getOrderDetailsForAdmin error:", e);
+    //console.error("getOrderDetailsForAdmin error:", e);
     res.status(500).json({
       success: false,
       message: "Admin için sipariş detayı alınırken hata oluştu.",
@@ -107,7 +107,7 @@ const updateOrderStatus = async (req, res) => {
       message: "Order status is updated successfully!",
     });
   } catch (e) {
-    console.log(e);
+    //console.log(e);
     res.status(500).json({
       success: false,
       message: "Some error occured!",
@@ -210,7 +210,7 @@ const getUsersWithOrders = async (req, res) => {
       data: usersWithOrders,
     });
   } catch (e) {
-    console.error("getUsersWithOrders error:", e);
+    //console.error("getUsersWithOrders error:", e);
     res.status(500).json({
       success: false,
       message: "Kullanıcı sipariş listesi alınırken bir hata oluştu!",
@@ -258,7 +258,7 @@ const getOrdersByUserIdForAdmin = async (req, res) => {
       data: orders,
     });
   } catch (e) {
-    console.error("getOrdersByUserIdForAdmin error:", e);
+    //console.error("getOrdersByUserIdForAdmin error:", e);
     res.status(500).json({
       success: false,
       message: "Belirli kullanıcıya ait siparişler alınırken bir hata oluştu!",
@@ -277,7 +277,7 @@ const getAllGuestOrdersForAdmin = async (req, res) => {
       data: guestOrders,
     });
   } catch (e) {
-    console.error("getAllGuestOrdersForAdmin error:", e);
+    //console.error("getAllGuestOrdersForAdmin error:", e);
     res.status(500).json({
       success: false,
       message: "Misafir siparişleri alınırken bir hata oluştu!",

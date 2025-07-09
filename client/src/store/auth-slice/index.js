@@ -53,7 +53,7 @@ export const logoutUser = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
-      console.error("Logout API error:", error.response?.data || error.message);
+     // console.error("Logout API error:", error.response?.data || error.message);
       return rejectWithValue(
         error.response?.data || { message: "Çıkış yapılamadı." }
       );

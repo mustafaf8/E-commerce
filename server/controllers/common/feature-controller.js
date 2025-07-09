@@ -9,7 +9,7 @@ const addFeatureImage = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Resim URL'si gerekli." });
     }
-    console.log("Gelen Feature Data:", { image, title, link });
+   // console.log("Gelen Feature Data:", { image, title, link });
     const newFeatureImage = new Feature({
       image,
       title,
@@ -24,7 +24,7 @@ const addFeatureImage = async (req, res) => {
       data: newFeatureImage,
     });
   } catch (e) {
-    console.error("Banner eklenirken hata:", e);
+   // console.error("Banner eklenirken hata:", e);
     if (e.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -41,7 +41,7 @@ const getFeatureImages = async (req, res) => {
     const images = await Feature.find({}).sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: images });
   } catch (e) {
-    console.log(e);
+   // console.log(e);
     res.status(500).json({ success: false, message: "Some error occured!" });
   }
 };
@@ -67,7 +67,7 @@ const deleteFeatureImage = async (req, res) => {
       data: { _id: imageId },
     });
   } catch (error) {
-    console.error("Banner resmi silinirken hata:", error);
+   // console.error("Banner resmi silinirken hata:", error);
     if (error.name === "CastError") {
       return res
         .status(400)

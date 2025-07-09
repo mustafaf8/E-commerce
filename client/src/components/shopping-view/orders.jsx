@@ -39,7 +39,7 @@ function ShoppingOrders() {
     isLoading: orderDetailsLoading,
   } = useSelector((state) => state.shopOrder || {});
 
-  console.log(orderList, `orderDetails ${user?.id}`);
+  //console.log(orderList, `orderDetails ${user?.id}`);
   function handleFetchOrderDetails(getId) {
     setSelectedOrderId(getId);
     dispatch(getOrderDetails(getId));
@@ -64,7 +64,7 @@ function ShoppingOrders() {
         return format(parsedDate, "dd.MM.yyyy");
       }
     } catch (e) {
-      console.error("Tarih formatlama hatası:", e);
+     // console.error("Tarih formatlama hatası:", e);
     }
     return "N/A";
   };

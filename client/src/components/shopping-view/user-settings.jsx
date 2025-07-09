@@ -19,7 +19,7 @@ function UserSettings() {
       })
       .catch((error) => {
         toast({ title: "Çıkış yapılamadı", variant: "destructive" });
-        console.error("Çıkış hatası:", error);
+       // console.error("Çıkış hatası:", error);
       });
   }
 

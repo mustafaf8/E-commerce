@@ -76,7 +76,7 @@ const promoCardSlice = createSlice({
       })
       .addCase(addPromoCard.rejected, (state, action) => {
         state.error = action.payload?.message || action.error.message;
-        console.error("Promo kart ekleme hatası:", state.error);
+       // console.error("Promo kart ekleme hatası:", state.error);
       })
       // deletePromoCard
       .addCase(deletePromoCard.fulfilled, (state, action) => {
@@ -89,7 +89,7 @@ const promoCardSlice = createSlice({
       })
       .addCase(deletePromoCard.rejected, (state, action) => {
         state.error = action.payload?.message || action.error.message;
-        console.error("Promo kart silme hatası:", state.error);
+       // console.error("Promo kart silme hatası:", state.error);
       });
   },
 });

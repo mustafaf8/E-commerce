@@ -117,7 +117,7 @@ function MainHeaderActions() {
         toast({ title: "Çıkış yapıldı", variant: "success" });
       })
       .catch((error) => {
-        console.error("Shop logout failed:", error);
+       // console.error("Shop logout failed:", error);
         toast({ variant: "destructive", title: "Çıkış yapılamadı." });
       });
   }

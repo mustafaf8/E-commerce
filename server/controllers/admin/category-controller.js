@@ -28,7 +28,7 @@ const addCategoryAdmin = async (req, res) => {
       .status(201)
       .json({ success: true, message: "Kategori eklendi.", data: newCategory });
   } catch (error) {
-    console.error("Admin kategori ekleme hatası:", error);
+    //console.error("Admin kategori ekleme hatası:", error);
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -87,7 +87,7 @@ const updateCategoryAdmin = async (req, res) => {
       data: updatedCategory,
     });
   } catch (error) {
-    console.error("Admin kategori güncelleme hatası:", error);
+    //console.error("Admin kategori güncelleme hatası:", error);
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -133,7 +133,7 @@ const deleteCategoryAdmin = async (req, res) => {
       .status(200)
       .json({ success: true, message: "Kategori silindi.", data: { _id: id } });
   } catch (error) {
-    console.error("Admin kategori silme hatası:", error);
+    //console.error("Admin kategori silme hatası:", error);
     if (error.name === "CastError") {
       return res
         .status(400)
@@ -148,7 +148,7 @@ const getAllCategoriesAdmin = async (req, res) => {
     const categories = await Category.find({}).sort({ name: 1 });
     res.status(200).json({ success: true, data: categories });
   } catch (error) {
-    console.error("Admin tüm kategorileri getirme hatası:", error);
+    //console.error("Admin tüm kategorileri getirme hatası:", error);
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
 };

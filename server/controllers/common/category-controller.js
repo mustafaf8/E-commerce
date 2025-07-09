@@ -7,7 +7,7 @@ const getActiveCategories = async (req, res) => {
     });
     res.status(200).json({ success: true, data: categories });
   } catch (error) {
-    console.error("Aktif kategorileri getirme hatası:", error);
+   // console.error("Aktif kategorileri getirme hatası:", error);
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
 };

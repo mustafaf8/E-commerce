@@ -20,10 +20,10 @@ export const getFeatureImages = createAsyncThunk(
         );
       }
     } catch (error) {
-      console.error(
-        "getFeatureImages API Hatası:",
-        error.response?.data || error.message
-      );
+    //  console.error(
+    //    "getFeatureImages API Hatası:",
+    //    error.response?.data || error.message
+    //  );
       return rejectWithValue(
         error.response?.data || { message: "Bannerlar getirilemedi." }
       );
@@ -44,10 +44,10 @@ export const addFeatureImage = createAsyncThunk(
         );
       }
     } catch (error) {
-      console.error(
-        "addFeatureImage API Hatası:",
-        error.response?.data || error.message
-      );
+    //  console.error(
+    //    "addFeatureImage API Hatası:",
+    //    error.response?.data || error.message
+    //  );
       return rejectWithValue(
         error.response?.data || { message: "Banner eklenemedi." }
       );
@@ -68,10 +68,10 @@ export const deleteFeatureImage = createAsyncThunk(
         );
       }
     } catch (error) {
-      console.error(
-        "deleteFeatureImage API Hatası:",
-        error.response?.data || error.message
-      );
+    //  console.error(
+    //    "deleteFeatureImage API Hatası:",
+    //    error.response?.data || error.message
+    //  );
       return rejectWithValue(
         error.response?.data || { message: "Banner silinemedi." }
       );
@@ -107,7 +107,7 @@ const commonSlice = createSlice({
       })
       .addCase(addFeatureImage.rejected, (state, action) => {
         state.error = action.payload?.message || action.error.message;
-        console.error("Banner ekleme hatası (Redux):", state.error);
+       // console.error("Banner ekleme hatası (Redux):", state.error);
       })
 
       .addCase(deleteFeatureImage.fulfilled, (state, action) => {
@@ -120,7 +120,7 @@ const commonSlice = createSlice({
       })
       .addCase(deleteFeatureImage.rejected, (state, action) => {
         state.error = action.payload?.message || action.error.message;
-        console.error("Banner silme hatası (Redux):", state.error);
+       // console.error("Banner silme hatası (Redux):", state.error);
       });
   },
 });

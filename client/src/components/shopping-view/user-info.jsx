@@ -50,7 +50,7 @@ function UserInfo() {
         }
       })
       .catch((error) => {
-        console.error("Update user details error:", error);
+       // console.error("Update user details error:", error);
         toast({
           title: error?.message || "Bilgiler güncellenemedi",
           variant: "destructive",

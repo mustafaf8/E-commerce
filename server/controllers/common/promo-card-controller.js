@@ -7,7 +7,7 @@ const getPromoCards = async (req, res) => {
     const promoCards = await PromoCard.find({}).sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: promoCards });
   } catch (error) {
-    console.error("Promosyon kartları getirilirken hata:", error);
+   // console.error("Promosyon kartları getirilirken hata:", error);
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
 };
@@ -32,7 +32,7 @@ const addPromoCard = async (req, res) => {
       data: newPromoCard,
     });
   } catch (error) {
-    console.error("Promosyon kartı eklenirken hata:", error);
+   // console.error("Promosyon kartı eklenirken hata:", error);
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -68,7 +68,7 @@ const deletePromoCard = async (req, res) => {
       data: { _id: cardId },
     });
   } catch (error) {
-    console.error("Promosyon kartı silinirken hata:", error);
+   // console.error("Promosyon kartı silinirken hata:", error);
     if (error.name === "CastError") {
       return res
         .status(400)

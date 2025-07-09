@@ -20,10 +20,10 @@ export const fetchSideBanners = createAsyncThunk(
         );
       }
     } catch (error) {
-      console.error(
-        "fetchSideBanners API Hatası:",
-        error.response?.data || error.message
-      );
+    //  console.error(
+    //    "fetchSideBanners API Hatası:",
+    //    error.response?.data || error.message
+    //  );
       return rejectWithValue(
         error.response?.data || { message: "Yan bannerlar getirilemedi." }
       );
@@ -44,10 +44,10 @@ export const addSideBanner = createAsyncThunk(
         );
       }
     } catch (error) {
-      console.error(
-        "addSideBanner API Hatası:",
-        error.response?.data || error.message
-      );
+    //  console.error(
+    //    "addSideBanner API Hatası:",
+    //    error.response?.data || error.message
+    //  );
       return rejectWithValue(
         error.response?.data || { message: "Yan banner eklenemedi." }
       );
@@ -69,10 +69,10 @@ export const deleteSideBanner = createAsyncThunk(
         );
       }
     } catch (error) {
-      console.error(
-        "deleteSideBanner API Hatası:",
-        error.response?.data || error.message
-      );
+    //  console.error(
+    //    "deleteSideBanner API Hatası:",
+    //    error.response?.data || error.message
+    //  );
       return rejectWithValue(
         error.response?.data || { message: "Yan banner silinemedi." }
       );
@@ -106,7 +106,7 @@ const sideBannerSlice = createSlice({
       })
       .addCase(addSideBanner.rejected, (state, action) => {
         state.error = action.payload?.message || action.error.message;
-        console.error("Yan banner ekleme hatası:", state.error);
+       // console.error("Yan banner ekleme hatası:", state.error);
       })
       .addCase(deleteSideBanner.fulfilled, (state, action) => {
         if (action.payload?.success && action.payload?.data?._id) {
@@ -118,7 +118,7 @@ const sideBannerSlice = createSlice({
       })
       .addCase(deleteSideBanner.rejected, (state, action) => {
         state.error = action.payload?.message || action.error.message;
-        console.error("Yan banner silme hatası:", state.error);
+       // console.error("Yan banner silme hatası:", state.error);
       });
   },
 });

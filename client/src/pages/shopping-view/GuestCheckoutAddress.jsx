@@ -70,7 +70,7 @@ function GuestCheckoutAddress() {
   };
   useEffect(() => {
     if (paymentPageUrl) {
-      console.log("PaymentPageUrl alındı, yönlendiriliyor:", paymentPageUrl);
+     // console.log("PaymentPageUrl alındı, yönlendiriliyor:", paymentPageUrl);
       dispatch(resetPaymentPageUrl());
       window.location.href = paymentPageUrl;
     }
@@ -108,7 +108,7 @@ function GuestCheckoutAddress() {
       })),
     };
 
-    console.log("Misafir siparişi için gönderilecek veri:", orderData);
+   // console.log("Misafir siparişi için gönderilecek veri:", orderData);
 
     dispatch(createGuestOrderThunk(orderData))
       .unwrap()

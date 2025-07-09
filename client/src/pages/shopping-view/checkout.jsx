@@ -22,10 +22,10 @@ function ShoppingCheckout() {
     (state) => state.shopOrder
   );
   const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
-  console.log(
-    "Checkout Render - currentSelectedAddress:",
-    currentSelectedAddress
-  );
+  //console.log(
+  //  "Checkout Render - currentSelectedAddress:",
+  //  currentSelectedAddress
+  //);
   const dispatch = useDispatch();
   const { toast } = useToast();
   useEffect(() => {
@@ -84,7 +84,7 @@ function ShoppingCheckout() {
     dispatch(createNewOrder(orderData))
       .unwrap()
       .then((result) => {
-        console.log("createNewOrder result:", result);
+       // console.log("createNewOrder result:", result);
         if (result?.success && result?.paymentPageUrl) {
           toast({
             title: "Ödeme sayfasına yönlendiriliyorsunuz...",
@@ -92,9 +92,9 @@ function ShoppingCheckout() {
           });
           window.location.href = result.paymentPageUrl;
         } else if (result?.success && result?.checkoutFormContent) {
-          console.warn(
-            "PaymentPageUrl alınamadı, checkoutFormContent ile devam edilmeli."
-          );
+         // console.warn(
+         //   "PaymentPageUrl alınamadı, checkoutFormContent ile devam edilmeli."
+         // );
           toast({
             variant: "destructive",
             title: "Yönlendirme Hatası",
@@ -112,7 +112,7 @@ function ShoppingCheckout() {
         }
       })
       .catch((error) => {
-        console.error("createNewOrder error:", error);
+       // console.error("createNewOrder error:", error);
       });
   }
 

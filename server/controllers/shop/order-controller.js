@@ -53,7 +53,7 @@ const createOrder = async (req, res) => {
           quantity: item.quantity,
         });
       } else {
-        console.warn(`Checkout sırasında ürün bulunamadı: ${item.productId}`);
+       // console.warn(`Checkout sırasında ürün bulunamadı: ${item.productId}`);
       }
     }
 
@@ -121,7 +121,7 @@ const createOrder = async (req, res) => {
 
     iyzipay.checkoutFormInitialize.create(request, (err, result) => {
       if (err) {
-        console.error("Iyzico checkoutFormInitialize Hatası:", err);
+       // console.error("Iyzico checkoutFormInitialize Hatası:", err);
         return res.status(500).json({
           success: false,
           message: "Iyzico ödeme başlatılamadı.",
@@ -136,7 +136,7 @@ const createOrder = async (req, res) => {
         pendingOrder.iyzicoToken = result.token;
         pendingOrder.save();
 
-        console.log("Iyzico paymentPageUrl:", result.paymentPageUrl);
+       // console.log("Iyzico paymentPageUrl:", result.paymentPageUrl);
 
         res.status(200).json({
           success: true,
@@ -145,7 +145,7 @@ const createOrder = async (req, res) => {
           orderId: pendingOrder._id,
         });
       } else {
-        console.error("Iyzico checkoutFormInitialize Başarısız Sonuç:", result);
+       // console.error("Iyzico checkoutFormInitialize Başarısız Sonuç:", result);
         return res.status(500).json({
           success: false,
           message:
@@ -156,7 +156,7 @@ const createOrder = async (req, res) => {
       }
     });
   } catch (e) {
-    console.error(" Genel Hata:", e);
+   // console.error(" Genel Hata:", e);
     res.status(500).json({
       success: false,
       message: "Sipariş oluşturulurken sunucu hatası oluştu.",
@@ -165,11 +165,11 @@ const createOrder = async (req, res) => {
 };
 
 const handleIyzicoCallback = async (req, res) => {
-  console.log("Iyzico Callback Geldi. Body:", req.body);
+ // console.log("Iyzico Callback Geldi. Body:", req.body);
   const { token, status: iyzicoStatus } = req.body;
 
   if (!token) {
-    console.error("Iyzico callback - Token eksik.");
+   // console.error("Iyzico callback - Token eksik.");
     return res.redirect(
       `${process.env.CLIENT_BASE_URL}/shop/payment-failure?status=error&message=InvalidCallback`
     );
@@ -189,15 +189,15 @@ const handleIyzicoCallback = async (req, res) => {
         if (order) {
           orderId = order._id.toString();
         } else {
-          console.error(
-            `Iyzico callback - Token (${token}) ile eşleşen sipariş bulunamadı.`
-          );
+        //  console.error(
+        //    `Iyzico callback - Token (${token}) ile eşleşen sipariş bulunamadı.`
+       //   );
           redirectUrl = `${process.env.CLIENT_BASE_URL}/shop/payment-failure?status=error&message=OrderNotFoundForToken`;
           return res.redirect(redirectUrl);
         }
 
         if (err) {
-          console.error(`Iyzico Hatası (Order ID: ${orderId}):`, err);
+         // console.error(`Iyzico Hatası (Order ID: ${orderId}):`, err);
           await Order.findByIdAndUpdate(orderId, {
             orderStatus: "failed",
             paymentStatus: "callback_error",
@@ -207,10 +207,10 @@ const handleIyzicoCallback = async (req, res) => {
           return res.redirect(redirectUrl);
         }
 
-        console.log(
-          `Iyzico checkoutForm.retrieve Sonucu (Order ID: ${orderId}):`,
-          result
-        );
+        //console.log(
+        //  `Iyzico checkoutForm.retrieve Sonucu (Order ID: ${orderId}):`,
+        //  result
+        //);
 
         if (
           result.status === "success" &&
@@ -221,9 +221,9 @@ const handleIyzicoCallback = async (req, res) => {
             order.orderStatus === "confirmed" ||
             order.orderStatus === "paid"
           ) {
-            console.log(
-              `Sipariş zaten işlenmiş (Callback - Order ID: ${orderId})`
-            );
+           // console.log(
+           //   `Sipariş zaten işlenmiş (Callback - Order ID: ${orderId})`
+           // );
             redirectUrl = `${process.env.CLIENT_BASE_URL}/shop/payment-success?status=already_processed&orderId=${orderId}`;
             return res.redirect(redirectUrl);
           }
@@ -232,9 +232,9 @@ const handleIyzicoCallback = async (req, res) => {
           for (const item of order.cartItems) {
             const product = await Product.findById(item.productId);
             if (!product || product.totalStock < item.quantity) {
-              console.error(
-                `Stok yetersiz! OrderID: ${orderId}, ProductID: ${item.productId}`
-              );
+             // console.error(
+             //   `Stok yetersiz! OrderID: ${orderId}, ProductID: ${item.productId}`
+             // );
               order.orderStatus = "failed";
               order.paymentStatus = "stock_error"; // Yeni bir durum
               await order.save();
@@ -256,30 +256,30 @@ const handleIyzicoCallback = async (req, res) => {
               });
             }
             await Promise.all(productUpdatePromises);
-            console.log(
-              `Stok ve satış sayıları güncellendi (Order ID: ${orderId})`
-            );
+           // console.log(
+           //   `Stok ve satış sayıları güncellendi (Order ID: ${orderId})`
+           // );
             if (order.cartId) {
               await Cart.findByIdAndDelete(order.cartId);
             }
           } catch (updateError) {
-            console.error(
-              `Stok/Sepet güncelleme hatası (Callback - Order ID: ${orderId}):`,
-              updateError
-            );
+           // console.error(
+           //   `Stok/Sepet güncelleme hatası (Callback - Order ID: ${orderId}):`,
+           //   updateError
+           // );
           }
 
           await order.save();
-          console.log(
-            `Iyzico callback - Ödeme başarılı, sipariş güncellendi (Order ID: ${orderId})`
-          );
+         // console.log(
+         //   `Iyzico callback - Ödeme başarılı, sipariş güncellendi (Order ID: ${orderId})`
+         // );
           redirectUrl = `${process.env.CLIENT_BASE_URL}/shop/payment-success?status=success&orderId=${orderId}`;
           return res.redirect(redirectUrl);
         } else {
-          console.warn(
-            `Iyzico callback - Ödeme başarısız (Order ID: ${orderId}). Result:`,
-            result
-          );
+         // console.warn(
+         //   `Iyzico callback - Ödeme başarısız (Order ID: ${orderId}). Result:`,
+         //   result
+         // );
           await Order.findByIdAndUpdate(orderId, {
             orderStatus: "failed",
             paymentStatus: "failed",
@@ -293,10 +293,10 @@ const handleIyzicoCallback = async (req, res) => {
           return res.redirect(redirectUrl);
         }
       } catch (generalError) {
-        console.error(
-          `Iyzico callback - Genel Hata (Token: ${token}, Order ID: ${orderId}):`,
-          generalError
-        );
+       // console.error(
+       //   `Iyzico callback - Genel Hata (Token: ${token}, Order ID: ${orderId}):`,
+       //   generalError
+       // );
         redirectUrl = `${
           process.env.CLIENT_BASE_URL
         }/shop/payment-failure?status=server_error${
@@ -321,7 +321,7 @@ const getAllOrdersByUser = async (req, res) => {
       data: orders,
     });
   } catch (e) {
-    console.error("getAllOrdersByUser error:", e);
+   // console.error("getAllOrdersByUser error:", e);
     res.status(500).json({
       success: false,
       message: "Siparişler alınırken bir hata oluştu!",
@@ -354,7 +354,7 @@ const getOrderDetails = async (req, res) => {
       data: order,
     });
   } catch (e) {
-    console.log(e);
+   // console.log(e);
     res.status(500).json({
       success: false,
       message: "Some error occured!",
@@ -421,7 +421,7 @@ const createGuestOrder = async (req, res) => {
           quantity: item.quantity,
         });
       } else {
-        console.warn(`Misafir siparişi: Ürün bulunamadı ID: ${item.productId}`);
+       // console.warn(`Misafir siparişi: Ürün bulunamadı ID: ${item.productId}`);
         return res.status(404).json({
           success: false,
           message: `Ürün bulunamadı: ID ${item.productId}`,
@@ -508,7 +508,7 @@ const createGuestOrder = async (req, res) => {
 
     iyzipay.checkoutFormInitialize.create(request, async (err, result) => {
       if (err) {
-        console.error("Iyzico checkoutFormInitialize Hatası (Guest):", err);
+       // console.error("Iyzico checkoutFormInitialize Hatası (Guest):", err);
         await Order.findByIdAndDelete(pendingOrder._id);
         return res.status(500).json({
           success: false,
@@ -531,10 +531,10 @@ const createGuestOrder = async (req, res) => {
           orderId: pendingOrder._id,
         });
       } else {
-        console.error(
-          "Iyzico checkoutFormInitialize Başarısız Sonuç (Guest):",
-          result
-        );
+       // console.error(
+       //   "Iyzico checkoutFormInitialize Başarısız Sonuç (Guest):",
+       //   result
+       // );
         await Order.findByIdAndDelete(pendingOrder._id);
         return res.status(500).json({
           success: false,
@@ -546,7 +546,7 @@ const createGuestOrder = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error("Misafir siparişi oluşturma genel hata:", error);
+   // console.error("Misafir siparişi oluşturma genel hata:", error);
     res.status(500).json({
       success: false,
       message: "Misafir siparişi oluşturulurken sunucu hatası oluştu.",
@@ -592,7 +592,7 @@ const trackGuestOrder = async (req, res) => {
 
     res.status(200).json({ success: true, data: order });
   } catch (error) {
-    console.error("Misafir sipariş takip hatası:", error);
+   // console.error("Misafir sipariş takip hatası:", error);
     if (error.name === "CastError") {
       return res
         .status(400)
