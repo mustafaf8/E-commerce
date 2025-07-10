@@ -49,9 +49,9 @@ try {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   });
-  console.log("Firebase Admin SDK başarıyla başlatıldı.");
+  // console.log("Firebase Admin SDK başarıyla başlatıldı.");
 } catch (error) {
-  console.error("Firebase Admin SDK başlatılamadı:", error.message);
+  // console.error("Firebase Admin SDK başlatılamadı:", error.message);
 }
 
 const authRouter = require("./routes/auth/auth-routes");
@@ -102,34 +102,12 @@ const allowedOrigins = [
 
 const IYZICO_CALLBACK_PATH = "/api/shop/order/iyzico-callback";
 
-app.use((req, res, next) => {
-  if (req.path === IYZICO_CALLBACK_PATH) {
-    return next();
-  }
-
+app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        callback(
-          new Error(
-            "Bu origin için CORS politikası tarafından izin verilmiyor."
-          )
-        );
-      }
-    },
-    methods: ["GET", "POST", "DELETE", "PUT"],
+    origin: "*", // GEÇİCİ OLARAK TÜM KAYNAKLARA İZİN VER
     credentials: true,
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "Cache-Control",
-      "Expires",
-      "Pragma",
-    ],
-  })(req, res, next);
-});
+  })
+);
 
 app.use(cookieParser());
 
