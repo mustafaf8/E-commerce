@@ -5,18 +5,31 @@ const mongoose = require("mongoose");
 const handleImageUpload = async (req, res) => {
   try {
     const b64 = Buffer.from(req.file.buffer).toString("base64");
-    const url = "data:" + req.file.mimetype + ";base64," + b64;
-    const result = await imageUploadUtil(url);
+    const dataUri = "data:" + req.file.mimetype + ";base64," + b64;
+
+    // Cloudinary'e yükle
+    const uploadResult = await imageUploadUtil(dataUri);
+
+    // Dönen URL'in 'https' olduğundan emin ol
+    const secureUrl =
+      uploadResult.secure_url || uploadResult.url.replace(/^http:/i, "https:");
+
+    // Cloudinary'den dönen result objesini, secure_url ile güncelleyerek geri gönder
+    const finalResult = {
+      ...uploadResult,
+      url: secureUrl,
+      secure_url: secureUrl,
+    };
 
     res.json({
       success: true,
-      result,
+      result: finalResult, // Güncellenmiş result objesini gönder
     });
   } catch (error) {
-    //console.log(error);
-    res.json({
+    // console.log(error);
+    res.status(500).json({
       success: false,
-      message: "Error occured",
+      message: "Resim yüklenirken bir hata oluştu.",
     });
   }
 };
