@@ -96,6 +96,8 @@ const allowedOrigins = [
   process.env.CLIENT_BASE_URL,
   "https://deposun.com",
   "http://localhost:5173",
+  "http://localhost",
+  "capacitor://localhost",
 ];
 
 const IYZICO_CALLBACK_PATH = "/api/shop/order/iyzico-callback";
