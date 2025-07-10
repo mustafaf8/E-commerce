@@ -2,9 +2,13 @@ export const registerFormControls = [
   {
     name: "userName",
     label: "Kullanıcı Adı",
-    placeholder: "Kullanıcı adınızı girin",
+    placeholder: "Kullanıcı adınızı girin (3-30 karakter)",
     componentType: "input",
     type: "text",
+    maxLength: 30,
+    pattern: "^[a-zA-ZğüşıöçĞÜŞİÖÇ0-9\\s]{3,}$",
+    title: "En az 3 karakter, sadece harf, rakam ve boşluk kullanabilirsiniz",
+    required: true,
   },
   {
     name: "email",
@@ -12,13 +16,21 @@ export const registerFormControls = [
     placeholder: "Email adresinizi girin",
     componentType: "input",
     type: "email",
+    maxLength: 50,
+    pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+    title: "Geçerli bir email adresi giriniz",
+    required: true,
   },
   {
     name: "password",
     label: "Şifre",
-    placeholder: "Şifrenizi girin",
+    placeholder: "Şifrenizi girin (en az 8 karakter)",
     componentType: "input",
     type: "password",
+    maxLength: 20,
+    pattern: "^.{8,}$",
+    title: "Şifreniz en az 8 karakter olmalıdır",
+    required: true,
   },
 ];
 
@@ -154,42 +166,54 @@ export const addressFormControls = [
   {
     name: "address",
     label: "Tam Adres",
-    placeholder: "Mahalle, sokak, bina no, daire no, ilçe/şehir...", // Daha açıklayıcı
-    componentType: "textarea", // Textarea olduğundan emin ol
-    rows: 3, // Önerilen satır sayısı
-    layout: "full", // Tam genişlik kaplasın
+    placeholder: "Mahalle, sokak, bina no, daire no, ilçe/şehir... (En fazla 300 karakter)",
+    componentType: "textarea",
+    rows: 3,
+    layout: "full",
+    maxLength: 300,
+    required: true,
   },
   {
     name: "city",
     label: "Şehir / İlçe",
-    placeholder: "Örn: Selçuklu", // Yerel örnek
+    placeholder: "Örn: Selçuklu (En fazla 50 karakter)",
     componentType: "input",
     type: "text",
-    // layout: 'col' // Grid'de yan yana gelmesi için işaretleyebiliriz (CommonForm'da yöneteceğiz)
+    maxLength: 50,
+    required: true,
+    pattern: "^[a-zA-ZğüşıöçĞÜŞİÖÇ\\s]{2,}$",
+    title: "Sadece harf ve boşluk kullanabilirsiniz"
   },
   {
     name: "pincode",
     label: "Posta Kodu",
-    placeholder: "Örn: 42100",
+    placeholder: "Örn: 42100 (5 haneli)",
     componentType: "input",
-    type: "text", // Farklı formatlara izin vermek için text kalsın
-    // layout: 'col'
+    type: "text",
+    maxLength: 10,
+    required: false,
+    title: "Posta kodu 5 haneli rakam olmalıdır"
   },
   {
     name: "phone",
     label: "Telefon Numarası",
-    placeholder: "5xxxxxxxxx (Başında 0 olmadan)", // Daha belirgin placeholder
+    placeholder: "5xxxxxxxxx (10 haneli, başında 0 olmadan)",
     componentType: "input",
-    type: "tel", // Telefon için 'tel' tipi
-    // layout: 'col'
+    type: "tel",
+    pattern: "^5[0-9]{9}$",
+    maxLength: 10,
+    required: true,
+    title: "Telefon numarası 5 ile başlamalı ve 10 haneli olmalıdır"
   },
   {
     name: "notes",
     label: "Adres Notları (İsteğe Bağlı)",
-    placeholder: "Teslimatla ilgili notlarınız...",
-    componentType: "textarea", // Textarea olduğundan emin ol
+    placeholder: "Teslimatla ilgili notlarınız... (En fazla 200 karakter)",
+    componentType: "textarea",
     rows: 2,
-    layout: "full", // Tam genişlik kaplasın
+    layout: "full",
+    maxLength: 200,
+    required: false
   },
 ];
 

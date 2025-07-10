@@ -38,6 +38,10 @@ function CommonForm({
                 [getControlItem.name]: event.target.value,
               })
             }
+            maxLength={getControlItem.maxLength}
+            pattern={getControlItem.pattern}
+            title={getControlItem.title}
+            required={getControlItem.required}
           />
         );
 
@@ -83,6 +87,8 @@ function CommonForm({
               })
             }
             className="rounded-lg resize-none"
+            maxLength={getControlItem.maxLength}
+            required={getControlItem.required}
           />
         );
 
@@ -102,6 +108,10 @@ function CommonForm({
                 [getControlItem.name]: event.target.value,
               })
             }
+            maxLength={getControlItem.maxLength}
+            pattern={getControlItem.pattern}
+            title={getControlItem.title}
+            required={getControlItem.required}
           />
         );
         break;

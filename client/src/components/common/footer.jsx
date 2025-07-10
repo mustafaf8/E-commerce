@@ -74,7 +74,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-white dark:bg-gray-900 pt-2 pb-2 md:pb-4 border-t border-gray-100 mt-6">
+    <footer className="bg-white dark:bg-gray-900 pt-2 pb-20 md:pb-4 lg:pb-4 border-t border-gray-100 mt-6">
       <div className="mt-4 container mx-auto px-4 lg:px-20">
         {/* Main footer content */}
         <div className="mb-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 min-[640px]:ml-16 min-[699px]:ml-16 min-[1024px]:ml-32">
@@ -171,7 +171,7 @@ const Footer = () => {
                 key={logo.name}
                 src={logo.url}
                 alt={logo.name}
-                className="h-10 opacity-90"
+                className="h-10 opacity-90 max-[690px]:h-7"
               />
             ))}
           </div>

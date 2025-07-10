@@ -278,6 +278,7 @@ function ShoppingHeader() {
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState({ products: [], categories: [], brands: [] });
   const [showSuggest, setShowSuggest] = useState(false);
+  const [activeInput, setActiveInput] = useState(''); // 'desktop' veya 'mobile'
   const debounceRef = useRef();
   const [searchParams] = useSearchParams();
 
@@ -305,9 +306,10 @@ function ShoppingHeader() {
       .catch(() => {});
   };
 
-  const handleSearchChange = (e) => {
+  const handleSearchChange = (e, inputType) => {
     const value = e.target.value;
     setSearchTerm(value);
+    setActiveInput(inputType);
     clearTimeout(debounceRef.current);
     if (value.trim() === "") {
       setShowSuggest(false);
@@ -355,12 +357,12 @@ function ShoppingHeader() {
                 type="search"
                 placeholder="Ürün, kategori veya marka ara..."
                 value={searchTerm}
-                onChange={handleSearchChange}
+                onChange={(e) => handleSearchChange(e, 'desktop')}
                 className="w-full rounded-md bg-muted pl-10 pr-4 py-2.5 h-11 text-sm border-transparent focus:border-primary focus:bg-background focus:ring-1 focus:ring-primary max-md:hidden"
               />
-              {/* Suggestions Dropdown */}
-              {showSuggest && (suggestions.products.length > 0 || suggestions.categories.length > 0 || suggestions.brands.length > 0) && (
-                <div className="absolute z-50 mt-1 w-full bg-background border shadow-lg rounded-md max-h-80 overflow-y-auto">
+              {/* Suggestions Dropdown - Sadece desktop için */}
+              {showSuggest && activeInput === 'desktop' && (suggestions.products.length > 0 || suggestions.categories.length > 0 || suggestions.brands.length > 0) && (
+                <div className="absolute z-50 mt-1 w-full bg-background border shadow-lg rounded-md max-h-80 overflow-y-auto ">
                   {suggestions.products.map((p) => (
                     <div
                       key={`prod-${p._id}`}
@@ -407,11 +409,11 @@ function ShoppingHeader() {
               type="search"
               placeholder="Ne aramıştınız?"
               value={searchTerm}
-              onChange={handleSearchChange}
+              onChange={(e) => handleSearchChange(e, 'mobile')}
               className="w-full rounded-md bg-muted/70 dark:bg-muted/30 pl-10 pr-4 py-2 h-10 text-sm border-transparent focus:border-primary focus:bg-background focus:ring-1 focus:ring-primary"
             />
-            {/* Suggestions Dropdown */}
-            {showSuggest && (suggestions.products.length > 0 || suggestions.categories.length > 0 || suggestions.brands.length > 0) && (
+            {/* Suggestions Dropdown - Sadece mobile için */}
+            {showSuggest && activeInput === 'mobile' && (suggestions.products.length > 0 || suggestions.categories.length > 0 || suggestions.brands.length > 0) && (
               <div className="absolute z-50 mt-1 w-full bg-background border shadow-lg rounded-md max-h-80 overflow-y-auto">
                 {suggestions.products.map((p) => (
                   <div

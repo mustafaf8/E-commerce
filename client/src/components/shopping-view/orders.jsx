@@ -81,15 +81,15 @@ function ShoppingOrders() {
             orderList.map((orderItem) => (
               <Card key={orderItem?._id} className="border shadow-sm">
                 <CardContent className="p-4">
-                  <div className="flex justify-between items-start mb-3">
+                  <div className="flex justify-between items-start mb-3 gap-2">
                     <div>
                       <p className="text-xs text-muted-foreground">
                         Sipariş No
                       </p>
-                      <p className="text-sm font-medium">{orderItem?._id}</p>
+                      <p className="text-xs md:text-sm font-medium break-all">{orderItem?._id}</p>
                     </div>
                     <Badge
-                      className={`p-1 px-3 w-24 justify-center ${
+                      className={`p-1 px-3 w-24 justify-center text-xs mt-2.5 ${
                         orderStatusMappingUser[orderItem?.orderStatus]?.color ||
                         orderStatusMappingUser.default.color
                       } ${

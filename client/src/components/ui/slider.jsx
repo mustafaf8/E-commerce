@@ -31,18 +31,26 @@ const Slider = React.forwardRef(
       return Math.round(val / step) * step;
     };
 
-    const handleMouseDown = (index) => (e) => {
+    const getClientPosition = (event) => {
+      if (event.touches) {
+        return event.touches[0].clientX;
+      }
+      return event.clientX;
+    };
+
+    const handleStart = (index) => (e) => {
       if (disabled) return;
       e.preventDefault();
       isDragging.current = true;
       activeThumb.current = index;
     };
 
-    const handleMouseMove = (e) => {
+    const handleMove = (e) => {
       if (!isDragging.current || activeThumb.current === null || disabled) return;
 
       const rect = sliderRef.current.getBoundingClientRect();
-      const percentage = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+      const clientX = getClientPosition(e);
+      const percentage = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
       const newValue = getValueFromPercentage(percentage);
 
       setLocalValue((prev) => {
@@ -68,25 +76,38 @@ const Slider = React.forwardRef(
       });
     };
 
-    const handleMouseUp = () => {
+    const handleEnd = () => {
       isDragging.current = false;
       activeThumb.current = null;
     };
 
     useEffect(() => {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+      const moveEvents = ['mousemove', 'touchmove'];
+      const endEvents = ['mouseup', 'touchend', 'touchcancel'];
+
+      moveEvents.forEach(event => {
+        document.addEventListener(event, handleMove, { passive: false });
+      });
+
+      endEvents.forEach(event => {
+        document.addEventListener(event, handleEnd);
+      });
 
       return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
+        moveEvents.forEach(event => {
+          document.removeEventListener(event, handleMove);
+        });
+        endEvents.forEach(event => {
+          document.removeEventListener(event, handleEnd);
+        });
       };
     }, []);
 
     const handleTrackClick = (e) => {
       if (disabled) return;
       const rect = sliderRef.current.getBoundingClientRect();
-      const percentage = ((e.clientX - rect.left) / rect.width) * 100;
+      const clientX = getClientPosition(e);
+      const percentage = ((clientX - rect.left) / rect.width) * 100;
       const newValue = getValueFromPercentage(percentage);
 
       setLocalValue((prev) => {
@@ -122,6 +143,7 @@ const Slider = React.forwardRef(
           ref={sliderRef}
           className="relative h-2 w-full grow overflow-hidden rounded-full bg-gray-300 cursor-pointer"
           onClick={handleTrackClick}
+          onTouchStart={handleTrackClick}
         >
           {/* Track fill */}
           <div
@@ -135,29 +157,31 @@ const Slider = React.forwardRef(
           {/* Min thumb */}
           <div
             className={cn(
-              'absolute h-3 w-6 rounded-full border-4 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-grab active:cursor-grabbing',
+              'absolute h-6 w-6 rounded-full border-4 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-grab active:cursor-grabbing',
               disabled && 'cursor-not-allowed opacity-50'
             )}
             style={{
-              left: `calc(${getPercentage(localValue[0])}% - 10px)`,
+              left: `calc(${getPercentage(localValue[0])}% - 12px)`,
               top: '50%',
               transform: 'translateY(-50%)',
             }}
-            onMouseDown={handleMouseDown(0)}
+            onMouseDown={handleStart(0)}
+            onTouchStart={handleStart(0)}
           />
           
           {/* Max thumb */}
           <div
             className={cn(
-              'absolute h-3 w-6 rounded-full border-4 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-grab active:cursor-grabbing',
+              'absolute h-6 w-6 rounded-full border-4 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-grab active:cursor-grabbing',
               disabled && 'cursor-not-allowed opacity-50'
             )}
             style={{
-              left: `calc(${getPercentage(localValue[1])}% - 10px)`,
+              left: `calc(${getPercentage(localValue[1])}% - 12px)`,
               top: '50%',
               transform: 'translateY(-50%)',
             }}
-            onMouseDown={handleMouseDown(1)}
+            onMouseDown={handleStart(1)}
+            onTouchStart={handleStart(1)}
           />
         </div>
       </div>

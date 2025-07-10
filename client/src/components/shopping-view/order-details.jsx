@@ -62,161 +62,159 @@ function ShoppingOrderDetailsView({ orderDetails }) {
   };
 
   return (
-    <div className="flex flex-col gap-4 pt-2">
+    <div className="flex flex-col gap-4 max-w-full">
       {/* Üst Bilgi: Durum ve Toplam Tutar */}
-      <div className="flex flex-wrap gap-4 items-center justify-between mb-2">
+      <div className="flex justify-between gap-3 bg-white p-4 rounded-lg shadow-sm max-md:flex-col">
         <Badge
-          className={`px-3 py-1 text-xs sm:text-sm ${statusInfo.color} ${statusInfo.textColor}`}
+          className={`w-fit px-3 py-1.5 text-sm ${statusInfo.color} ${statusInfo.textColor}`}
         >
           {statusInfo.label}
         </Badge>
-        <div className="text-right">
-          <div className="text-xs sm:text-sm text-muted-foreground">
+        <div>
+          <div className="text-sm text-muted-foreground">
             Toplam Tutar
           </div>
-          <div className="text-lg sm:text-xl font-bold">
+          <div className="text-lg font-bold">
             {orderDetails.totalAmount?.toFixed(2) || 0} TL
           </div>
         </div>
       </div>
 
-      {/* Sipariş Bilgileri Kartı */}
-      <Card className="p-4 shadow-sm">
-        <div className="flex items-center gap-2 mb-3">
-          <Package className="h-4 w-4 text-primary" />
-          <h3 className="text-sm sm:text-base font-semibold">
+      {/* Sipariş Bilgileri */}
+      <div className="bg-white p-4 rounded-lg shadow-sm space-y-4">
+        <div className="flex items-center gap-2">
+          <Package className="h-5 w-5 text-primary" />
+          <h3 className="text-base font-semibold">
             Sipariş Bilgileri
           </h3>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-xs sm:text-sm">
+        <div className="grid grid-cols-2 gap-3 max-md:grid-cols-1 ">
           <div>
-            <p className="text-muted-foreground">Sipariş No:</p>
-            <p className="font-medium break-all">{orderDetails._id}</p>
+            <p className="text-sm text-muted-foreground mb-1">Sipariş No:</p>
+            <p className="text-sm font-medium break-all">{orderDetails._id}</p>
           </div>
           <div>
-            <p className="text-muted-foreground">Sipariş Tarihi:</p>
-            <p className="font-medium">{formattedDate}</p>
+            <p className="text-sm text-muted-foreground mb-1">Sipariş Tarihi:</p>
+            <p className="text-sm font-medium">{formattedDate}</p>
           </div>
           <div>
-            <p className="text-muted-foreground">Ödeme Yöntemi:</p>
-            <p className="font-medium capitalize">
+            <p className="text-sm text-muted-foreground mb-1">Ödeme Yöntemi:</p>
+            <p className="text-sm font-medium capitalize">
               {orderDetails.paymentMethod?.replace("_", " ") || "Belirtilmemiş"}
             </p>
           </div>
           <div>
-            <p className="text-muted-foreground">Ödeme Durumu:</p>
-            <p className="font-medium capitalize">
+            <p className="text-sm text-muted-foreground mb-1">Ödeme Durumu:</p>
+            <p className="text-sm font-medium capitalize">
               {orderDetails.paymentStatus || "Bilinmiyor"}
             </p>
           </div>
         </div>
-      </Card>
+      </div>
 
-      {/* Alıcı Bilgileri Kartı */}
+      {/* Alıcı Bilgileri */}
       {!isGuest && isAuthenticated && user && (
-        <Card className="p-4 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <User className="h-4 w-4 text-primary" />
-            <h3 className="text-sm sm:text-base font-semibold">
+        <div className="bg-white p-4 rounded-lg shadow-sm space-y-4">
+          <div className="flex items-center gap-2">
+            <User className="h-5 w-5 text-primary" />
+            <h3 className="text-base font-semibold">
               Alıcı Bilgileri
             </h3>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-xs sm:text-sm">
+          <div className=" grid grid-cols-2 gap-3 max-md:grid-cols-1">
             <div>
-              <p className="text-muted-foreground">Ad Soyad:</p>
-              <p className="font-medium">{recipientName}</p>
+              <p className="text-sm text-muted-foreground mb-1">Ad Soyad:</p>
+              <p className="text-sm font-medium">{recipientName}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">E-posta:</p>
-              <p className="font-medium">{recipientEmail}</p>
+              <p className="text-sm text-muted-foreground mb-1">E-posta:</p>
+              <p className="text-sm font-medium break-all">{recipientEmail}</p>
             </div>
           </div>
-        </Card>
+        </div>
       )}
 
-      {/* Teslimat Adresi Kartı */}
-      <Card className="p-4 shadow-sm">
-        <div className="flex items-center gap-2 mb-3">
-          <MapPin className="h-4 w-4 text-primary" />
-          <h3 className="text-sm sm:text-base font-semibold">
+      {/* Teslimat Adresi */}
+      <div className="bg-white p-4 rounded-lg shadow-sm space-y-4">
+        <div className="flex items-center gap-2">
+          <MapPin className="h-5 w-5 text-primary" />
+          <h3 className="text-base font-semibold">
             Teslimat Adresi
           </h3>
         </div>
         {orderDetails.addressInfo ? (
-          <div className="grid gap-1 text-xs sm:text-sm">
-            <p className="font-medium">
+          <div className="space-y-2">
+            <p className="text-sm font-medium">
               {orderDetails.addressInfo.fullName || recipientName}
             </p>
-            <p className="text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               {orderDetails.addressInfo.address}
             </p>
-            <p className="text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               {orderDetails.addressInfo.city}
               {orderDetails.addressInfo.pincode
                 ? `, ${orderDetails.addressInfo.pincode}`
                 : ""}
             </p>
-            <p className="text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Tel: {orderDetails.addressInfo.phone || "-"}
             </p>
             {orderDetails.addressInfo.notes && (
-              <p className="text-xs text-muted-foreground italic pt-1 mt-1 border-t border-gray-200 dark:border-gray-700">
+              <p className="text-sm text-muted-foreground italic mt-2 pt-2 border-t">
                 Not: {orderDetails.addressInfo.notes}
               </p>
             )}
           </div>
         ) : (
-          <p className="text-xs sm:text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Teslimat adresi bilgisi bulunamadı.
           </p>
         )}
-      </Card>
+      </div>
 
-      {/* Sipariş Öğeleri Kartı */}
-      <Card className="p-4 shadow-sm">
-        <div className="flex items-center gap-2 mb-3">
-          <ShoppingCart className="h-4 w-4 text-primary" />
-          <h3 className="text-sm sm:text-base font-semibold">
+      {/* Sipariş Öğeleri */}
+      <div className="bg-white p-4 rounded-lg shadow-sm space-y-4">
+        <div className="flex items-center gap-2">
+          <ShoppingCart className="h-5 w-5 text-primary" />
+          <h3 className="text-base font-semibold">
             Sipariş Öğeleri
           </h3>
         </div>
         {orderDetails.cartItems && orderDetails.cartItems.length > 0 ? (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {orderDetails.cartItems.map((item, index) => (
               <div
                 key={item.productId + "-" + index}
-                className="flex justify-between items-center border-b pb-2 last:border-0 last:pb-0 text-xs sm:text-sm"
+                className="flex flex-col border-b pb-3 last:border-0 last:pb-0"
               >
-                <div className="flex-grow pr-2">
-                  <p className="font-medium truncate" title={item.title}>
-                    {item.title}
+                <p className="text-sm font-medium mb-1" title={item.title}>
+                  {item.title}
+                </p>
+                <div className="flex justify-between items-center">
+                  <p className="text-sm text-muted-foreground">
+                    {parseFloat(item.price || 0).toFixed(2)} TL x {item.quantity} adet
                   </p>
-                  <p className="text-muted-foreground text-xs">
-                    Birim Fiyat: {parseFloat(item.price || 0).toFixed(2)} TL x{" "}
-                    {item.quantity} adet
+                  <p className="text-sm font-semibold">
+                    {(parseFloat(item.price || 0) * item.quantity).toFixed(2)} TL
                   </p>
                 </div>
-                <p className="font-semibold whitespace-nowrap">
-                  {(parseFloat(item.price || 0) * item.quantity).toFixed(2)} TL
-                </p>
               </div>
             ))}
-            <Separator className="my-2" />
-            <div className="flex justify-between items-center font-semibold text-sm sm:text-base pt-2 border-t">
-              <p>Genel Toplam:</p>
-              <p>{orderDetails.totalAmount?.toFixed(2) || 0} TL</p>
+            <div className="flex justify-between items-center pt-3 border-t">
+              <p className="text-base font-semibold">Genel Toplam:</p>
+              <p className="text-base font-semibold">{orderDetails.totalAmount?.toFixed(2) || 0} TL</p>
             </div>
           </div>
         ) : (
-          <p className="text-xs sm:text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Sipariş içeriği bulunamadı.
           </p>
         )}
-      </Card>
+      </div>
 
       {canCancel && (
         <button
-          className="mt-2 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded"
+          className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg text-sm font-medium"
           onClick={() => setShowCancelConfirm(true)}
         >
           Siparişi İptal Et
