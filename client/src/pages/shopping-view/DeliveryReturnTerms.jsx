@@ -48,7 +48,7 @@ const DeliveryReturnTerms = () => {
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
-                  1-2 iş günü: İstanbul, Ankara, İzmir
+                  1-2 iş günü: İstanbul, Ankara, İzmir, Konya, Antalya
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
