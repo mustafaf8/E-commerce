@@ -102,12 +102,48 @@ const allowedOrigins = [
 
 const IYZICO_CALLBACK_PATH = "/api/shop/order/iyzico-callback";
 
-app.use(
-  cors({
-    origin: "*", // GEÇİCİ OLARAK TÜM KAYNAKLARA İZİN VER
+// YUKARIDAKİNİ SİLİP BUNU YAPIŞTIRIN
+
+app.use((req, res, next) => {
+  // Iyzico callback yolu için CORS'u atla
+  if (req.path === "/api/shop/order/iyzico-callback") {
+    return next();
+  }
+
+  // Ana CORS yapılandırması
+  const corsOptions = {
+    origin: function (origin, callback) {
+      const allowedOrigins = [
+        process.env.CLIENT_BASE_URL,
+        "https://deposun.com",
+        "http://localhost:5173",
+        "http://localhost",
+        "capacitor://localhost",
+      ];
+
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(
+          new Error(
+            "Bu origin için CORS politikası tarafından izin verilmiyor."
+          )
+        );
+      }
+    },
+    methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true,
-  })
-);
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "Cache-Control",
+      "Expires",
+      "Pragma",
+    ],
+  };
+
+  cors(corsOptions)(req, res, next);
+});
 
 app.use(cookieParser());
 
