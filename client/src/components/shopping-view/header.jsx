@@ -342,7 +342,7 @@ function ShoppingHeader() {
         <div className="flex h-20 items-center justify-between gap-4 md:gap-6">
           <Link to="/shop/home" className="flex-shrink-0">
             <img
-              className="h-36 w-36 max-[690px]:h-24 max-[690px]:w-24"
+              className="h-36 w-36 max-[690px]:h-24 max-[690px]:w-24 "
               src="/dlogo2.png"
               alt="logo"
             />

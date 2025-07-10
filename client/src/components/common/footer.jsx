@@ -32,10 +32,19 @@ const Footer = () => {
     {
       title: "Şirketimiz",
       links: [
+        { label: "İletişim", href: "/shop/iletisim" },
         { label: "Hakkımızda", href: "/shop/hakkimizda" },
-        { label: "Kişisel Verilerin Korunması", href: "/shop/kvkk" },
         { label: "Bilgi Güvenliği Politikası", href: "/shop/bilgi-guvenligi" },
+        { label: "Kişisel Verilerin Korunması", href: "/shop/kvkk" },
+      ],
+    },
+    {
+      title: "Yasal Bilgiler",
+      links: [
         { label: "SSL Sertifikası", href: "/shop/ssl-sertifikasi" },
+        { label: "Gizlilik Sözleşmesi", href: "/shop/gizlilik-sozlesmesi" },
+        { label: "Teslimat ve İade Şartları", href: "/shop/teslimat-iade" },
+        { label: "Mesafeli Satış Sözleşmesi", href: "/shop/mesafeli-satis" },
       ],
     },
     {
@@ -46,14 +55,7 @@ const Footer = () => {
         { label: "İşlem Rehberi", href: "/shop/islem-rehberi" },
       ],
     },
-    {
-      title: "Yasal Bilgiler",
-      links: [
-        { label: "Teslimat ve İade Şartları", href: "/shop/teslimat-iade" },
-        { label: "Gizlilik Sözleşmesi", href: "/shop/gizlilik-sozlesmesi" },
-        { label: "Mesafeli Satış Sözleşmesi", href: "/shop/mesafeli-satis" },
-      ],
-    },
+
     {
       title: "Bizi Takip Edin",
       links: [

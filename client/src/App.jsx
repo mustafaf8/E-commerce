@@ -46,6 +46,7 @@ const ShoppingListing = lazy(() => import("./pages/shopping-view/listing"));
 const ShoppingAccount = lazy(() => import("./pages/shopping-view/account"));
 const UnauthPage = lazy(() => import("./pages/unauth-page"));
 const SearchProducts = lazy(() => import("./pages/shopping-view/search"));
+const ContactPage = lazy(() => import("./pages/shopping-view/ContactPage"));
 
 const ShoppingWishlist = lazy(() => import("./pages/shopping-view/wishlist"));
 const AboutUs = lazy(() => import("./components/shopping-view/about-us"));
@@ -185,6 +186,7 @@ function App() {
             <Route path="listing" element={<ShoppingListing />} />
             <Route path="search" element={<SearchProducts />} />
             <Route path="hakkimizda" element={<AboutUs />} />
+            <Route path="iletisim" element={<ContactPage />} />
             <Route path="kvkk" element={<KVKK />} />
             <Route path="bilgi-guvenligi" element={<InfoSecurityPolicy />} />
             <Route path="islem-rehberi" element={<TransactionGuide />} />

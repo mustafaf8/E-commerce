@@ -11,6 +11,36 @@ const transporter = nodemailer.createTransport({
 });
 
 /**
+ * Genel amaçlı e-posta gönderme fonksiyonu
+ * @param {Object} options E-posta gönderme seçenekleri
+ * @param {string} options.to Alıcı e-posta adresi
+ * @param {string} options.subject E-posta konusu
+ * @param {string} options.text E-posta metni
+ * @param {string} [options.html] HTML formatında e-posta içeriği (opsiyonel)
+ * @param {string} [options.replyTo] Yanıt verilecek e-posta adresi (opsiyonel)
+ * @returns {Promise<boolean>} E-posta başarıyla gönderildiyse true döner
+ */
+const sendEmail = async (options) => {
+  const mailOptions = {
+    from: `"Deposun Destek" <${process.env.EMAIL_USER}>`,
+    to: options.to,
+    subject: options.subject,
+    text: options.text,
+    html: options.html,
+    replyTo: options.replyTo
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`E-posta başarıyla gönderildi: ${options.to}`);
+    return true;
+  } catch (error) {
+    console.error(`E-posta gönderilemedi ${options.to}:`, error);
+    return false;
+  }
+};
+
+/**
  * Terk edilmiş sepet hatırlatma e-postası gönderir.
  * @param {string} toEmail Alıcının e-posta adresi
  * @param {string} userName Alıcının kullanıcı adı
@@ -142,4 +172,4 @@ const sendPasswordResetEmail = async (toEmail, token) => {
 };
 
 
-module.exports = { sendAbandonedCartEmail, sendPasswordResetEmail };
+module.exports = { sendAbandonedCartEmail, sendPasswordResetEmail, sendEmail };

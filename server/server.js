@@ -77,6 +77,7 @@ const commonBrandRouter = require("./routes/common/brand-routes");
 const adminStatsRouter = require("./routes/admin/statsAdminRoutes");
 const adminAuthorizationRouter = require("./routes/admin/authorization-routes");
 const maintenanceRouter = require("./routes/common/maintenance-routes");
+const contactRouter = require("./routes/common/contact-routes");
 const errorHandler = require("./middleware/errorHandler");
 const { scheduleAbandonedCartEmails } = require("./jobs/abandonedCartJob");
 require("./controllers/auth/auth-controller");
@@ -174,6 +175,7 @@ app.use("/api/common/brands", commonBrandRouter);
 app.use("/api/admin/stats", adminStatsRouter);
 app.use("/api/admin/authorization", adminAuthorizationRouter);
 app.use("/api/maintenance", maintenanceRouter);
+app.use("/api/contact", contactRouter);
 app.use(errorHandler);
 if (process.env.NODE_ENV !== "test") {
   scheduleAbandonedCartEmails();
