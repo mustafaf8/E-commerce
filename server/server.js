@@ -80,6 +80,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost",
   "capacitor://localhost",
+  "https://localhost"
 ];
 
 const corsOptions = {
