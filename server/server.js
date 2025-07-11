@@ -74,6 +74,17 @@ mongoose
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const IYZICO_CALLBACK_PATH = "/api/shop/order/iyzico-callback";
+app.use((req, res, next) => {
+  if (req.path === IYZICO_CALLBACK_PATH) {
+    // Iyzico için standart urlencoded parser yeterli
+    express.urlencoded({ extended: true })(req, res, next);
+  } else {
+    // Diğer tüm rotalar için JSON parser kullan
+    express.json()(req, res, next);
+  }
+});
+
 const allowedOrigins = [
   process.env.CLIENT_BASE_URL,
   "https://deposun.com",
@@ -103,16 +114,7 @@ app.use(helmet());
 app.use(cookieParser());
 app.use(express.json());
 
-const IYZICO_CALLBACK_PATH = "/api/shop/order/iyzico-callback";
-app.use((req, res, next) => {
-  if (req.path === IYZICO_CALLBACK_PATH) {
-    // Iyzico için standart urlencoded parser yeterli
-    express.urlencoded({ extended: true })(req, res, next);
-  } else {
-    // Diğer tüm rotalar için JSON parser kullan
-    express.json()(req, res, next);
-  }
-});
+
 
 app.use(
   session({
