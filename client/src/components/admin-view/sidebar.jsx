@@ -7,6 +7,7 @@ import {
   ShoppingBasket,
   Tags,
   UserCog,
+  Wrench,
 } from "lucide-react";
 import { Fragment } from "react";
 import { useSelector } from "react-redux";
@@ -17,10 +18,10 @@ import PropTypes from "prop-types";
 
 const adminSidebarMenuItems = [
   {
-    id: "dashboard",
-    label: "Banner",
-    path: "/admin/dashboard",
-    icon: <LayoutDashboard size={18} />,
+    id: "orders",
+    label: "Siparişler",
+    path: "/admin/orders",
+    icon: <BadgeCheck size={18} />,
   },
   {
     id: "products",
@@ -29,21 +30,21 @@ const adminSidebarMenuItems = [
     icon: <ShoppingBasket size={18} />,
   },
   {
-    id: "orders",
-    label: "Siparişler",
-    path: "/admin/orders",
-    icon: <BadgeCheck size={18} />,
+    id: "dashboard",
+    label: "Banner",
+    path: "/admin/dashboard",
+    icon: <LayoutDashboard size={18} />,
   },
   {
-    id: "brands",
-    label: "Markalar",
-    path: "/admin/brands",
-    icon: <Tags size={18} />,
+    id: "stats",
+    label: "İstatistikler",
+    path: "/admin/stats",
+    icon: <ChartNoAxesCombined size={18} />,
   },
   {
-    id: "categories",
-    label: "Kategoriler",
-    path: "/admin/categories",
+    id: "categories-brands",
+    label: "Kategori & Marka",
+    path: "/admin/categories-brands",
     icon: <LayoutGrid size={18} />,
   },
   {
@@ -53,10 +54,10 @@ const adminSidebarMenuItems = [
     icon: <Home size={18} />,
   },
   {
-    id: "stats",
-    label: "İstatistikler",
-    path: "/admin/stats",
-    icon: <ChartNoAxesCombined size={18} />,
+    id: "maintenance",
+    label: "Bakım Modu",
+    path: "/admin/maintenance",
+    icon: <Wrench size={18} />,
   },
 ];
 
@@ -77,6 +78,13 @@ function MenuItems({ setOpen }) {
   // Determine visible menu items based on permissions
   const visibleMenuItems = adminSidebarMenuItems.filter((item) => {
     if (user?.adminAccessLevel === 1 || user?.adminAccessLevel === undefined) return true; // Full access or not set
+
+    // For categories-brands, check both permissions
+    if (item.id === "categories-brands") {
+      const categoriesPerms = user?.adminModulePermissions?.categories;
+      const brandsPerms = user?.adminModulePermissions?.brands;
+      return categoriesPerms?.view || brandsPerms?.view; // show if can view either
+    }
 
     // For lower levels, check adminModulePermissions
     const perms = user?.adminModulePermissions?.[item.id];

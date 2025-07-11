@@ -1,8 +1,14 @@
 import { Navigate, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
+import { Skeleton } from "@/components/ui/skeleton";
 
-function CheckAuth({ isAuthenticated, user, children }) {
+function CheckAuth({ isAuthenticated, user, children, isLoading }) {
   const location = useLocation();
+
+  // Auth durumu yüklenirken skeleton göster
+  if (isLoading) {
+    return <Skeleton className="w-full h-screen bg-gray-200" />;
+  }
 
   if (location.pathname === "/") {
     if (!isAuthenticated) {
@@ -46,12 +52,14 @@ function CheckAuth({ isAuthenticated, user, children }) {
 
   return <>{children}</>;
 }
+
 CheckAuth.propTypes = {
   isAuthenticated: PropTypes.bool.isRequired,
   user: PropTypes.shape({
     role: PropTypes.string,
   }),
   children: PropTypes.node,
+  isLoading: PropTypes.bool,
 };
 
 export default CheckAuth;

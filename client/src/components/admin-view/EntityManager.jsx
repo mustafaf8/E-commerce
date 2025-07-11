@@ -10,14 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  addCategory,
-  deleteCategory,
-  fetchAllCategories,
-  updateCategory,
-} from "@/store/common-slice/categories-slice";
 import { Edit, Trash2, PlusCircle, BadgeCheck, BadgeX } from "lucide-react";
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -27,32 +20,38 @@ import { useDispatch, useSelector } from "react-redux";
 import { CardTitle } from "../ui/card";
 import PropTypes from "prop-types";
 
-const initialCategoryData = { name: "", slug: "", isActive: true };
-
-function CategoryManager({ canManage }) {
+function EntityManager({
+  entityName,
+  entityNamePlural,
+  selector,
+  actions,
+  canManage,
+  listKey = "list", // entityList veya brandList gibi farklı key'ler için
+}) {
   const dispatch = useDispatch();
+  const stateData = useSelector(selector);
   const {
-    categoryList = [],
-    isLoading,
-    error,
-  } = useSelector(
-    (state) => state.categories || { categoryList: [], isLoading: false }
-  );
+    [listKey]: entityList = [],
+    isLoading = false,
+    error = null,
+  } = stateData || {};
+  
   const { toast } = useToast();
 
+  const initialEntityData = { name: "", slug: "", isActive: true };
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [currentCategory, setCurrentCategory] = useState(initialCategoryData);
-  const [categoryToDelete, setCategoryToDelete] = useState(null);
+  const [currentEntity, setCurrentEntity] = useState(initialEntityData);
+  const [entityToDelete, setEntityToDelete] = useState(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchAllCategories());
-  }, [dispatch]);
+    dispatch(actions.fetchAll());
+  }, [dispatch, actions]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setCurrentCategory((prev) => ({
+    setCurrentEntity((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
@@ -65,54 +64,55 @@ function CategoryManager({ canManage }) {
         .replace(/--+/g, "-")
         .replace(/^-+/, "")
         .replace(/-+$/, "");
-      setCurrentCategory((prev) => ({ ...prev, slug: slug }));
+      setCurrentEntity((prev) => ({ ...prev, slug: slug }));
     }
   };
 
   const handleSwitchChange = (checked) => {
-    setCurrentCategory((prev) => ({ ...prev, isActive: checked }));
+    setCurrentEntity((prev) => ({ ...prev, isActive: checked }));
   };
 
-  const openModalForEdit = (category) => {
+  const openModalForEdit = (entity) => {
     setIsEditing(true);
-    setCurrentCategory({ ...category });
+    setCurrentEntity({ ...entity });
     setIsModalOpen(true);
   };
 
   const openModalForAdd = () => {
     setIsEditing(false);
-    setCurrentCategory(initialCategoryData);
+    setCurrentEntity(initialEntityData);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setIsEditing(false);
-    setCurrentCategory(initialCategoryData);
+    setCurrentEntity(initialEntityData);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!currentCategory.name || !currentCategory.slug) {
+    if (!currentEntity.name || !currentEntity.slug) {
       toast({
         variant: "destructive",
-        title: "Kategori adı ve slug zorunludur.",
+        title: `${entityName} adı ve slug zorunludur.`,
       });
       return;
     }
     const action = isEditing
-      ? updateCategory({
-          id: currentCategory._id,
-          categoryData: currentCategory,
+      ? actions.update({
+          id: currentEntity._id,
+          [entityName.toLowerCase() === "kategori" ? "categoryData" : "brandData"]: currentEntity,
         })
-      : addCategory(currentCategory);
+      : actions.add(currentEntity);
+    
     dispatch(action)
       .unwrap()
       .then((payload) => {
         if (payload.success) {
           toast({
             variant: "success",
-            title: `Kategori başarıyla ${
+            title: `${entityName} başarıyla ${
               isEditing ? "güncellendi" : "eklendi"
             }.`,
           });
@@ -122,7 +122,7 @@ function CategoryManager({ canManage }) {
             variant: "destructive",
             title:
               payload.message ||
-              `Kategori ${isEditing ? "güncellenemedi" : "eklenemedi"}.`,
+              `${entityName} ${isEditing ? "güncellenemedi" : "eklenemedi"}.`,
           });
         }
       })
@@ -134,18 +134,18 @@ function CategoryManager({ canManage }) {
       });
   };
 
-  const handleDeleteClick = (category) => {
-    setCategoryToDelete(category);
+  const handleDeleteClick = (entity) => {
+    setEntityToDelete(entity);
     setIsConfirmModalOpen(true);
   };
 
   const confirmDelete = () => {
-    if (!categoryToDelete) return;
+    if (!entityToDelete) return;
 
-    dispatch(deleteCategory(categoryToDelete._id))
+    dispatch(actions.delete(entityToDelete._id))
       .unwrap()
       .then(() => {
-        toast({ variant: "success", title: "Kategori silindi." });
+        toast({ variant: "success", title: `${entityName} silindi.` });
       })
       .catch((error) => {
         const isUsedError = error?.isUsedError;
@@ -153,26 +153,27 @@ function CategoryManager({ canManage }) {
 
         toast({
           variant: isUsedError ? "warning" : "destructive",
-          title: isUsedError ? "Kategori Kullanımda" : "Silme Başarısız",
+          title: isUsedError ? `${entityName} Kullanımda` : "Silme Başarısız",
           description: errorMessage,
         });
       })
       .finally(() => {
-        setCategoryToDelete(null);
+        setEntityToDelete(null);
         setIsConfirmModalOpen(false);
       });
   };
 
   return (
     <div>
-      <div className="flex justify-between items-center my-4">
-        <CardTitle>Kategori Yönetimi</CardTitle>
-        {canManage && (<Button onClick={openModalForAdd}>
-          <PlusCircle className="mr-2 h-4 w-4" /> Yeni Kategori Ekle
-        </Button>)}
+      <div className="flex justify-between items-center mb-4">
+        {canManage && (
+          <Button onClick={openModalForAdd} className="ml-auto">
+            <PlusCircle className="mr-2 h-4 w-4" /> Yeni {entityName} Ekle
+          </Button>
+        )}
       </div>
       <div className="space-y-3">
-        {isLoading && !categoryList.length ? (
+        {isLoading && !entityList.length ? (
           <div className="space-y-2">
             <Skeleton className="h-12 w-full" />
             <Skeleton className="h-12 w-full" />
@@ -180,67 +181,69 @@ function CategoryManager({ canManage }) {
           </div>
         ) : error ? (
           <p className="text-red-500 text-center">Hata: {error}</p>
-        ) : categoryList.length === 0 ? (
+        ) : entityList.length === 0 ? (
           <p className="text-center text-muted-foreground py-4">
-            Henüz kategori eklenmemiş.
+            Henüz {entityName.toLowerCase()} eklenmemiş.
           </p>
         ) : (
-          categoryList.map((category) => (
+          entityList.map((entity) => (
             <div
-              key={category._id}
+              key={entity._id}
               className="flex items-center justify-between p-3 border rounded-md bg-muted/30 hover:bg-muted/60 transition-colors"
             >
               <div className="flex flex-col sm:flex-row sm:items-center gap-x-4 gap-y-1 flex-grow min-w-0 mr-4">
                 <div className="min-w-0">
                   <p
                     className="font-semibold text-base truncate"
-                    title={category.name}
+                    title={entity.name}
                   >
-                    {category.name}
+                    {entity.name}
                   </p>
                   <p
                     className="text-xs text-muted-foreground truncate"
-                    title={category.slug}
+                    title={entity.slug}
                   >
-                    /{category.slug}
+                    /{entity.slug}
                   </p>
                 </div>
                 <Badge
-                  variant={category.isActive ? "default" : "secondary"}
+                  variant={entity.isActive ? "default" : "secondary"}
                   className={`px-2 py-0.5 text-xs ${
-                    category.isActive
+                    entity.isActive
                       ? "bg-green-100 text-green-800 border-green-300"
                       : "bg-red-100 text-red-800 border-red-300"
                   }`}
                 >
-                  {category.isActive ? (
+                  {entity.isActive ? (
                     <BadgeCheck className="mr-1 h-3 w-3" />
                   ) : (
                     <BadgeX className="mr-1 h-3 w-3" />
                   )}
-                  {category.isActive ? "Aktif" : "Pasif"}
+                  {entity.isActive ? "Aktif" : "Pasif"}
                 </Badge>
               </div>
-              {canManage && ( <div className="flex-shrink-0 flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => openModalForEdit(category)}
-                >
-                  <Edit className="h-4 w-4" />
-                  <span className="sr-only">Düzenle</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                  onClick={() => handleDeleteClick(category)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                  <span className="sr-only">Sil</span>
-                </Button>
-              </div>)}
+              {canManage && (
+                <div className="flex-shrink-0 flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => openModalForEdit(entity)}
+                  >
+                    <Edit className="h-4 w-4" />
+                    <span className="sr-only">Düzenle</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    onClick={() => handleDeleteClick(entity)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span className="sr-only">Sil</span>
+                  </Button>
+                </div>
+              )}
             </div>
           ))
         )}
@@ -249,7 +252,7 @@ function CategoryManager({ canManage }) {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>
-              {isEditing ? "Kategori Düzenle" : "Yeni Kategori Ekle"}
+              {isEditing ? `${entityName} Düzenle` : `Yeni ${entityName} Ekle`}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="grid gap-4 py-4">
@@ -260,7 +263,7 @@ function CategoryManager({ canManage }) {
               <Input
                 id="name"
                 name="name"
-                value={currentCategory.name}
+                value={currentEntity.name}
                 onChange={handleInputChange}
                 className="col-span-3"
                 required
@@ -273,7 +276,7 @@ function CategoryManager({ canManage }) {
               <Input
                 id="slug"
                 name="slug"
-                value={currentCategory.slug}
+                value={currentEntity.slug}
                 onChange={handleInputChange}
                 className="col-span-3"
                 required
@@ -287,7 +290,7 @@ function CategoryManager({ canManage }) {
                 <Switch
                   id="isActive"
                   name="isActive"
-                  checked={currentCategory.isActive}
+                  checked={currentEntity.isActive}
                   onCheckedChange={handleSwitchChange}
                 />
               </div>
@@ -304,18 +307,29 @@ function CategoryManager({ canManage }) {
         </DialogContent>
       </Dialog>
 
-      {/* Silme Onay Modalı (Aynı kalabilir) */}
+      {/* Silme Onay Modalı */}
       <ConfirmationModal
         isOpen={isConfirmModalOpen}
-        message={`'${categoryToDelete?.name}' kategorisini silmek istediğinizden emin misiniz? Bu kategori bir veya daha fazla üründe kullanılıyorsa silinemez.`}
+        message={`'${entityToDelete?.name}' ${entityName.toLowerCase()}ini silmek istediğinizden emin misiniz? Bu ${entityName.toLowerCase()} bir veya daha fazla üründe kullanılıyorsa silinemez.`}
         onConfirm={confirmDelete}
         onCancel={() => setIsConfirmModalOpen(false)}
       />
     </div>
   );
 }
-CategoryManager.propTypes = {
+
+EntityManager.propTypes = {
+  entityName: PropTypes.string.isRequired,
+  entityNamePlural: PropTypes.string.isRequired,
+  selector: PropTypes.func.isRequired,
+  actions: PropTypes.shape({
+    fetchAll: PropTypes.func.isRequired,
+    add: PropTypes.func.isRequired,
+    update: PropTypes.func.isRequired,
+    delete: PropTypes.func.isRequired,
+  }).isRequired,
   canManage: PropTypes.bool.isRequired,
+  listKey: PropTypes.string,
 };
 
-export default CategoryManager;
+export default EntityManager; 

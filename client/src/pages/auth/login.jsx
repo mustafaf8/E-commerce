@@ -338,6 +338,7 @@ function AuthLogin() {
             </div>
           </div>
 
+          {/* Geçici olarak telefon girişi gizlendi
           <Button
             variant="outline"
             className="w-full"
@@ -346,6 +347,7 @@ function AuthLogin() {
             <Phone className="mr-2 h-4 w-4" />
             Telefon ile Giriş Yap
           </Button>
+          */}
         </div>
       </AuthLayout>
     );

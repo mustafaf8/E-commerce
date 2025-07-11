@@ -182,12 +182,12 @@ const loginUser = async (req, res) => {
     // 2. Durum: Kullanıcının kayıtlı bir şifresi YOK (Google/Telefon ile kayıt olmuş)
     else {
       let loginMethod = "Google"; // Varsayılan
-      if (checkUser.phoneNumber) {
-        loginMethod = "telefon numarası";
-      }
+    //  if (checkUser.phoneNumber) {
+    //    loginMethod = "telefon numarası";
+    //  }
       return res.status(401).json({
         success: false,
-        message: `Bu hesap şifre ile korunmuyor. Lütfen ${loginMethod} ile giriş yapmayı deneyin.`,
+        message: `Bu hesap şifre ile korunmuyor. Bu bir ${loginMethod} hesabıdır. Lütfen ${loginMethod} ile giriş yapmayı deneyin.`,
       });
     }
 

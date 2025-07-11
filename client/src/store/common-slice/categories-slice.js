@@ -66,6 +66,22 @@ export const deleteCategory = createAsyncThunk(
   }
 );
 
+export const fetchAllCategoriesAdmin = createAsyncThunk(
+  "categories/fetchAllAdmin",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/admin/categories/list`, {
+        withCredentials: true,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || { message: "Kategoriler getirilemedi (admin)." }
+      );
+    }
+  }
+);
+
 const categoriesSlice = createSlice({
   name: "categories",
   initialState,
@@ -120,6 +136,19 @@ const categoriesSlice = createSlice({
       })
       .addCase(deleteCategory.rejected, (state, action) => {
         state.error = action.payload?.message || "Kategori silinemedi.";
+      })
+      .addCase(fetchAllCategoriesAdmin.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllCategoriesAdmin.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.categoryList = action.payload?.data || [];
+      })
+      .addCase(fetchAllCategoriesAdmin.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload?.message || "Kategoriler alınamadı (admin).";
+        state.categoryList = [];
       });
   },
 });

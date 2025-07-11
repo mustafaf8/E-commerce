@@ -155,8 +155,8 @@ const Footer = () => {
             </a>
           </div>
 
-          <div className="space-y-3">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-3 relative pl-3 before:absolute before:left-0 before:top-1 before:h-5 before:w-1 before:bg-primary before:rounded-full">
+          <div className="space-y-2">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-0 relative pl-3 before:absolute before:left-0 before:top-1 before:h-5 before:w-1 before:bg-primary before:rounded-full">
               Hakkımızda
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">

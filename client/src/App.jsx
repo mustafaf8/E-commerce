@@ -33,13 +33,13 @@ const AdminDashboard = lazy(() => import("./pages/admin-view/dashboard"));
 const AdminProducts = lazy(() => import("./pages/admin-view/products"));
 const AdminOrders = lazy(() => import("./pages/admin-view/orders"));
 const AdminFeatures = lazy(() => import("./pages/admin-view/features"));
-const AdminCategories = lazy(() => import("./pages/admin-view/categories"));
+const AdminCategoriesBrands = lazy(() => import("./pages/admin-view/categories-brands"));
 const AdminHomeSections = lazy(() =>
   import("./pages/admin-view/home-sections")
 );
-const AdminBrands = lazy(() => import("./pages/admin-view/brands"));
 const AdminStatsPage = lazy(() => import("./pages/admin-view/AdminStatsPage"));
 const AdminAuthorization = lazy(() => import("./pages/admin-view/authorization"));
+const AdminMaintenanceMode = lazy(() => import("./pages/admin-view/maintenance-mode"));
 
 const NotFound = lazy(() => import("./pages/not-found"));
 const ShoppingListing = lazy(() => import("./pages/shopping-view/listing"));
@@ -138,13 +138,14 @@ function App() {
               <CheckAuth
                 isAuthenticated={isAuthenticated}
                 user={user}
+                isLoading={authIsLoading}
               ></CheckAuth>
             }
           />
           <Route
             path="/auth"
             element={
-              <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+              <CheckAuth isAuthenticated={isAuthenticated} user={user} isLoading={authIsLoading}>
                 <AuthLayout />
               </CheckAuth>
             }
@@ -167,9 +168,8 @@ function App() {
             <Route path="products" element={<AdminProducts />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="features" element={<AdminFeatures />} />
-            <Route path="categories" element={<AdminCategories />} />
+            <Route path="categories-brands" element={<AdminCategoriesBrands />} />
             <Route path="home-sections" element={<AdminHomeSections />} />
-            <Route path="brands" element={<AdminBrands />} />
             <Route path="stats" element={<AdminStatsPage />} />
             <Route
               path="authorization"
@@ -179,6 +179,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="maintenance" element={<AdminMaintenanceMode />} />
           </Route>
 
           <Route path="/shop" element={<ShoppingLayout />}>

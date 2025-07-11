@@ -64,6 +64,20 @@ export const deleteBrand = createAsyncThunk(
   }
 );
 
+export const fetchAllBrandsAdmin = createAsyncThunk(
+  "brands/fetchAllAdmin",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/admin/brands/list`, { withCredentials: true });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || { message: "Markalar getirilemedi (admin)." }
+      );
+    }
+  }
+);
+
 const brandsSlice = createSlice({
   name: "brands",
   initialState,
@@ -152,6 +166,20 @@ const brandsSlice = createSlice({
         state.isProcessing = false;
         state.error =
           action.payload?.message || "Marka silinirken bir hata oluştu.";
+      })
+
+      .addCase(fetchAllBrandsAdmin.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllBrandsAdmin.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.brandList = action.payload?.data || [];
+      })
+      .addCase(fetchAllBrandsAdmin.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload?.message || "Markalar alınamadı (admin).";
+        state.brandList = [];
       });
   },
 });

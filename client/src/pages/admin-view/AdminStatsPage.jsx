@@ -35,7 +35,6 @@ import {
   Bar,
   Legend,
 } from "recharts";
-import MaintenanceManager from "@/components/admin-view/MaintenanceManager";
 import useAdminPermission from "@/hooks/useAdminPermission";
 
 
@@ -721,7 +720,6 @@ function AdminStatsPage() {
           )}
         </div>
       )}
-      {canManage && <MaintenanceManager canManage={canManage}/>}
     </div>
   );
 }

@@ -1,14 +1,17 @@
 import "react";
 import { useSelector } from "react-redux";
 import { Navigate, useLocation } from "react-router-dom";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function ProtectedRoute({ children, adminOnly = false, level1Only = false }) {
   const { isAuthenticated, isLoading, user } = useSelector(
     (state) => state.auth
   );
   const location = useLocation();
+  
+  // Auth durumu yüklenirken tam ekran skeleton göster
   if (isLoading) {
-    return <div>Yükleniyor...</div>;
+    return <Skeleton className="w-full h-screen bg-gray-200" />;
   }
 
   if (!isAuthenticated) {
