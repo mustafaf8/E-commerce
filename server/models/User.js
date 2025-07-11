@@ -24,6 +24,16 @@ const UserSchema = new mongoose.Schema(
       sparse: true,
       index: true,
     },
+    tcKimlikNo: {
+      type: String,
+      required: false,
+      validate: {
+        validator: function(v) {
+          return !v || /^\d{11}$/.test(v);
+        },
+        message: 'TC Kimlik No 11 haneli sayı olmalıdır'
+      }
+    },
     role: {
       type: String,
       default: "user",

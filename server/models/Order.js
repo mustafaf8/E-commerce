@@ -33,6 +33,28 @@ const OrderSchema = new mongoose.Schema(
           return this.isGuestOrder;
         },
       },
+      tcKimlikNo: {
+        type: String,
+        required: function () {
+          return this.isGuestOrder;
+        },
+        validate: {
+          validator: function(v) {
+            return !v || /^\d{11}$/.test(v);
+          },
+          message: 'TC Kimlik No 11 haneli sayı olmalıdır'
+        }
+      },
+    },
+    tcKimlikNo: {
+      type: String,
+      required: false,
+      validate: {
+        validator: function(v) {
+          return !v || /^\d{11}$/.test(v);
+        },
+        message: 'TC Kimlik No 11 haneli sayı olmalıdır'
+      }
     },
     cartId: String,
     cartItems: [

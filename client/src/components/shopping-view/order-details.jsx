@@ -113,26 +113,34 @@ function ShoppingOrderDetailsView({ orderDetails }) {
       </div>
 
       {/* Alıcı Bilgileri */}
-      {!isGuest && isAuthenticated && user && (
-        <div className="bg-white p-4 rounded-lg shadow-sm space-y-4">
-          <div className="flex items-center gap-2">
-            <User className="h-5 w-5 text-primary" />
-            <h3 className="text-base font-semibold">
-              Alıcı Bilgileri
-            </h3>
+      <div className="bg-white p-4 rounded-lg shadow-sm space-y-4">
+        <div className="flex items-center gap-2">
+          <User className="h-5 w-5 text-primary" />
+          <h3 className="text-base font-semibold">
+            Alıcı Bilgileri
+          </h3>
+        </div>
+        <div className=" grid grid-cols-2 gap-3 max-md:grid-cols-1">
+          <div>
+            <p className="text-sm text-muted-foreground mb-1">Ad Soyad:</p>
+            <p className="text-sm font-medium">{recipientName}</p>
           </div>
-          <div className=" grid grid-cols-2 gap-3 max-md:grid-cols-1">
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">Ad Soyad:</p>
-              <p className="text-sm font-medium">{recipientName}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">E-posta:</p>
-              <p className="text-sm font-medium break-all">{recipientEmail}</p>
-            </div>
+          <div>
+            <p className="text-sm text-muted-foreground mb-1">E-posta:</p>
+            <p className="text-sm font-medium break-all">{recipientEmail}</p>
+          </div>
+          {/* TC Kimlik No */}
+          <div>
+            <p className="text-sm text-muted-foreground mb-1">TC Kimlik No:</p>
+            <p className="text-sm font-medium">
+              {isGuest 
+                ? orderDetails.guestInfo?.tcKimlikNo || "Belirtilmemiş"
+                : orderDetails.tcKimlikNo || "Belirtilmemiş"
+              }
+            </p>
           </div>
         </div>
-      )}
+      </div>
 
       {/* Teslimat Adresi */}
       <div className="bg-white p-4 rounded-lg shadow-sm space-y-4">

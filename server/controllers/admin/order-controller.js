@@ -46,7 +46,7 @@ const getOrderDetailsForAdmin = async (req, res) => {
       order = await Order.findById(id)
         .populate({
           path: "userId",
-          select: "userName email phoneNumber",
+          select: "userName email phoneNumber tcKimlikNo",
         })
         .lean();
 
@@ -98,7 +98,7 @@ const updateOrderStatus = async (req, res) => {
       { new: true }
     ).populate({
       path: "userId",
-      select: "userName email phoneNumber",
+      select: "userName email phoneNumber tcKimlikNo",
     });
 
     res.status(200).json({

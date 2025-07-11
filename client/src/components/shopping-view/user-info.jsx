@@ -15,6 +15,7 @@ function UserInfo() {
     userName: "",
     email: "",
     phoneNumber: "",
+    tcKimlikNo: "",
   });
 
   useEffect(() => {
@@ -23,6 +24,7 @@ function UserInfo() {
         userName: user.userName || "",
         email: user.email || "",
         phoneNumber: user.phoneNumber || "",
+        tcKimlikNo: user.tcKimlikNo || "",
       });
     }
   }, [user]);
@@ -30,12 +32,27 @@ function UserInfo() {
   function handleUpdateUserInfo(event) {
     event.preventDefault();
 
-    if (formData.phoneNumber === (user?.phoneNumber || "")) {
+    // TC Kimlik No validasyonu
+    if (formData.tcKimlikNo && !/^[0-9]{11}$/.test(formData.tcKimlikNo)) {
+      toast({
+        title: "TC Kimlik Numarası 11 haneli ve sadece rakam olmalıdır",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (
+      formData.phoneNumber === (user?.phoneNumber || "") &&
+      formData.tcKimlikNo === (user?.tcKimlikNo || "")
+    ) {
       toast({ title: "Değişiklik yapılmadı.", variant: "info" });
       return;
     }
 
-    const dataToSend = { phoneNumber: formData.phoneNumber };
+    const dataToSend = { 
+      phoneNumber: formData.phoneNumber,
+      tcKimlikNo: formData.tcKimlikNo,
+    };
 
     dispatch(updateUserDetails(dataToSend))
       .unwrap()

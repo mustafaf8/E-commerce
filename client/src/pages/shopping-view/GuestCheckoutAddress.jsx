@@ -25,6 +25,7 @@ const initialAddressFormData = {
   phone: "",
   email: "",
   notes: "",
+  tcKimlikNo: "",
 };
 
 function GuestCheckoutAddress() {
@@ -65,7 +66,9 @@ function GuestCheckoutAddress() {
       formData.address.trim() !== "" &&
       formData.city.trim() !== "" &&
       formData.pincode.trim() !== "" &&
-      formData.phone.trim() !== ""
+      formData.phone.trim() !== "" &&
+      formData.tcKimlikNo.trim() !== "" &&
+      /^[0-9]{11}$/.test(formData.tcKimlikNo)
     );
   };
   useEffect(() => {
@@ -101,6 +104,7 @@ function GuestCheckoutAddress() {
         city: formData.city,
         pincode: formData.pincode,
         notes: formData.notes,
+        tcKimlikNo: formData.tcKimlikNo,
       },
       cartItems: cartForCheckout.items.map((item) => ({
         productId: item.productId,

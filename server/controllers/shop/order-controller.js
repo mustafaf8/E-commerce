@@ -10,7 +10,7 @@ const mongoose = require("mongoose");
 const createOrder = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { cartItems, addressInfo, cartId } = req.body;
+    const { cartItems, addressInfo, cartId, tcKimlikNo } = req.body;
 
     const user = await User.findById(userId);
     if (!user)
@@ -25,6 +25,14 @@ const createOrder = async (req, res) => {
       return res
         .status(400)
         .json({ success: false, message: "Sepet ürünleri geçersiz." });
+
+    // TC Kimlik No validasyonu
+    if (tcKimlikNo && !/^\d{11}$/.test(tcKimlikNo)) {
+      return res.status(400).json({
+        success: false,
+        message: "TC Kimlik No 11 haneli sayı olmalıdır.",
+      });
+    }
 
     let calculatedTotal = 0;
     const basketItemsForIyzico = [];
@@ -75,6 +83,7 @@ const createOrder = async (req, res) => {
       totalAmount: calculatedTotal,
       orderDate: new Date(),
       iyzicoConversationId: conversationId,
+      tcKimlikNo,
     });
     await pendingOrder.save();
     const backendCallbackUrl = `${process.env.SERVER_BASE_URL}/api/shop/order/iyzico-callback`;
@@ -95,7 +104,7 @@ const createOrder = async (req, res) => {
         surname: user.userName.split(" ")[1] || "Soyad",
         gsmNumber: addressInfo.phone || "+905000000000",
         email: user.email || "muhasebe@rmrenerji.com",
-        identityNumber: "11111111111",
+        identityNumber: tcKimlikNo || "11111111111",
         registrationAddress: addressInfo.address,
         ip: req.ip || "127.0.0.1",
         city: addressInfo.city,
@@ -373,11 +382,20 @@ const createGuestOrder = async (req, res) => {
       !guestInfo.address ||
       !guestInfo.city ||
       !guestInfo.pincode ||
-      !guestInfo.phone
+      !guestInfo.phone ||
+      !guestInfo.tcKimlikNo
     ) {
       return res
         .status(400)
-        .json({ success: false, message: "Misafir bilgileri ve adres eksik." });
+        .json({ success: false, message: "Misafir bilgileri ve adres eksik. TC Kimlik No zorunludur." });
+    }
+
+    // TC Kimlik No validasyonu
+    if (!/^\d{11}$/.test(guestInfo.tcKimlikNo)) {
+      return res.status(400).json({
+        success: false,
+        message: "TC Kimlik No 11 haneli sayı olmalıdır.",
+      });
     }
     if (!Array.isArray(cartItems) || cartItems.length === 0) {
       return res
@@ -443,6 +461,7 @@ const createGuestOrder = async (req, res) => {
         fullName: guestInfo.fullName,
         email: guestInfo.email,
         phone: guestInfo.phone,
+        tcKimlikNo: guestInfo.tcKimlikNo,
       },
       cartItems: orderCartItemsDetails,
       addressInfo: {
@@ -482,7 +501,7 @@ const createGuestOrder = async (req, res) => {
         surname: guestInfo.fullName.split(" ").slice(1).join(" ") || "Soyad",
         gsmNumber: guestInfo.phone,
         email: guestInfo.email,
-        identityNumber: "11111111111",
+        identityNumber: guestInfo.tcKimlikNo || "11111111111",
         registrationAddress: guestInfo.address,
         ip: req.ip || "127.0.0.1",
         city: guestInfo.city,

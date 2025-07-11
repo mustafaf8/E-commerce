@@ -163,6 +163,17 @@ function AdminOrderDetailsView({ orderDetails, canManage}) {
               {isGuest ? "Misafir" : "Kayıtlı Kullanıcı"}
             </div>
           </div>
+
+          {/* TC Kimlik No */}
+          <div>
+            <div className="text-muted-foreground">TC Kimlik No</div>
+            <div className="font-medium">
+              {isGuest 
+                ? orderDetails?.guestInfo?.tcKimlikNo || "Belirtilmemiş"
+                : orderDetails?.tcKimlikNo || "Belirtilmemiş"
+              }
+            </div>
+          </div>
         </div>
       </Card>
 

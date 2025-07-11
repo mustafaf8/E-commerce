@@ -73,7 +73,7 @@ passport.deserializeUser(async (id, done) => {
 });
 
 const registerUser = async (req, res) => {
-  const { userName, email, password } = req.body;
+  const { userName, email, password, tcKimlikNo } = req.body;
 
   if (!userName || !email || !password) {
     return res.status(400).json({
@@ -86,6 +86,14 @@ const registerUser = async (req, res) => {
     return res
       .status(400)
       .json({ success: false, message: "Şifre en az 4 karakter olmalıdır." });
+  }
+
+  // TC Kimlik No validasyonu
+  if (tcKimlikNo && !/^\d{11}$/.test(tcKimlikNo)) {
+    return res.status(400).json({
+      success: false,
+      message: "TC Kimlik No 11 haneli sayı olmalıdır.",
+    });
   }
 
   try {
@@ -109,6 +117,7 @@ const registerUser = async (req, res) => {
       userName,
       email,
       password: hashPassword,
+      tcKimlikNo,
     });
 
     await newUser.save();
@@ -188,6 +197,8 @@ const loginUser = async (req, res) => {
         role: checkUser.role,
         email: checkUser.email,
         userName: checkUser.userName,
+        phoneNumber: checkUser.phoneNumber,
+        tcKimlikNo: checkUser.tcKimlikNo,
       },
       process.env.CLIENT_SECRET_KEY || "DEFAULT_SECRET_KEY",
       { expiresIn: "1h" }
@@ -201,6 +212,7 @@ const loginUser = async (req, res) => {
         id: checkUser._id,
         userName: checkUser.userName,
         phoneNumber: checkUser.phoneNumber,
+        tcKimlikNo: checkUser.tcKimlikNo,
         adminAccessLevel: checkUser.adminAccessLevel,
         adminModulePermissions: checkUser.adminModulePermissions,
       },
@@ -282,7 +294,7 @@ const updateUserDetails = async (req, res) => {
         .json({ success: false, message: "Yetkilendirme hatası." });
     }
     const userId = req.user.id;
-    const { userName, email, phoneNumber } = req.body;
+    const { userName, email, phoneNumber, tcKimlikNo } = req.body;
 
     const user = await User.findById(userId);
     if (!user)
@@ -327,6 +339,16 @@ const updateUserDetails = async (req, res) => {
       }
       updatedFields.phoneNumber = phoneNumber;
     }
+
+    if (tcKimlikNo !== undefined && tcKimlikNo !== user.tcKimlikNo) {
+      if (tcKimlikNo && !/^\d{11}$/.test(tcKimlikNo)) {
+        return res.status(400).json({
+          success: false,
+          message: "TC Kimlik No 11 haneli sayı olmalıdır.",
+        });
+      }
+      updatedFields.tcKimlikNo = tcKimlikNo;
+    }
     if (Object.keys(updatedFields).length > 0) {
       await User.updateOne({ _id: userId }, { $set: updatedFields });
      // console.log(`Kullanıcı ${userId} güncellendi:`, updatedFields);
@@ -338,6 +360,7 @@ const updateUserDetails = async (req, res) => {
           email: updatedUser.email,
           userName: updatedUser.userName,
           phoneNumber: updatedUser.phoneNumber,
+          tcKimlikNo: updatedUser.tcKimlikNo,
         },
         process.env.CLIENT_SECRET_KEY || "DEFAULT_SECRET_KEY",
         { expiresIn: "1h" }
@@ -362,6 +385,7 @@ const updateUserDetails = async (req, res) => {
           email: updatedUser.email,
           role: updatedUser.role,
           phoneNumber: updatedUser.phoneNumber,
+          tcKimlikNo: updatedUser.tcKimlikNo,
         },
       });
     } else {
@@ -405,6 +429,7 @@ const verifyPhoneNumberLogin = async (req, res) => {
           email: user.email,
           userName: user.userName,
           phoneNumber: user.phoneNumber,
+          tcKimlikNo: user.tcKimlikNo,
         },
         process.env.CLIENT_SECRET_KEY || "DEFAULT_SECRET_KEY",
         { expiresIn: "1h" }
@@ -422,6 +447,7 @@ const verifyPhoneNumberLogin = async (req, res) => {
           email: user.email,
           role: user.role,
           phoneNumber: user.phoneNumber,
+          tcKimlikNo: user.tcKimlikNo,
         },
       });
     } else {
@@ -480,6 +506,7 @@ const registerPhoneNumberUser = async (req, res) => {
           email: existingUser.email,
           userName: existingUser.userName,
           phoneNumber: existingUser.phoneNumber,
+          tcKimlikNo: existingUser.tcKimlikNo,
         },
         process.env.CLIENT_SECRET_KEY || "DEFAULT_SECRET_KEY",
         { expiresIn: "1h" }
@@ -494,6 +521,7 @@ const registerPhoneNumberUser = async (req, res) => {
           email: existingUser.email,
           role: existingUser.role,
           phoneNumber: existingUser.phoneNumber,
+          tcKimlikNo: existingUser.tcKimlikNo,
         },
       });
     }
@@ -516,6 +544,7 @@ const registerPhoneNumberUser = async (req, res) => {
         email: newUser.email,
         userName: newUser.userName,
         phoneNumber: newUser.phoneNumber,
+        tcKimlikNo: newUser.tcKimlikNo,
       },
       process.env.CLIENT_SECRET_KEY || "DEFAULT_SECRET_KEY",
       { expiresIn: "1h" }
@@ -531,6 +560,7 @@ const registerPhoneNumberUser = async (req, res) => {
         email: newUser.email,
         role: newUser.role,
         phoneNumber: newUser.phoneNumber,
+        tcKimlikNo: newUser.tcKimlikNo,
       },
     });
   } catch (error) {

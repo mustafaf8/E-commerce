@@ -32,6 +32,17 @@ export const registerFormControls = [
     title: "Şifreniz en az 8 karakter olmalıdır",
     required: true,
   },
+  {
+    name: "tcKimlikNo",
+    label: "TC Kimlik No (Opsiyonel)",
+    placeholder: "11 haneli TC Kimlik Numaranız",
+    componentType: "input",
+    type: "text",
+    maxLength: 11,
+    pattern: "^[0-9]{11}$",
+    title: "TC Kimlik Numarası 11 haneli ve sadece rakam olmalıdır",
+    required: false,
+  },
 ];
 
 export const loginFormControls = [
@@ -215,6 +226,17 @@ export const addressFormControls = [
     maxLength: 200,
     required: false
   },
+  {
+    name: "tcKimlikNo",
+    label: "TC Kimlik No (Fatura için zorunludur)",
+    placeholder: "11 haneli TC Kimlik Numaranız",
+    componentType: "input",
+    type: "text",
+    maxLength: 11,
+    pattern: "^[0-9]{11}$",
+    title: "TC Kimlik Numarası 11 haneli ve sadece rakam olmalıdır",
+    required: true,
+  },
 ];
 
 export const userInfoFormControls = [
@@ -238,6 +260,17 @@ export const userInfoFormControls = [
     type: "tel",
     placeholder: "Telefon numaranız (varsa)",
     disabled: true,
+  },
+  {
+    name: "tcKimlikNo",
+    label: "TC Kimlik No (Fatura için zorunludur)",
+    placeholder: "11 haneli TC Kimlik Numaranız",
+    componentType: "input",
+    type: "text",
+    maxLength: 11,
+    pattern: "^[0-9]{11}$",
+    title: "TC Kimlik Numarası 11 haneli ve sadece rakam olmalıdır",
+    required: true,
   },
 ];
 
