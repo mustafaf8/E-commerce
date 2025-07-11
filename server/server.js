@@ -10,32 +10,20 @@ const admin = require("firebase-admin");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 
-const authRouter = require("./routes/auth/auth-routes");
-const adminProductsRouter = require("./routes/admin/products-routes");
-const adminOrderRouter = require("./routes/admin/order-routes");
-const shopProductsRouter = require("./routes/shop/products-routes");
-const shopCartRouter = require("./routes/shop/cart-routes");
-const shopAddressRouter = require("./routes/shop/address-routes");
-const shopOrderRouter = require("./routes/shop/order-routes");
-const shopSearchRouter = require("./routes/shop/search-routes");
-const shopReviewRouter = require("./routes/shop/review-routes");
-const commonPromoCardRouter = require("./routes/common/promo-card-routes");
-const commonFeatureRouter = require("./routes/common/feature-routes");
-const shopWishlistRouter = require("./routes/shop/wishlist-routes");
-const commonSideBannerRouter = require("./routes/common/side-banner-routes");
-const adminCategoryRouter = require("./routes/admin/category-routes"); // Yeni
-const adminHomeSectionRouter = require("./routes/admin/home-section-routes"); // Yeni
-const commonCategoryRouter = require("./routes/common/category-routes"); // Yeni
-const shopHomeSectionRouter = require("./routes/shop/home-section-routes");
-const adminBrandRouter = require("./routes/admin/brand-routes"); // Yeni
-const commonBrandRouter = require("./routes/common/brand-routes");
-const adminStatsRouter = require("./routes/admin/statsAdminRoutes");
-const adminAuthorizationRouter = require("./routes/admin/authorization-routes");
-const maintenanceRouter = require("./routes/common/maintenance-routes");
-const contactRouter = require("./routes/common/contact-routes");
-const errorHandler = require("./middleware/errorHandler");
-const { scheduleAbandonedCartEmails } = require("./jobs/abandonedCartJob");
-require("./controllers/auth/auth-controller");
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 dakika
+  max: 500, // her IP'den 15 dakikada en fazla 100 istek
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: "Çok fazla istek yaptınız, lütfen 15 dakika sonra tekrar deneyin.",
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 dakika
+  max: 15, // 15 dakikada 10 giriş denemesi
+  message:
+    "Çok fazla giriş denemesi yapıldı, lütfen daha sonra tekrar deneyin.",
+});
 
 try {
   const serviceAccount = {
@@ -61,10 +49,37 @@ try {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   });
-  // console.log("Firebase Admin SDK başarıyla başlatıldı.");
+  console.log("Firebase Admin SDK başarıyla başlatıldı.");
 } catch (error) {
-  // console.error("Firebase Admin SDK başlatılamadı:", error.message);
+  console.error("Firebase Admin SDK başlatılamadı:", error.message);
 }
+
+const authRouter = require("./routes/auth/auth-routes");
+const adminProductsRouter = require("./routes/admin/products-routes");
+const adminOrderRouter = require("./routes/admin/order-routes");
+const shopProductsRouter = require("./routes/shop/products-routes");
+const shopCartRouter = require("./routes/shop/cart-routes");
+const shopAddressRouter = require("./routes/shop/address-routes");
+const shopOrderRouter = require("./routes/shop/order-routes");
+const shopSearchRouter = require("./routes/shop/search-routes");
+const shopReviewRouter = require("./routes/shop/review-routes");
+const commonPromoCardRouter = require("./routes/common/promo-card-routes");
+const commonFeatureRouter = require("./routes/common/feature-routes");
+const shopWishlistRouter = require("./routes/shop/wishlist-routes");
+const commonSideBannerRouter = require("./routes/common/side-banner-routes");
+
+const adminCategoryRouter = require("./routes/admin/category-routes"); // Yeni
+const adminHomeSectionRouter = require("./routes/admin/home-section-routes"); // Yeni
+const commonCategoryRouter = require("./routes/common/category-routes"); // Yeni
+const shopHomeSectionRouter = require("./routes/shop/home-section-routes");
+const adminBrandRouter = require("./routes/admin/brand-routes"); // Yeni
+const commonBrandRouter = require("./routes/common/brand-routes");
+const adminStatsRouter = require("./routes/admin/statsAdminRoutes");
+const adminAuthorizationRouter = require("./routes/admin/authorization-routes");
+const maintenanceRouter = require("./routes/common/maintenance-routes");
+const errorHandler = require("./middleware/errorHandler");
+const { scheduleAbandonedCartEmails } = require("./jobs/abandonedCartJob");
+require("./controllers/auth/auth-controller");
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -72,21 +87,22 @@ mongoose
   .catch((error) => console.log("MongoDB connection error:", error));
 
 const app = express();
+app.set("trust proxy", 1);
+app.use(helmet());
 const PORT = process.env.PORT || 5000;
 
+const allowedOrigins = [
+  process.env.CLIENT_BASE_URL,
+  "https://deposun.com",
+  "http://localhost:5173",
+];
+
+const IYZICO_CALLBACK_PATH = "/api/shop/order/iyzico-callback";
 
 app.use((req, res, next) => {
   if (req.path === IYZICO_CALLBACK_PATH) {
     return next();
   }
-
-  const allowedOrigins = [
-    process.env.CLIENT_BASE_URL,
-    "https://deposun.com",
-    "http://localhost:5173",
-  ];
-  
-  const IYZICO_CALLBACK_PATH = "/api/shop/order/iyzico-callback";
 
   cors({
     origin: function (origin, callback) {
@@ -112,12 +128,10 @@ app.use((req, res, next) => {
   })(req, res, next);
 });
 
-app.set("trust proxy", 1);
-app.use(helmet());
 app.use(cookieParser());
+
 app.use(express.json());
-
-
+app.use(express.urlencoded({ extended: true }));
 
 app.use(
   session({
@@ -135,25 +149,9 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
-
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 dakika
-  max: 800, // her IP'den 15 dakikada en fazla 100 istek
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: "Çok fazla istek yaptınız, lütfen 15 dakika sonra tekrar deneyin.",
-});
-
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 dakika
-  max: 15, // 15 dakikada 10 giriş denemesi
-  message:
-    "Çok fazla giriş denemesi yapıldı, lütfen daha sonra tekrar deneyin.",
-});
 app.use("/api/", apiLimiter);
 app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/register", authLimiter);
-
 app.use("/api/auth", authRouter);
 app.use("/api/admin/products", adminProductsRouter);
 app.use("/api/admin/orders", adminOrderRouter);
@@ -176,8 +174,6 @@ app.use("/api/common/brands", commonBrandRouter);
 app.use("/api/admin/stats", adminStatsRouter);
 app.use("/api/admin/authorization", adminAuthorizationRouter);
 app.use("/api/maintenance", maintenanceRouter);
-app.use("/api/contact", contactRouter);
-
 app.use(errorHandler);
 if (process.env.NODE_ENV !== "test") {
   scheduleAbandonedCartEmails();
