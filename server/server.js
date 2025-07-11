@@ -74,40 +74,43 @@ mongoose
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-const IYZICO_CALLBACK_PATH = "/api/shop/order/iyzico-callback";
+
 app.use((req, res, next) => {
   if (req.path === IYZICO_CALLBACK_PATH) {
-    // Iyzico için standart urlencoded parser yeterli
-    express.urlencoded({ extended: true })(req, res, next);
-  } else {
-    // Diğer tüm rotalar için JSON parser kullan
-    express.json()(req, res, next);
+    return next();
   }
+
+  const allowedOrigins = [
+    process.env.CLIENT_BASE_URL,
+    "https://deposun.com",
+    "http://localhost:5173",
+  ];
+  
+  const IYZICO_CALLBACK_PATH = "/api/shop/order/iyzico-callback";
+
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(
+          new Error(
+            "Bu origin için CORS politikası tarafından izin verilmiyor."
+          )
+        );
+      }
+    },
+    methods: ["GET", "POST", "DELETE", "PUT"],
+    credentials: true,
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "Cache-Control",
+      "Expires",
+      "Pragma",
+    ],
+  })(req, res, next);
 });
-
-const allowedOrigins = [
-  process.env.CLIENT_BASE_URL,
-  "https://deposun.com",
-  "http://localhost:5173",
-  "http://localhost",
-  "capacitor://localhost",
-  "https://localhost"
-];
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(
-        new Error("Bu origin için CORS politikası tarafından izin verilmiyor.")
-      );
-    }
-  },
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
 
 app.set("trust proxy", 1);
 app.use(helmet());
