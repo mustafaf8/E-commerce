@@ -20,6 +20,7 @@ const initialAddressFormData = {
   phone: "",
   pincode: "",
   notes: "",
+  tcKimlikNo: "",
 };
 
 function Address({ setCurrentSelectedAddress, seciliAdresProp }) {
@@ -102,6 +103,7 @@ function Address({ setCurrentSelectedAddress, seciliAdresProp }) {
       phone: getCuurentAddress?.phone,
       pincode: getCuurentAddress?.pincode,
       notes: getCuurentAddress?.notes,
+      tcKimlikNo: user?.tcKimlikNo || "",
     });
   }
 
@@ -145,6 +147,13 @@ function Address({ setCurrentSelectedAddress, seciliAdresProp }) {
   useEffect(() => {
     dispatch(fetchAllAddresses(user?.id));
   }, [dispatch, user?.id]);
+
+  useEffect(() => {
+    // Kullanıcı TC bilgisi geldiğinde formData'ya set et (yeni adres eklerken hazır olsun)
+    if (user?.tcKimlikNo) {
+      setFormData((prev) => ({ ...prev, tcKimlikNo: user.tcKimlikNo }));
+    }
+  }, [user?.tcKimlikNo]);
 
   //console.log(
   //  "Address Component Render - Received selectedId:",

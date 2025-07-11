@@ -14,6 +14,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useNavigate } from "react-router-dom";
+import { AlertTriangle } from "lucide-react";
 
 function ShoppingCheckout() {
   const { cartItems } = useSelector((state) => state.shopCart);
@@ -27,6 +29,7 @@ function ShoppingCheckout() {
   //  currentSelectedAddress
   //);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { toast } = useToast();
   useEffect(() => {
     if (orderError) {
@@ -71,6 +74,15 @@ function ShoppingCheckout() {
       return;
     }
 
+    if (!user?.tcKimlikNo) {
+      toast({
+        variant: "warning",
+        title: "TC Kimlik No Eksik",
+        description: "Fatura için TC Kimlik No gereklidir. Lütfen profilinizi güncelleyin.",
+      });
+      return;
+    }
+
     const orderData = {
       userId: user?.id,
       cartId: cartItems?._id,
@@ -79,6 +91,7 @@ function ShoppingCheckout() {
         quantity: singleCartItem?.quantity,
       })),
       addressInfo: currentSelectedAddress,
+      tcKimlikNo: user?.tcKimlikNo,
     };
 
     dispatch(createNewOrder(orderData))
@@ -129,10 +142,40 @@ function ShoppingCheckout() {
         </div>
       </div>
       <div className="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8 px-4 py-8">
-        <Address
-          seciliAdresProp={currentSelectedAddress}
-          setCurrentSelectedAddress={setCurrentSelectedAddress}
-        />
+        <div className="space-y-4">
+          <Address
+            seciliAdresProp={currentSelectedAddress}
+            setCurrentSelectedAddress={setCurrentSelectedAddress}
+          />
+          
+          {/* TC Kimlik No Uyarısı */}
+          {!user?.tcKimlikNo && (
+            <Card className="border-amber-200 bg-amber-50">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="h-5 w-5 text-amber-600" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-amber-800">
+                      TC Kimlik Numarası Gerekli
+                    </p>
+                    <p className="text-xs text-amber-700 mt-1">
+                      Fatura işlemleri için TC Kimlik Numaranız gereklidir.
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-amber-300 text-amber-700 hover:bg-amber-100"
+                    onClick={() => navigate("/shop/account")}
+                  >
+                    Profili Güncelle
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+        
         <Card className="shadow-md">
           <CardHeader>
             <CardTitle className="text-xl font-semibold">

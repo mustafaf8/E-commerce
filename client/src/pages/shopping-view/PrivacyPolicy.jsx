@@ -59,7 +59,7 @@ const PrivacyPolicy = () => {
                 Kimlik ve İletişim Bilgileri
               </h3>
               <ul className="text-sm text-gray-700 dark:text-gray-400 space-y-1">
-                <li>• Ad, soyad</li>
+                <li>• Ad, soyad, TC Kimlik No</li>
                 <li>• E-posta adresi</li>
                 <li>• Telefon numarası</li>
                 <li>• Doğum tarihi</li>

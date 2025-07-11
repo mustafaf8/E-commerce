@@ -12,6 +12,7 @@ const initialState = {
   userName: "",
   email: "",
   password: "",
+  tcKimlikNo: "",
 };
 
 function AuthRegister() {

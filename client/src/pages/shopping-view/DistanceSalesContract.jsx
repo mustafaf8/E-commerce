@@ -59,7 +59,7 @@ const DistanceSalesContract = () => {
                   <li>Adres Bilgileri</li>
                   <li>Telefon Numarası</li>
                   <li>E-posta Adresi</li>
-                  <li>Vergi No</li>
+                  <li>Vergi No / TC Kimlik No</li>
                 </ul>
               </div>
             </div>
