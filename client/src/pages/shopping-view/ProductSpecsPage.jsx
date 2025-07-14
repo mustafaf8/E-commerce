@@ -94,6 +94,11 @@ function ProductSpecsPage() {
     }
   }, [productDetails]);
 
+  // Sayfa yüklendiğinde en üste scroll et
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const handleAddToCart = () => {
     if (!productDetails) return;
     const productDetailsForCart = {

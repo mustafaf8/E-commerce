@@ -67,33 +67,86 @@ const getFilteredProducts = async (req, res) => {
     }
 
     let sort = {};
-    switch (sortBy) {
-      case "price-lowtohigh":
-        sort.price = 1;
-        break;
-      case "price-hightolow":
-        sort.price = -1;
-        break;
-      case "title-atoz":
-        sort.title = 1;
-        break;
-      case "title-ztoa":
-        sort.title = -1;
-        break;
-      case "salesCount-desc":
-        sort.salesCount = -1;
-        break;
-      default:
-        sort.salesCount = -1;
-        break;
+    let pipeline = null;
+
+    // Fiyat sıralaması için aggregation pipeline kullan
+    if (sortBy === "price-lowtohigh" || sortBy === "price-hightolow") {
+      const sortDirection = sortBy === "price-lowtohigh" ? 1 : -1;
+      
+      pipeline = [
+        { $match: filters },
+        {
+          $addFields: {
+            effectivePrice: {
+              $cond: {
+                if: { $and: [{ $ne: ["$salePrice", null] }, { $gt: ["$salePrice", 0] }] },
+                then: "$salePrice",
+                else: "$price"
+              }
+            }
+          }
+        },
+        { $sort: { effectivePrice: sortDirection } },
+        { $limit: parseInt(limit, 10) },
+        {
+          $lookup: {
+            from: "categories",
+            localField: "category",
+            foreignField: "_id",
+            as: "category"
+          }
+        },
+        {
+          $lookup: {
+            from: "brands",
+            localField: "brand",
+            foreignField: "_id",
+            as: "brand"
+          }
+        },
+        {
+          $addFields: {
+            category: { $arrayElemAt: ["$category", 0] },
+            brand: { $arrayElemAt: ["$brand", 0] }
+          }
+        },
+        {
+          $project: {
+            description: 0,
+            costPrice: 0,
+            effectivePrice: 0
+          }
+        }
+      ];
+    } else {
+      // Diğer sıralama türleri için normal sort kullan
+      switch (sortBy) {
+        case "title-atoz":
+          sort.title = 1;
+          break;
+        case "title-ztoa":
+          sort.title = -1;
+          break;
+        case "salesCount-desc":
+          sort.salesCount = -1;
+          break;
+        default:
+          sort.salesCount = -1;
+          break;
+      }
     }
 
-    const products = await Product.find(filters)
-      .sort(sort)
-      .limit(parseInt(limit, 10))
-      .populate("category", "name slug")
-      .populate("brand", "name slug")
-      .select("-description -costPrice");
+    let products;
+    if (pipeline) {
+      products = await Product.aggregate(pipeline);
+    } else {
+      products = await Product.find(filters)
+        .sort(sort)
+        .limit(parseInt(limit, 10))
+        .populate("category", "name slug")
+        .populate("brand", "name slug")
+        .select("-description -costPrice");
+    }
 
     res.status(200).json({
       success: true,
