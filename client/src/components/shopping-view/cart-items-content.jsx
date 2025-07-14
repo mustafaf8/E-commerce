@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { useDispatch } from "react-redux";
 import { deleteCartItem, updateCartQuantity } from "@/store/shop/cart-slice";
 import { useToast } from "../ui/use-toast";
+import { formatPrice } from "@/lib/utils";
 
 function UserCartItemsContent({ cartItem, readOnly = false }) {
   const dispatch = useDispatch();
@@ -114,13 +115,12 @@ function UserCartItemsContent({ cartItem, readOnly = false }) {
         )}
       </div>
       <div className="flex flex-col items-end flex-shrink-0 ml-2">
-        <p className="font-semibold text-sm md:text-base">
-          {(
+        <p className="font-semibold text-sm md:text-base whitespace-nowrap">
+          {formatPrice(
             (cartItem?.salePrice > 0
               ? cartItem?.salePrice
               : cartItem?.price || 0) * cartItem?.quantity
-          ).toFixed(2)}{" "}
-          TL
+          )} TL
         </p>
         {!readOnly && (
           <Button

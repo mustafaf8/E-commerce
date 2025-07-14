@@ -5,11 +5,12 @@ export function cn(...inputs) {
   return twMerge(clsx(inputs))
 }
 
-// Format price for display: thousands separated by dot, no decimal part.
+// Format price for display: thousands separated by dot, with 2 decimal places for shopping view.
 export function formatPrice(value) {
   if (value === null || value === undefined || isNaN(value)) return "";
   return new Intl.NumberFormat("tr-TR", {
-    maximumFractionDigits: 0,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(value);
 }
 

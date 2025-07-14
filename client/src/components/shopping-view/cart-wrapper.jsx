@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Button } from "../ui/button";
 import PropTypes from "prop-types";
+import { formatPrice } from "@/lib/utils";
 
 import UserCartItemsContent from "./cart-items-content";
 import {
@@ -83,8 +84,8 @@ function UserCartWrapper({ setOpenCartSheet }) {
           <Separator className="my-2" />
           <div className="flex justify-between text-base font-medium">
             <span>Toplam Tutar:</span>
-            <span className="font-bold text-lg">
-              {totalCartAmount.toFixed(2)} TL
+            <span className="font-bold text-lg whitespace-nowrap">
+              {formatPrice(totalCartAmount)} TL
             </span>
           </div>
           <Button onClick={handleCheckout} className="w-full text-base py-3">

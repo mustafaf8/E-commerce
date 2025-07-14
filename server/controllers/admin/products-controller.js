@@ -39,6 +39,7 @@ const addProduct = async (req, res) => {
   try {
     const {
       image,
+      images,
       title,
       description,
       category,
@@ -48,10 +49,12 @@ const addProduct = async (req, res) => {
       totalStock,
       averageReview,
       costPrice,
+      technicalSpecs, // Yeni alanı al
     } = req.body;
 
     const newlyCreatedProduct = new Product({
       image,
+      images: images || [],
       title,
       description,
       category,
@@ -61,6 +64,7 @@ const addProduct = async (req, res) => {
       totalStock,
       averageReview,
       costPrice,
+      technicalSpecs, // Yeni alanı ekle
     });
 
     await newlyCreatedProduct.save();
@@ -105,6 +109,7 @@ const editProduct = async (req, res) => {
     }
     const {
       image,
+      images,
       title,
       description,
       category,
@@ -114,6 +119,7 @@ const editProduct = async (req, res) => {
       totalStock,
       averageReview,
       costPrice,
+      technicalSpecs,
     } = req.body;
 
     let findProduct = await Product.findById(id);
@@ -123,17 +129,18 @@ const editProduct = async (req, res) => {
         message: "Product not found",
       });
 
-    findProduct.title = title || findProduct.title;
-    findProduct.description = description || findProduct.description;
-    findProduct.category = category || findProduct.category;
-    findProduct.brand = brand || findProduct.brand;
-    findProduct.price = price === "" ? 0 : price || findProduct.price;
-    findProduct.salePrice =
-      salePrice === "" ? null : salePrice ?? findProduct.salePrice;
-    findProduct.totalStock = totalStock || findProduct.totalStock;
-    findProduct.image = image || findProduct.image;
-    findProduct.averageReview = averageReview || findProduct.averageReview;
-    findProduct.costPrice = costPrice || findProduct.costPrice;
+    if (title !== undefined) findProduct.title = title;
+    if (description !== undefined) findProduct.description = description;
+    if (category !== undefined) findProduct.category = category;
+    if (brand !== undefined) findProduct.brand = brand;
+    if (price !== undefined) findProduct.price = price;
+    if (salePrice !== undefined) findProduct.salePrice = salePrice;
+    if (totalStock !== undefined) findProduct.totalStock = totalStock;
+    if (image !== undefined) findProduct.image = image;
+    if (images !== undefined) findProduct.images = images;
+    if (averageReview !== undefined) findProduct.averageReview = averageReview;
+    if (costPrice !== undefined) findProduct.costPrice = costPrice;
+    if (technicalSpecs !== undefined) findProduct.technicalSpecs = technicalSpecs;
 
     await findProduct.save();
     res.status(200).json({

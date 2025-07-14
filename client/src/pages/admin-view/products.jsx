@@ -26,6 +26,10 @@ import ProductTileSkeleton from "@/components/shopping-view/product-tile-skeleto
 import { fetchAllBrands } from "@/store/common-slice/brands-slice";
 import { fetchAllCategories } from "@/store/common-slice/categories-slice";
 import api from "@/api/axiosInstance";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Trash } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 const initialFormData = {
   title: "",
@@ -37,7 +41,9 @@ const initialFormData = {
   totalStock: "",
   averageReview: 0,
   image: "",
+  images: [], // Ek resimler için array
   costPrice: "",
+  technicalSpecs: [], // Yeni alan
 };
 
 function AdminProducts() {
@@ -47,6 +53,8 @@ function AdminProducts() {
   const [productImageFile, setProductImageFile] = useState(null);
   const [productImageLoadingState, setProductImageLoadingState] =
     useState(false);
+  const [additionalImageFiles, setAdditionalImageFiles] = useState([]);
+  const [additionalImageLoadingState, setAdditionalImageLoadingState] = useState(false);
   const [currentEditedId, setCurrentEditedId] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [productIdToDelete, setProductIdToDelete] = useState(null);
@@ -65,6 +73,82 @@ function AdminProducts() {
   const { brandList = [] } = useSelector((state) => state.brands || {});
   const [dynamicFormControls, setDynamicFormControls] =
     useState(initialFormElements);
+
+  // Teknik özellikler için state yönetimi
+  const handleTechSpecChange = (index, field, value) => {
+    const updatedSpecs = [...formData.technicalSpecs];
+    updatedSpecs[index][field] = value;
+    setFormData(prev => ({ ...prev, technicalSpecs: updatedSpecs }));
+  };
+
+  const addTechSpec = () => {
+    setFormData(prev => ({
+      ...prev,
+      technicalSpecs: [...prev.technicalSpecs, { key: "", value: "" }],
+    }));
+  };
+
+  const removeTechSpec = (index) => {
+    const updatedSpecs = formData.technicalSpecs.filter((_, i) => i !== index);
+    setFormData(prev => ({ ...prev, technicalSpecs: updatedSpecs }));
+  };
+
+  // Ek resim yükleme fonksiyonu
+  const handleAdditionalImageUpload = async (files) => {
+    if (!files || files.length === 0) {
+      toast({ variant: "destructive", title: "Lütfen en az bir resim seçin" });
+      return;
+    }
+
+    setAdditionalImageLoadingState(true);
+    try {
+      const uploadPromises = Array.from(files).map(async (file, index) => {
+        const formDataUpload = new FormData();
+        formDataUpload.append('my_file', file);
+        
+        const response = await api.post("/admin/products/upload-image", formDataUpload, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        
+        if (response.data.success) {
+          return response.data.result.secure_url;
+        }
+        throw new Error(`Resim ${index + 1} yüklenemedi: ${response.data.message || 'Bilinmeyen hata'}`);
+      });
+
+      const uploadedUrls = await Promise.all(uploadPromises);
+      
+      setFormData(prev => ({
+        ...prev,
+        images: [...prev.images, ...uploadedUrls]
+      }));
+      
+      toast({ title: `${uploadedUrls.length} resim başarıyla yüklendi`, variant: "success" });
+      
+      // File input'u temizle
+      const fileInput = document.getElementById('additional-images');
+      if (fileInput) {
+        fileInput.value = '';
+      }
+    } catch (error) {
+      toast({ 
+        variant: "destructive", 
+        title: "Resim yükleme hatası",
+        description: error?.response?.data?.message || error.message || "Bilinmeyen hata oluştu"
+      });
+    } finally {
+      setAdditionalImageLoadingState(false);
+    }
+  };
+
+  // Ek resim silme fonksiyonu
+  const removeAdditionalImage = (index) => {
+    const updatedImages = formData.images.filter((_, i) => i !== index);
+    setFormData(prev => ({ ...prev, images: updatedImages }));
+  };
+
 
   useEffect(() => {
     const updatedControls = initialFormElements.map((control) => {
@@ -186,14 +270,26 @@ function AdminProducts() {
           category: formData.category,
           brand: formData.brand || null,
           image: finalImageUrl,
+          images: formData.images || [], // Ek resimler
         };
        // console.log("Gönderilen Veri (Brand Kontrol):", dataToSend);
-        const action =
-          currentEditedId !== null
-            ? editProduct({ id: currentEditedId, formData: dataToSend })
-            : addNewProduct(dataToSend);
 
-        await dispatch(action).unwrap();
+      // technicalSpecs'i boş ve geçersiz satırlardan temizle
+      const filteredSpecs = dataToSend.technicalSpecs.filter(
+        (spec) => spec.key.trim() !== "" && spec.value.trim() !== ""
+      );
+
+      const finalDataToSend = {
+        ...dataToSend,
+        technicalSpecs: filteredSpecs,
+      };
+
+      const action =
+        currentEditedId !== null
+          ? editProduct({ id: currentEditedId, formData: finalDataToSend })
+          : addNewProduct(finalDataToSend);
+
+      await dispatch(action).unwrap();
 
         toast({
           title: `Ürün başarıyla ${
@@ -268,12 +364,15 @@ function AdminProducts() {
           price: productToEdit.price?.toString() ?? "",
           salePrice: productToEdit.salePrice?.toString() ?? "",
           totalStock: productToEdit.totalStock?.toString() ?? "",
+          technicalSpecs: productToEdit.technicalSpecs || [], // Düzenleme için yükle
         });
         setProductImageFile(null);
+        setAdditionalImageFiles([]);
       } else {
         setCurrentEditedId(null);
         setFormData(initialFormData);
         setProductImageFile(null);
+        setAdditionalImageFiles([]);
       }
     }
   }, [currentEditedId, productList, openCreateProductsDialog]);
@@ -315,18 +414,32 @@ function AdminProducts() {
   }, [groupedProducts, categoryList]);
 
   const handleEditClick = useCallback(
-    (product = null) => {
+    (product) => {
       if (!canManage) {
         toast({ variant: "destructive", title: "Bu işlem için yetkiniz yok." });
         return;
       }
       if (product && product._id) {
         setCurrentEditedId(product._id);
+        setFormData({
+          title: product.title,
+          description: product.description,
+          category: product.category,
+          brand: product.brand,
+          price: product.price,
+          salePrice: product.salePrice,
+          totalStock: product.totalStock,
+          image: product.image,
+          images: product.images || [], // Ek resimler
+          costPrice: product.costPrice,
+          technicalSpecs: product.technicalSpecs || [], // Düzenleme için yükle
+        });
         setOpenCreateProductsDialog(true);
       } else {
         setCurrentEditedId(null);
         setFormData(initialFormData);
         setProductImageFile(null);
+        setAdditionalImageFiles([]);
         setOpenCreateProductsDialog(true);
       }
     },
@@ -447,25 +560,141 @@ function AdminProducts() {
               </div>
             )}
 
-            {/* Kategori yüklenirken Form'u gösterme (veya disabled yap) */}
-            {categoriesLoading ? (
-              <div className="space-y-4">
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-20 w-full" />
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-10 w-full" />
+            {/* Ek Resimler Bölümü */}
+            <div className="space-y-4 pt-4 border-t">
+              <h3 className="text-lg font-medium">Ek Resimler</h3>
+              
+              {/* Ek Resim Yükleme */}
+              <div>
+                <Label htmlFor="additional-images">Ek Resimler Seç (Çoklu)</Label>
+                <Input
+                  id="additional-images"
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => handleAdditionalImageUpload(e.target.files)}
+                  className="mt-1"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Birden fazla resim seçebilirsiniz. JPG, PNG, GIF desteklenir.
+                </p>
               </div>
-            ) : (
-              <CommonForm
-                onSubmit={onSubmit}
-                formData={formData}
-                setFormData={setFormData}
-                buttonText={currentEditedId !== null ? "Güncelle" : "Ekle"}
-                formControls={dynamicFormControls}
-                isBtnDisabled={productImageLoadingState || !isFormValid()}
-              />
-            )}
+
+              {/* Ek Resim Yükleme Göstergesi */}
+              {additionalImageLoadingState && (
+                <div className="flex items-center text-sm text-blue-600">
+                  <Skeleton className="h-4 w-4 mr-2 rounded-full animate-spin" />
+                  <span>Ek resimler yükleniyor...</span>
+                </div>
+              )}
+
+              {/* Yüklenen Ek Resimler */}
+              {formData.images && formData.images.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium mb-2">Yüklenen Ek Resimler:</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {formData.images.map((imageUrl, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={imageUrl}
+                          alt={`Ek Resim ${index + 1}`}
+                          className="w-full h-20 object-cover rounded border"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeAdditionalImage(index)}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Trash className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <form onSubmit={onSubmit} className="space-y-4">
+              {/* Form Alanları */}
+              {dynamicFormControls.map((control) => (
+                 <div key={control.name} className="space-y-1">
+                   <Label htmlFor={control.name}>{control.label}</Label>
+                   {control.componentType === 'input' && (
+                     <Input
+                       type={control.type}
+                       id={control.name}
+                       name={control.name}
+                       placeholder={control.placeholder}
+                       value={formData[control.name]}
+                       onChange={(e) => setFormData({ ...formData, [control.name]: e.target.value })}
+                     />
+                   )}
+                   {control.componentType === 'textarea' && (
+                     <Textarea
+                       id={control.name}
+                       name={control.name}
+                       placeholder={control.placeholder}
+                       value={formData[control.name]}
+                       onChange={(e) => setFormData({ ...formData, [control.name]: e.target.value })}
+                       rows={4}
+                     />
+                   )}
+                   {control.componentType === 'select' && (
+                      <select
+                        id={control.name}
+                        name={control.name}
+                        value={formData[control.name]}
+                        onChange={(e) => setFormData({ ...formData, [control.name]: e.target.value })}
+                        className="w-full p-2 border rounded-md"
+                      >
+                        <option value="">{control.placeholder}</option>
+                        {control.options.map(option => (
+                          <option key={option.id} value={option.id}>{option.label}</option>
+                        ))}
+                      </select>
+                   )}
+                 </div>
+              ))}
+
+              {/* Teknik Özellikler Bölümü */}
+              <div className="space-y-4 pt-4 border-t">
+                <h3 className="text-lg font-medium">Teknik Özellikler</h3>
+                {formData.technicalSpecs.map((spec, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <Input
+                      placeholder="Özellik Adı (örn. Renk)"
+                      value={spec.key}
+                      onChange={(e) => handleTechSpecChange(index, 'key', e.target.value)}
+                      className="flex-1"
+                    />
+                    <Input
+                      placeholder="Değer (örn. Kırmızı)"
+                      value={spec.value}
+                      onChange={(e) => handleTechSpecChange(index, 'value', e.target.value)}
+                      className="flex-1"
+                    />
+                    <Button variant="ghost" size="icon" onClick={() => removeTechSpec(index)}>
+                      <Trash className="w-4 h-4 text-red-500" />
+                    </Button>
+                  </div>
+                ))}
+                <Button type="button" variant="outline" onClick={addTechSpec} className="w-full">
+                  Yeni Özellik Ekle
+                </Button>
+              </div>
+
+              <Button
+                className="mt-4 w-full"
+                type="submit"
+                disabled={!isFormValid() || productImageLoadingState}
+              >
+                {productImageLoadingState
+                  ? "Resim Yükleniyor..."
+                  : currentEditedId
+                  ? "Ürünü Güncelle"
+                  : "Yeni Ürün Ekle"}
+              </Button>
+            </form>
           </div>
         </SheetContent>
       </Sheet>

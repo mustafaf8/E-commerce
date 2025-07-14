@@ -8,6 +8,7 @@ import { Card } from "../ui/card";
 import { Package, MapPin, User, ShoppingCart } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { cancelOrder } from "@/store/shop/order-slice";
+import { formatPrice } from "@/lib/utils";
 import { useState } from "react";
 import ConfirmationModal from "@/components/admin-view/ConfirmationModal";
 
@@ -74,8 +75,8 @@ function ShoppingOrderDetailsView({ orderDetails }) {
           <div className="text-sm text-muted-foreground">
             Toplam Tutar
           </div>
-          <div className="text-lg font-bold">
-            {orderDetails.totalAmount?.toFixed(2) || 0} TL
+          <div className="text-lg font-bold whitespace-nowrap">
+            {formatPrice(orderDetails.totalAmount || 0)} TL
           </div>
         </div>
       </div>
@@ -199,18 +200,18 @@ function ShoppingOrderDetailsView({ orderDetails }) {
                   {item.title}
                 </p>
                 <div className="flex justify-between items-center">
-                  <p className="text-sm text-muted-foreground">
-                    {parseFloat(item.price || 0).toFixed(2)} TL x {item.quantity} adet
+                  <p className="text-sm text-muted-foreground whitespace-nowrap">
+                    {formatPrice(parseFloat(item.price || 0))} TL x {item.quantity} adet
                   </p>
-                  <p className="text-sm font-semibold">
-                    {(parseFloat(item.price || 0) * item.quantity).toFixed(2)} TL
+                  <p className="text-sm font-semibold whitespace-nowrap">
+                    {formatPrice(parseFloat(item.price || 0) * item.quantity)} TL
                   </p>
                 </div>
               </div>
             ))}
             <div className="flex justify-between items-center pt-3 border-t">
               <p className="text-base font-semibold">Genel Toplam:</p>
-              <p className="text-base font-semibold">{orderDetails.totalAmount?.toFixed(2) || 0} TL</p>
+              <p className="text-base font-semibold whitespace-nowrap">{formatPrice(orderDetails.totalAmount || 0)} TL</p>
             </div>
           </div>
         ) : (

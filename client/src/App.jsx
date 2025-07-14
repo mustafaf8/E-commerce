@@ -74,6 +74,7 @@ const GuestCheckoutAddress = lazy(() =>
 );
 const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/auth/ResetPassword"));
+const ProductSpecsPage = lazy(() => import("./pages/shopping-view/ProductSpecsPage"));
 
 function App() {
   const {
@@ -210,7 +211,7 @@ function App() {
               }
             />
             <Route
-              path="account"
+              path="account/*" // account altındaki tüm rotaları kapsar
               element={
                 <ProtectedRoute>
                   <ShoppingAccount />
@@ -225,6 +226,8 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            {/* Bu yeni rota, diğerlerini etkilemeden eklendi */}
+            <Route path="product/:id/specs" element={<ProductSpecsPage />} />
           </Route>
 
           <Route path="/unauth-page" element={<UnauthPage />} />

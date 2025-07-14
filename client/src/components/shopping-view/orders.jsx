@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
+import { formatPrice } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import {
   Dialog,
@@ -114,8 +115,8 @@ function ShoppingOrders() {
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground">Tutar</p>
-                      <p className="text-sm font-medium">
-                        {orderItem?.totalAmount?.toFixed(2) || 0} TL
+                      <p className="text-sm font-medium whitespace-nowrap">
+                        {formatPrice(orderItem?.totalAmount || 0)} TL
                       </p>
                     </div>
                   </div>
@@ -174,8 +175,8 @@ function ShoppingOrders() {
                             ?.label || orderStatusMappingUser.default.label}
                         </Badge>
                       </TableCell>
-                      <TableCell>
-                        {orderItem?.totalAmount?.toFixed(2) || 0} TL
+                      <TableCell className="whitespace-nowrap">
+                        {formatPrice(orderItem?.totalAmount || 0)} TL
                       </TableCell>
                       <TableCell className="text-right">
                         <Button

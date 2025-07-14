@@ -171,7 +171,7 @@ const ShoppingProductTile = React.memo(function ShoppingProductTile({
           {/* Product details */}
           <CardContent className="p-3 space-y-1.5 flex-grow">
             <h2
-              className="text-sm font-medium line-clamp-1"
+              className="text-sm font-medium line-clamp-2"
               title={product?.title}
             >
               {product?.title}
@@ -198,13 +198,13 @@ const ShoppingProductTile = React.memo(function ShoppingProductTile({
                   {product?.price &&
                     product.price > 0 &&
                     product.price > product.salePrice && (
-                      <span className="line-through text-xs sm:text-sm text-gray-400">
+                      <span className="line-through text-xs sm:text-sm text-gray-400 whitespace-nowrap">
                         {`${formatPrice(product.price)} TL`}
                       </span>
                     )}
                   <span
                     className={cn(
-                      "font-medium text-sm sm:text-base", // Dinamik boyutlandırma
+                      "font-medium text-sm sm:text-base whitespace-nowrap", // Dinamik boyutlandırma
                       product?.price &&
                         product.price > 0 &&
                         product.price > product.salePrice
@@ -216,7 +216,7 @@ const ShoppingProductTile = React.memo(function ShoppingProductTile({
                   </span>
                 </div>
               ) : product?.price && product.price > 0 ? (
-                <span className="font-medium text-sm sm:text-base text-black">
+                <span className="font-medium text-sm sm:text-base text-black whitespace-nowrap">
                   {`${formatPrice(product.price)} TL`}
                 </span>
               ) : (

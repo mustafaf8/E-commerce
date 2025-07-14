@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { createNewOrder } from "@/store/shop/order-slice";
 import { useToast } from "@/components/ui/use-toast";
+import { formatPrice } from "@/lib/utils";
 import {
   Card,
   CardContent,
@@ -203,7 +204,7 @@ function ShoppingCheckout() {
                 <Separator className="my-3" />
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>Ara Toplam</span>
-                  <span>{totalCartAmount.toFixed(2)} TL</span>
+                  <span className="whitespace-nowrap">{formatPrice(totalCartAmount)} TL</span>
                 </div>
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>Kargo</span>
@@ -212,7 +213,7 @@ function ShoppingCheckout() {
                 <Separator className="my-3" />
                 <div className="flex justify-between text-lg font-bold">
                   <span>Toplam</span>
-                  <span>{totalCartAmount.toFixed(2)} TL</span>
+                  <span className="whitespace-nowrap">{formatPrice(totalCartAmount)} TL</span>
                 </div>
               </div>
             )}

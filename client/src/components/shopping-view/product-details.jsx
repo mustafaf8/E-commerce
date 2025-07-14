@@ -1,4 +1,4 @@
-import { Heart } from "lucide-react";
+import { Heart, Minus, Plus } from "lucide-react";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
@@ -19,6 +19,8 @@ import { formatPrice } from "@/lib/utils";
 function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const [reviewMsg, setReviewMsg] = useState("");
   const [rating, setRating] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+  const [isAddingToCart, setIsAddingToCart] = useState(false); // Yükleme durumu
   const dispatch = useDispatch();
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const navigate = useNavigate();
@@ -70,23 +72,23 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
     setRating(getRating);
   }
 
-  function handleAddToCart(
-    getCurrentProductId,
-    getTotalStock,
-    currentProductDetails
-  ) {
+  const handleAddToCart = () => {
+    if (isAddingToCart || !productDetails) return;
+
+    setIsAddingToCart(true);
+
     const productDetailsForCart = {
-      price: currentProductDetails.price,
-      salePrice: currentProductDetails.salePrice,
-      title: currentProductDetails.title,
-      image: currentProductDetails.image,
-      totalStock: currentProductDetails.totalStock,
+      price: productDetails.price,
+      salePrice: productDetails.salePrice,
+      title: productDetails.title,
+      image: productDetails.image,
+      totalStock: productDetails.totalStock,
     };
 
     dispatch(
       addToCart({
-        productId: getCurrentProductId,
-        quantity: 1,
+        productId: productDetails._id,
+        quantity: quantity,
         productDetails: productDetailsForCart,
       })
     )
@@ -102,7 +104,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
             variant: "destructive",
             title: payload?.message || "Sepete eklenemedi",
             description: payload?.isStockError
-              ? `En fazla ${payload.availableStock} adet eklenebilir.`
+              ? `Stokta en fazla ${payload.availableStock} adet ürün var.`
               : undefined,
           });
         }
@@ -112,49 +114,21 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
           variant: "destructive",
           title: error?.message || "Sepete ekleme sırasında bir hata oluştu.",
           description: error?.isStockError
-            ? `En fazla ${error.availableStock} adet eklenebilir.`
+            ? `Stokta en fazla ${error.availableStock} adet ürün var.`
             : undefined,
         });
-      });
-
-    let getCartItems = cartItems.items || [];
-    if (getCartItems.length) {
-      const indexOfCurrentItem = getCartItems.findIndex(
-        (item) => item.productId === getCurrentProductId
-      );
-      if (indexOfCurrentItem > -1) {
-        const getQuantity = getCartItems[indexOfCurrentItem].quantity;
-        if (getQuantity + 1 > getTotalStock) {
-          toast({
-            title: `Bu ürün için yalnızca ${getQuantity} adet eklenebilir`,
-            variant: "info",
-          });
-          return;
-        }
-      }
-    }
-    dispatch(
-      addToCart({
-        userId: user?.id,
-        productId: getCurrentProductId,
-        quantity: 1,
       })
-    ).then((data) => {
-      if (data?.payload?.success) {
-        dispatch(fetchCartItems(user?.id));
-        toast({
-          title: "Ürün sepete eklendi",
-          variant: "success",
-        });
-      }
-    });
-  }
+      .finally(() => {
+        setIsAddingToCart(false);
+      });
+  };
 
   function handleDialogClose() {
     setOpen(false);
     dispatch(setProductDetails(null));
     setRating(0);
     setReviewMsg("");
+    setQuantity(1);
   }
 
   async function handleAddReview() {
@@ -198,6 +172,13 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
       dispatch(getReviews(productDetails._id));
     }
   }, [productDetails?._id, dispatch]);
+
+  // Reset quantity when dialog opens or product changes
+  useEffect(() => {
+    if (open && productDetails) {
+      setQuantity(1);
+    }
+  }, [open, productDetails]);
 
   const averageReview =
     reviews && reviews.length > 0
@@ -274,13 +255,13 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                   {productDetails?.price &&
                     productDetails.price > 0 &&
                     productDetails.price > productDetails.salePrice && (
-                      <p className="line-through text-lg text-gray-400 ">
+                      <p className="line-through text-lg text-gray-400 whitespace-nowrap">
                         {`${formatPrice(productDetails.price)} TL`}
                       </p>
                     )}
 
                   <p
-                    className={`font-bold ${
+                    className={`font-bold whitespace-nowrap ${
                       productDetails?.price &&
                       productDetails.price > 0 &&
                       productDetails.price > productDetails.salePrice
@@ -293,7 +274,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                 </div>
               ) : productDetails?.price && productDetails.price > 0 ? (
                 <div className="flex justify-start">
-                  <p className="text-lg font-semibold text-black">
+                  <p className="text-lg font-semibold text-black whitespace-nowrap">
                     {`${formatPrice(productDetails.price)} TL`}
                   </p>
                 </div>
@@ -327,18 +308,57 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                   Stokta Yok
                 </Button>
               ) : (
-                <Button
-                  className="w-full"
-                  onClick={() =>
-                    handleAddToCart(
-                      productDetails._id,
-                      productDetails.totalStock,
-                      productDetails
-                    )
-                  }
-                >
-                  Sepete Ekle
-                </Button>
+                <div className="flex items-center gap-3">
+                  {/* Quantity Stepper - Left */}
+                  <div className="flex items-center border rounded-full p-0.5 gap-1">
+                    <Button
+                      variant="ghost"
+                      className="h-7 w-7 rounded-full p-0 hover:bg-gray-100"
+                      size="icon"
+                      disabled={quantity <= 1 || isAddingToCart}
+                      onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                    >
+                      <Minus className="w-3.5 h-3.5" />
+                      <span className="sr-only">Azalt</span>
+                    </Button>
+                    <span className="font-medium text-sm w-7 text-center">
+                      {quantity}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      className="h-7 w-7 rounded-full p-0 hover:bg-gray-100"
+                      size="icon"
+                      disabled={quantity >= productDetails.totalStock || isAddingToCart}
+                      onClick={() =>
+                        setQuantity((prev) =>
+                          Math.min(productDetails.totalStock, prev + 1)
+                        )
+                      }
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span className="sr-only">Arttır</span>
+                    </Button>
+                  </div>
+
+                  {/* Add to Cart Button - Center */}
+                  <Button
+                    className="flex-1 h-8 text-sm"
+                    onClick={handleAddToCart}
+                    disabled={isAddingToCart}
+                  >
+                    {isAddingToCart ? "Ekleniyor..." : `Sepete Ekle (${quantity})`}
+                  </Button>
+
+                  {/* Specs Button - Right */}
+                  <Button
+                    variant="outline"
+                    className="h-8 text-sm"
+                    onClick={() => navigate(`/shop/product/${productDetails._id}/specs`)}
+                    disabled={isAddingToCart}
+                  >
+                    Özellikler
+                  </Button>
+                </div>
               )}
             </div>
           </div>

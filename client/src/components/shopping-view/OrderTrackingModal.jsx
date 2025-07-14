@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { formatPrice } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -193,7 +194,7 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
 
               <p>
                 <strong>Toplam Tutar:</strong>{" "}
-                {searchResult.totalAmount?.toFixed(2) || "N/A"} TL
+                <span className="whitespace-nowrap">{formatPrice(searchResult.totalAmount || 0)} TL</span>
               </p>
               {searchResult.guestInfo?.fullName && (
                 <p>

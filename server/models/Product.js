@@ -5,6 +5,10 @@ const ProductSchema = new mongoose.Schema(
       type: String,
       required: [true, "Ürün resmi zorunludur."],
     },
+    images: [{
+      type: String,
+      trim: true,
+    }],
     title: {
       type: String,
       required: [true, "Ürün başlığı zorunludur."],
@@ -27,10 +31,16 @@ const ProductSchema = new mongoose.Schema(
     },
     totalStock: {
       type: Number,
-      required: [true, "Stok miktarı zorunludur."],
-      min: [0, "Stok negatif olamaz."],
+      required: true,
+      min: 0,
       default: 0,
     },
+    technicalSpecs: [
+      {
+        key: { type: String, trim: true },
+        value: { type: String, trim: true },
+      },
+    ],
     averageReview: {
       type: Number,
       default: 0,
