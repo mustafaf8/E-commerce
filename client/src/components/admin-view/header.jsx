@@ -47,11 +47,11 @@ function AdminHeader({ setOpen }) {
 
     const socket = io(socketURL, { withCredentials: true });
 
-    socket.emit("register_admin");
-
     socket.on("visitor_count", (count) => {
       setLiveVisitorCount(count);
     });
+
+    socket.emit("register_admin");
 
     return () => {
       socket.disconnect();
