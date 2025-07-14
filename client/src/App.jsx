@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect } from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation, Navigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 // Bileşenleri ve yardımcıları import et
@@ -165,6 +165,7 @@ function App() {
               </ProtectedRoute>
             }
           >
+            <Route index element={<Navigate to="stats" replace />} />
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="orders" element={<AdminOrders />} />

@@ -1,4 +1,5 @@
 import { AlignJustify, BellRing, LogOut, User } from "lucide-react";
+import { io } from "socket.io-client";
 import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "@/store/auth-slice";
@@ -13,6 +14,7 @@ function AdminHeader({ setOpen }) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [newOrderCount, setNewOrderCount] = useState(0);
+  const [liveVisitorCount, setLiveVisitorCount] = useState(null);
 
   // Get order data from store
   const { userList = [], guestOrderList = [] } = useSelector(
@@ -35,6 +37,26 @@ function AdminHeader({ setOpen }) {
     // Set total count
     setNewOrderCount(registeredNewOrders + guestNewOrders);
   }, [userList, guestOrderList]);
+
+  // Socket.io bağlantısı (yalnızca adminler için canlı ziyaretçi sayısı)
+  useEffect(() => {
+    // Geliştirme ortamında backend localhost:5000, prod'da aynı origin
+    const socketURL = import.meta.env.DEV
+      ? "http://localhost:5000"
+      : window.location.origin;
+
+    const socket = io(socketURL, { withCredentials: true });
+
+    socket.emit("register_admin");
+
+    socket.on("visitor_count", (count) => {
+      setLiveVisitorCount(count);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   function handleLogout() {
     dispatch(logoutUser())
@@ -68,9 +90,16 @@ function AdminHeader({ setOpen }) {
           <AlignJustify size={20} />
           <span className="sr-only">Toggle menu</span>
         </Button>
-        <h1 className="text-lg font-semibold text-primary hidden md:block">
-          Admin Dashboard
-        </h1>
+        <div className="flex items-center gap-2">
+          {/* Yanıp sönen yeşil nokta */}
+          <span className="relative flex h-3 w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+          </span>
+          <span className="text-lg font-semibold text-primary hidden md:block">
+            Anlık Ziyaretçi: {liveVisitorCount !== null ? liveVisitorCount : "-"}
+          </span>
+        </div>
       </div>
 
       <div className="flex items-center gap-4">

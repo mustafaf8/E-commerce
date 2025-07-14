@@ -9,6 +9,8 @@ const passport = require("passport");
 const admin = require("firebase-admin");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
+const http = require("http");
+const { Server } = require("socket.io");
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 dakika
@@ -87,6 +89,8 @@ mongoose
   .catch((error) => console.log("MongoDB connection error:", error));
 
 const app = express();
+// HTTP sunucusunu oluştur ve Socket.io entegrasyonu yap
+const serverInstance = http.createServer(app);
 app.set("trust proxy", 1);
 app.use(helmet());
 const PORT = process.env.PORT || 5000;
@@ -96,6 +100,39 @@ const allowedOrigins = [
   "https://deposun.com",
   "http://localhost:5173",
 ];
+
+// Socket.io kurulumu (allowedOrigins kullanarak CORS ayarı)
+const io = new Server(serverInstance, {
+  cors: {
+    origin: allowedOrigins,
+    credentials: true,
+  },
+});
+
+let activeVisitorCount = 0;
+
+io.on("connection", (socket) => {
+  // Ziyaretçi olarak kayıt
+  socket.on("register_visitor", () => {
+    socket.data.isVisitor = true;
+    activeVisitorCount += 1;
+    io.to("admins").emit("visitor_count", activeVisitorCount);
+  });
+
+  // Admin olarak kayıt ve mevcut sayıyı gönder
+  socket.on("register_admin", () => {
+    socket.join("admins");
+    socket.emit("visitor_count", activeVisitorCount);
+  });
+
+  // Bağlantı koptuğunda ziyaretçi sayaç güncellemesi
+  socket.on("disconnect", () => {
+    if (socket.data.isVisitor) {
+      activeVisitorCount = Math.max(activeVisitorCount - 1, 0);
+      io.to("admins").emit("visitor_count", activeVisitorCount);
+    }
+  });
+});
 
 const IYZICO_CALLBACK_PATH = "/api/shop/order/iyzico-callback";
 
@@ -179,4 +216,7 @@ if (process.env.NODE_ENV !== "test") {
   scheduleAbandonedCartEmails();
 }
 
-app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));
+// Express uygulamasını Socket.io ile beraber dinlemeye al
+serverInstance.listen(PORT, () =>
+  console.log(`Server (with Socket.io) is now running on port ${PORT}`)
+);
