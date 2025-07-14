@@ -38,6 +38,7 @@ const AdminHomeSections = lazy(() =>
   import("./pages/admin-view/home-sections")
 );
 const AdminStatsPage = lazy(() => import("./pages/admin-view/AdminStatsPage"));
+const AdminCouponsPage = lazy(() => import("./pages/admin-view/AdminCouponsPage"));
 const AdminAuthorization = lazy(() => import("./pages/admin-view/authorization"));
 const AdminMaintenanceMode = lazy(() => import("./pages/admin-view/maintenance-mode"));
 
@@ -171,6 +172,7 @@ function App() {
             <Route path="orders" element={<AdminOrders />} />
             <Route path="features" element={<AdminFeatures />} />
             <Route path="categories-brands" element={<AdminCategoriesBrands />} />
+            <Route path="coupons" element={<AdminCouponsPage />} />
             <Route path="home-sections" element={<AdminHomeSections />} />
             <Route path="stats" element={<AdminStatsPage />} />
             <Route

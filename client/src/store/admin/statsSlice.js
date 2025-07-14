@@ -1,11 +1,21 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../../api/axiosInstance";
 
+// Yardımcı: tarih aralığı varsa ?startDate&endDate, yoksa ?period
+function buildQuery({ period, dateRange }) {
+  if (dateRange && dateRange.startDate && dateRange.endDate) {
+    return `startDate=${encodeURIComponent(dateRange.startDate)}&endDate=${encodeURIComponent(dateRange.endDate)}`;
+  }
+  if (period) return `period=${encodeURIComponent(period)}`;
+  return "";
+}
+
 export const fetchSalesOverview = createAsyncThunk(
   "adminStats/fetchSalesOverview",
-  async (period = "weekly", { rejectWithValue }) => {
+  async ({ period = "weekly", dateRange } = {}, { rejectWithValue }) => {
     try {
-      const res = await api.get(`/admin/stats/sales-overview?period=${period}`);
+      const query = buildQuery({ period, dateRange });
+      const res = await api.get(`/admin/stats/sales-overview?${query}`);
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: err.message });
@@ -65,9 +75,10 @@ export const fetchSalesByBrand = createAsyncThunk(
 
 export const fetchUserSummary = createAsyncThunk(
   "adminStats/fetchUserSummary",
-  async (period = "weekly", { rejectWithValue }) => {
+  async ({ period = "weekly", dateRange } = {}, { rejectWithValue }) => {
     try {
-      const res = await api.get(`/admin/stats/user-summary?period=${period}`);
+      const query = buildQuery({ period, dateRange });
+      const res = await api.get(`/admin/stats/user-summary?${query}`);
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: err.message });
@@ -101,9 +112,10 @@ export const fetchProductSummary = createAsyncThunk(
 
 export const fetchSalesTrend = createAsyncThunk(
   "adminStats/fetchSalesTrend",
-  async (period = "monthly", { rejectWithValue }) => {
+  async ({ period = "monthly", dateRange } = {}, { rejectWithValue }) => {
     try {
-      const res = await api.get(`/admin/stats/sales-trend?period=${period}`);
+      const query = buildQuery({ period, dateRange });
+      const res = await api.get(`/admin/stats/sales-trend?${query}`);
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: err.message });
@@ -113,11 +125,10 @@ export const fetchSalesTrend = createAsyncThunk(
 
 export const fetchUserRegistrationsTrend = createAsyncThunk(
   "adminStats/fetchUserRegistrationsTrend",
-  async (period = "monthly", { rejectWithValue }) => {
+  async ({ period = "monthly", dateRange } = {}, { rejectWithValue }) => {
     try {
-      const res = await api.get(
-        `/admin/stats/user-registrations-trend?period=${period}`
-      );
+      const query = buildQuery({ period, dateRange });
+      const res = await api.get(`/admin/stats/user-registrations-trend?${query}`);
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: err.message });
@@ -141,11 +152,10 @@ export const fetchTopLikedProducts = createAsyncThunk(
 
 export const fetchProfitOverview = createAsyncThunk(
   "adminStats/fetchProfitOverview",
-  async (period = "weekly", { rejectWithValue }) => {
+  async ({ period = "weekly", dateRange } = {}, { rejectWithValue }) => {
     try {
-      const res = await api.get(
-        `/admin/stats/profit-overview?period=${period}`
-      );
+      const query = buildQuery({ period, dateRange });
+      const res = await api.get(`/admin/stats/profit-overview?${query}`);
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || { message: err.message });

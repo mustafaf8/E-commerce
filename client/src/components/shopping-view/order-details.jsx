@@ -209,9 +209,41 @@ function ShoppingOrderDetailsView({ orderDetails }) {
                 </div>
               </div>
             ))}
-            <div className="flex justify-between items-center pt-3 border-t">
-              <p className="text-base font-semibold">Genel Toplam:</p>
-              <p className="text-base font-semibold whitespace-nowrap">{formatPrice(orderDetails.totalAmount || 0)} TL</p>
+            
+            {/* Kupon ve Toplam Bilgileri */}
+            <div className="space-y-2 pt-3 border-t">
+              {orderDetails.appliedCoupon && orderDetails.appliedCoupon.code && (
+                <>
+                  <div className="flex justify-between items-center text-sm">
+                    <p>Ara Toplam:</p>
+                    <p className="whitespace-nowrap">
+                      {formatPrice(
+                        (orderDetails.totalAmount || 0) +
+                          (orderDetails.appliedCoupon.discountAmount || 0)
+                      )}{" "}
+                      TL
+                    </p>
+                  </div>
+                  <div className="flex justify-between items-center text-sm text-green-600">
+                    <p>
+                      Kupon İndirimi ({orderDetails.appliedCoupon.code}):
+                    </p>
+                    <p className="whitespace-nowrap">
+                      -
+                      {formatPrice(
+                        orderDetails.appliedCoupon.discountAmount || 0
+                      )}{" "}
+                      TL
+                    </p>
+                  </div>
+                </>
+              )}
+              <div className="flex justify-between items-center pt-2 border-t text-base font-semibold">
+                <p>Genel Toplam:</p>
+                <p className="whitespace-nowrap">
+                  {formatPrice(orderDetails.totalAmount || 0)} TL
+                </p>
+              </div>
             </div>
           </div>
         ) : (
@@ -249,25 +281,13 @@ ShoppingOrderDetailsView.propTypes = {
     paymentStatus: PropTypes.string,
     orderStatus: PropTypes.string,
     isGuestOrder: PropTypes.bool,
-    guestInfo: PropTypes.shape({
-      fullName: PropTypes.string,
-      email: PropTypes.string,
-    }),
-    cartItems: PropTypes.arrayOf(
-      PropTypes.shape({
-        productId: PropTypes.string,
-        title: PropTypes.string,
-        quantity: PropTypes.number,
-        price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-      })
-    ),
-    addressInfo: PropTypes.shape({
-      fullName: PropTypes.string,
-      address: PropTypes.string,
-      city: PropTypes.string,
-      pincode: PropTypes.string,
-      phone: PropTypes.string,
-      notes: PropTypes.string,
+    addressInfo: PropTypes.object,
+    cartItems: PropTypes.array,
+    guestInfo: PropTypes.object,
+    tcKimlikNo: PropTypes.string,
+    appliedCoupon: PropTypes.shape({
+      code: PropTypes.string,
+      discountAmount: PropTypes.number,
     }),
   }),
 };

@@ -5,6 +5,7 @@ import UserCartItemsContent from "@/components/shopping-view/cart-items-content"
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { createNewOrder } from "@/store/shop/order-slice";
+import { applyCoupon, removeCoupon, clearCouponState } from "@/store/shop/cart-slice";
 import { useToast } from "@/components/ui/use-toast";
 import { formatPrice } from "@/lib/utils";
 import {
@@ -14,17 +15,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Ticket, X } from "lucide-react";
 
 function ShoppingCheckout() {
-  const { cartItems } = useSelector((state) => state.shopCart);
+  const { cartItems, appliedCoupon, discountAmount, couponLoading, couponError } = useSelector((state) => state.shopCart);
   const { user } = useSelector((state) => state.auth);
   const { loading: orderLoading, error: orderError } = useSelector(
     (state) => state.shopOrder
   );
   const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
+  const [couponCode, setCouponCode] = useState("");
   //console.log(
   //  "Checkout Render - currentSelectedAddress:",
   //  currentSelectedAddress
@@ -55,6 +58,51 @@ function ShoppingCheckout() {
           0
         )
       : 0;
+
+  const finalAmount = totalCartAmount - (discountAmount || 0);
+
+  const handleApplyCoupon = () => {
+    if (!couponCode.trim()) {
+      toast({
+        variant: "warning",
+        title: "Kupon Kodu Gerekli",
+        description: "Lütfen geçerli bir kupon kodu girin.",
+      });
+      return;
+    }
+
+    dispatch(applyCoupon({ couponCode: couponCode.trim(), cartTotal: totalCartAmount }))
+      .unwrap()
+      .then((result) => {
+        if (result?.success) {
+          toast({
+            title: "Kupon Uygulandı",
+            description: `${formatPrice(result.discountAmount)} TL indirim uygulandı!`,
+            variant: "success",
+          });
+          setCouponCode("");
+        }
+      })
+      .catch((error) => {
+        toast({
+          variant: "destructive",
+          title: "Kupon Uygulanamadı",
+          description: error.message || "Kupon uygulanamadı. Lütfen tekrar deneyin.",
+        });
+      });
+  };
+
+  const handleRemoveCoupon = () => {
+    dispatch(removeCoupon())
+      .unwrap()
+      .then(() => {
+        toast({
+          title: "Kupon Kaldırıldı",
+          description: "Kupon indiriminiz kaldırılmıştır.",
+          variant: "success",
+        });
+      });
+  };
 
   function handleInitiateIyzicoPayment() {
     if (!cartItems || !cartItems.items || cartItems.items.length === 0) {
@@ -93,6 +141,7 @@ function ShoppingCheckout() {
       })),
       addressInfo: currentSelectedAddress,
       tcKimlikNo: user?.tcKimlikNo,
+      appliedCoupon: appliedCoupon,
     };
 
     dispatch(createNewOrder(orderData))
@@ -100,6 +149,8 @@ function ShoppingCheckout() {
       .then((result) => {
        // console.log("createNewOrder result:", result);
         if (result?.success && result?.paymentPageUrl) {
+          // Sipariş başarılı olduğunda kupon state'ini temizle
+          dispatch(clearCouponState());
           toast({
             title: "Ödeme sayfasına yönlendiriliyorsunuz...",
             variant: "success",
@@ -200,20 +251,88 @@ function ShoppingCheckout() {
               </p>
             )}
             {cartItems?.items?.length > 0 && (
-              <div className="space-y-2 pt-4">
-                <Separator className="my-3" />
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>Ara Toplam</span>
-                  <span className="whitespace-nowrap">{formatPrice(totalCartAmount)} TL</span>
+              <div className="space-y-4 pt-4">
+                {/* Kupon Bölümü */}
+                <div className="space-y-3">
+                  <Separator className="my-3" />
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <Ticket className="h-4 w-4" />
+                    <span>İndirim Kuponu</span>
+                  </div>
+                  
+                  {appliedCoupon ? (
+                    <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-md">
+                      <div className="flex items-center gap-2">
+                        <Ticket className="h-4 w-4 text-green-600" />
+                        <span className="text-sm font-medium text-green-800">
+                          {appliedCoupon.code}
+                        </span>
+                        <span className="text-xs text-green-600">
+                          ({appliedCoupon.discountType === 'percentage' 
+                            ? `%${appliedCoupon.discountValue}` 
+                            : `${formatPrice(appliedCoupon.discountValue)} TL`} indirim)
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleRemoveCoupon}
+                        className="h-8 w-8 p-0 text-green-600 hover:text-green-800 hover:bg-green-100"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Kupon kodunu girin"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                        className="flex-1"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            handleApplyCoupon();
+                          }
+                        }}
+                      />
+                      <Button
+                        variant="outline"
+                        onClick={handleApplyCoupon}
+                        disabled={couponLoading || !couponCode.trim()}
+                        className="px-4"
+                      >
+                        {couponLoading ? "..." : "Uygula"}
+                      </Button>
+                    </div>
+                  )}
+                  
+                  {couponError && (
+                    <p className="text-sm text-red-600">{couponError}</p>
+                  )}
                 </div>
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>Kargo</span>
-                  <span>Ücretsiz</span>
-                </div>
-                <Separator className="my-3" />
-                <div className="flex justify-between text-lg font-bold">
-                  <span>Toplam</span>
-                  <span className="whitespace-nowrap">{formatPrice(totalCartAmount)} TL</span>
+
+                {/* Fiyat Özeti */}
+                <div className="space-y-2">
+                  <Separator className="my-3" />
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span>Ara Toplam</span>
+                    <span className="whitespace-nowrap">{formatPrice(totalCartAmount)} TL</span>
+                  </div>
+                  {appliedCoupon && discountAmount > 0 && (
+                    <div className="flex justify-between text-sm text-green-600">
+                      <span>İndirim ({appliedCoupon.code})</span>
+                      <span className="whitespace-nowrap">-{formatPrice(discountAmount)} TL</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span>Kargo</span>
+                    <span>Ücretsiz</span>
+                  </div>
+                  <Separator className="my-3" />
+                  <div className="flex justify-between text-lg font-bold">
+                    <span>Toplam</span>
+                    <span className="whitespace-nowrap">{formatPrice(finalAmount)} TL</span>
+                  </div>
                 </div>
               </div>
             )}

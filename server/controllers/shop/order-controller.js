@@ -4,13 +4,14 @@ const Order = require("../../models/Order");
 const Cart = require("../../models/Cart");
 const Product = require("../../models/Product");
 const User = require("../../models/User");
+const Coupon = require("../../models/Coupon");
 const crypto = require("crypto");
 const mongoose = require("mongoose");
 
 const createOrder = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { cartItems, addressInfo, cartId, tcKimlikNo } = req.body;
+    const { cartItems, addressInfo, cartId, tcKimlikNo, appliedCoupon } = req.body;
 
     const user = await User.findById(userId);
     if (!user)
@@ -71,6 +72,72 @@ const createOrder = async (req, res) => {
         .json({ success: false, message: "Sepette geçerli ürün bulunamadı." });
     }
 
+    // Kupon kontrolü ve indirim hesaplama
+    let couponInfo = null;
+    let discountAmount = 0;
+    
+    if (appliedCoupon && appliedCoupon.code) {
+      const coupon = await Coupon.findOne({ 
+        code: appliedCoupon.code.toUpperCase() 
+      });
+      
+      if (!coupon) {
+        return res.status(400).json({
+          success: false,
+          message: "Geçersiz kupon kodu.",
+        });
+      }
+      
+      // Kuponun geçerliliğini kontrol et
+      const validation = coupon.isValidCoupon(calculatedTotal);
+      if (!validation.valid) {
+        return res.status(400).json({
+          success: false,
+          message: validation.message,
+        });
+      }
+      
+      // İndirim tutarını hesapla
+      discountAmount = coupon.calculateDiscount(calculatedTotal);
+      couponInfo = {
+        code: coupon.code,
+        discountType: coupon.discountType,
+        discountValue: coupon.discountValue,
+        discountAmount: discountAmount,
+      };
+    }
+    
+    // İndirimli toplam tutarı hesapla
+    const finalTotal = Math.max(calculatedTotal - discountAmount, 0);
+
+    if (finalTotal <= 0 && calculatedTotal > 0) {
+      // If the entire cart is free, handle it as a successful order without payment
+      // This part can be implemented later if needed. For now, we block it.
+      return res.status(400).json({
+        success: false,
+        message: "Kupon indirimi sonrası sepet tutarı 0 veya daha az olamaz.",
+      });
+    }
+
+    // Iyzico sepet kırılımını ve toplamını eşitlemek için
+    if (discountAmount > 0 && basketItemsForIyzico.length > 0) {
+      const lastItemIndex = basketItemsForIyzico.length - 1;
+      const lastItemPrice = parseFloat(basketItemsForIyzico[lastItemIndex].price);
+      const newLastItemPrice = lastItemPrice - discountAmount;
+      
+      // Son elemanın fiyatı negatif olmamalı
+      if (newLastItemPrice < 0) {
+          // This is a complex case where discount is larger than the last item's price.
+          // A more robust solution would be to distribute the discount among items.
+          // For now, we'll return an error to prevent payment issues.
+          return res.status(400).json({
+              success: false,
+              message: "İndirim tutarı, sepet öğelerinin fiyat dağılımı için uygun değil."
+          });
+      }
+      basketItemsForIyzico[lastItemIndex].price = newLastItemPrice.toFixed(2);
+    }
+    
     const conversationId = crypto.randomUUID();
     const pendingOrder = new Order({
       userId,
@@ -80,10 +147,11 @@ const createOrder = async (req, res) => {
       orderStatus: "pending",
       paymentMethod: "iyzico",
       paymentStatus: "pending",
-      totalAmount: calculatedTotal,
+      totalAmount: finalTotal, // Use finalTotal for the order
       orderDate: new Date(),
       iyzicoConversationId: conversationId,
       tcKimlikNo,
+      appliedCoupon: couponInfo, // Store coupon info
     });
     await pendingOrder.save();
     const backendCallbackUrl = `${process.env.SERVER_BASE_URL}/api/shop/order/iyzico-callback`;
@@ -91,8 +159,8 @@ const createOrder = async (req, res) => {
     const request = {
       locale: Iyzipay.LOCALE.TR,
       conversationId: conversationId,
-      price: calculatedTotal.toFixed(2),
-      paidPrice: calculatedTotal.toFixed(2),
+      price: finalTotal.toFixed(2), // Use finalTotal for the request
+      paidPrice: finalTotal.toFixed(2), // Use finalTotal for the request
       currency: Iyzipay.CURRENCY.TRY,
       basketId: pendingOrder._id.toString(),
       paymentGroup: Iyzipay.PAYMENT_GROUP.PRODUCT,
@@ -130,7 +198,7 @@ const createOrder = async (req, res) => {
 
     iyzipay.checkoutFormInitialize.create(request, (err, result) => {
       if (err) {
-       // console.error("Iyzico checkoutFormInitialize Hatası:", err);
+        console.error("Iyzico checkoutFormInitialize Hatası:", err);
         return res.status(500).json({
           success: false,
           message: "Iyzico ödeme başlatılamadı.",
@@ -154,7 +222,7 @@ const createOrder = async (req, res) => {
           orderId: pendingOrder._id,
         });
       } else {
-       // console.error("Iyzico checkoutFormInitialize Başarısız Sonuç:", result);
+        console.error("Iyzico checkoutFormInitialize Başarısız Sonuç:", result);
         return res.status(500).json({
           success: false,
           message:
@@ -165,10 +233,11 @@ const createOrder = async (req, res) => {
       }
     });
   } catch (e) {
-   // console.error(" Genel Hata:", e);
+    console.error("createOrder Genel Hata:", e);
     res.status(500).json({
       success: false,
       message: "Sipariş oluşturulurken sunucu hatası oluştu.",
+      error: e.message,
     });
   }
 };
@@ -268,6 +337,18 @@ const handleIyzicoCallback = async (req, res) => {
            // console.log(
            //   `Stok ve satış sayıları güncellendi (Order ID: ${orderId})`
            // );
+           
+           // Kupon kullanım sayısını artır
+           if (order.appliedCoupon && order.appliedCoupon.code) {
+             await Coupon.findOneAndUpdate(
+               { code: order.appliedCoupon.code },
+               { $inc: { usesCount: 1 } }
+             );
+             // console.log(
+             //   `Kupon kullanım sayısı artırıldı: ${order.appliedCoupon.code}`
+             // );
+           }
+           
             if (order.cartId) {
               await Cart.findByIdAndDelete(order.cartId);
             }
@@ -373,7 +454,7 @@ const getOrderDetails = async (req, res) => {
 
 const createGuestOrder = async (req, res) => {
   try {
-    const { guestInfo, cartItems } = req.body;
+    const { guestInfo, cartItems, appliedCoupon } = req.body;
 
     if (
       !guestInfo ||
@@ -453,6 +534,66 @@ const createGuestOrder = async (req, res) => {
         .json({ success: false, message: "Sepette geçerli ürün bulunamadı." });
     }
 
+    // Kupon kontrolü ve indirim hesaplama (Guest Order için)
+    let couponInfo = null;
+    let discountAmount = 0;
+    
+    if (appliedCoupon && appliedCoupon.code) {
+      const coupon = await Coupon.findOne({ 
+        code: appliedCoupon.code.toUpperCase() 
+      });
+      
+      if (!coupon) {
+        return res.status(400).json({
+          success: false,
+          message: "Geçersiz kupon kodu.",
+        });
+      }
+      
+      // Kuponun geçerliliğini kontrol et
+      const validation = coupon.isValidCoupon(calculatedTotal);
+      if (!validation.valid) {
+        return res.status(400).json({
+          success: false,
+          message: validation.message,
+        });
+      }
+      
+      // İndirim tutarını hesapla
+      discountAmount = coupon.calculateDiscount(calculatedTotal);
+      couponInfo = {
+        code: coupon.code,
+        discountType: coupon.discountType,
+        discountValue: coupon.discountValue,
+        discountAmount: discountAmount,
+      };
+    }
+    
+    // İndirimli toplam tutarı hesapla
+    const finalTotal = Math.max(calculatedTotal - discountAmount, 0);
+
+    if (finalTotal <= 0 && calculatedTotal > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Kupon indirimi sonrası sepet tutarı 0 veya daha az olamaz.",
+      });
+    }
+
+    // Iyzico sepet kırılımını ve toplamını eşitlemek için
+    if (discountAmount > 0 && basketItemsForIyzico.length > 0) {
+      const lastItemIndex = basketItemsForIyzico.length - 1;
+      const lastItemPrice = parseFloat(basketItemsForIyzico[lastItemIndex].price);
+      const newLastItemPrice = lastItemPrice - discountAmount;
+      
+      if (newLastItemPrice < 0) {
+          return res.status(400).json({
+              success: false,
+              message: "İndirim tutarı, sepet öğelerinin fiyat dağılımı için uygun değil."
+          });
+      }
+      basketItemsForIyzico[lastItemIndex].price = newLastItemPrice.toFixed(2);
+    }
+
     const conversationId = crypto.randomUUID();
 
     const pendingOrder = new Order({
@@ -475,9 +616,10 @@ const createGuestOrder = async (req, res) => {
       orderStatus: "pending_payment",
       paymentMethod: "iyzico",
       paymentStatus: "pending",
-      totalAmount: calculatedTotal,
+      totalAmount: finalTotal,
       orderDate: new Date(),
       iyzicoConversationId: conversationId,
+      appliedCoupon: couponInfo, // Store coupon info
     });
     await pendingOrder.save();
 
@@ -488,8 +630,8 @@ const createGuestOrder = async (req, res) => {
     const request = {
       locale: Iyzipay.LOCALE.TR,
       conversationId: conversationId,
-      price: calculatedTotal.toFixed(2),
-      paidPrice: calculatedTotal.toFixed(2),
+      price: finalTotal.toFixed(2),
+      paidPrice: finalTotal.toFixed(2),
       currency: Iyzipay.CURRENCY.TRY,
       basketId: pendingOrder._id.toString(),
       paymentGroup: Iyzipay.PAYMENT_GROUP.PRODUCT,

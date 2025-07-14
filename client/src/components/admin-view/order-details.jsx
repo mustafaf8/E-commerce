@@ -265,10 +265,36 @@ function AdminOrderDetailsView({ orderDetails, canManage}) {
               </div>
             ))}
 
-            <div className="flex justify-between pt-2 border-t">
-              <div className="font-semibold">Toplam</div>
-              <div className="font-bold text-right">
-                {orderDetails?.totalAmount?.toFixed(2) || 0}₺
+            <div className="border-t pt-3 mt-3 space-y-2">
+              {orderDetails.appliedCoupon && orderDetails.appliedCoupon.code && (
+                <>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Ara Toplam</span>
+                    <span>
+                      {(
+                        (orderDetails.totalAmount || 0) +
+                        (orderDetails.appliedCoupon.discountAmount || 0)
+                      ).toFixed(2)}
+                      ₺
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span className="font-medium">
+                      Kupon İndirimi ({orderDetails.appliedCoupon.code})
+                    </span>
+                    <span className="font-medium">
+                      -
+                      {(
+                        orderDetails.appliedCoupon.discountAmount || 0
+                      ).toFixed(2)}
+                      ₺
+                    </span>
+                  </div>
+                </>
+              )}
+              <div className="flex justify-between font-semibold text-base">
+                <span>Genel Toplam</span>
+                <span>{orderDetails?.totalAmount?.toFixed(2) || 0}₺</span>
               </div>
             </div>
           </div>
@@ -316,6 +342,7 @@ function AdminOrderDetailsView({ orderDetails, canManage}) {
 }
 
 AdminOrderDetailsView.propTypes = {
+  canManage: PropTypes.bool,
   orderDetails: PropTypes.shape({
     _id: PropTypes.string,
     orderDate: PropTypes.string,
@@ -324,35 +351,16 @@ AdminOrderDetailsView.propTypes = {
     paymentStatus: PropTypes.string,
     orderStatus: PropTypes.string,
     isGuestOrder: PropTypes.bool,
-    guestInfo: PropTypes.shape({
-      fullName: PropTypes.string,
-      email: PropTypes.string,
-      phone: PropTypes.string,
+    addressInfo: PropTypes.object,
+    cartItems: PropTypes.array,
+    userId: PropTypes.object,
+    guestInfo: PropTypes.object,
+    tcKimlikNo: PropTypes.string,
+    appliedCoupon: PropTypes.shape({
+      code: PropTypes.string,
+      discountAmount: PropTypes.number,
     }),
-    addressInfo: PropTypes.shape({
-      fullName: PropTypes.string,
-      address: PropTypes.string,
-      city: PropTypes.string,
-      pincode: PropTypes.string,
-      phone: PropTypes.string,
-      notes: PropTypes.string,
-    }),
-    userId: PropTypes.shape({
-      _id: PropTypes.string,
-      userName: PropTypes.string,
-      email: PropTypes.string,
-      phoneNumber: PropTypes.string,
-    }),
-    cartItems: PropTypes.arrayOf(
-      PropTypes.shape({
-        productId: PropTypes.string,
-        title: PropTypes.string,
-        quantity: PropTypes.number,
-        price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-      })
-    ),
-  }).isRequired,
-  canManage: PropTypes.bool.isRequired,
+  }),
 };
 
 export default AdminOrderDetailsView;

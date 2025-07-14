@@ -6,6 +6,7 @@ import {
   LayoutGrid,
   ShoppingBasket,
   Tags,
+  Ticket,
   UserCog,
   Wrench,
 } from "lucide-react";
@@ -46,6 +47,12 @@ const adminSidebarMenuItems = [
     label: "Kategori & Marka",
     path: "/admin/categories-brands",
     icon: <LayoutGrid size={18} />,
+  },
+  {
+    id: "coupons",
+    label: "Kuponlar",
+    path: "/admin/coupons",
+    icon: <Ticket size={18} />,
   },
   {
     id: "home-sections",

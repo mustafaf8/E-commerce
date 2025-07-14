@@ -1,5 +1,7 @@
-const Cart = require("../../models/Cart");
+const User = require("../../models/User");
 const Product = require("../../models/Product");
+const Cart = require("../../models/Cart");
+const Coupon = require("../../models/Coupon");
 
 const addToCart = async (req, res) => {
   try {
@@ -385,10 +387,71 @@ const syncLocalCart = async (req, res) => {
       .json({ success: false, message: "Sunucu hatası (senkronizasyon)." });
   }
 };
+// Kupon uygula
+const applyCoupon = async (req, res) => {
+  try {
+    const { couponCode, cartTotal } = req.body;
+
+    if (!couponCode || typeof cartTotal !== 'number') {
+      return res.status(400).json({
+        success: false,
+        message: "Kupon kodu ve sepet tutarı gereklidir.",
+      });
+    }
+
+    // Kuponu bul (case-insensitive)
+    const coupon = await Coupon.findOne({ 
+      code: couponCode.toUpperCase() 
+    });
+
+    if (!coupon) {
+      return res.status(404).json({
+        success: false,
+        message: "Geçersiz kupon kodu.",
+      });
+    }
+
+    // Kuponun geçerliliğini kontrol et
+    const validation = coupon.isValidCoupon(cartTotal);
+    
+    if (!validation.valid) {
+      return res.status(400).json({
+        success: false,
+        message: validation.message,
+      });
+    }
+
+    // İndirim tutarını hesapla
+    const discountAmount = coupon.calculateDiscount(cartTotal);
+    const newTotal = Math.max(cartTotal - discountAmount, 0);
+
+    res.status(200).json({
+      success: true,
+      message: "Kupon başarıyla uygulandı.",
+      coupon: {
+        code: coupon.code,
+        discountType: coupon.discountType,
+        discountValue: coupon.discountValue,
+      },
+      discountAmount: discountAmount,
+      originalTotal: cartTotal,
+      newTotal: newTotal,
+    });
+
+  } catch (error) {
+    console.error("Kupon uygulama hatası:", error);
+    res.status(500).json({
+      success: false,
+      message: "Kupon uygulanırken hata oluştu.",
+    });
+  }
+};
+
 module.exports = {
   addToCart,
-  updateCartItemQty,
-  deleteCartItem,
   fetchCartItems,
+  deleteCartItem,
+  updateCartItemQty,
   syncLocalCart,
+  applyCoupon,
 };

@@ -12,6 +12,10 @@ const initialState = {
   isLoading: false,
   isCartOpen: false,
   error: null,
+  appliedCoupon: null,
+  discountAmount: 0,
+  couponLoading: false,
+  couponError: null,
 };
 
 export const addToCart = createAsyncThunk(
@@ -325,6 +329,48 @@ export const syncLocalCartToBackend = createAsyncThunk(
   }
 );
 
+export const applyCoupon = createAsyncThunk(
+  "cart/applyCoupon",
+  async ({ couponCode, cartTotal }, { getState, rejectWithValue }) => {
+    try {
+      const response = await api.post(
+        "/shop/cart/apply-coupon",
+        { 
+          couponCode,
+          cartTotal 
+        },
+        { withCredentials: true }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || {
+          success: false,
+          message: "Kupon uygulanamadı.",
+        }
+      );
+    }
+  }
+);
+
+export const removeCoupon = createAsyncThunk(
+  "cart/removeCoupon",
+  async (_, { rejectWithValue }) => {
+    try {
+      // Kupon kaldırma işlemi - sadece state'i temizleriz
+      return {
+        success: true,
+        message: "Kupon kaldırıldı.",
+      };
+    } catch (error) {
+      return rejectWithValue({
+        success: false,
+        message: "Kupon kaldırılamadı.",
+      });
+    }
+  }
+);
+
 const shoppingCartSlice = createSlice({
   name: "shoppingCart",
   initialState,
@@ -341,6 +387,15 @@ const shoppingCartSlice = createSlice({
       state.cartItems = { items: [], guestCartId: null, _id: null };
       state.isLoading = false;
       state.error = null;
+      state.appliedCoupon = null;
+      state.discountAmount = 0;
+      state.couponError = null;
+    },
+    clearCouponState: (state) => {
+      state.appliedCoupon = null;
+      state.discountAmount = 0;
+      state.couponError = null;
+      state.couponLoading = false;
     },
   },
   extraReducers: (builder) => {
@@ -397,10 +452,44 @@ const shoppingCartSlice = createSlice({
 
       .addCase(syncLocalCartToBackend.pending, handlePending)
       .addCase(syncLocalCartToBackend.fulfilled, handleFulfilled)
-      .addCase(syncLocalCartToBackend.rejected, handleRejected);
+      .addCase(syncLocalCartToBackend.rejected, handleRejected)
+
+      // Kupon işlemleri
+      .addCase(applyCoupon.pending, (state) => {
+        state.couponLoading = true;
+        state.couponError = null;
+      })
+      .addCase(applyCoupon.fulfilled, (state, action) => {
+        state.couponLoading = false;
+        if (action.payload?.success) {
+          state.appliedCoupon = action.payload.coupon;
+          state.discountAmount = action.payload.discountAmount;
+          state.couponError = null;
+        } else {
+          state.couponError = action.payload?.message || "Kupon uygulanamadı.";
+        }
+      })
+      .addCase(applyCoupon.rejected, (state, action) => {
+        state.couponLoading = false;
+        state.couponError = action.payload?.message || "Kupon uygulanamadı.";
+      })
+
+      .addCase(removeCoupon.pending, (state) => {
+        state.couponLoading = true;
+      })
+      .addCase(removeCoupon.fulfilled, (state) => {
+        state.couponLoading = false;
+        state.appliedCoupon = null;
+        state.discountAmount = 0;
+        state.couponError = null;
+      })
+      .addCase(removeCoupon.rejected, (state, action) => {
+        state.couponLoading = false;
+        state.couponError = action.payload?.message || "Kupon kaldırılamadı.";
+      });
   },
 });
 
-export const { setIsCartOpen, loadGuestCartToState, clearCartState } =
+export const { setIsCartOpen, loadGuestCartToState, clearCartState, clearCouponState } =
   shoppingCartSlice.actions;
 export default shoppingCartSlice.reducer;

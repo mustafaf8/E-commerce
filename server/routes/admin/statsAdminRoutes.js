@@ -8,6 +8,7 @@ const {
   getUserSummary,
   getTopCustomers,
   getProductSummary,
+  exportData,
 } = require("../../controllers/admin/statsAdminController");
 
 const router = express.Router();
@@ -50,5 +51,8 @@ router.get(
   "/profit-by-brand",
   require("../../controllers/admin/statsAdminController").getProfitByBrand
 );
+
+// CSV export route
+router.post("/export", exportData);
 
 module.exports = router;

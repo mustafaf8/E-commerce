@@ -78,6 +78,12 @@ const OrderSchema = new mongoose.Schema(
     paymentMethod: { type: String, required: true },
     paymentStatus: { type: String, required: true, default: "pending" },
     totalAmount: { type: Number, required: true },
+    appliedCoupon: {
+      code: String,
+      discountType: String,
+      discountValue: Number,
+      discountAmount: Number,
+    },
     orderDate: { type: Date, default: Date.now },
     orderUpdateDate: Date,
     paymentId: String,

@@ -5,6 +5,7 @@ const Category = require("../../models/Category");
 const Brand = require("../../models/Brand");
 const mongoose = require("mongoose");
 const Wishlist = require("../../models/Wishlist");
+const { Parser } = require("json2csv");
 
 function getPeriodMatch(period) {
   if (!period) return {};
@@ -29,11 +30,28 @@ function getPeriodMatch(period) {
   return { orderDate: { $gte: start, $lte: end } };
 }
 
+// Yardımcı: startDate ve endDate varsa tarih aralığına göre $match döndürür
+function getDateRangeMatch(startDate, endDate, field = "orderDate") {
+  if (startDate && endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    if (!isNaN(start) && !isNaN(end)) {
+      return { [field]: { $gte: start, $lte: end } };
+    }
+  }
+  return {};
+}
+
 // 1. Satış Genel Bakışı
 const getSalesOverview = async (req, res) => {
   try {
-    const { period } = req.query;
-    const match = { ...getPeriodMatch(period) };
+    const { period, startDate, endDate } = req.query;
+    let match = {};
+    if (startDate && endDate) {
+      match = getDateRangeMatch(startDate, endDate, "orderDate");
+    } else {
+      match = { ...getPeriodMatch(period) };
+    }
     const results = await Order.aggregate([
       { $match: match },
       {
@@ -41,13 +59,16 @@ const getSalesOverview = async (req, res) => {
           _id: null,
           totalRevenue: { $sum: "$totalAmount" },
           totalOrders: { $sum: 1 },
+          totalDiscount: { $sum: { $ifNull: ["$appliedCoupon.discountAmount", 0] } },
         },
       },
       {
         $project: {
           _id: 0,
-          totalRevenue: 1,
+          totalNetRevenue: "$totalRevenue",
           totalOrders: 1,
+          totalDiscount: 1,
+          totalGrossRevenue: { $add: ["$totalRevenue", "$totalDiscount"] },
           averageOrderValue: {
             $cond: [
               { $eq: ["$totalOrders", 0] },
@@ -321,8 +342,13 @@ const getProductSummary = async (_req, res) => {
 // 9. Satış Trendi (Zaman Serisi)
 const getSalesTrend = async (req, res) => {
   try {
-    const { period = "monthly" } = req.query;
-    const match = { ...getPeriodMatch(period) };
+    const { period = "monthly", startDate, endDate } = req.query;
+    let match = {};
+    if (startDate && endDate) {
+      match = getDateRangeMatch(startDate, endDate, "orderDate");
+    } else {
+      match = { ...getPeriodMatch(period) };
+    }
 
     let dateFormat = "%Y-%m-%d";
     if (period === "daily") {
@@ -485,8 +511,13 @@ function getCostAndRevenueAggregation(match = {}) {
 // 12. Profit Overview
 const getProfitOverview = async (req, res) => {
   try {
-    const { period } = req.query;
-    const match = { ...getPeriodMatch(period) };
+    const { period, startDate, endDate } = req.query;
+    let match = {};
+    if (startDate && endDate) {
+      match = getDateRangeMatch(startDate, endDate, "orderDate");
+    } else {
+      match = { ...getPeriodMatch(period) };
+    }
 
     const pipeline = [
       ...getCostAndRevenueAggregation(match),
@@ -662,6 +693,86 @@ const getProfitByBrand = async (_req, res) => {
   }
 };
 
+// === CSV EXPORT ===
+const exportData = async (req, res) => {
+  try {
+    const { dataType, startDate, endDate } = req.body;
+
+    let model;
+    let dateField = "createdAt";
+    switch (dataType) {
+      case "orders":
+        model = Order;
+        dateField = "orderDate";
+        break;
+      case "products":
+        model = Product;
+        dateField = "createdAt";
+        break;
+      default:
+        return res
+          .status(400)
+          .json({ success: false, message: "Geçersiz dataType" });
+    }
+
+    const match = getDateRangeMatch(startDate, endDate, dateField);
+    let rawData;
+    if (dataType === "products") {
+      rawData = await model
+        .find(match)
+        .populate("category", "name")
+        .populate("brand", "name")
+        .lean();
+    } else {
+      rawData = await model.find(match).lean();
+    }
+
+    if (!rawData.length) {
+      return res.status(200).send("");
+    }
+
+    // Exporta dahil edilecek alanları belirle
+    let sanitized;
+    if (dataType === "products") {
+      sanitized = rawData.map((p) => ({
+        id: p._id.toString(),
+        title: p.title,
+        price: p.price,
+        salePrice: p.salePrice || "",
+        totalStock: p.totalStock,
+        salesCount: p.salesCount,
+        category: p.category?.name || "",
+        brand: p.brand?.name || "",
+        createdAt: p.createdAt?.toISOString().split("T")[0] || "",
+      }));
+    } else {
+      sanitized = rawData.map((o) => ({
+        id: o._id.toString(),
+        orderDate: o.orderDate?.toISOString().split("T")[0] || "",
+        totalAmount: o.totalAmount,
+        orderStatus: o.orderStatus,
+        paymentMethod: o.paymentMethod,
+        customer: o.isGuestOrder ? o.guestInfo?.fullName : undefined,
+        email: o.isGuestOrder ? o.guestInfo?.email : undefined,
+        items: o.cartItems?.length || 0,
+      }));
+    }
+
+    const parser = new Parser();
+    const csv = parser.parse(sanitized);
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${dataType}-report.csv"`
+    );
+    return res.status(200).send(csv);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 module.exports = {
   getSalesOverview,
   getOrderStatusDistribution,
@@ -678,4 +789,5 @@ module.exports = {
   getProfitByProduct,
   getProfitByCategory,
   getProfitByBrand,
+  exportData,
 };

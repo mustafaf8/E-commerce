@@ -15,7 +15,8 @@ import sideBannerReducer from "./common-slice/side-banner-slice";
 import categoriesReducer from "./common-slice/categories-slice"; // Yeni
 import homeSectionsReducer from "./common-slice/home-sections-slice"; // Yeni
 import brandsReducer from "./common-slice/brands-slice";
-import adminStatsSlice from "./admin/statsSlice";
+import adminStatsReducer from "./admin/statsSlice";
+import adminCouponReducer from "./admin/coupon-slice";
 import maintenanceReducer from "./common-slice/maintenance-slice";
 import authorizationReducer from "./admin/authorization-slice";
 
@@ -37,7 +38,8 @@ const store = configureStore({
     categories: categoriesReducer,
     homeSections: homeSectionsReducer,
     brands: brandsReducer,
-    adminStats: adminStatsSlice,
+    adminStats: adminStatsReducer,
+    adminCoupons: adminCouponReducer,
     maintenance: maintenanceReducer,
     adminAuthorization: authorizationReducer,
   },

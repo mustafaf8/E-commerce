@@ -36,11 +36,18 @@ import {
   Legend,
 } from "recharts";
 import useAdminPermission from "@/hooks/useAdminPermission";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/dist/style.css";
+import axios from "axios";
+import { saveAs } from "file-saver";
 
 
 function AdminStatsPage() {
   const dispatch = useDispatch();
   const [period, setPeriod] = useState("monthly");
+  const [dateRange, setDateRange] = useState({ from: null, to: null });
+  const [showPicker, setShowPicker] = useState(false);
+  const [dataType, setDataType] = useState("orders");
 
   const canView = useAdminPermission('stats');
   const canManage = useAdminPermission('stats', 'manage');
@@ -84,24 +91,26 @@ function AdminStatsPage() {
   }, [dispatch, productList]);
 
   useEffect(() => {
-    if(canView) {
-      dispatch(fetchSalesOverview(period));
-      dispatch(fetchSalesTrend(period));
-      dispatch(fetchOrderStatusDistribution());
-      dispatch(fetchTopSellingProducts({ limit: 10 }));
-      dispatch(fetchSalesByCategory());
-      dispatch(fetchSalesByBrand());
-      dispatch(fetchUserSummary(period));
-      dispatch(fetchUserRegistrationsTrend(period));
-      dispatch(fetchTopCustomers());
-      dispatch(fetchTopLikedProducts());
-      dispatch(fetchProductSummary());
-      dispatch(fetchProfitOverview(period));
-      dispatch(fetchProfitByProduct());
-      dispatch(fetchProfitByCategory());
-      dispatch(fetchProfitByBrand());
-    }
-  }, [dispatch, period, canView]);
+    if (!canView) return;
+
+    const options = dateRange.from && dateRange.to ? { dateRange: { startDate: dateRange.from.toISOString(), endDate: dateRange.to.toISOString() } } : { period };
+
+    dispatch(fetchSalesOverview(options));
+    dispatch(fetchSalesTrend(options));
+    dispatch(fetchOrderStatusDistribution());
+    dispatch(fetchTopSellingProducts({ limit: 10 }));
+    dispatch(fetchSalesByCategory());
+    dispatch(fetchSalesByBrand());
+    dispatch(fetchUserSummary(options));
+    dispatch(fetchUserRegistrationsTrend(options));
+    dispatch(fetchTopCustomers());
+    dispatch(fetchTopLikedProducts());
+    dispatch(fetchProductSummary());
+    dispatch(fetchProfitOverview(options));
+    dispatch(fetchProfitByProduct());
+    dispatch(fetchProfitByCategory());
+    dispatch(fetchProfitByBrand());
+  }, [dispatch, period, dateRange, canView]);
 
 
   if (!canView) {
@@ -169,61 +178,152 @@ function AdminStatsPage() {
 
   return (
     <div className="p-4 space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h1 className="text-2xl font-semibold">İstatistikler</h1>
-        <select
-          value={period}
-          onChange={(e) => setPeriod(e.target.value)}
-          className="border rounded-md p-2 text-sm"
-        >
-          <option value="all">Tüm Zamanlar</option>
-          <option value="daily">Son 24 Saat</option>
-          <option value="weekly">Son 7 Gün</option>
-          <option value="monthly">Son 30 Gün</option>
-        </select>
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-4 flex-wrap">
+          <h1 className="text-2xl font-semibold">İstatistikler</h1>
+
+          {/* Tarih Aralığı Picker */}
+          <div className="relative">
+            <button
+              onClick={() => setShowPicker((p) => !p)}
+              className="border rounded-md px-3 py-1.5 text-sm bg-white"
+            >
+              {dateRange.from && dateRange.to
+                ? `${dateRange.from.toLocaleDateString()} - ${dateRange.to.toLocaleDateString()}`
+                : "Tarih Aralığı Seç"}
+            </button>
+            {showPicker && (
+              <div className="absolute z-50 mt-2 bg-white border shadow-lg">
+                <DayPicker
+                  mode="range"
+                  selected={dateRange}
+                  onSelect={(range) => {
+                    setDateRange(range);
+                  }}
+                />
+                <div className="flex justify-end p-2 border-t">
+                  <button
+                    className="text-sm text-primary px-3 py-1"
+                    onClick={() => setShowPicker(false)}
+                  >
+                    Kapat
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Ya tarih yoksa periyod seçici */}
+          {!dateRange.from && (
+            <select
+              value={period}
+              onChange={(e) => setPeriod(e.target.value)}
+              className="border rounded-md p-2 text-sm"
+            >
+              <option value="all">Tüm Zamanlar</option>
+              <option value="daily">Son 24 Saat</option>
+              <option value="weekly">Son 7 Gün</option>
+              <option value="monthly">Son 30 Gün</option>
+            </select>
+          )}
+        </div>
+
+        {/* Rapor İndir */}
+        <div className="flex items-center gap-2">
+          <select
+            value={dataType}
+            onChange={(e) => setDataType(e.target.value)}
+            className="border rounded-md p-2 text-sm"
+          >
+            <option value="orders">Siparişler</option>
+            <option value="products">Ürünler</option>
+          </select>
+          <button
+            onClick={async () => {
+              try {
+                const body = {
+                  dataType,
+                  startDate: dateRange.from ? dateRange.from.toISOString() : null,
+                  endDate: dateRange.to ? dateRange.to.toISOString() : null,
+                };
+
+                const response = await axios.post(
+                  "/api/admin/stats/export",
+                  body,
+                  {
+                    responseType: "blob",
+                    withCredentials: true,
+                  }
+                );
+
+                const blob = new Blob([response.data], {
+                  type: "text/csv;charset=utf-8;",
+                });
+                saveAs(blob, `${dataType}-report.csv`);
+              } catch (err) {
+                console.error("CSV indirme hatası", err);
+              }
+            }}
+            className="bg-primary text-white rounded-md px-4 py-2 text-sm"
+          >
+            Raporu İndir
+          </button>
+        </div>
       </div>
 
-      {/* KPI Cards */}
-      {salesOverview && userSummary && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="bg-primary text-white">
-            <CardHeader>
-              <CardTitle>Toplam Gelir</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">
-                ₺{salesOverview.totalRevenue?.toFixed(2)}
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="bg-secondary text-gray-900 dark:text-white">
-            <CardHeader>
-              <CardTitle>Toplam Sipariş</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">{salesOverview.totalOrders}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Yeni Kullanıcılar</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">{userSummary.newUsers}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Ort. Sepet Tutarı</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">
-                ₺{salesOverview.averageOrderValue?.toFixed(2)}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Brüt Satış */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium">Brüt Satış</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {salesOverview?.totalGrossRevenue?.toFixed(2) || "0.00"}₺
+            </div>
+            <p className="text-xs text-muted-foreground">İndirimler öncesi toplam tutar</p>
+          </CardContent>
+        </Card>
+
+        {/* Toplam Kupon İndirimi */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium">Toplam Kupon İndirimi</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-amber-600">
+              -{salesOverview?.totalDiscount?.toFixed(2) || "0.00"}₺
+            </div>
+            <p className="text-xs text-muted-foreground">Uygulanan toplam indirim</p>
+          </CardContent>
+        </Card>
+
+        {/* Net Gelir */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium">Net Gelir</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">
+              {salesOverview?.totalNetRevenue?.toFixed(2) || "0.00"}₺
+            </div>
+            <p className="text-xs text-muted-foreground">İndirimler sonrası net kazanç</p>
+          </CardContent>
+        </Card>
+        
+        {/* Toplam Sipariş */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium">Toplam Sipariş</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{salesOverview?.totalOrders || 0}</div>
+             <p className="text-xs text-muted-foreground">
+              Ort. Sipariş Değeri: {salesOverview?.averageOrderValue?.toFixed(2) || "0.00"}₺
+            </p>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Sales Trend Chart */}
       {salesTrend && salesTrend.length > 0 && (
