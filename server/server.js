@@ -83,6 +83,7 @@ const maintenanceRouter = require("./routes/common/maintenance-routes");
 const errorHandler = require("./middleware/errorHandler");
 const { scheduleAbandonedCartEmails } = require("./jobs/abandonedCartJob");
 require("./controllers/auth/auth-controller");
+const shopCouponRouter = require("./routes/shop/coupon-routes");
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -217,6 +218,7 @@ app.use(errorHandler);
 if (process.env.NODE_ENV !== "test") {
   scheduleAbandonedCartEmails();
 }
+app.use("/api/shop/coupons", shopCouponRouter);
 
 // Express uygulamasını Socket.io ile beraber dinlemeye al
 serverInstance.listen(PORT, () =>

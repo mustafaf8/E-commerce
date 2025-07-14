@@ -119,7 +119,7 @@ function MainHeaderActions() {
         toast({ title: "Çıkış yapıldı", variant: "success" });
       })
       .catch((error) => {
-       // console.error("Shop logout failed:", error);
+        // console.error("Shop logout failed:", error);
         toast({ variant: "destructive", title: "Çıkış yapılamadı." });
       });
   }
@@ -246,7 +246,7 @@ function TopStrip() {
     {
       id: "campaigns",
       label: "Kampanyalar",
-      path: "/shop/listing?tag=kampanya",
+      path: "/shop/campaigns",
     },
   ];
 
@@ -276,9 +276,13 @@ function TopStrip() {
 function ShoppingHeader() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [suggestions, setSuggestions] = useState({ products: [], categories: [], brands: [] });
+  const [suggestions, setSuggestions] = useState({
+    products: [],
+    categories: [],
+    brands: [],
+  });
   const [showSuggest, setShowSuggest] = useState(false);
-  const [activeInput, setActiveInput] = useState(''); // 'desktop' veya 'mobile'
+  const [activeInput, setActiveInput] = useState(""); // 'desktop' veya 'mobile'
   const debounceRef = useRef();
   const [searchParams] = useSearchParams();
 
@@ -357,41 +361,57 @@ function ShoppingHeader() {
                 type="search"
                 placeholder="Ürün, kategori veya marka ara..."
                 value={searchTerm}
-                onChange={(e) => handleSearchChange(e, 'desktop')}
+                onChange={(e) => handleSearchChange(e, "desktop")}
                 className="w-full rounded-md bg-muted pl-10 pr-4 py-2.5 h-11 text-sm border-transparent focus:border-primary focus:bg-background focus:ring-1 focus:ring-primary max-md:hidden"
               />
               {/* Suggestions Dropdown - Sadece desktop için */}
-              {showSuggest && activeInput === 'desktop' && (suggestions.products.length > 0 || suggestions.categories.length > 0 || suggestions.brands.length > 0) && (
-                <div className="absolute z-50 mt-1 w-full bg-background border shadow-lg rounded-md max-h-80 overflow-y-auto ">
-                  {suggestions.products.map((p) => (
-                    <div
-                      key={`prod-${p._id}`}
-                      className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
-                      onClick={() => handleSuggestionClick(`/shop/search?keyword=${encodeURIComponent(p.title)}`)}
-                    >
-                      Ürün: {p.title}
-                    </div>
-                  ))}
-                  {suggestions.categories.map((c) => (
-                    <div
-                      key={`cat-${c.slug}`}
-                      className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
-                      onClick={() => handleSuggestionClick(`/shop/listing?category=${c.slug}`)}
-                    >
-                      Kategori: {c.name}
-                    </div>
-                  ))}
-                  {suggestions.brands.map((b) => (
-                    <div
-                      key={`brand-${b.slug}`}
-                      className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
-                      onClick={() => handleSuggestionClick(`/shop/listing?brand=${b.slug}`)}
-                    >
-                      Marka: {b.name}
-                    </div>
-                  ))}
-                </div>
-              )}
+              {showSuggest &&
+                activeInput === "desktop" &&
+                (suggestions.products.length > 0 ||
+                  suggestions.categories.length > 0 ||
+                  suggestions.brands.length > 0) && (
+                  <div className="absolute z-50 mt-1 w-full bg-background border shadow-lg rounded-md max-h-80 overflow-y-auto ">
+                    {suggestions.products.map((p) => (
+                      <div
+                        key={`prod-${p._id}`}
+                        className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
+                        onClick={() =>
+                          handleSuggestionClick(
+                            `/shop/search?keyword=${encodeURIComponent(
+                              p.title
+                            )}`
+                          )
+                        }
+                      >
+                        Ürün: {p.title}
+                      </div>
+                    ))}
+                    {suggestions.categories.map((c) => (
+                      <div
+                        key={`cat-${c.slug}`}
+                        className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
+                        onClick={() =>
+                          handleSuggestionClick(
+                            `/shop/listing?category=${c.slug}`
+                          )
+                        }
+                      >
+                        Kategori: {c.name}
+                      </div>
+                    ))}
+                    {suggestions.brands.map((b) => (
+                      <div
+                        key={`brand-${b.slug}`}
+                        className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
+                        onClick={() =>
+                          handleSuggestionClick(`/shop/listing?brand=${b.slug}`)
+                        }
+                      >
+                        Marka: {b.name}
+                      </div>
+                    ))}
+                  </div>
+                )}
               <button type="submit" className="hidden"></button>
             </div>
           </form>
@@ -409,41 +429,55 @@ function ShoppingHeader() {
               type="search"
               placeholder="Ne aramıştınız?"
               value={searchTerm}
-              onChange={(e) => handleSearchChange(e, 'mobile')}
+              onChange={(e) => handleSearchChange(e, "mobile")}
               className="w-full rounded-md bg-muted/70 dark:bg-muted/30 pl-10 pr-4 py-2 h-10 text-sm border-transparent focus:border-primary focus:bg-background focus:ring-1 focus:ring-primary"
             />
             {/* Suggestions Dropdown - Sadece mobile için */}
-            {showSuggest && activeInput === 'mobile' && (suggestions.products.length > 0 || suggestions.categories.length > 0 || suggestions.brands.length > 0) && (
-              <div className="absolute z-50 mt-1 w-full bg-background border shadow-lg rounded-md max-h-80 overflow-y-auto">
-                {suggestions.products.map((p) => (
-                  <div
-                    key={`prod-${p._id}`}
-                    className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
-                    onClick={() => handleSuggestionClick(`/shop/search?keyword=${encodeURIComponent(p.title)}`)}
-                  >
-                    Ürün: {p.title}
-                  </div>
-                ))}
-                {suggestions.categories.map((c) => (
-                  <div
-                    key={`cat-${c.slug}`}
-                    className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
-                    onClick={() => handleSuggestionClick(`/shop/listing?category=${c.slug}`)}
-                  >
-                    Kategori: {c.name}
-                  </div>
-                ))}
-                {suggestions.brands.map((b) => (
-                  <div
-                    key={`brand-${b.slug}`}
-                    className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
-                    onClick={() => handleSuggestionClick(`/shop/listing?brand=${b.slug}`)}
-                  >
-                    Marka: {b.name}
-                  </div>
-                ))}
-              </div>
-            )}
+            {showSuggest &&
+              activeInput === "mobile" &&
+              (suggestions.products.length > 0 ||
+                suggestions.categories.length > 0 ||
+                suggestions.brands.length > 0) && (
+                <div className="absolute z-50 mt-1 w-full bg-background border shadow-lg rounded-md max-h-80 overflow-y-auto">
+                  {suggestions.products.map((p) => (
+                    <div
+                      key={`prod-${p._id}`}
+                      className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
+                      onClick={() =>
+                        handleSuggestionClick(
+                          `/shop/search?keyword=${encodeURIComponent(p.title)}`
+                        )
+                      }
+                    >
+                      Ürün: {p.title}
+                    </div>
+                  ))}
+                  {suggestions.categories.map((c) => (
+                    <div
+                      key={`cat-${c.slug}`}
+                      className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
+                      onClick={() =>
+                        handleSuggestionClick(
+                          `/shop/listing?category=${c.slug}`
+                        )
+                      }
+                    >
+                      Kategori: {c.name}
+                    </div>
+                  ))}
+                  {suggestions.brands.map((b) => (
+                    <div
+                      key={`brand-${b.slug}`}
+                      className="px-3 py-2 hover:bg-muted cursor-pointer text-sm"
+                      onClick={() =>
+                        handleSuggestionClick(`/shop/listing?brand=${b.slug}`)
+                      }
+                    >
+                      Marka: {b.name}
+                    </div>
+                  ))}
+                </div>
+              )}
           </div>
         </form>
       </div>

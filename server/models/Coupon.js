@@ -20,14 +20,14 @@ const CouponSchema = new mongoose.Schema(
       required: [true, "İndirim değeri zorunludur."],
       min: [0, "İndirim değeri negatif olamaz."],
       validate: {
-        validator: function(value) {
+        validator: function (value) {
           if (this.discountType === "percentage") {
             return value >= 0 && value <= 100;
           }
           return value >= 0;
         },
-        message: "Yüzdelik indirim 0-100 arasında olmalıdır."
-      }
+        message: "Yüzdelik indirim 0-100 arasında olmalıdır.",
+      },
     },
     minPurchase: {
       type: Number,
@@ -57,6 +57,14 @@ const CouponSchema = new mongoose.Schema(
       trim: true,
       maxlength: [200, "Açıklama en fazla 200 karakter olabilir."],
     },
+    imageUrl: {
+      type: String,
+      default: null,
+    },
+    showOnCampaignsPage: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
@@ -72,37 +80,37 @@ CouponSchema.pre("save", function (next) {
 });
 
 // Kuponun geçerli olup olmadığını kontrol eden method
-CouponSchema.methods.isValidCoupon = function(cartTotal = 0) {
+CouponSchema.methods.isValidCoupon = function (cartTotal = 0) {
   const now = new Date();
-  
+
   // Aktif mi?
   if (!this.isActive) {
     return { valid: false, message: "Bu kupon aktif değil." };
   }
-  
+
   // Süresi dolmuş mu?
   if (this.expiryDate && this.expiryDate < now) {
     return { valid: false, message: "Bu kuponun süresi dolmuş." };
   }
-  
+
   // Kullanım limiti aşılmış mı?
   if (this.maxUses && this.usesCount >= this.maxUses) {
     return { valid: false, message: "Bu kuponun kullanım limiti dolmuş." };
   }
-  
+
   // Minimum alışveriş tutarı sağlanıyor mu?
   if (this.minPurchase && cartTotal < this.minPurchase) {
-    return { 
-      valid: false, 
-      message: `Bu kupon için minimum ${this.minPurchase}₺ alışveriş yapmalısınız.` 
+    return {
+      valid: false,
+      message: `Bu kupon için minimum ${this.minPurchase}₺ alışveriş yapmalısınız.`,
     };
   }
-  
+
   return { valid: true, message: "Kupon geçerli." };
 };
 
 // İndirim tutarını hesaplayan method
-CouponSchema.methods.calculateDiscount = function(cartTotal) {
+CouponSchema.methods.calculateDiscount = function (cartTotal) {
   if (this.discountType === "percentage") {
     return (cartTotal * this.discountValue) / 100;
   } else {
@@ -110,4 +118,4 @@ CouponSchema.methods.calculateDiscount = function(cartTotal) {
   }
 };
 
-module.exports = mongoose.model("Coupon", CouponSchema); 
+module.exports = mongoose.model("Coupon", CouponSchema);

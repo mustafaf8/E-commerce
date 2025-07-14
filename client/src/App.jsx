@@ -33,14 +33,22 @@ const AdminDashboard = lazy(() => import("./pages/admin-view/dashboard"));
 const AdminProducts = lazy(() => import("./pages/admin-view/products"));
 const AdminOrders = lazy(() => import("./pages/admin-view/orders"));
 const AdminFeatures = lazy(() => import("./pages/admin-view/features"));
-const AdminCategoriesBrands = lazy(() => import("./pages/admin-view/categories-brands"));
+const AdminCategoriesBrands = lazy(() =>
+  import("./pages/admin-view/categories-brands")
+);
 const AdminHomeSections = lazy(() =>
   import("./pages/admin-view/home-sections")
 );
 const AdminStatsPage = lazy(() => import("./pages/admin-view/AdminStatsPage"));
-const AdminCouponsPage = lazy(() => import("./pages/admin-view/AdminCouponsPage"));
-const AdminAuthorization = lazy(() => import("./pages/admin-view/authorization"));
-const AdminMaintenanceMode = lazy(() => import("./pages/admin-view/maintenance-mode"));
+const AdminCouponsPage = lazy(() =>
+  import("./pages/admin-view/AdminCouponsPage")
+);
+const AdminAuthorization = lazy(() =>
+  import("./pages/admin-view/authorization")
+);
+const AdminMaintenanceMode = lazy(() =>
+  import("./pages/admin-view/maintenance-mode")
+);
 
 const NotFound = lazy(() => import("./pages/not-found"));
 const ShoppingListing = lazy(() => import("./pages/shopping-view/listing"));
@@ -64,9 +72,7 @@ const SSLCertificate = lazy(() =>
 const DeliveryReturnTerms = lazy(() =>
   import("./pages/shopping-view/DeliveryReturnTerms")
 );
-const PrivacyPolicy = lazy(() =>
-  import("./pages/shopping-view/PrivacyPolicy")
-);
+const PrivacyPolicy = lazy(() => import("./pages/shopping-view/PrivacyPolicy"));
 const DistanceSalesContract = lazy(() =>
   import("./pages/shopping-view/DistanceSalesContract")
 );
@@ -75,7 +81,10 @@ const GuestCheckoutAddress = lazy(() =>
 );
 const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/auth/ResetPassword"));
-const ProductSpecsPage = lazy(() => import("./pages/shopping-view/ProductSpecsPage"));
+const ProductSpecsPage = lazy(() =>
+  import("./pages/shopping-view/ProductSpecsPage")
+);
+const Campaigns = lazy(() => import("./pages/shopping-view/Campaigns"));
 
 function App() {
   const {
@@ -147,7 +156,11 @@ function App() {
           <Route
             path="/auth"
             element={
-              <CheckAuth isAuthenticated={isAuthenticated} user={user} isLoading={authIsLoading}>
+              <CheckAuth
+                isAuthenticated={isAuthenticated}
+                user={user}
+                isLoading={authIsLoading}
+              >
                 <AuthLayout />
               </CheckAuth>
             }
@@ -171,7 +184,10 @@ function App() {
             <Route path="products" element={<AdminProducts />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="features" element={<AdminFeatures />} />
-            <Route path="categories-brands" element={<AdminCategoriesBrands />} />
+            <Route
+              path="categories-brands"
+              element={<AdminCategoriesBrands />}
+            />
             <Route path="coupons" element={<AdminCouponsPage />} />
             <Route path="home-sections" element={<AdminHomeSections />} />
             <Route path="stats" element={<AdminStatsPage />} />
@@ -190,6 +206,7 @@ function App() {
             <Route path="home" element={<ShoppingHome />} />
             <Route path="listing" element={<ShoppingListing />} />
             <Route path="search" element={<SearchProducts />} />
+            <Route path="campaigns" element={<Campaigns />} />
             <Route path="hakkimizda" element={<AboutUs />} />
             <Route path="iletisim" element={<ContactPage />} />
             <Route path="kvkk" element={<KVKK />} />

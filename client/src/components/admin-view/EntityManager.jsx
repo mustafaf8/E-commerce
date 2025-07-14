@@ -35,7 +35,7 @@ function EntityManager({
     isLoading = false,
     error = null,
   } = stateData || {};
-  
+
   const { toast } = useToast();
 
   const initialEntityData = { name: "", slug: "", isActive: true };
@@ -99,13 +99,14 @@ function EntityManager({
       });
       return;
     }
+    const dataKey = `${entityName.toLowerCase()}Data`;
     const action = isEditing
       ? actions.update({
           id: currentEntity._id,
-          [entityName.toLowerCase() === "kategori" ? "categoryData" : "brandData"]: currentEntity,
+          [dataKey]: currentEntity,
         })
       : actions.add(currentEntity);
-    
+
     dispatch(action)
       .unwrap()
       .then((payload) => {
@@ -310,7 +311,9 @@ function EntityManager({
       {/* Silme Onay Modalı */}
       <ConfirmationModal
         isOpen={isConfirmModalOpen}
-        message={`'${entityToDelete?.name}' ${entityName.toLowerCase()}ini silmek istediğinizden emin misiniz? Bu ${entityName.toLowerCase()} bir veya daha fazla üründe kullanılıyorsa silinemez.`}
+        message={`'${
+          entityToDelete?.name
+        }' ${entityName.toLowerCase()}ini silmek istediğinizden emin misiniz? Bu ${entityName.toLowerCase()} bir veya daha fazla üründe kullanılıyorsa silinemez.`}
         onConfirm={confirmDelete}
         onCancel={() => setIsConfirmModalOpen(false)}
       />
@@ -332,4 +335,4 @@ EntityManager.propTypes = {
   listKey: PropTypes.string,
 };
 
-export default EntityManager; 
+export default EntityManager;

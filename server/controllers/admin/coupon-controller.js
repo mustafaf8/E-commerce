@@ -28,13 +28,15 @@ const createCoupon = async (req, res) => {
       maxUses,
       expiryDate,
       description,
+      imageUrl, // yeni alan
+      showOnCampaignsPage, // yeni alan
     } = req.body;
 
     // Kupon kodu zaten var mı kontrol et
-    const existingCoupon = await Coupon.findOne({ 
-      code: code.toUpperCase() 
+    const existingCoupon = await Coupon.findOne({
+      code: code.toUpperCase(),
     });
-    
+
     if (existingCoupon) {
       return res.status(400).json({
         success: false,
@@ -50,6 +52,8 @@ const createCoupon = async (req, res) => {
       maxUses: maxUses || null,
       expiryDate: expiryDate || null,
       description: description || "",
+      imageUrl: imageUrl || null,
+      showOnCampaignsPage: showOnCampaignsPage || false,
     });
 
     await newCoupon.save();
@@ -80,7 +84,7 @@ const updateCoupon = async (req, res) => {
         code: updateData.code.toUpperCase(),
         _id: { $ne: id },
       });
-      
+
       if (existingCoupon) {
         return res.status(400).json({
           success: false,
@@ -89,11 +93,10 @@ const updateCoupon = async (req, res) => {
       }
     }
 
-    const updatedCoupon = await Coupon.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true, runValidators: true }
-    );
+    const updatedCoupon = await Coupon.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!updatedCoupon) {
       return res.status(404).json({
@@ -147,9 +150,9 @@ const deleteCoupon = async (req, res) => {
 const getCouponById = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const coupon = await Coupon.findById(id);
-    
+
     if (!coupon) {
       return res.status(404).json({
         success: false,
@@ -174,9 +177,9 @@ const getCouponById = async (req, res) => {
 const toggleCouponStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const coupon = await Coupon.findById(id);
-    
+
     if (!coupon) {
       return res.status(404).json({
         success: false,
@@ -189,7 +192,7 @@ const toggleCouponStatus = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: `Kupon ${coupon.isActive ? 'aktif' : 'pasif'} hale getirildi.`,
+      message: `Kupon ${coupon.isActive ? "aktif" : "pasif"} hale getirildi.`,
       data: coupon,
     });
   } catch (error) {
@@ -208,4 +211,4 @@ module.exports = {
   deleteCoupon,
   getCouponById,
   toggleCouponStatus,
-}; 
+};
