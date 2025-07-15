@@ -151,19 +151,16 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] max-w-md sm:max-w-[500px]">
         <DialogHeader className="space-y-1 pb-2">
-          <DialogTitle className="text-base sm:text-lg">
+          <DialogTitle className="text-base sm:text-lg text-center">
             Sipariş Takibi
           </DialogTitle>
-          <DialogDescription className="text-xs sm:text-sm">
+          <DialogDescription className="text-xs sm:text-sm text-center">
             Siparişinizin durumunu sorgulayın veya siparişlerinizi görmek için
             giriş yapın.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleTrackOrder} className="grid gap-3 py-2">
           <div className="grid gap-1.5">
-            <Label htmlFor="orderId" className="text-xs sm:text-sm font-medium">
-              Sipariş Numaranız
-            </Label>
             <Input
               id="orderId"
               placeholder="Sipariş numaranızı girin"
@@ -282,8 +279,8 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
           onCancel={() => setShowCancelConfirm(false)}
         />
 
-        <div className="mt-4 text-center space-y-2">
-          <p className="text-xs text-muted-foreground">veya</p>
+        <div className="mt-0 text-center space-y-0">
+          <p className="text-xs text-muted-foreground mb-2">veya</p>
           <Button
             variant="outline"
             onClick={handleLoginRedirect}

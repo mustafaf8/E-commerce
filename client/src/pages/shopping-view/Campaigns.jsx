@@ -24,13 +24,13 @@ function formatDiscount(coupon) {
     return {
       value: `%${coupon.discountValue}`,
       text: "İndirim",
-      icon: Percent
+      icon: Percent,
     };
   }
   return {
     value: `${coupon.discountValue}₺`,
     text: "İndirim",
-    icon: TrendingUp
+    icon: TrendingUp,
   };
 }
 
@@ -64,9 +64,9 @@ export default function Campaigns() {
       textArea.value = code;
       document.body.appendChild(textArea);
       textArea.select();
-      document.execCommand('copy');
+      document.execCommand("copy");
       document.body.removeChild(textArea);
-      
+
       toast({
         title: "🎉 Kupon Kopyalandı!",
         description: `${code} kodu panoya kopyalandı.`,
@@ -95,11 +95,11 @@ export default function Campaigns() {
             Özel Kampanyalar
           </h1>
           <p className="text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
-            Size özel hazırladığımız harika indirim fırsatlarını kaçırmayın! 
+            Size özel hazırladığımız harika indirim fırsatlarını kaçırmayın!
             Kupon kodlarını kopyalayıp alışverişinizde kullanın.
           </p>
         </div>
-        
+
         {/* Decorative Elements */}
         <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full animate-pulse"></div>
         <div className="absolute bottom-10 right-10 w-16 h-16 bg-white/10 rounded-full animate-pulse delay-1000"></div>
@@ -111,7 +111,10 @@ export default function Campaigns() {
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl shadow-lg p-6 animate-pulse">
+              <div
+                key={i}
+                className="bg-white rounded-2xl shadow-lg p-6 animate-pulse"
+              >
                 <div className="h-40 bg-gradient-to-r from-gray-200 to-gray-300 rounded-xl mb-4"></div>
                 <div className="h-4 bg-gray-200 rounded w-3/4 mb-3"></div>
                 <div className="h-6 bg-gray-300 rounded w-1/2 mb-4"></div>
@@ -124,9 +127,11 @@ export default function Campaigns() {
             <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <Zap className="w-10 h-10 text-red-500" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-4">Bir hata oluştu</h3>
+            <h3 className="text-2xl font-bold text-gray-800 mb-4">
+              Bir hata oluştu
+            </h3>
             <p className="text-gray-600 mb-6">{error}</p>
-            <Button 
+            <Button
               onClick={() => dispatch(fetchCampaignCoupons())}
               className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
             >
@@ -142,11 +147,14 @@ export default function Campaigns() {
               Yakında Harika Kampanyalar!
             </h3>
             <p className="text-gray-600 text-lg max-w-md mx-auto mb-8">
-              Şu anda aktif kampanya bulunmuyor, ancak çok yakında size özel fırsatlar hazırlıyoruz!
+              Şu anda aktif kampanya bulunmuyor, ancak çok yakında size özel
+              fırsatlar hazırlıyoruz!
             </p>
             <div className="flex items-center justify-center gap-2 text-purple-600">
               <Clock className="w-5 h-5" />
-              <span className="font-medium">Güncellemeler için takipte kalın</span>
+              <span className="font-medium">
+                Güncellemeler için takipte kalın
+              </span>
             </div>
           </div>
         ) : (
@@ -154,7 +162,7 @@ export default function Campaigns() {
             {coupons.map((coupon, index) => {
               const discount = formatDiscount(coupon);
               const DiscountIcon = discount.icon;
-              
+
               return (
                 <div
                   key={coupon._id}
@@ -164,25 +172,22 @@ export default function Campaigns() {
                   <div className="absolute top-4 right-4 z-10">
                     <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-yellow-900 border-0 shadow-lg">
                       <Crown className="w-3 h-3 mr-1" />
-                      ÖZE
+                      ÖZEL
                     </Badge>
                   </div>
 
                   {/* Discount Header */}
-                  <div className="relative bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 p-6 text-white">
+                  <div className="relative bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 p-4 text-white">
                     <div className="absolute inset-0 bg-black/10"></div>
                     <div className="relative text-center">
-                      <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
-                        <DiscountIcon className="w-8 h-8 text-white" />
-                      </div>
-                      <div className="text-4xl font-bold mb-2 tracking-tight">
+                      <div className="text-4xl font-bold tracking-tight">
                         {discount.value}
                       </div>
                       <div className="text-lg font-medium text-white/90">
                         {discount.text}
                       </div>
                     </div>
-                    
+
                     {/* Decorative elements */}
                     <div className="absolute top-2 left-2 w-4 h-4 bg-white/20 rounded-full"></div>
                     <div className="absolute bottom-2 right-2 w-6 h-6 bg-white/20 rounded-full"></div>
@@ -238,11 +243,9 @@ export default function Campaigns() {
                       <div className="inline-flex items-center gap-2 text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
                         <Calendar className="w-4 h-4" />
                         <span className="font-medium">
-                          {coupon.expiryDate ? (
-                            `${formatDate(coupon.expiryDate)} tarihine kadar`
-                          ) : (
-                            "Süresiz geçerli"
-                          )}
+                          {coupon.expiryDate
+                            ? `${formatDate(coupon.expiryDate)} tarihine kadar`
+                            : "Süresiz geçerli"}
                         </span>
                       </div>
                     </div>
@@ -264,7 +267,7 @@ export default function Campaigns() {
               );
             })}
           </div>
-              )}
+        )}
       </div>
     </div>
   );
