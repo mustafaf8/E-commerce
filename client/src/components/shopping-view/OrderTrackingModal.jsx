@@ -81,7 +81,7 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
           "Sipariş sorgulanırken bir hata oluştu."
       );
       setSearchResult(null);
-     // console.error("Sipariş sorgulama hatası:", error);
+      // console.error("Sipariş sorgulama hatası:", error);
     } finally {
       setIsLoading(false);
     }
@@ -95,15 +95,29 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
   const handleGuestCancel = async () => {
     if (!searchResult?._id) return;
     try {
-      const resp = await api.put(`/shop/order/guest-cancel/${searchResult._id}`);
+      const resp = await api.put(
+        `/shop/order/guest-cancel/${searchResult._id}`
+      );
       if (resp.data?.success) {
         setSearchResult(resp.data.data);
-        toast({ title: "Başarılı", description: "Siparişiniz başarıyla iptal edildi.", variant: "success" });
+        toast({
+          title: "Başarılı",
+          description: "Siparişiniz başarıyla iptal edildi.",
+          variant: "success",
+        });
       } else {
-        toast({ title: "Hata", description: resp.data?.message || "Sipariş iptal edilemedi.", variant: "destructive" });
+        toast({
+          title: "Hata",
+          description: resp.data?.message || "Sipariş iptal edilemedi.",
+          variant: "destructive",
+        });
       }
     } catch (err) {
-      toast({ title: "Hata", description: err.response?.data?.message || "Sipariş iptal edilemedi.", variant: "destructive" });
+      toast({
+        title: "Hata",
+        description: err.response?.data?.message || "Sipariş iptal edilemedi.",
+        variant: "destructive",
+      });
     } finally {
       setShowCancelConfirm(false);
     }
@@ -112,6 +126,16 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
   const formatDate = (dateString) => {
     if (!dateString || !isValid(parseISO(dateString))) return "N/A";
     return format(parseISO(dateString), "dd.MM.yyyy HH:mm");
+  };
+
+  const formatOrderId = (orderId) => {
+    if (!orderId) return "N/A";
+    if (orderId.length > 12) {
+      return `${orderId.substring(0, 8)}...${orderId.substring(
+        orderId.length - 4
+      )}`;
+    }
+    return orderId;
   };
 
   useEffect(() => {
@@ -125,35 +149,45 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Sipariş Takibi</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="w-[95vw] max-w-md sm:max-w-[500px]">
+        <DialogHeader className="space-y-1 pb-2">
+          <DialogTitle className="text-base sm:text-lg">
+            Sipariş Takibi
+          </DialogTitle>
+          <DialogDescription className="text-xs sm:text-sm">
             Siparişinizin durumunu sorgulayın veya siparişlerinizi görmek için
             giriş yapın.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleTrackOrder} className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="orderId">Sipariş Numaranız</Label>
+        <form onSubmit={handleTrackOrder} className="grid gap-3 py-2">
+          <div className="grid gap-1.5">
+            <Label htmlFor="orderId" className="text-xs sm:text-sm font-medium">
+              Sipariş Numaranız
+            </Label>
             <Input
               id="orderId"
-              placeholder="Sipariş numaranızı girin (örn: 6e3b16a08t72z4f03e52c743)"
+              placeholder="Sipariş numaranızı girin"
               value={orderIdInput}
               onChange={(e) => setOrderIdInput(e.target.value)}
               required
+              className="text-xs sm:text-sm h-9"
             />
           </div>
           {searchError && (
-            <p className="text-sm text-red-600 flex items-center">
-              <AlertCircle className="w-4 h-4 mr-1" /> {searchError}
+            <p className="text-xs text-red-600 flex items-start">
+              <AlertCircle className="w-3 h-3 mr-1 mt-0.5 flex-shrink-0" />
+              <span className="break-words">{searchError}</span>
             </p>
           )}
-          <Button type="submit" disabled={isLoading} className="w-full">
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="w-full text-xs sm:text-sm h-9"
+          >
             {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              <Loader2 className="h-3 w-3 animate-spin mr-2" />
             ) : (
-              <Search className="h-4 w-4 mr-2" />
+              <Search className="h-3 w-3 mr-2" />
             )}
             Siparişimi Sorgula
           </Button>
@@ -161,15 +195,25 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
 
         {/* searchResult null değilse ve bir obje ise render et */}
         {searchResult && typeof searchResult === "object" && (
-          <div className="mt-4 p-4 border rounded-md bg-gray-50 dark:bg-gray-800">
-            <h3 className="text-lg font-semibold mb-2">Sipariş Durumu</h3>
-            <div className="space-y-1 text-sm">
-              <p>
-                <strong>Sipariş No:</strong> {searchResult._id || "N/A"}
-              </p>
-              <p>
+          <div className="mt-3 p-2.5 sm:p-3 border rounded-md bg-gray-50 dark:bg-gray-800">
+            <h3 className="text-sm sm:text-base font-semibold mb-2">
+              Sipariş Durumu
+            </h3>
+            <div className="space-y-1.5 text-xs">
+              <div className="break-words">
+                <strong>Sipariş No:</strong>{" "}
+                <span className="font-mono text-xs">
+                  <span className="sm:hidden">
+                    {formatOrderId(searchResult._id || "N/A")}
+                  </span>
+                  <span className="hidden sm:inline">
+                    {searchResult._id || "N/A"}
+                  </span>
+                </span>
+              </div>
+              <div>
                 <strong>Tarih:</strong> {formatDate(searchResult.orderDate)}
-              </p>
+              </div>
               {/* Durum gösterimi standardize edildi */}
               {(() => {
                 const statusKey = searchResult.orderStatus;
@@ -180,24 +224,29 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
                   (statusKey && statusIcons[statusKey]) || statusIcons.default;
 
                 return (
-                  <p className="flex items-center">
-                    <strong>Durum:</strong>
-                    <span className={`ml-2 font-medium flex items-center`}>
+                  <div className="flex items-start sm:items-center">
+                    <strong className="mr-2">Durum:</strong>
+                    <span className={`font-medium flex items-center`}>
                       {React.cloneElement(iconElement, {
-                        className: `w-5 h-5 mr-2`,
+                        className: `w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0`,
                       })}
-                      {statusInfo.label || orderStatusMappingUser.default.label}
+                      <span className="break-words text-xs">
+                        {statusInfo.label ||
+                          orderStatusMappingUser.default.label}
+                      </span>
                     </span>
-                  </p>
+                  </div>
                 );
               })()}
 
-              <p>
+              <div>
                 <strong>Toplam Tutar:</strong>{" "}
-                <span className="whitespace-nowrap">{formatPrice(searchResult.totalAmount || 0)} TL</span>
-              </p>
+                <span className="whitespace-nowrap font-semibold text-green-600">
+                  {formatPrice(searchResult.totalAmount || 0)} TL
+                </span>
+              </div>
               {searchResult.guestInfo?.fullName && (
-                <p>
+                <div className="break-words">
                   <strong>Alıcı:</strong>{" "}
                   {searchResult.guestInfo.fullName.substring(0, 1) +
                     "****" +
@@ -206,24 +255,25 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
                       searchResult.guestInfo.fullName.lastIndexOf(" ")
                     ) +
                     "****"}
-                </p>
+                </div>
               )}
             </div>
           </div>
         )}
 
         {/* İptal butonu */}
-        {searchResult && cancellableStatuses.includes(searchResult.orderStatus) && (
-          <div className="mt-4">
-            <Button
-              variant="destructive"
-              className="w-full"
-              onClick={() => setShowCancelConfirm(true)}
-            >
-              Siparişi İptal Et
-            </Button>
-          </div>
-        )}
+        {searchResult &&
+          cancellableStatuses.includes(searchResult.orderStatus) && (
+            <div className="mt-3">
+              <Button
+                variant="destructive"
+                className="w-full text-xs sm:text-sm h-9"
+                onClick={() => setShowCancelConfirm(true)}
+              >
+                Siparişi İptal Et
+              </Button>
+            </div>
+          )}
 
         <ConfirmationModal
           isOpen={showCancelConfirm}
@@ -232,20 +282,26 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
           onCancel={() => setShowCancelConfirm(false)}
         />
 
-        <div className="mt-6 text-center">
-          <p className="text-sm text-muted-foreground mb-2">veya</p>
+        <div className="mt-4 text-center space-y-2">
+          <p className="text-xs text-muted-foreground">veya</p>
           <Button
             variant="outline"
             onClick={handleLoginRedirect}
-            className="w-full"
+            className="w-full text-xs sm:text-sm h-9"
           >
-            <LogIn className="h-4 w-4 mr-2" />
-            Giriş Yaparak Tüm Siparişlerinizi Görün
+            <LogIn className="h-3 w-3 mr-2" />
+            <span className="break-words">
+              Giriş Yaparak Tüm Siparişlerinizi Görün
+            </span>
           </Button>
         </div>
-        <DialogFooter className="mt-4">
+        <DialogFooter className="mt-3 pt-2">
           <DialogClose asChild>
-            <Button type="button" variant="secondary">
+            <Button
+              type="button"
+              variant="secondary"
+              className="w-full text-xs sm:text-sm h-9"
+            >
               Kapat
             </Button>
           </DialogClose>

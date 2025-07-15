@@ -252,7 +252,7 @@ function TopStrip() {
 
   return (
     <>
-      <div className="bg-gray-100 dark:bg-gray-800 text-xs text-muted-foreground hidden lg:block">
+      <div className="bg-gray-100 dark:bg-gray-800 text-xs text-muted-foreground max-[690px]:text-[10px]">
         <div className="container mx-auto px-4 md:px-20 h-8 flex justify-end items-center gap-x-4 md:gap-x-6">
           {stripLinks.map((link) => (
             <Link
@@ -273,6 +273,7 @@ function TopStrip() {
     </>
   );
 }
+
 function ShoppingHeader() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
