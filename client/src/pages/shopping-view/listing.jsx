@@ -10,12 +10,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
-import { sortOptions } from "@/config"; // sortOptions kalabilir
+import { sortOptions } from "@/config"; 
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import {
   fetchAllFilteredProducts,
   fetchProductDetails,
-  setProductDetails, // Dialog kapanınca detayları temizlemek için
+  setProductDetails, 
 } from "@/store/shop/products-slice";
 import { ArrowUpDownIcon } from "lucide-react";
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
@@ -52,7 +52,7 @@ function parseUrlParamsToFilters(searchParams) {
     if (key === "category" || key === "brand") {
       filters[key] = value.split(",").sort();
     } else {
-      filters[key] = value; // scalar
+      filters[key] = value; 
     }
   }
   return filters;
