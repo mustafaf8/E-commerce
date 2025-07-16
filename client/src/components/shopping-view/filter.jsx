@@ -46,7 +46,7 @@ function ProductFilter({
     debounceTimerRef.current = setTimeout(() => {
       handleScalarFilter("minPrice", minPrice === 0 ? "" : minPrice.toString());
       handleScalarFilter("maxPrice", maxPrice === 1000000 ? "" : maxPrice.toString());
-    }, 300); // 300ms debounce
+    }, 300); 
   }, [handleScalarFilter]);
 
   // Fiyat aralığı değiştiğinde filtrele (debounced)
