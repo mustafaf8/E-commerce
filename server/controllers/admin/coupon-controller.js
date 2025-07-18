@@ -28,8 +28,8 @@ const createCoupon = async (req, res) => {
       maxUses,
       expiryDate,
       description,
-      imageUrl, // yeni alan
-      showOnCampaignsPage, // yeni alan
+      imageUrl, 
+      showOnCampaignsPage,
     } = req.body;
 
     // Kupon kodu zaten var mı kontrol et
