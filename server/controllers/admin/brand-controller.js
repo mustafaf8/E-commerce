@@ -100,7 +100,7 @@ const updateBrandAdmin = async (req, res) => {
   }
 };
 
-// Marka Sil (Admin)
+
 const deleteBrandAdmin = async (req, res) => {
   try {
     const { id } = req.params;
