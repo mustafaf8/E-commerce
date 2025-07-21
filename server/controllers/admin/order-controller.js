@@ -47,8 +47,9 @@ const getOrderDetailsForAdmin = async (req, res) => {
         .populate({
           path: "userId",
           select: "userName email phoneNumber tcKimlikNo",
-        })
-        .lean();
+        });
+
+      order = order.toJSON();
 
       if (!order) {
         return res.status(404).json({
@@ -244,14 +245,15 @@ const getOrdersByUserIdForAdmin = async (req, res) => {
       };
     }
 
-    const orders = await Order.find(query)
+    const ordersDocs = await Order.find(query)
       .sort({ orderDate: -1 })
       .populate({
         path: "userId",
         select: "userName email",
         options: { omitUndefined: true },
-      })
-      .lean();
+      });
+
+    const orders = ordersDocs.map((doc) => doc.toJSON());
 
     res.status(200).json({
       success: true,
@@ -269,9 +271,10 @@ const getOrdersByUserIdForAdmin = async (req, res) => {
 
 const getAllGuestOrdersForAdmin = async (req, res) => {
   try {
-    const guestOrders = await Order.find({ isGuestOrder: true })
-      .sort({ orderDate: -1 })
-      .lean();
+    const guestOrderDocs = await Order.find({ isGuestOrder: true })
+      .sort({ orderDate: -1 });
+
+    const guestOrders = guestOrderDocs.map((doc) => doc.toJSON());
     res.status(200).json({
       success: true,
       data: guestOrders,

@@ -36,8 +36,8 @@ const initialFormData = {
   description: "",
   category: "",
   brand: "",
-  price: "",
-  salePrice: "",
+  priceUSD: "",
+  salePriceUSD: "",
   totalStock: "",
   averageReview: 0,
   image: "",
@@ -231,10 +231,10 @@ function AdminProducts() {
           return;
         }
 
-        const priceNum = parseFloat(formData.price);
+        const priceNum = parseFloat(formData.priceUSD);
         const stockNum = parseInt(formData.totalStock, 10);
-        const salePriceNum = formData.salePrice
-          ? parseFloat(formData.salePrice)
+        const salePriceNum = formData.salePriceUSD
+          ? parseFloat(formData.salePriceUSD)
           : null;
 
         if (isNaN(priceNum) || priceNum <= 0) {
@@ -341,7 +341,7 @@ function AdminProducts() {
   }, [dispatch, productIdToDelete, toast, closeConfirmationModal]);
 
   const isFormValid = useCallback(() => {
-    const requiredFields = ["title", "category", "price", "totalStock"];
+    const requiredFields = ["title", "category", "priceUSD", "totalStock"];
     const allFieldsFilled = requiredFields.every(
       (key) => formData[key] !== "" && formData[key] !== null
     );
@@ -361,8 +361,8 @@ function AdminProducts() {
           ...productToEdit,
           category: productToEdit.category?._id || productToEdit.category || "",
           brand: productToEdit.brand?._id || productToEdit.brand || "",
-          price: productToEdit.price?.toString() ?? "",
-          salePrice: productToEdit.salePrice?.toString() ?? "",
+          priceUSD: productToEdit.priceUSD?.toString() ?? "",
+          salePriceUSD: productToEdit.salePriceUSD?.toString() ?? "",
           totalStock: productToEdit.totalStock?.toString() ?? "",
           technicalSpecs: productToEdit.technicalSpecs || [], // Düzenleme için yükle
         });
@@ -426,8 +426,8 @@ function AdminProducts() {
           description: product.description,
           category: product.category,
           brand: product.brand,
-          price: product.price,
-          salePrice: product.salePrice,
+          priceUSD: product.priceUSD,
+          salePriceUSD: product.salePriceUSD,
           totalStock: product.totalStock,
           image: product.image,
           images: product.images || [], // Ek resimler

@@ -1,6 +1,8 @@
 const Product = require("../../models/Product");
 const mongoose = require("mongoose");
 const Brand = require("../../models/Brand");
+const { getExchangeRate } = require("../../utils/currencyConverter");
+const { roundToMarketingPrice } = require("../../utils/priceUtils");
 
 const getFilteredProducts = async (req, res) => {
   try {
@@ -139,6 +141,16 @@ const getFilteredProducts = async (req, res) => {
     let products;
     if (pipeline) {
       products = await Product.aggregate(pipeline);
+      // Aggregation sonuçları için manuel olarak TL fiyat hesaplaması yap
+      for (const product of products) {
+        if (product.priceUSD) {
+          const rate = await getExchangeRate();
+          product.price = roundToMarketingPrice(product.priceUSD * rate);
+          if (product.salePriceUSD) {
+            product.salePrice = roundToMarketingPrice(product.salePriceUSD * rate);
+          }
+        }
+      }
     } else {
       products = await Product.find(filters)
         .sort(sort)
@@ -146,6 +158,11 @@ const getFilteredProducts = async (req, res) => {
         .populate("category", "name slug")
         .populate("brand", "name slug")
         .select("-description -costPrice");
+      
+      // Her ürün için TL fiyatlarını hesapla
+      for (const product of products) {
+        await product.calculateTLPrices();
+      }
     }
 
     res.status(200).json({
@@ -179,6 +196,9 @@ const getProductDetails = async (req, res) => {
         success: false,
         message: "Ürün bulunamadı!",
       });
+
+    // TL fiyatlarını hesapla
+    await product.calculateTLPrices();
 
     res.status(200).json({
       success: true,

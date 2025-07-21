@@ -44,12 +44,12 @@ const addProduct = async (req, res) => {
       description,
       category,
       brand,
-      price,
-      salePrice,
+      priceUSD, // Değişti: price -> priceUSD
+      salePriceUSD, // Değişti: salePrice -> salePriceUSD
       totalStock,
       averageReview,
       costPrice,
-      technicalSpecs, // Yeni alanı al
+      technicalSpecs,
     } = req.body;
 
     const newlyCreatedProduct = new Product({
@@ -59,12 +59,12 @@ const addProduct = async (req, res) => {
       description,
       category,
       brand,
-      price,
-      salePrice,
+      priceUSD, // Değişti
+      salePriceUSD, // Değişti
       totalStock,
       averageReview,
       costPrice,
-      technicalSpecs, // Yeni alanı ekle
+      technicalSpecs,
     });
 
     await newlyCreatedProduct.save();
@@ -114,8 +114,8 @@ const editProduct = async (req, res) => {
       description,
       category,
       brand,
-      price,
-      salePrice,
+      priceUSD, // Değişti
+      salePriceUSD, // Değişti
       totalStock,
       averageReview,
       costPrice,
@@ -133,8 +133,8 @@ const editProduct = async (req, res) => {
     if (description !== undefined) findProduct.description = description;
     if (category !== undefined) findProduct.category = category;
     if (brand !== undefined) findProduct.brand = brand;
-    if (price !== undefined) findProduct.price = price;
-    if (salePrice !== undefined) findProduct.salePrice = salePrice;
+    if (priceUSD !== undefined) findProduct.priceUSD = priceUSD; // Değişti
+    if (salePriceUSD !== undefined) findProduct.salePriceUSD = salePriceUSD; // Değişti
     if (totalStock !== undefined) findProduct.totalStock = totalStock;
     if (image !== undefined) findProduct.image = image;
     if (images !== undefined) findProduct.images = images;

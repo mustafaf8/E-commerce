@@ -50,17 +50,20 @@ const addToCart = async (req, res) => {
     await cart.save();
     const populatedCart = await Cart.findById(cart._id).populate({
       path: "items.productId",
-      select: "image title price salePrice totalStock", // Gerekli alanları seçin
+      select: "image title priceUSD salePriceUSD totalStock",
     });
 
-    const finalPopulatedItems = populatedCart.items.map((item) => ({
-      productId: item.productId._id,
-      image: item.productId.image,
-      title: item.productId.title,
-      price: item.productId.price,
-      salePrice: item.productId.salePrice,
-      quantity: item.quantity,
-      totalStock: item.productId.totalStock,
+    const finalPopulatedItems = await Promise.all(populatedCart.items.map(async (item) => {
+      const productWithPrices = await item.productId.calculateTLPrices();
+      return {
+        productId: productWithPrices._id,
+        image: productWithPrices.image,
+        title: productWithPrices.title,
+        price: productWithPrices.price,
+        salePrice: productWithPrices.salePrice,
+        quantity: item.quantity,
+        totalStock: productWithPrices.totalStock,
+      };
     }));
 
     res.status(200).json({
@@ -89,7 +92,7 @@ const fetchCartItems = async (req, res) => {
 
     let cart = await Cart.findOne({ userId }).populate({
       path: "items.productId",
-      select: "image title price salePrice totalStock",
+      select: "image title priceUSD salePriceUSD totalStock",
     });
 
     if (!cart) {
@@ -110,13 +113,16 @@ const fetchCartItems = async (req, res) => {
       await cart.save();
     }
 
-    const populateCartItems = validItems.map((item) => ({
-      productId: item.productId._id,
-      image: item.productId.image,
-      title: item.productId.title,
-      price: item.productId.price,
-      salePrice: item.productId.salePrice,
-      quantity: item.quantity,
+    const populateCartItems = await Promise.all(validItems.map(async (item) => {
+      const productWithPrices = await item.productId.calculateTLPrices();
+      return {
+        productId: productWithPrices._id,
+        image: productWithPrices.image,
+        title: productWithPrices.title,
+        price: productWithPrices.price,
+        salePrice: productWithPrices.salePrice,
+        quantity: item.quantity,
+      };
     }));
 
     res.status(200).json({
@@ -208,16 +214,19 @@ const updateCartItemQty = async (req, res) => {
     // Populate edilmiş sepeti döndür
     const populatedCart = await Cart.findById(cart._id).populate({
       path: "items.productId",
-      select: "image title price salePrice totalStock",
+      select: "image title priceUSD salePriceUSD totalStock",
     });
-    const finalPopulatedItems = populatedCart.items.map((item) => ({
-      productId: item.productId._id,
-      image: item.productId.image,
-      title: item.productId.title,
-      price: item.productId.price,
-      salePrice: item.productId.salePrice,
-      quantity: item.quantity,
-      totalStock: item.productId.totalStock,
+    const finalPopulatedItems = await Promise.all(populatedCart.items.map(async (item) => {
+      const productWithPrices = await item.productId.calculateTLPrices();
+      return {
+        productId: productWithPrices._id,
+        image: productWithPrices.image,
+        title: productWithPrices.title,
+        price: productWithPrices.price,
+        salePrice: productWithPrices.salePrice,
+        quantity: item.quantity,
+        totalStock: productWithPrices.totalStock,
+      };
     }));
 
     res.status(200).json({
@@ -284,16 +293,19 @@ const deleteCartItem = async (req, res) => {
 
     const populatedCart = await Cart.findById(cart._id).populate({
       path: "items.productId",
-      select: "image title price salePrice totalStock",
+      select: "image title priceUSD salePriceUSD totalStock",
     });
-    const finalPopulatedItems = populatedCart.items.map((item) => ({
-      productId: item.productId._id,
-      image: item.productId.image,
-      title: item.productId.title,
-      price: item.productId.price,
-      salePrice: item.productId.salePrice,
-      quantity: item.quantity,
-      totalStock: item.productId.totalStock,
+    const finalPopulatedItems = await Promise.all(populatedCart.items.map(async (item) => {
+      const productWithPrices = await item.productId.calculateTLPrices();
+      return {
+        productId: productWithPrices._id,
+        image: productWithPrices.image,
+        title: productWithPrices.title,
+        price: productWithPrices.price,
+        salePrice: productWithPrices.salePrice,
+        quantity: item.quantity,
+        totalStock: productWithPrices.totalStock,
+      };
     }));
 
     res.status(200).json({
@@ -362,17 +374,20 @@ const syncLocalCart = async (req, res) => {
 
     const populatedCart = await Cart.findById(userCart._id).populate({
       path: "items.productId",
-      select: "image title price salePrice totalStock",
+      select: "image title priceUSD salePriceUSD totalStock",
     });
 
-    const finalPopulatedItems = populatedCart.items.map((item) => ({
-      productId: item.productId._id,
-      image: item.productId.image,
-      title: item.productId.title,
-      price: item.productId.price,
-      salePrice: item.productId.salePrice,
-      quantity: item.quantity,
-      totalStock: item.productId.totalStock,
+    const finalPopulatedItems = await Promise.all(populatedCart.items.map(async (item) => {
+      const productWithPrices = await item.productId.calculateTLPrices();
+      return {
+        productId: productWithPrices._id,
+        image: productWithPrices.image,
+        title: productWithPrices.title,
+        price: productWithPrices.price,
+        salePrice: productWithPrices.salePrice,
+        quantity: item.quantity,
+        totalStock: productWithPrices.totalStock,
+      };
     }));
 
     res.status(200).json({

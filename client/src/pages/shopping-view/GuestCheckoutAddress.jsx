@@ -34,7 +34,9 @@ function GuestCheckoutAddress() {
   const { isLoading: orderIsLoading, paymentPageUrl } = useSelector(
     (state) => state.shopOrder
   );
-  const { cartItems: cartForCheckout } = useSelector((state) => state.shopCart);
+  const { cartItems: cartForCheckout, appliedCoupon } = useSelector(
+    (state) => state.shopCart
+  );
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -110,6 +112,7 @@ function GuestCheckoutAddress() {
         productId: item.productId,
         quantity: item.quantity,
       })),
+      appliedCoupon: appliedCoupon || null,
     };
 
    // console.log("Misafir siparişi için gönderilecek veri:", orderData);

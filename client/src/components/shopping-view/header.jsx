@@ -221,6 +221,20 @@ function TopStrip() {
   const navigate = useNavigate();
   const { isAuthenticated } = useSelector((state) => state.auth);
   const [isTrackingModalOpen, setIsTrackingModalOpen] = useState(false);
+  const [exchangeRate, setExchangeRate] = useState(null);
+
+  useEffect(() => {
+    // Kur bilgisini çek
+    api.get('/common/currency/rate')
+      .then(response => {
+        if (response.data.success) {
+          setExchangeRate(response.data.data.rate);
+        }
+      })
+      .catch(error => {
+        console.error("Döviz kuru alınırken hata oluştu:", error);
+      });
+  }, []); // Sadece bileşen ilk yüklendiğinde çalışır
 
   const handleOrdersClick = (e) => {
     if (isAuthenticated) {
@@ -253,17 +267,28 @@ function TopStrip() {
   return (
     <>
       <div className="bg-gray-100 dark:bg-gray-800 text-xs text-muted-foreground max-[690px]:text-[10px]">
-        <div className="container mx-auto px-4 md:px-20 h-8 flex justify-end items-center gap-x-4 md:gap-x-6">
-          {stripLinks.map((link) => (
-            <Link
-              key={link.id}
-              to={link.path}
-              onClick={link.action}
-              className="hover:text-primary transition-colors"
-            >
-              {link.label}
-            </Link>
-          ))}
+        <div className="container mx-auto px-4 md:px-20 h-8 flex justify-between items-center">
+          {/* Sol Taraf (Boşluk veya Başka Bir Şey) */}
+          <div></div>
+
+          {/* Orta ve Sağ Taraf Linkler */}
+          <div className="flex items-center gap-x-4 md:gap-x-6">
+            {stripLinks.map((link) => (
+              <Link
+                key={link.id}
+                to={link.path}
+                onClick={link.action}
+                className="hover:text-primary transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
+            {exchangeRate && (
+              <span className="font-semibold text-primary">
+                1 USD = {Number(exchangeRate).toFixed(2)} TL
+              </span>
+            )}
+          </div>
         </div>
       </div>
       <OrderTrackingModal

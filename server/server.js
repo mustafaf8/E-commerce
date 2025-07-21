@@ -80,8 +80,10 @@ const adminCouponRouter = require("./routes/admin/coupon-routes");
 const adminStatsRouter = require("./routes/admin/statsAdminRoutes");
 const adminAuthorizationRouter = require("./routes/admin/authorization-routes");
 const maintenanceRouter = require("./routes/common/maintenance-routes");
+const currencyRouter = require("./routes/common/currency-routes"); // Yeni rota
 const errorHandler = require("./middleware/errorHandler");
 const { scheduleAbandonedCartEmails } = require("./jobs/abandonedCartJob");
+const { startScheduledRateUpdates } = require("./utils/currencyConverter");
 require("./controllers/auth/auth-controller");
 const shopCouponRouter = require("./routes/shop/coupon-routes");
 
@@ -214,9 +216,11 @@ app.use("/api/admin/coupons", adminCouponRouter);
 app.use("/api/admin/stats", adminStatsRouter);
 app.use("/api/admin/authorization", adminAuthorizationRouter);
 app.use("/api/maintenance", maintenanceRouter);
+app.use("/api/common/currency", currencyRouter); // Yeni rotayı kullan
 app.use(errorHandler);
 if (process.env.NODE_ENV !== "test") {
   scheduleAbandonedCartEmails();
+  startScheduledRateUpdates();
 }
 app.use("/api/shop/coupons", shopCouponRouter);
 
