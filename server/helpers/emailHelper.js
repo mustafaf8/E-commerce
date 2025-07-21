@@ -1,41 +1,40 @@
-const nodemailer = require("nodemailer");
+const SibApiV3Sdk = require("@getbrevo/brevo");
 
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: parseInt(process.env.EMAIL_PORT || "587"),
-  secure: process.env.EMAIL_SECURE === "true",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+let apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+
+let apiKey = apiInstance.authentications["apiKey"];
+apiKey.apiKey = process.env.BREVO_API_KEY;
+
+const sender = {
+  email: process.env.BREVO_SENDER_EMAIL,
+  name: "Deposun Destek",
+};
 
 /**
  * Genel amaçlı e-posta gönderme fonksiyonu
  * @param {Object} options E-posta gönderme seçenekleri
  * @param {string} options.to Alıcı e-posta adresi
  * @param {string} options.subject E-posta konusu
- * @param {string} options.text E-posta metni
- * @param {string} [options.html] HTML formatında e-posta içeriği (opsiyonel)
- * @param {string} [options.replyTo] Yanıt verilecek e-posta adresi (opsiyonel)
+ * @param {string} [options.htmlContent] HTML formatında e-posta içeriği
  * @returns {Promise<boolean>} E-posta başarıyla gönderildiyse true döner
  */
 const sendEmail = async (options) => {
-  const mailOptions = {
-    from: `"Deposun Destek" <${process.env.EMAIL_USER}>`,
-    to: options.to,
-    subject: options.subject,
-    text: options.text,
-    html: options.html,
-    replyTo: options.replyTo
-  };
+  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+
+  sendSmtpEmail.sender = sender;
+  sendSmtpEmail.to = [{ email: options.to }];
+  sendSmtpEmail.subject = options.subject;
+  sendSmtpEmail.htmlContent = options.htmlContent;
 
   try {
-    await transporter.sendMail(mailOptions);
-    console.log(`E-posta başarıyla gönderildi: ${options.to}`);
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log(`Brevo ile e-posta başarıyla gönderildi: ${options.to}`);
     return true;
   } catch (error) {
-    console.error(`E-posta gönderilemedi ${options.to}:`, error);
+    console.error(
+      `Brevo ile e-posta gönderilemedi ${options.to}:`,
+      error.response ? error.response.body : error.message
+    );
     return false;
   }
 };
@@ -111,23 +110,11 @@ const sendAbandonedCartEmail = async (
     </div>
   `;
 
-  const mailOptions = {
-    from: `"Deposun Shop Destek" <${process.env.EMAIL_USER}>`,
+  return sendEmail({
     to: toEmail,
     subject: "🛍️ Unutma, Sepetindeki Harika Ürünler Seni Bekliyor!",
-    html: emailHtml,
-  };
-
-  try {
-    await transporter.sendMail(mailOptions);
-    console.log(
-      `Terk edilmiş sepet e-postası başarıyla gönderildi: ${toEmail}`
-    );
-    return true;
-  } catch (error) {
-    console.error(`E-posta gönderilemedi ${toEmail}:`, error);
-    return false;
-  }
+    htmlContent: emailHtml,
+  });
 };
 
 /**
@@ -154,22 +141,11 @@ const sendPasswordResetEmail = async (toEmail, token) => {
     </div>
   `;
 
-  const mailOptions = {
-    from: `"Deposun Destek" <${process.env.EMAIL_USER}>`,
+  return sendEmail({
     to: toEmail,
     subject: "Deposun - Şifre Sıfırlama Talebiniz",
-    html: emailHtml,
-  };
-
-  try {
-    await transporter.sendMail(mailOptions);
-    console.log(`Şifre sıfırlama e-postası başarıyla gönderildi: ${toEmail}`);
-    return true;
-  } catch (error) {
-    console.error(`E-posta gönderilemedi ${toEmail}:`, error);
-    return false;
-  }
+    htmlContent: emailHtml,
+  });
 };
-
 
 module.exports = { sendAbandonedCartEmail, sendPasswordResetEmail, sendEmail };

@@ -43,7 +43,9 @@ const scheduleAbandonedCartEmails = () => {
 
       for (const cart of potentialCarts) {
         if (!cart.userId || !cart.userId.email) {
-           console.log(`Sepet ID ${cart._id}: Kullanıcı bilgisi veya e-postası eksik, atlanıyor.`);
+          console.log(
+            `Sepet ID ${cart._id}: Kullanıcı bilgisi veya e-postası eksik, atlanıyor.`
+          );
           continue;
         }
 
