@@ -7,10 +7,10 @@ const cache = {
 };
 
 // Cache süresi (milisaniye cinsinden), 1 saat
-const CACHE_DURATION = 60 * 60 * 1000; 
+const CACHE_DURATION = 4 * 60 * 60 * 1000; 
 
 // Varsayılan kur (API hatası durumunda kullanılır)
-const DEFAULT_RATE = 30;
+const DEFAULT_RATE = 40;
 
 // API anahtarı için ortam değişkeni
 const API_KEY = process.env.EXCHANGE_RATE_API_KEY;
