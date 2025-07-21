@@ -14,7 +14,7 @@ const { Server } = require("socket.io");
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 dakika
-  max: 500, // her IP'den 15 dakikada en fazla 100 istek
+  max: 1, // her IP'den 15 dakikada en fazla 100 istek
   standardHeaders: true,
   legacyHeaders: false,
   message: "Çok fazla istek yaptınız, lütfen 15 dakika sonra tekrar deneyin.",
