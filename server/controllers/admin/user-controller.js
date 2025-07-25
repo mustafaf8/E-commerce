@@ -3,7 +3,9 @@ const User = require("../../models/User");
 // GET /api/users/admins -> Sadece admin rolündeki kullanıcıları getir
 exports.getAdminUsers = async (req, res) => {
   try {
-    const adminUsers = await User.find({ role: "admin" }).select("_id userName email role authProvider createdAt");
+    const adminUsers = await User.find({ role: "admin" })
+      .select("_id userName email role authProvider createdAt")
+      .sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: adminUsers });
   } catch (error) {
     res.status(500).json({
@@ -17,7 +19,9 @@ exports.getAdminUsers = async (req, res) => {
 // GET /api/users/regular -> Sadece normal rolündeki kullanıcıları getir
 exports.getRegularUsers = async (req, res) => {
   try {
-    const regularUsers = await User.find({ role: "user" }).select("_id userName email role authProvider createdAt");
+    const regularUsers = await User.find({ role: "user" })
+      .select("_id userName email role authProvider createdAt")
+      .sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: regularUsers });
   } catch (error) {
     res.status(500).json({

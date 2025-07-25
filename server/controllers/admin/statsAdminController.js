@@ -161,6 +161,7 @@ const getTopSellingProducts = async (req, res) => {
 const getSalesByCategory = async (_req, res) => {
   try {
     const pipeline = [
+      { $match: { salesCount: { $gt: 0 } } },
       {
         $lookup: {
           from: "categories",
@@ -191,6 +192,7 @@ const getSalesByCategory = async (_req, res) => {
 const getSalesByBrand = async (_req, res) => {
   try {
     const pipeline = [
+      { $match: { salesCount: { $gt: 0 } } },
       {
         $lookup: {
           from: "brands",

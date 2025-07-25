@@ -33,12 +33,16 @@ passport.use(
         let user = await User.findOne({ googleId: profile.id });
 
         if (user) {
+          user.googleId = profile.id;
+          user.authProvider = "google";
+          await user.save();
           return done(null, user);
         } else {
           user = await User.findOne({ email: profile.emails[0].value });
 
           if (user) {
             user.googleId = profile.id;
+            user.authProvider = "google";
             await user.save();
             return done(null, user);
           } else {
@@ -47,6 +51,7 @@ passport.use(
               userName: profile.displayName,
               email: profile.emails[0].value,
               role: "user",
+              authProvider: "google",
             });
             await newUser.save();
             return done(null, newUser);
