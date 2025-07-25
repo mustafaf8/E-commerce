@@ -734,33 +734,54 @@ const exportData = async (req, res) => {
     }
 
     // Exporta dahil edilecek alanları belirle
-    let sanitized;
+    let sanitized, fields;
     if (dataType === "products") {
       sanitized = rawData.map((p) => ({
-        id: p._id.toString(),
-        title: p.title,
-        price: p.price,
-        salePrice: p.salePrice || "",
-        totalStock: p.totalStock,
-        salesCount: p.salesCount,
-        category: p.category?.name || "",
-        brand: p.brand?.name || "",
-        createdAt: p.createdAt?.toISOString().split("T")[0] || "",
+        "Ürün ID": p._id.toString(),
+        "Başlık": p.title,
+        "Fiyat (₺)": p.price,
+        "İndirimli Fiyat (₺)": p.salePrice || "",
+        "Stok": p.totalStock,
+        "Satış Adedi": p.salesCount,
+        "Kategori": p.category?.name || "",
+        "Marka": p.brand?.name || "",
+        "Kayıt Tarihi": p.createdAt?.toISOString().split("T")[0] || "",
       }));
+      fields = [
+        "Ürün ID",
+        "Başlık",
+        "Fiyat (₺)",
+        "İndirimli Fiyat (₺)",
+        "Stok",
+        "Satış Adedi",
+        "Kategori",
+        "Marka",
+        "Kayıt Tarihi",
+      ];
     } else {
       sanitized = rawData.map((o) => ({
-        id: o._id.toString(),
-        orderDate: o.orderDate?.toISOString().split("T")[0] || "",
-        totalAmount: o.totalAmount,
-        orderStatus: o.orderStatus,
-        paymentMethod: o.paymentMethod,
-        customer: o.isGuestOrder ? o.guestInfo?.fullName : undefined,
-        email: o.isGuestOrder ? o.guestInfo?.email : undefined,
-        items: o.cartItems?.length || 0,
+        "Sipariş ID": o._id.toString(),
+        "Sipariş Tarihi": o.orderDate?.toISOString().split("T")[0] || "",
+        "Tutar (₺)": o.totalAmount,
+        "Durum": o.orderStatus,
+        "Ödeme Yöntemi": o.paymentMethod,
+        "Müşteri": o.isGuestOrder ? o.guestInfo?.fullName : undefined,
+        "E-posta": o.isGuestOrder ? o.guestInfo?.email : undefined,
+        "Ürün Adedi": o.cartItems?.length || 0,
       }));
+      fields = [
+        "Sipariş ID",
+        "Sipariş Tarihi",
+        "Tutar (₺)",
+        "Durum",
+        "Ödeme Yöntemi",
+        "Müşteri",
+        "E-posta",
+        "Ürün Adedi",
+      ];
     }
 
-    const parser = new Parser();
+    const parser = new Parser({ fields, delimiter: ";" });
     const csv = parser.parse(sanitized);
 
     res.setHeader("Content-Type", "text/csv");

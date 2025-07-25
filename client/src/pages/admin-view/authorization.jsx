@@ -25,6 +25,8 @@ const MODULES = [
   { id: "categories", label: "Kategoriler", icon: "📁", color: "bg-indigo-500" },
   { id: "home-sections", label: "AnaSayfa", icon: "🏠", color: "bg-pink-500" },
   { id: "stats", label: "İstatistikler", icon: "📈", color: "bg-teal-500" },
+  { id: "users", label: "Kullanıcılar", icon: "👥", color: "bg-sky-500" },
+  { id: "coupons", label: "Kuponlar", icon: "🏷️", color: "bg-amber-600" },
 ];
 
 const ACCESS_LEVELS = {
