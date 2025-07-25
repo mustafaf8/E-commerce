@@ -60,9 +60,7 @@ const getExchangeRate = async () => {
  * Belirtilen aralıklarla döviz kurunu arka planda günceller.
  */
 const startScheduledRateUpdates = () => {
-    // Sunucu başlangıcında hemen bir kez kuru çek
     getExchangeRate();
-    // Ardından her saat başı güncelle
     setInterval(getExchangeRate, CACHE_DURATION);
 };
 

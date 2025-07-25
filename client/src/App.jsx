@@ -46,6 +46,7 @@ const AdminCouponsPage = lazy(() =>
 const AdminAuthorization = lazy(() =>
   import("./pages/admin-view/authorization")
 );
+const AdminUsers = lazy(() => import("./pages/admin-view/users"));
 const AdminMaintenanceMode = lazy(() =>
   import("./pages/admin-view/maintenance-mode")
 );
@@ -199,6 +200,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="users" element={<AdminUsers />} />
             <Route path="maintenance" element={<AdminMaintenanceMode />} />
           </Route>
 

@@ -62,6 +62,11 @@ const UserSchema = new mongoose.Schema(
       unique: true,
       sparse: true,
     },
+    authProvider: {
+      type: String,
+      enum: ["local", "google", "github", "facebook", "twitter"],
+      default: "local",
+    },
     resetPasswordToken: {
       type: String,
   },

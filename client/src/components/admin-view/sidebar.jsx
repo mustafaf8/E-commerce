@@ -9,6 +9,7 @@ import {
   Ticket,
   UserCog,
   Wrench,
+  Users,
 } from "lucide-react";
 import { Fragment } from "react";
 import { useSelector } from "react-redux";
@@ -43,22 +44,29 @@ const adminSidebarMenuItems = [
     icon: <ChartNoAxesCombined size={18} />,
   },
   {
-    id: "categories-brands",
-    label: "Kategori & Marka",
-    path: "/admin/categories-brands",
-    icon: <LayoutGrid size={18} />,
-  },
-  {
     id: "coupons",
     label: "Kuponlar",
     path: "/admin/coupons",
     icon: <Ticket size={18} />,
   },
   {
+    id: "categories-brands",
+    label: "Kategori & Marka",
+    path: "/admin/categories-brands",
+    icon: <LayoutGrid size={18} />,
+  },
+ 
+  {
     id: "home-sections",
     label: "AnaSayfa Yönetimi",
     path: "/admin/home-sections",
     icon: <Home size={18} />,
+  },
+  {
+    id: "users",
+    label: "Kullanıcılar",
+    path: "/admin/users",
+    icon: <Users size={18} />,
   },
   {
     id: "maintenance",

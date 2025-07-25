@@ -79,6 +79,7 @@ const commonBrandRouter = require("./routes/common/brand-routes");
 const adminCouponRouter = require("./routes/admin/coupon-routes");
 const adminStatsRouter = require("./routes/admin/statsAdminRoutes");
 const adminAuthorizationRouter = require("./routes/admin/authorization-routes");
+const adminUserRouter = require("./routes/admin/user-routes"); // Kullanıcı yönetimi route'ları
 const maintenanceRouter = require("./routes/common/maintenance-routes");
 const currencyRouter = require("./routes/common/currency-routes"); // Yeni rota
 const errorHandler = require("./middleware/errorHandler");
@@ -215,6 +216,7 @@ app.use("/api/common/brands", commonBrandRouter);
 app.use("/api/admin/coupons", adminCouponRouter);
 app.use("/api/admin/stats", adminStatsRouter);
 app.use("/api/admin/authorization", adminAuthorizationRouter);
+app.use("/api/admin/users", adminUserRouter); // Kullanıcı yönetimi route'ları
 app.use("/api/maintenance", maintenanceRouter);
 app.use("/api/common/currency", currencyRouter); // Yeni rotayı kullan
 app.use(errorHandler);
