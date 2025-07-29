@@ -50,7 +50,7 @@ const BottomNavBar = () => {
       </Sheet>
 
       <div className="h-16 mb-0 md:mb-0 pb-safe-bottom"></div>
-      <nav className="fixed bottom-0 left-0 w-full bg-white dark:bg-gray-900 shadow-md z-50 bottom-nav border-t border-gray-100">
+      <nav className="fixed bottom-0 left-0 w-full bg-white dark:bg-gray-900 shadow-md z-[9999998] bottom-nav border-t border-gray-100">
         <ul className="flex w-full justify-around items-center h-16">
           {navItems.map((item) => {
             const isActive = location.pathname.startsWith(item.to);

@@ -92,7 +92,14 @@ function EntityManager({
 
   const openModalForEdit = (entity) => {
     setIsEditing(true);
-    setCurrentEntity({ ...entity, parent: entity.parent || null });
+    // Parent alanını doğru şekilde handle et
+    const parentId = entity.parent ? (entity.parent._id || entity.parent) : null;
+    setCurrentEntity({ 
+      ...entity, 
+      parent: parentId,
+      name: entity.name || "",
+      slug: entity.slug || ""
+    });
     setIsModalOpen(true);
   };
 
@@ -110,20 +117,37 @@ function EntityManager({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!currentEntity.name || !currentEntity.slug) {
+    
+    // Daha detaylı validasyon
+    if (!currentEntity.name || currentEntity.name.trim() === "") {
       toast({
         variant: "destructive",
-        title: `${entityName} adı ve slug zorunludur.`,
+        title: `${entityName} adı zorunludur.`,
       });
       return;
     }
-    const dataKey = `${entityName.toLowerCase()}Data`;
+    
+    if (!currentEntity.slug || currentEntity.slug.trim() === "") {
+      toast({
+        variant: "destructive",
+        title: `${entityName} slug zorunludur.`,
+      });
+      return;
+    }
+    
+    // Trim edilmiş değerleri kullan
+    const entityData = {
+      ...currentEntity,
+      name: currentEntity.name.trim(),
+      slug: currentEntity.slug.trim()
+    };
+    
     const action = isEditing
       ? actions.update({
           id: currentEntity._id,
-          [dataKey]: currentEntity,
+          categoryData: entityData,
         })
-      : actions.add(currentEntity);
+      : actions.add(entityData);
 
     dispatch(action)
       .unwrap()

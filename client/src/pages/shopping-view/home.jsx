@@ -112,7 +112,7 @@ function ShoppingHome() {
 
   return (
     <div className="bg-white flex flex-col min-h-screen">
-      <section className="pb-2 lg:pt-6 pt-4 ">
+      <section className="pb-2 lg:pt-6 pt-4 relative z-[9999997]">
         <div className="container mx-auto px-4 lg:px-20">
           <div className="promo-card-container ">
             {promoCardsLoading ? (
@@ -154,7 +154,7 @@ function ShoppingHome() {
         </div>
       </section>
 
-      <section className="my-1 md:my-4 container mx-auto px-20 max-[1024px]:px-1">
+      <section className="my-1 md:my-4 container mx-auto px-20 max-[1024px]:px-1 relative z-[9999997]">
         {featuresLoading || sideBannersLoading ? (
           <div className="flex flex-col md:flex-row gap-4 h-60  max-sm:h-[200px] max-md:h-[200px]">
             <Skeleton className="w-full md:w-[65%] h-full rounded-3xl bg-gray-200 animate-pulse max-sm:h-40" />
