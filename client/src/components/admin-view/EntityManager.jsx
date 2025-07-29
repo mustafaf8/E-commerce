@@ -136,6 +136,10 @@ function EntityManager({
             }.`,
           });
           closeModal();
+          // Kategori işlemlerinden sonra hiyerarşik yapıyı korumak için yeniden fetch et
+          if (entityName === "Kategori") {
+            dispatch(actions.fetchAll());
+          }
         } else {
           toast({
             variant: "destructive",
@@ -165,6 +169,10 @@ function EntityManager({
       .unwrap()
       .then(() => {
         toast({ variant: "success", title: `${entityName} silindi.` });
+        // Kategori silme işleminden sonra hiyerarşik yapıyı korumak için yeniden fetch et
+        if (entityName === "Kategori") {
+          dispatch(actions.fetchAll());
+        }
       })
       .catch((error) => {
         const isUsedError = error?.isUsedError;
@@ -332,7 +340,7 @@ function EntityManager({
                       .filter((cat) => cat._id !== currentEntity._id) // Kendisini parent olarak seçmesini engelle
                       .map((cat) => (
                         <SelectItem key={cat._id} value={cat._id}>
-                          {cat.name}
+                          {cat.parent ? `    └─ ${cat.name}` : cat.name}
                         </SelectItem>
                       ))}
                   </SelectContent>
