@@ -68,6 +68,7 @@ const addProduct = async (req, res) => {
     });
 
     await newlyCreatedProduct.save();
+    
     res.status(201).json({
       success: true,
       data: newlyCreatedProduct,
@@ -84,7 +85,10 @@ const addProduct = async (req, res) => {
 //fetch all products
 const fetchAllProducts = async (req, res) => {
   try {
-    const listOfProducts = await Product.find({});
+    const listOfProducts = await Product.find({})
+      .populate("category", "name slug")
+      .populate("brand", "name slug");
+
     res.status(200).json({
       success: true,
       data: listOfProducts,
@@ -143,6 +147,7 @@ const editProduct = async (req, res) => {
     if (technicalSpecs !== undefined) findProduct.technicalSpecs = technicalSpecs;
 
     await findProduct.save();
+    
     res.status(200).json({
       success: true,
       data: findProduct,

@@ -49,6 +49,27 @@ const updateBrandAdmin = async (req, res) => {
     }
     const { name, slug, isActive } = req.body;
 
+    // Eğer sadece isActive güncelleniyorsa, diğer alanları kontrol etme
+    if (Object.keys(req.body).length === 1 && req.body.hasOwnProperty('isActive')) {
+      const updatedBrand = await Brand.findByIdAndUpdate(
+        id, 
+        { isActive }, 
+        { new: true }
+      );
+
+      if (!updatedBrand) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Güncellenecek marka bulunamadı." });
+      }
+      
+      return res.status(200).json({
+        success: true,
+        message: "Marka durumu güncellendi.",
+        data: updatedBrand,
+      });
+    }
+
     if (!name || !slug) {
       return res
         .status(400)

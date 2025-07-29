@@ -131,15 +131,15 @@ function ProductSpecsPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <Skeleton className="h-10 w-1/2 mb-4" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Skeleton className="w-full h-96" />
-          <div className="space-y-4">
-            <Skeleton className="h-8 w-3/4" />
-            <Skeleton className="h-6 w-1/4" />
+      <div className="container mx-auto px-4 py-4">
+        <Skeleton className="h-8 w-1/2 mb-3" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Skeleton className="w-full h-80" />
+          <div className="space-y-3">
+            <Skeleton className="h-6 w-3/4" />
+            <Skeleton className="h-5 w-1/4" />
+            <Skeleton className="h-8 w-full" />
             <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-12 w-full" />
           </div>
         </div>
       </div>
@@ -148,9 +148,9 @@ function ProductSpecsPage() {
 
   if (!productDetails) {
     return (
-      <div className="container mx-auto px-4 py-8 text-center">
-        <h1 className="text-2xl font-bold">Ürün bulunamadı.</h1>
-        <Button onClick={() => navigate("/shop/home")} className="mt-4">
+      <div className="container mx-auto px-4 py-6 text-center">
+        <h1 className="text-xl font-bold">Ürün bulunamadı.</h1>
+        <Button onClick={() => navigate("/shop/home")} className="mt-3 text-sm">
           Ana Sayfaya Dön
         </Button>
       </div>
@@ -160,26 +160,26 @@ function ProductSpecsPage() {
   const hasSpecs = productDetails.technicalSpecs && productDetails.technicalSpecs.length > 0;
 
   return (
-    <div className="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 lg:gap-12">
+    <div className="container mx-auto px-4 py-4 sm:py-6 max-w-6xl">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8">
         {/* Sol Taraf - Ürün Bilgileri */}
         <div className="flex flex-col">
           {/* Ana Resim */}
-          <div className="bg-gray-100 rounded-lg p-4 flex items-center justify-center mb-4">
+          <div className="bg-gray-100 rounded-lg p-3 flex items-center justify-center mb-3 h-80 w-full">
             <img
               src={selectedImage || productDetails.image}
               alt={productDetails.title}
-              className="max-w-full h-auto max-h-96 object-contain"
+              className="max-w-full max-h-full object-contain"
             />
           </div>
           
           {/* Küçük Resimler Galerisi */}
           {productDetails.images && productDetails.images.length > 0 && (
-            <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
+            <div className="flex gap-1 overflow-x-auto pb-1 mb-3 justify-center">
               {/* Ana resim thumbnail */}
               <div 
-                className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
-                  selectedImage === productDetails.image ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-200 hover:border-gray-300'
+                className={`flex-shrink-0 w-16 h-16 rounded overflow-hidden cursor-pointer border-2 transition-all ${
+                  selectedImage === productDetails.image ? 'border-blue-500 ring-1 ring-blue-200' : 'border-gray-200 hover:border-gray-300'
                 }`}
                 onClick={() => setSelectedImage(productDetails.image)}
               >
@@ -194,8 +194,8 @@ function ProductSpecsPage() {
               {productDetails.images.map((image, index) => (
                 <div 
                   key={index}
-                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
-                    selectedImage === image ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-200 hover:border-gray-300'
+                  className={`flex-shrink-0 w-16 h-16 rounded overflow-hidden cursor-pointer border-2 transition-all ${
+                    selectedImage === image ? 'border-blue-500 ring-1 ring-blue-200' : 'border-gray-200 hover:border-gray-300'
                   }`}
                   onClick={() => setSelectedImage(image)}
                 >
@@ -208,42 +208,46 @@ function ProductSpecsPage() {
               ))}
             </div>
           )}
-          <h1 className="text-2xl sm:text-3xl font-bold mb-3 break-words">{productDetails.title}</h1>
-          
-          {/* Fiyat */}
-          <div className="text-2xl font-bold text-primary mb-4">
+          {/* Başlık ve Fiyat - Alt Alta */}
+          <div className="mb-5 mt-2 flex flex-col items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold break-words text-center">{productDetails.title}</h1>
             {productDetails.salePrice ? (
-              <div className="flex items-baseline gap-3 flex-wrap">
-                <span className="text-green-600 whitespace-nowrap">{formatPrice(productDetails.salePrice)} TL</span>
-                <span className="line-through text-lg text-gray-400 whitespace-nowrap">{formatPrice(productDetails.price)} TL</span>
+              <div className="flex items-center gap-2 justify-center">
+                <div className="bg-yellow-50 border border-yellow-300 text-yellow-900 font-bold px-4 py-1 rounded-xl shadow-sm text-lg whitespace-nowrap">
+                  {formatPrice(productDetails.salePrice)} TL
+                </div>
+                <span className="line-through text-base text-gray-400 whitespace-nowrap">{formatPrice(productDetails.price)} TL</span>
               </div>
             ) : (
-              <span className="whitespace-nowrap">{formatPrice(productDetails.price)} TL</span>
+              <div className="bg-yellow-50 border border-yellow-300 text-yellow-900 font-bold px-4 py-1 rounded-xl shadow-sm text-lg whitespace-nowrap">
+                {formatPrice(productDetails.price)} TL
+              </div>
             )}
           </div>
           
-          {/* Sepete Ekle - Üste Taşındı */}
-          <div className="mb-6">
+          {/* Sepete Ekle - Kompakt */}
+          <div className="mb-4">
             {productDetails.totalStock > 0 ? (
-              <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center justify-center gap-3 flex-wrap">
                 <div className="flex items-center border rounded-full p-1 gap-1">
-                  <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full" disabled={quantity <= 1} onClick={() => setQuantity(q => Math.max(1, q - 1))}><Minus className="w-4 h-4" /></Button>
-                  <span className="font-semibold w-8 text-center">{quantity}</span>
-                  <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full" disabled={quantity >= productDetails.totalStock} onClick={() => setQuantity(q => Math.min(productDetails.totalStock, q + 1))}><Plus className="w-4 h-4" /></Button>
+                  <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" disabled={quantity <= 1} onClick={() => setQuantity(q => Math.max(1, q - 1))}><Minus className="w-3 h-3" /></Button>
+                  <span className="font-semibold w-6 text-center text-sm">{quantity}</span>
+                  <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" disabled={quantity >= productDetails.totalStock} onClick={() => setQuantity(q => Math.min(productDetails.totalStock, q + 1))}><Plus className="w-3 h-3" /></Button>
                 </div>
-                <Button className="flex-1 min-w-0" onClick={handleAddToCart}>Sepete Ekle ({quantity})</Button>
+                <Button className="flex-1 min-w-0 max-w-48 text-sm" onClick={handleAddToCart}>
+                  Ekle
+                </Button>
               </div>
             ) : (
-              <Button disabled className="w-full">Stokta Yok</Button>
+              <Button disabled className="w-full text-sm">Stokta Yok</Button>
             )}
           </div>
         </div>
 
-        {/* Sağ Taraf - Teknik Özellikler */}
-        <div className="xl:mt-4">
-          <h2 className="text-xl font-semibold border-b pb-3 mb-6 text-gray-800">Teknik Özellikler</h2>
+        {/* Sağ Taraf - Teknik Özellikler - Kompakt */}
+        <div className="xl:max-h-[520px] max-h-[480px] overflow-y-auto">
           {hasSpecs ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
               {productDetails.technicalSpecs.map((spec, index) => {
                 const IconComponent = getSpecIcon(spec.key);
                 const isLongContent = spec.value.length > 50 || spec.key.length > 20;
@@ -252,18 +256,18 @@ function ProductSpecsPage() {
                   <div 
                     key={index} 
                     className={`
-                      bg-white border border-gray-200 rounded-xl p-5 shadow-sm
+                      bg-white border border-gray-200 rounded-lg p-3 shadow-sm
                       ${isLongContent ? 'md:col-span-2' : ''}
                     `}
                   >
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center shadow-sm">
-                        <IconComponent className="h-6 w-6 text-blue-600" />
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg flex items-center justify-center shadow-sm">
+                        <IconComponent className="h-5 w-5 text-blue-600" />
                       </div>
-                      <div className="flex-1 min-w-0 space-y-2">
-                        <h3 className="font-semibold text-gray-900 text-base break-words leading-tight">{spec.key}</h3>
-                        <div className="w-8 h-0.5 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full"></div>
-                        <p className="text-gray-700 break-words text-sm leading-relaxed font-medium">{spec.value}</p>
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <h3 className="font-semibold text-gray-900 text-sm break-words leading-tight">{spec.key}</h3>
+                        <div className="w-6 h-0.5 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full"></div>
+                        <p className="text-gray-700 break-words text-xs leading-relaxed font-medium">{spec.value}</p>
                       </div>
                     </div>
                   </div>
@@ -271,9 +275,9 @@ function ProductSpecsPage() {
               })}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <Settings className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 text-lg">Bu ürün için teknik özellik bulunmamaktadır.</p>
+            <div className="text-center py-8">
+              <Settings className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-gray-500 text-base">Bu ürün için teknik özellik bulunmamaktadır.</p>
             </div>
           )}
         </div>

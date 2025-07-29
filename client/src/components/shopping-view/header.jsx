@@ -5,6 +5,7 @@ import {
   UserCog,
   Search,
   ChevronDown,
+  Heart
 } from "lucide-react";
 import {
   Link,
@@ -22,6 +23,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuPortal,
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { logoutUser } from "@/store/auth-slice";
@@ -309,23 +311,25 @@ function MainHeaderActions() {
               </div>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end" className="w-56">
-            <DropdownMenuLabel>Merhaba, {user.userName}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate("/shop/account")}>
-              <UserCog className="mr-2 h-4 w-4" />
-              Hesabım & Siparişlerim
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate("/shop/wishlist")}>
-              <Heart className="mr-2 h-4 w-4" />
-              Favorilerim
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Çıkış Yap
-            </DropdownMenuItem>
-          </DropdownMenuContent>
+          <DropdownMenuPortal>
+            <DropdownMenuContent side="bottom" align="end" className="w-56 z-[9999999999]">
+              <DropdownMenuLabel>Merhaba, {user.userName}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate("/shop/account")}>
+                <UserCog className="mr-2 h-4 w-4" />
+                Hesabım & Siparişlerim
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/shop/wishlist")}>
+                <Heart className="mr-2 h-4 w-4" />
+                Favorilerim
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Çıkış Yap
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenuPortal>
         </DropdownMenu>
       ) : (
         <Button

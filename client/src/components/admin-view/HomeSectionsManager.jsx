@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -36,7 +37,7 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
-import { Edit, Trash2, PlusCircle, ArrowUpDown } from "lucide-react";
+import { Edit, Trash2, PlusCircle, ArrowUpDown, BadgeCheck, BadgeX } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 import ConfirmationModal from "@/components/admin-view/ConfirmationModal";
@@ -129,10 +130,6 @@ function HomeSectionsManager({ canManage }) {
     }));
   };
 
-  const handleSwitchChange = (checked) => {
-    setCurrentSection((prev) => ({ ...prev, isActive: checked }));
-  };
-
   const openModalForEdit = (section) => {
     setIsEditing(true);
     setCurrentSection({ ...section });
@@ -202,6 +199,37 @@ function HomeSectionsManager({ canManage }) {
         toast({
           variant: "destructive",
           title: err.message || `Bir hata oluştu.`,
+        });
+      });
+  };
+
+  const handleToggleActive = (section) => {
+    // Sadece isActive alanını güncelle
+    const updateData = {
+      isActive: !section.isActive,
+    };
+
+    dispatch(updateHomeSection({ id: section._id, sectionData: updateData }))
+      .unwrap()
+      .then((payload) => {
+        if (payload.success) {
+          toast({
+            variant: "success",
+            title: `Bölüm başarıyla ${!section.isActive ? "aktifleştirildi" : "pasifleştirildi"}.`,
+          });
+          dispatch(fetchAllHomeSections());
+        } else {
+          toast({
+            variant: "destructive",
+            title: payload.message || "Durum güncellenemedi.",
+          });
+        }
+      })
+      .catch((err) => {
+        console.error("Durum güncelleme hatası:", err);
+        toast({
+          variant: "destructive",
+          title: err.message || "Bir hata oluştu.",
         });
       });
   };
@@ -369,24 +397,52 @@ function HomeSectionsManager({ canManage }) {
                   {getContentValueName(section)}
                 </TableCell>
                 <TableCell>{section.itemLimit}</TableCell>
-                <TableCell>{section.isActive ? "Aktif" : "Pasif"}</TableCell>
-                {canManage && (<TableCell className="text-right space-x-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => openModalForEdit(section)}
+                <TableCell>
+                  <Badge
+                    variant={section.isActive ? "default" : "secondary"}
+                    className={`px-2 py-0.5 text-xs ${
+                      section.isActive
+                        ? "bg-green-100 text-green-800 border-green-300"
+                        : "bg-red-100 text-red-800 border-red-300"
+                    }`}
                   >
-                    <Edit className="h-4 w-4" />
-                    <span className="sr-only">Düzenle</span>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDeleteClick(section)}
-                  >
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                    <span className="sr-only">Sil</span>
-                  </Button>
+                    {section.isActive ? (
+                      <BadgeCheck className="mr-1 h-3 w-3" />
+                    ) : (
+                      <BadgeX className="mr-1 h-3 w-3" />
+                    )}
+                    {section.isActive ? "Aktif" : "Pasif"}
+                  </Badge>
+                </TableCell>
+                {canManage && (<TableCell className="text-right">
+                  <div className="flex items-center justify-end gap-2">
+                    <Switch
+                      checked={section.isActive}
+                      onCheckedChange={() => handleToggleActive(section)}
+                      className="data-[state=checked]:bg-primary"
+                    />
+                    {/* Düzenle */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => openModalForEdit(section)}
+                      className="px-2 py-1"
+                    >
+                      <Edit className="h-4 w-4" />
+                      <span className="sr-only">Düzenle</span>
+                    </Button>
+                    
+                    {/* Sil */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteClick(section)}
+                      className="px-2 py-1 text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span className="sr-only">Sil</span>
+                    </Button>
+                  </div>
                 </TableCell>)}
               </TableRow>
             ))}
@@ -555,20 +611,7 @@ function HomeSectionsManager({ canManage }) {
               />
             </div>
 
-            {/* Is Active */}
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="isActive" className="text-right">
-                Aktif
-              </Label>
-              <div className="col-span-3">
-                <Switch
-                  id="isActive"
-                  name="isActive"
-                  checked={currentSection.isActive}
-                  onCheckedChange={handleSwitchChange}
-                />
-              </div>
-            </div>
+
 
             <DialogFooter>
               <DialogClose asChild>

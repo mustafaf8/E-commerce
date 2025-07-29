@@ -79,10 +79,6 @@ function EntityManager({
     }
   };
 
-  const handleSwitchChange = (checked) => {
-    setCurrentEntity((prev) => ({ ...prev, isActive: checked }));
-  };
-
   const handleSelectChange = (name, value) => {
     setCurrentEntity((prev) => ({
       ...prev,
@@ -142,10 +138,13 @@ function EntityManager({
       slug: currentEntity.slug.trim()
     };
     
+    // Entity tipine göre parametre adını belirle
+    const dataParam = entityName === "Kategori" ? "categoryData" : "brandData";
+
     const action = isEditing
       ? actions.update({
           id: currentEntity._id,
-          categoryData: entityData,
+          [dataParam]: entityData,
         })
       : actions.add(entityData);
 
@@ -177,6 +176,43 @@ function EntityManager({
         toast({
           variant: "destructive",
           title: err.message || `Bir hata oluştu.`,
+        });
+      });
+  };
+
+  const handleToggleActive = (entity) => {
+    // Sadece isActive alanını güncelle
+    const updateData = {
+      isActive: !entity.isActive,
+    };
+
+    // Entity tipine göre parametre adını belirle
+    const dataParam = entityName === "Kategori" ? "categoryData" : "brandData";
+
+    dispatch(actions.update({
+      id: entity._id,
+      [dataParam]: updateData,
+    }))
+      .unwrap()
+      .then((payload) => {
+        if (payload.success) {
+          toast({
+            variant: "success",
+            title: `${entityName} başarıyla ${!entity.isActive ? "aktifleştirildi" : "pasifleştirildi"}.`,
+          });
+          dispatch(actions.fetchAll());
+        } else {
+          toast({
+            variant: "destructive",
+            title: payload.message || "Durum güncellenemedi.",
+          });
+        }
+      })
+      .catch((err) => {
+        console.error("Durum güncelleme hatası:", err);
+        toast({
+          variant: "destructive",
+          title: err.message || "Bir hata oluştu.",
         });
       });
   };
@@ -221,7 +257,7 @@ function EntityManager({
           className="flex items-center justify-between p-3 border rounded-md bg-muted/30 hover:bg-muted/60 transition-colors"
           style={{ marginLeft: `${level * 32}px` }} // Girinti
         >
-          <div className="flex flex-col sm:flex-row sm:items-center gap-x-4 gap-y-1 flex-grow min-w-0 mr-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-x-4 gap-y-1 flex-grow min-w-0">
             <div className="min-w-0">
               <p
                 className="font-semibold text-base truncate"
@@ -236,24 +272,29 @@ function EntityManager({
                 /{entity.slug}
               </p>
             </div>
-            <Badge
-              variant={entity.isActive ? "default" : "secondary"}
-              className={`px-2 py-0.5 text-xs ${
-                entity.isActive
-                  ? "bg-green-100 text-green-800 border-green-300"
-                  : "bg-red-100 text-red-800 border-red-300"
-              }`}
-            >
-              {entity.isActive ? (
-                <BadgeCheck className="mr-1 h-3 w-3" />
-              ) : (
-                <BadgeX className="mr-1 h-3 w-3" />
-              )}
-              {entity.isActive ? "Aktif" : "Pasif"}
-            </Badge>
           </div>
           {canManage && (
-            <div className="flex-shrink-0 flex items-center gap-1">
+            <div className="flex-shrink-0 flex items-center gap-2">
+              <Badge
+                variant={entity.isActive ? "default" : "secondary"}
+                className={`px-2 py-0.5 text-xs ${
+                  entity.isActive
+                    ? "bg-green-100 text-green-800 border-green-300"
+                    : "bg-red-100 text-red-800 border-red-300"
+                }`}
+              >
+                {entity.isActive ? (
+                  <BadgeCheck className="mr-1 h-3 w-3" />
+                ) : (
+                  <BadgeX className="mr-1 h-3 w-3" />
+                )}
+                {entity.isActive ? "Aktif" : "Pasif"}
+              </Badge>
+              <Switch
+                checked={entity.isActive}
+                onCheckedChange={() => handleToggleActive(entity)}
+                className="data-[state=checked]:bg-primary"
+              />
               <Button
                 variant="ghost"
                 size="icon"
@@ -272,6 +313,25 @@ function EntityManager({
                 <Trash2 className="h-4 w-4" />
                 <span className="sr-only">Sil</span>
               </Button>
+            </div>
+          )}
+          {!canManage && (
+            <div className="flex-shrink-0">
+              <Badge
+                variant={entity.isActive ? "default" : "secondary"}
+                className={`px-2 py-0.5 text-xs ${
+                  entity.isActive
+                    ? "bg-green-100 text-green-800 border-green-300"
+                    : "bg-red-100 text-red-800 border-red-300"
+                }`}
+              >
+                {entity.isActive ? (
+                  <BadgeCheck className="mr-1 h-3 w-3" />
+                ) : (
+                  <BadgeX className="mr-1 h-3 w-3" />
+                )}
+                {entity.isActive ? "Aktif" : "Pasif"}
+              </Badge>
             </div>
           )}
         </div>
@@ -372,19 +432,7 @@ function EntityManager({
               </div>
             )}
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="isActive" className="text-right">
-                Aktif
-              </Label>
-              <div className="col-span-3">
-                <Switch
-                  id="isActive"
-                  name="isActive"
-                  checked={currentEntity.isActive}
-                  onCheckedChange={handleSwitchChange}
-                />
-              </div>
-            </div>
+
             <DialogFooter>
               <DialogClose asChild>
                 <Button type="button" variant="secondary">
