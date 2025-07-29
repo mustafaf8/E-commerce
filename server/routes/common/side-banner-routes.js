@@ -5,6 +5,7 @@ const adminCheckMiddleware = require("../../middleware/adminCheckMiddleware");
 const {
   getSideBanners,
   addSideBanner,
+  updateSideBanner,
   deleteSideBanner,
 } = require("../../controllers/common/side-banner-controller");
 
@@ -13,6 +14,11 @@ const router = express.Router();
 router.get("/get", getSideBanners);
 
 router.post("/add", [authMiddleware, adminCheckMiddleware], addSideBanner);
+router.put(
+  "/update/:bannerId",
+  [authMiddleware, adminCheckMiddleware],
+  updateSideBanner
+);
 router.delete(
   "/delete/:bannerId",
   [authMiddleware, adminCheckMiddleware],

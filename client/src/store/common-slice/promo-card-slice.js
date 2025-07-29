@@ -35,6 +35,20 @@ export const addPromoCard = createAsyncThunk(
   }
 );
 
+export const updatePromoCard = createAsyncThunk(
+  "promoCards/updatePromoCard",
+  async ({ cardId, cardData }, { rejectWithValue }) => {
+    try {
+      const response = await api.put(`/common/promo-cards/update/${cardId}`, cardData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || { message: "Promosyon kartı güncellenemedi." }
+      );
+    }
+  }
+);
+
 export const deletePromoCard = createAsyncThunk(
   "promoCards/deletePromoCard",
   async (cardId, { rejectWithValue }) => {
@@ -79,6 +93,20 @@ const promoCardSlice = createSlice({
        // console.error("Promo kart ekleme hatası:", state.error);
       })
       // deletePromoCard
+      .addCase(updatePromoCard.fulfilled, (state, action) => {
+        if (action.payload?.success && action.payload?.data) {
+          const index = state.promoCardList.findIndex(
+            (card) => card._id === action.payload.data._id
+          );
+          if (index !== -1) {
+            state.promoCardList[index] = action.payload.data;
+          }
+          state.error = null;
+        }
+      })
+      .addCase(updatePromoCard.rejected, (state, action) => {
+        state.error = action.payload?.message || action.error.message;
+      })
       .addCase(deletePromoCard.fulfilled, (state, action) => {
         if (action.payload?.success && action.payload?.data?._id) {
           state.promoCardList = state.promoCardList.filter(

@@ -6,19 +6,22 @@ import { useToast } from "@/components/ui/use-toast";
 import {
   addFeatureImage,
   getFeatureImages,
+  updateFeatureImage,
   deleteFeatureImage,
 } from "@/store/common-slice";
 import {
   addPromoCard,
+  updatePromoCard,
   deletePromoCard,
   fetchPromoCards,
 } from "@/store/common-slice/promo-card-slice";
 import {
   addSideBanner,
+  updateSideBanner,
   deleteSideBanner,
   fetchSideBanners,
 } from "@/store/common-slice/side-banner-slice";
-import { Trash } from "lucide-react";
+import { Trash, Edit } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ConfirmationModal from "@/components/admin-view/ConfirmationModal";
@@ -58,6 +61,11 @@ function AdminDashboard() {
     useState(false);
   const [sideBannerTitle, setSideBannerTitle] = useState("");
   const [sideBannerLink, setSideBannerLink] = useState("");
+  
+  // Düzenleme state'leri
+  const [editingFeatureImage, setEditingFeatureImage] = useState(null);
+  const [editingPromoCard, setEditingPromoCard] = useState(null);
+  const [editingSideBanner, setEditingSideBanner] = useState(null);
   const {
     sideBannerList,
     isLoading: sideBannerLoading,
@@ -162,6 +170,69 @@ function AdminDashboard() {
     }
   }
 
+  function handleEditFeatureImage(banner) {
+    setEditingFeatureImage(banner);
+    setFeatureImageTitle(banner.title || "");
+    setFeatureImageLink(banner.link || "");
+  }
+
+  function handleCancelEditFeatureImage() {
+    setEditingFeatureImage(null);
+    setFeatureImageTitle("");
+    setFeatureImageLink("");
+    setFeatureImageFile(null);
+  }
+
+  async function handleUpdateFeatureImage() {
+    if (!editingFeatureImage) return;
+    
+    setFeatureImageLoadingState(true);
+    let imageUrl = editingFeatureImage.image;
+    
+    if (featureImageFile) {
+      const uploadedUrl = await uploadImage(featureImageFile);
+      if (!uploadedUrl) {
+        setFeatureImageLoadingState(false);
+        return;
+      }
+      imageUrl = uploadedUrl;
+    }
+
+    const bannerData = {
+      image: imageUrl,
+      title: featureImageTitle,
+      link: featureImageLink,
+    };
+
+    dispatch(updateFeatureImage({ bannerId: editingFeatureImage._id, bannerData }))
+      .then((data) => {
+        if (data?.payload?.success) {
+          setEditingFeatureImage(null);
+          setFeatureImageTitle("");
+          setFeatureImageLink("");
+          setFeatureImageFile(null);
+          toast({
+            title: "Banner başarıyla güncellendi.",
+            variant: "success",
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: data.payload?.message || "Banner güncellenemedi.",
+          });
+        }
+      })
+      .catch((err) => {
+        toast({
+          variant: "destructive",
+          title: "Banner güncellenirken bir hata oluştu.",
+        });
+      })
+      .finally(() => {
+        setFeatureImageLoadingState(false);
+      });
+  }
+
   function handleDeleteFeatureImage(bannerId) {
     openModal("Bu banner'ı silmek istediğinizden emin misiniz?", () => {
       dispatch(deleteFeatureImage(bannerId)).then((data) => {
@@ -219,6 +290,69 @@ function AdminDashboard() {
     } else {
       setPromoCardImageLoadingState(false);
     }
+  }
+
+  function handleEditPromoCard(card) {
+    setEditingPromoCard(card);
+    setPromoCardTitle(card.title || "");
+    setPromoCardLink(card.link || "");
+  }
+
+  function handleCancelEditPromoCard() {
+    setEditingPromoCard(null);
+    setPromoCardTitle("");
+    setPromoCardLink("");
+    setPromoCardImageFile(null);
+  }
+
+  async function handleUpdatePromoCard() {
+    if (!editingPromoCard) return;
+    
+    setPromoCardImageLoadingState(true);
+    let imageUrl = editingPromoCard.image;
+    
+    if (promoCardImageFile) {
+      const uploadedUrl = await uploadImage(promoCardImageFile);
+      if (!uploadedUrl) {
+        setPromoCardImageLoadingState(false);
+        return;
+      }
+      imageUrl = uploadedUrl;
+    }
+
+    const cardData = {
+      image: imageUrl,
+      title: promoCardTitle,
+      link: promoCardLink,
+    };
+
+    dispatch(updatePromoCard({ cardId: editingPromoCard._id, cardData }))
+      .then((data) => {
+        if (data?.payload?.success) {
+          setEditingPromoCard(null);
+          setPromoCardTitle("");
+          setPromoCardLink("");
+          setPromoCardImageFile(null);
+          toast({
+            title: "Fırsat kartı başarıyla güncellendi.",
+            variant: "success",
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: data.payload?.message || "Fırsat kartı güncellenemedi.",
+          });
+        }
+      })
+      .catch((err) => {
+        toast({
+          variant: "destructive",
+          title: "Fırsat kartı güncellenirken bir hata oluştu.",
+        });
+      })
+      .finally(() => {
+        setPromoCardImageLoadingState(false);
+      });
   }
 
   function handleDeletePromoCard(cardId) {
@@ -292,6 +426,69 @@ function AdminDashboard() {
     }
   }
 
+  function handleEditSideBanner(banner) {
+    setEditingSideBanner(banner);
+    setSideBannerTitle(banner.title || "");
+    setSideBannerLink(banner.link || "");
+  }
+
+  function handleCancelEditSideBanner() {
+    setEditingSideBanner(null);
+    setSideBannerTitle("");
+    setSideBannerLink("");
+    setSideBannerImageFile(null);
+  }
+
+  async function handleUpdateSideBanner() {
+    if (!editingSideBanner) return;
+    
+    setSideBannerImageLoadingState(true);
+    let imageUrl = editingSideBanner.image;
+    
+    if (sideBannerImageFile) {
+      const uploadedUrl = await uploadImage(sideBannerImageFile);
+      if (!uploadedUrl) {
+        setSideBannerImageLoadingState(false);
+        return;
+      }
+      imageUrl = uploadedUrl;
+    }
+
+    const bannerData = {
+      image: imageUrl,
+      title: sideBannerTitle,
+      link: sideBannerLink,
+    };
+
+    dispatch(updateSideBanner({ bannerId: editingSideBanner._id, bannerData }))
+      .then((data) => {
+        if (data?.payload?.success) {
+          setEditingSideBanner(null);
+          setSideBannerTitle("");
+          setSideBannerLink("");
+          setSideBannerImageFile(null);
+          toast({
+            title: "Yan banner başarıyla güncellendi.",
+            variant: "success",
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: data.payload?.message || "Yan banner güncellenemedi.",
+          });
+        }
+      })
+      .catch((err) => {
+        toast({
+          variant: "destructive",
+          title: "Yan banner güncellenirken bir hata oluştu.",
+        });
+      })
+      .finally(() => {
+        setSideBannerImageLoadingState(false);
+      });
+  }
+
   function handleDeleteSideBanner(bannerId) {
     openModal("Bu küçük banner'ı silmek istediğinizden emin misiniz?", () => {
       dispatch(deleteSideBanner(bannerId)).then((data) => {
@@ -358,15 +555,37 @@ function AdminDashboard() {
           />
         </div>
 
-        <Button
-          onClick={handleUploadPromoCard}
-          className="mt-4 w-full"
-          disabled={promoCardImageLoadingState || !promoCardImageFile}
-        >
-          {promoCardImageLoadingState
-            ? "Yükleniyor..."
-            : "Yeni Fırsat Kartı Ekle"}
-        </Button>
+        <div className="flex gap-2 mt-4">
+          {editingPromoCard ? (
+            <>
+              <Button
+                onClick={handleUpdatePromoCard}
+                className="flex-1"
+                disabled={promoCardImageLoadingState}
+              >
+                {promoCardImageLoadingState ? "Güncelleniyor..." : "Güncelle"}
+              </Button>
+              <Button
+                onClick={handleCancelEditPromoCard}
+                variant="outline"
+                className="flex-1"
+                disabled={promoCardImageLoadingState}
+              >
+                İptal
+              </Button>
+            </>
+          ) : (
+            <Button
+              onClick={handleUploadPromoCard}
+              className="w-full"
+              disabled={promoCardImageLoadingState || !promoCardImageFile}
+            >
+              {promoCardImageLoadingState
+                ? "Yükleniyor..."
+                : "Yeni Fırsat Kartı Ekle"}
+            </Button>
+          )}
+        </div>
         </>
         )}
         <div className="mt-6 space-y-3 max-h-96 overflow-y-auto">
@@ -400,14 +619,26 @@ function AdminDashboard() {
                     {card.link || "Link Yok"}
                   </p>
                 </div>
-                {canManage && (<Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-red-500 hover:bg-red-100 h-7 w-7 flex-shrink-0"
-                  onClick={() => handleDeletePromoCard(card._id)}
-                >
-                  <Trash size={16} />
-                </Button>)}
+                {canManage && (
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-blue-500 hover:bg-blue-100 h-7 w-7 flex-shrink-0"
+                      onClick={() => handleEditPromoCard(card)}
+                    >
+                      <Edit size={16} />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-red-500 hover:bg-red-100 h-7 w-7 flex-shrink-0"
+                      onClick={() => handleDeletePromoCard(card._id)}
+                    >
+                      <Trash size={16} />
+                    </Button>
+                  </div>
+                )}
               </div>
             ))
           ) : (
@@ -449,13 +680,35 @@ function AdminDashboard() {
             placeholder="Örn: /shop/listing?discount=true"
           />
         </div>
-        <Button
-          onClick={handleUploadFeatureImage}
-          className="mt-4 w-full"
-          disabled={featureImageLoadingState || !featureImageFile}
-        >
-          {featureImageLoadingState ? "Yükleniyor..." : "Yeni Banner Ekle"}
-        </Button>
+        <div className="flex gap-2 mt-4">
+          {editingFeatureImage ? (
+            <>
+              <Button
+                onClick={handleUpdateFeatureImage}
+                className="flex-1"
+                disabled={featureImageLoadingState}
+              >
+                {featureImageLoadingState ? "Güncelleniyor..." : "Güncelle"}
+              </Button>
+              <Button
+                onClick={handleCancelEditFeatureImage}
+                variant="outline"
+                className="flex-1"
+                disabled={featureImageLoadingState}
+              >
+                İptal
+              </Button>
+            </>
+          ) : (
+            <Button
+              onClick={handleUploadFeatureImage}
+              className="w-full"
+              disabled={featureImageLoadingState || !featureImageFile}
+            >
+              {featureImageLoadingState ? "Yükleniyor..." : "Yeni Banner Ekle"}
+            </Button>
+          )}
+        </div>
         </>
         )}
         <div className="mt-6 space-y-3 max-h-96 overflow-y-auto">
@@ -486,15 +739,27 @@ function AdminDashboard() {
                       {featureImgItem.link || "Link Yok"}
                     </p>
                   </div>
-                  {/* Silme Butonu */}
-                  {canManage && (<Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-red-500 hover:bg-red-100 h-7 w-7 flex-shrink-0"
-                    onClick={() => handleDeleteFeatureImage(featureImgItem._id)}
-                  >
-                    <Trash size={16} />
-                  </Button>)}
+                  {/* Düzenleme ve Silme Butonları */}
+                  {canManage && (
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-blue-500 hover:bg-blue-100 h-7 w-7 flex-shrink-0"
+                        onClick={() => handleEditFeatureImage(featureImgItem)}
+                      >
+                        <Edit size={16} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-red-500 hover:bg-red-100 h-7 w-7 flex-shrink-0"
+                        onClick={() => handleDeleteFeatureImage(featureImgItem._id)}
+                      >
+                        <Trash size={16} />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))
@@ -539,15 +804,37 @@ function AdminDashboard() {
           />
         </div>
 
-        <Button
-          onClick={handleUploadSideBanner}
-          className="mt-4 w-full"
-          disabled={sideBannerImageLoadingState || !sideBannerImageFile}
-        >
-          {sideBannerImageLoadingState
-            ? "Yükleniyor..."
-            : "Yeni Yan Banner Ekle"}
-        </Button>
+        <div className="flex gap-2 mt-4">
+          {editingSideBanner ? (
+            <>
+              <Button
+                onClick={handleUpdateSideBanner}
+                className="flex-1"
+                disabled={sideBannerImageLoadingState}
+              >
+                {sideBannerImageLoadingState ? "Güncelleniyor..." : "Güncelle"}
+              </Button>
+              <Button
+                onClick={handleCancelEditSideBanner}
+                variant="outline"
+                className="flex-1"
+                disabled={sideBannerImageLoadingState}
+              >
+                İptal
+              </Button>
+            </>
+          ) : (
+            <Button
+              onClick={handleUploadSideBanner}
+              className="w-full"
+              disabled={sideBannerImageLoadingState || !sideBannerImageFile}
+            >
+              {sideBannerImageLoadingState
+                ? "Yükleniyor..."
+                : "Yeni Yan Banner Ekle"}
+            </Button>
+          )}
+        </div>
         </>
         )}
 
@@ -583,14 +870,26 @@ function AdminDashboard() {
                     {banner.link || "Link Yok"}
                   </p>
                 </div>
-                {canManage && (<Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-red-500 hover:bg-red-100 h-7 w-7 flex-shrink-0"
-                  onClick={() => handleDeleteSideBanner(banner._id)}
-                >
-                  <Trash size={16} />
-                </Button>)}
+                {canManage && (
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-blue-500 hover:bg-blue-100 h-7 w-7 flex-shrink-0"
+                      onClick={() => handleEditSideBanner(banner)}
+                    >
+                      <Edit size={16} />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-red-500 hover:bg-red-100 h-7 w-7 flex-shrink-0"
+                      onClick={() => handleDeleteSideBanner(banner._id)}
+                    >
+                      <Trash size={16} />
+                    </Button>
+                  </div>
+                )}
               </div>
             ))
           ) : (
