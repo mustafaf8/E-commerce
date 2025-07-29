@@ -10,22 +10,30 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
-import { sortOptions } from "@/config"; 
+import { sortOptions } from "@/config";
 import { addToCart, fetchCartItems } from "@/store/shop/cart-slice";
 import {
   fetchAllFilteredProducts,
   fetchProductDetails,
-  setProductDetails, 
+  setProductDetails,
 } from "@/store/shop/products-slice";
-import { ArrowUpDownIcon } from "lucide-react";
-import { useEffect, useState, useCallback, useRef, useMemo } from "react";
+import { ArrowUpDownIcon, ChevronRight } from "lucide-react";
+import {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  useMemo,
+  Fragment,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import isEqual from "lodash/isEqual";
 import { Skeleton } from "@/components/ui/skeleton";
 import ProductTileSkeleton from "@/components/shopping-view/product-tile-skeleton.jsx";
 import { fetchAllCategories } from "@/store/common-slice/categories-slice";
 import { fetchAllBrands } from "@/store/common-slice/brands-slice";
+import PropTypes from "prop-types";
 
 function createSearchParamsHelper(filterParams) {
   const queryParams = [];
@@ -52,11 +60,73 @@ function parseUrlParamsToFilters(searchParams) {
     if (key === "category" || key === "brand") {
       filters[key] = value.split(",").sort();
     } else {
-      filters[key] = value; 
+      filters[key] = value;
     }
   }
   return filters;
 }
+
+const Breadcrumbs = ({ categorySlug }) => {
+  const { categoryList } = useSelector((state) => state.categories);
+
+  const findCategoryPath = (categories, slug) => {
+    for (const category of categories) {
+      if (category.slug === slug) {
+        return [category];
+      }
+      if (category.children && category.children.length > 0) {
+        const path = findCategoryPath(category.children, slug);
+        if (path) {
+          return [category, ...path];
+        }
+      }
+    }
+    return null;
+  };
+
+  const path = categorySlug
+    ? findCategoryPath(categoryList, categorySlug)
+    : null;
+
+  if (!path) {
+    return (
+      <div className="flex items-center text-sm text-muted-foreground mb-4">
+        <Link to="/shop/home" className="hover:text-primary">
+          Anasayfa
+        </Link>
+        <ChevronRight className="h-4 w-4 mx-1" />
+        <span>Tüm Ürünler</span>
+      </div>
+    );
+  }
+
+  return (
+    <nav className="flex items-center text-sm text-muted-foreground mb-4">
+      <Link to="/shop/home" className="hover:text-primary">
+        Anasayfa
+      </Link>
+      {path.map((p, index) => (
+        <Fragment key={p._id}>
+          <ChevronRight className="h-4 w-4 mx-1" />
+          {index === path.length - 1 ? (
+            <span className="font-medium text-foreground">{p.name}</span>
+          ) : (
+            <Link
+              to={`/shop/listing?category=${p.slug}`}
+              className="hover:text-primary"
+            >
+              {p.name}
+            </Link>
+          )}
+        </Fragment>
+      ))}
+    </nav>
+  );
+};
+
+Breadcrumbs.propTypes = {
+  categorySlug: PropTypes.string,
+};
 
 function ShoppingListing() {
   const dispatch = useDispatch();
@@ -84,6 +154,7 @@ function ShoppingListing() {
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const isInitialMount = useRef(true);
   const lastFiltersPushedToUrl = useRef(createSearchParamsHelper(filters));
+  const categorySlugFromUrl = searchParams.get("category");
 
   const handleFilter = useCallback((getSectionId, getCurrentOptionSlug) => {
     setFilters((prevFilters) => {
@@ -231,6 +302,9 @@ function ShoppingListing() {
       setFilters(urlFilters);
       setSort(urlSortBy);
       lastFiltersPushedToUrl.current = urlFiltersString;
+      
+      // URL değiştiğinde sayfanın en üste scroll yap
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     if (isInitialMount.current) {
@@ -261,6 +335,9 @@ function ShoppingListing() {
         sortParams: initialUrlSort,
       })
     );
+    
+    // Sayfa yüklendiğinde en üste scroll yap
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [dispatch]);
 
   useEffect(() => {
@@ -274,112 +351,142 @@ function ShoppingListing() {
     dispatch(setProductDetails(null));
   }, [dispatch]);
 
+  // Hiyerarşik kategori listesini düz listeye çevir
+  const flattenCategories = (categories, result = []) => {
+    categories.forEach(category => {
+      result.push(category);
+      if (category.children && category.children.length > 0) {
+        flattenCategories(category.children, result);
+      }
+    });
+    return result;
+  };
+
   const dynamicFilterOptions = useMemo(
-    () => ({
-      category: categoryList
-        .filter((cat) => cat.isActive)
-        .map((cat) => ({ id: cat.slug, label: cat.name })),
-      brand: brandList
-        .filter((brand) => brand.isActive)
-        .map((brand) => ({ id: brand.slug, label: brand.name })),
-    }),
+    () => {
+      // Tüm kategorileri (ana ve alt kategoriler) düz listeye çevir
+      const allCategories = flattenCategories(categoryList);
+      
+      return {
+        category: allCategories
+          .filter((cat) => cat.isActive)
+          .map((cat) => ({ 
+            id: cat.slug, 
+            label: cat.parent ? `└─ ${cat.name}` : cat.name,
+            displayLabel: cat.parent ? `    └─ ${cat.name}` : cat.name
+          })),
+        brand: brandList
+          .filter((brand) => brand.isActive)
+          .map((brand) => ({ id: brand.slug, label: brand.name })),
+      };
+    },
     [categoryList, brandList]
   );
 
   const skeletonCount = 8;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6 p-4 md:p-6 max-[600px]:p-0 container mx-auto px-20 max-[1024px]:px-1">
-      <ProductFilter
-        filters={filters}
-        handleFilter={handleFilter}
-        handleScalarFilter={handleScalarFilter}
-        dynamicFilterOptions={dynamicFilterOptions}
-        isLoading={categoriesLoading || brandsLoading}
-      />
-      <div className="bg-background w-full rounded-lg shadow-sm border">
-        <div className="p-4 border-b flex items-center justify-between">
-          <h2 className="text-lg font-semibold">
-            {filters?.category?.length > 0
-              ? `${filters.category
-                  .map(
-                    (slug) =>
-                      categoryList.find((c) => c.slug === slug)?.name || slug
-                  )
-                  .join(", ")} Ürünleri`
-              : filters?.brand?.length > 0
-              ? `${filters.brand
-                  .map(
-                    (slug) =>
-                      brandList.find((b) => b.slug === slug)?.name || slug
-                  )
-                  .join(", ")} Markalı Ürünler`
-              : "Tüm Ürünler"}
-          </h2>
-          <div className="flex items-center gap-3">
+    <div className="container mx-auto px-4 md:px-6 py-4">
+      <Breadcrumbs categorySlug={categorySlugFromUrl} />
+      <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6 p-4 md:p-6 max-[600px]:p-0 container mx-auto px-20 max-[1024px]:px-1">
+        <ProductFilter
+          filters={filters}
+          handleFilter={handleFilter}
+          handleScalarFilter={handleScalarFilter}
+          dynamicFilterOptions={dynamicFilterOptions}
+          isLoading={categoriesLoading || brandsLoading}
+        />
+        <div className="bg-background w-full rounded-lg shadow-sm border">
+          <div className="p-4 border-b flex items-center justify-between">
+            <h2 className="text-lg font-semibold">
+              {filters?.category?.length > 0
+                ? `${filters.category
+                    .map(
+                      (slug) => {
+                        // Tüm kategorilerde ara (ana ve alt kategoriler)
+                        const allCategories = flattenCategories(categoryList);
+                        const category = allCategories.find((c) => c.slug === slug);
+                        return category ? (category.parent ? `    └─ ${category.name}` : category.name) : slug;
+                      }
+                    )
+                    .join(", ")} Ürünleri`
+                : filters?.brand?.length > 0
+                ? `${filters.brand
+                    .map(
+                      (slug) =>
+                        brandList.find((b) => b.slug === slug)?.name || slug
+                    )
+                    .join(", ")} Markalı Ürünler`
+                : "Tüm Ürünler"}
+            </h2>
+            <div className="flex items-center gap-3">
+              {productsLoading ? (
+                <Skeleton className="h-5 w-20" />
+              ) : (
+                <span className="text-sm text-muted-foreground">
+                  {productList?.length || 0} Ürün
+                </span>
+              )}
+              {/* Sıralama Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-1"
+                  >
+                    <ArrowUpDownIcon className="h-4 w-4" />
+                    <span>Sırala</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-[200px]">
+                  <DropdownMenuRadioGroup
+                    value={sort}
+                    onValueChange={handleSort}
+                  >
+                    {sortOptions.map((sortItem) => (
+                      <DropdownMenuRadioItem
+                        value={sortItem.id}
+                        key={sortItem.id}
+                      >
+                        {sortItem.label}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4 max-[600px]:p-1 max-[600px]:gap-2">
             {productsLoading ? (
-              <Skeleton className="h-5 w-20" />
+              Array.from({ length: skeletonCount }).map((_, index) => (
+                <ProductTileSkeleton key={`skeleton-${index}`} />
+              ))
+            ) : productList && productList.length > 0 ? (
+              productList.map((productItem) => (
+                <ShoppingProductTile
+                  key={productItem._id}
+                  handleGetProductDetails={handleGetProductDetails}
+                  product={productItem}
+                  handleAddtoCart={() =>
+                    handleAddtoCart(productItem._id, productItem.totalStock)
+                  }
+                />
+              ))
             ) : (
-              <span className="text-sm text-muted-foreground">
-                {productList?.length || 0} Ürün
-              </span>
+              <div className="col-span-full text-center py-10 text-gray-500">
+                Filtre kriterlerine uygun ürün bulunamadı.
+              </div>
             )}
-            {/* Sıralama Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-1"
-                >
-                  <ArrowUpDownIcon className="h-4 w-4" />
-                  <span>Sırala</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[200px]">
-                <DropdownMenuRadioGroup value={sort} onValueChange={handleSort}>
-                  {sortOptions.map((sortItem) => (
-                    <DropdownMenuRadioItem
-                      value={sortItem.id}
-                      key={sortItem.id}
-                    >
-                      {sortItem.label}
-                    </DropdownMenuRadioItem>
-                  ))}
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4 max-[600px]:p-1 max-[600px]:gap-2">
-          {productsLoading ? (
-            Array.from({ length: skeletonCount }).map((_, index) => (
-              <ProductTileSkeleton key={`skeleton-${index}`} />
-            ))
-          ) : productList && productList.length > 0 ? (
-            productList.map((productItem) => (
-              <ShoppingProductTile
-                key={productItem._id}
-                handleGetProductDetails={handleGetProductDetails}
-                product={productItem}
-                handleAddtoCart={() =>
-                  handleAddtoCart(productItem._id, productItem.totalStock)
-                }
-              />
-            ))
-          ) : (
-            <div className="col-span-full text-center py-10 text-gray-500">
-              Filtre kriterlerine uygun ürün bulunamadı.
-            </div>
-          )}
-        </div>
+        <ProductDetailsDialog
+          open={openDetailsDialog}
+          setOpen={setOpenDetailsDialog}
+          onOpenChange={(isOpen) => !isOpen && handleDialogClose()}
+          productDetails={productDetails}
+        />
       </div>
-      <ProductDetailsDialog
-        open={openDetailsDialog}
-        setOpen={setOpenDetailsDialog}
-        onOpenChange={(isOpen) => !isOpen && handleDialogClose()}
-        productDetails={productDetails}
-      />
     </div>
   );
 }

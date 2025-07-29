@@ -150,14 +150,33 @@ function AdminProducts() {
   };
 
 
+  // Hiyerarşik kategori listesini düz listeye çevir
+  const flattenCategories = (categories, result = []) => {
+    categories.forEach(category => {
+      result.push(category);
+      if (category.children && category.children.length > 0) {
+        flattenCategories(category.children, result);
+      }
+    });
+    return result;
+  };
+
   useEffect(() => {
     const updatedControls = initialFormElements.map((control) => {
       if (control.name === "category" && categoryList.length > 0) {
+        // Tüm kategorileri (ana ve alt kategoriler) düz listeye çevir
+        const allCategories = flattenCategories(categoryList);
+        
         return {
           ...control,
-          options: categoryList
+          options: allCategories
             .filter((cat) => cat.isActive)
-            .map((cat) => ({ id: cat._id, label: cat.name })),
+            .map((cat) => ({ 
+              id: cat._id, 
+              label: cat.name,
+              // Alt kategoriler için prefix ekle
+              displayLabel: cat.parent ? `  └─ ${cat.name}` : cat.name
+            })),
         };
       }
       if (control.name === "brand" && brandList.length > 0) {

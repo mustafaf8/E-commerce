@@ -64,7 +64,7 @@ function CommonForm({
               {getControlItem.options && getControlItem.options.length > 0
                 ? getControlItem.options.map((optionItem) => (
                     <SelectItem key={optionItem.id} value={optionItem.id}>
-                      {optionItem.label}
+                      {optionItem.displayLabel || optionItem.label}
                     </SelectItem>
                   ))
                 : null}

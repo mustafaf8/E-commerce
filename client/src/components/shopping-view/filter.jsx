@@ -263,7 +263,7 @@ function ProductFilter({
                                   }
                                 />
                                 <span className={`font-medium flex-1 ${isChecked ? 'text-primary' : ''}`}>
-                                  {option.label}
+                                  {option.displayLabel || option.label}
                                 </span>
                                 {isChecked && (
                                   <Badge variant="default" size="sm">
@@ -310,7 +310,7 @@ function ProductFilter({
                   const option = section.options.find(opt => opt.id === optionId);
                   return option ? (
                     <Badge key={`${section.id}-${optionId}`} variant="outline">
-                      {option.label}
+                      {option.displayLabel || option.label}
                     </Badge>
                   ) : null;
                 })
@@ -329,7 +329,11 @@ ProductFilter.propTypes = {
   handleScalarFilter: PropTypes.func.isRequired,
   dynamicFilterOptions: PropTypes.shape({
     category: PropTypes.arrayOf(
-      PropTypes.shape({ id: PropTypes.string, label: PropTypes.string })
+      PropTypes.shape({ 
+        id: PropTypes.string, 
+        label: PropTypes.string,
+        displayLabel: PropTypes.string 
+      })
     ),
     brand: PropTypes.arrayOf(
       PropTypes.shape({ id: PropTypes.string, label: PropTypes.string })

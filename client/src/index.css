@@ -383,6 +383,61 @@
 
 @media (min-width: 641px) and (max-width: 1023px) {
   .product-carousel-item {
-    width: 190px !important;
+    width: calc(50% - 0.5rem);
   }
+}
+
+/* Hover Dropdown Menü Stilleri */
+.dropdown-hover {
+  position: relative;
+}
+
+.dropdown-hover:hover .dropdown-content {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.dropdown-content {
+  display: none;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease-in-out;
+  pointer-events: none;
+}
+
+/* Menü açıldığında hover efektini koru */
+.dropdown-content:hover {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Kategori menü hover efektleri */
+.category-menu-item {
+  transition: all 0.2s ease-in-out;
+  border-radius: 0.375rem;
+  margin: 0 0.5rem;
+}
+
+.category-menu-item:hover {
+  background-color: hsl(var(--muted));
+  transform: translateX(2px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Alt menü hover efektleri */
+.submenu-item {
+  transition: all 0.15s ease-in-out;
+  border-radius: 0.375rem;
+  margin: 0 0.5rem;
+}
+
+.submenu-item:hover {
+  background-color: hsl(var(--accent) / 0.1);
+  color: hsl(var(--accent));
+  transform: translateX(2px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }

@@ -87,6 +87,20 @@ function HomeSectionsManager({ canManage }) {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [sortedSections, setSortedSections] = useState([]);
 
+  // Hiyerarşik kategori listesini düz listeye çevir
+  const flattenCategories = (categories, result = []) => {
+    categories.forEach(category => {
+      result.push(category);
+      if (category.children && category.children.length > 0) {
+        flattenCategories(category.children, result);
+      }
+    });
+    return result;
+  };
+
+  // Tüm kategorileri (ana ve alt kategoriler) al
+  const allCategories = flattenCategories(categoryList);
+
   useEffect(() => {
     dispatch(fetchAllHomeSections());
     dispatch(fetchAllCategories());
@@ -272,10 +286,10 @@ function HomeSectionsManager({ canManage }) {
   // Find the name of a brand or category based on its slug
   const getContentValueName = (section) => {
     if (section.contentType === "CATEGORY") {
-      const category = categoryList.find(
+      const category = allCategories.find(
         (c) => c.slug === section.contentValue
       );
-      return category?.name || section.contentValue;
+      return category ? (category.parent ? `└─ ${category.name}` : category.name) : section.contentValue;
     } else if (section.contentType === "BRAND") {
       const brand = brandList.find((b) => b.slug === section.contentValue);
       return brand?.name || section.contentValue;
@@ -474,11 +488,13 @@ function HomeSectionsManager({ canManage }) {
                           Yükleniyor...
                         </SelectItem>
                       ) : (
-                        categoryList.map((cat) => (
-                          <SelectItem key={cat._id} value={cat.slug}>
-                            {cat.name}
-                          </SelectItem>
-                        ))
+                        allCategories
+                          .filter((cat) => cat.isActive)
+                          .map((cat) => (
+                            <SelectItem key={cat._id} value={cat.slug}>
+                              {cat.parent ? `  └─ ${cat.name}` : cat.name}
+                            </SelectItem>
+                          ))
                       )}
                     </SelectContent>
                   </Select>
