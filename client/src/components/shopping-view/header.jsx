@@ -5,6 +5,7 @@ import {
   ShoppingCart,
   UserCog,
   Search,
+  ChevronDown,
 } from "lucide-react";
 import {
   Link,
@@ -22,84 +23,261 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuPortal,
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { logoutUser } from "@/store/auth-slice";
 import UserCartWrapper from "./cart-wrapper";
 import { Sheet, SheetTrigger } from "../ui/sheet";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, Fragment } from "react";
 import { fetchAllCategories } from "@/store/common-slice/categories-slice";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "../ui/use-toast";
 import OrderTrackingModal from "./OrderTrackingModal";
 import api from "@/api/axiosInstance";
 import { useRef } from "react";
+import PropTypes from "prop-types";
 
-// Kategori Menüsü (Header'ın Alt Satırı İçin)
+// Hover ile açılır menü bileşeni
+const HoverMenu = ({ children, trigger, className = "" }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const timeoutRef = useRef(null);
+  const menuRef = useRef(null);
+
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    setIsOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setIsOpen(false);
+    }, 300); // 300ms gecikme ile kapat
+  };
+
+  const handleMenuMouseEnter = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+  };
+
+  const handleMenuMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setIsOpen(false);
+    }, 300);
+  };
+
+  return (
+    <div
+      className={`relative ${className}`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {trigger}
+      {isOpen && (
+        <div 
+          ref={menuRef}
+          className="absolute top-full left-0 z-50 min-w-[220px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl py-2 transform transition-all duration-300 ease-out opacity-100 translate-y-0 scale-100"
+          onMouseEnter={handleMenuMouseEnter}
+          onMouseLeave={handleMenuMouseLeave}
+        >
+          {children}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Hover menü öğesi
+const HoverMenuItem = ({ children, onClick, className = "" }) => {
+  return (
+    <div
+      className={`px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-150 text-sm ${className}`}
+      onClick={onClick}
+    >
+      {children}
+    </div>
+  );
+};
+
+// Hover alt menü bileşeni
+const HoverSubMenu = ({ children, trigger, className = "" }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const timeoutRef = useRef(null);
+  const subMenuRef = useRef(null);
+
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    setIsOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setIsOpen(false);
+    }, 300);
+  };
+
+  const handleSubMenuMouseEnter = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+  };
+
+  const handleSubMenuMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setIsOpen(false);
+    }, 300);
+  };
+
+  return (
+    <div
+      className={`relative ${className}`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {trigger}
+      {isOpen && (
+        <div 
+          ref={subMenuRef}
+          className="absolute left-full top-0 z-50 min-w-[220px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl py-2 transform transition-all duration-300 ease-out opacity-100 translate-x-0 scale-100"
+          onMouseEnter={handleSubMenuMouseEnter}
+          onMouseLeave={handleSubMenuMouseLeave}
+        >
+          {children}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Recursive (Özyineli) Menü Bileşeni
+const RecursiveMenuItem = ({ category, handleNavigate }) => {
+  // Eğer kategorinin alt dalları varsa, bir alt menü oluştur
+  if (category.children && category.children.length > 0) {
+    return (
+      <div className="dropdown-hover relative">
+        <div className="category-menu-item px-4 py-3 cursor-pointer text-sm flex items-center justify-between">
+          <span>{category.name}</span>
+          <ChevronDown className="h-4 w-4 rotate-[-90deg]" />
+        </div>
+        <div className="dropdown-content absolute left-full top-0 z-50 min-w-[220px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl py-2">
+          {/* "Tümünü Gör" linki, ana dala gitmek için */}
+          <div 
+            className="submenu-item px-4 py-3 cursor-pointer text-sm"
+            onClick={() => handleNavigate(category.slug)}
+          >
+            Tüm {category.name}
+          </div>
+          <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+          {/* Alt dalları için kendini tekrar çağır */}
+          {category.children.map((child) => (
+            <RecursiveMenuItem
+              key={child._id}
+              category={child}
+              handleNavigate={handleNavigate}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Eğer alt dalı yoksa, direkt tıklanabilir bir menü öğesi oluştur
+  return (
+    <div 
+      className="submenu-item px-4 py-3 cursor-pointer text-sm"
+      onClick={() => handleNavigate(category.slug)}
+    >
+      {category.name}
+    </div>
+  );
+};
+
+RecursiveMenuItem.propTypes = {
+  category: PropTypes.object.isRequired,
+  handleNavigate: PropTypes.func.isRequired,
+};
+
 function CategorySubMenu() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [, setSearchParams] = useSearchParams();
   const dispatch = useDispatch();
-
   const { categoryList = [], isLoading: categoriesLoading } = useSelector(
-    (state) => state.categories || { categoryList: [], isLoading: false }
+    (state) => state.categories || {}
   );
 
   useEffect(() => {
-    if (!categoryList.length) {
-      dispatch(fetchAllCategories());
-    }
-  }, [dispatch, categoryList.length]);
+    dispatch(fetchAllCategories());
+  }, [dispatch]);
 
-  function handleNavigateToCategory(categorySlug) {
-    sessionStorage.removeItem("filters");
-    const currentFilter = { category: [categorySlug] };
-    sessionStorage.setItem("filters", JSON.stringify(currentFilter));
-
-    if (location.pathname.includes("/shop/listing")) {
-      setSearchParams(new URLSearchParams(`?category=${categorySlug}`));
-    } else {
-      navigate(`/shop/listing?category=${categorySlug}`);
-    }
-  }
-
-  const activeCategories = useMemo(() => {
-    return categoryList
-      .filter((cat) => cat.isActive)
-      .map((cat) => ({
-        id: cat.slug,
-        label: cat.name,
-      }));
-  }, [categoryList]);
+  const handleNavigate = (slug) => {
+    navigate(`/shop/listing?category=${slug}`);
+  };
 
   if (categoriesLoading) {
     return (
-      <div className="flex items-center justify-center gap-x-3 md:gap-x-4 overflow-x-auto no-scrollbar px-4 md:px-6 h-10">
-        {Array.from({ length: 10 }).map((_, i) => (
-          <Skeleton key={i} className="h-5 w-20 rounded" />
+      <div className="flex items-center justify-center gap-x-3 md:gap-x-4 h-10 px-4">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <Skeleton key={i} className="h-5 w-24 rounded" />
         ))}
       </div>
     );
   }
 
-  if (!activeCategories.length) {
-    return <div className="h-10 border-t"></div>;
-  }
-
   return (
-    <nav className="flex flex-wrap items-center justify-center gap-x-3 md:gap-x-4 overflow-x-auto no-scrollbar px-4 md:px-6 h-10 bg-muted/30 dark:bg-muted/10">
-      {activeCategories.map((category) => (
-        <Button
-          variant="mustafa"
-          size="mustafa"
-          onClick={() => handleNavigateToCategory(category.id)}
-          className="text-sm font-medium text-muted-foreground hover:text-primary px-2 whitespace-nowrap"
-          key={category.id}
-        >
-          {category.label}
-        </Button>
-      ))}
+    <nav className="flex flex-wrap items-center justify-center gap-x-1 md:gap-x-2 h-12 bg-muted/30 dark:bg-muted/10">
+      {categoryList.map((category) =>
+        category.children && category.children.length > 0 ? (
+          // Ana Kategori (Alt dalları var) - Hover menü
+          <HoverMenu
+            key={category._id}
+            trigger={
+              <Button
+                variant="mustafa"
+                size="mustafa"
+                className="text-sm font-medium text-muted-foreground hover:text-primary px-2 whitespace-nowrap flex items-center gap-1"
+              >
+                {category.name}
+                <ChevronDown className="h-4 w-4 transition-transform duration-200" />
+              </Button>
+            }
+          >
+            {/* Ana kategorinin kendisine gitmek için link */}
+            <div 
+              className="category-menu-item px-4 py-3 cursor-pointer text-sm"
+              onClick={() => handleNavigate(category.slug)}
+            >
+              Tüm {category.name}
+            </div>
+            <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+            {/* Alt dallar için recursive bileşeni çağır */}
+            {category.children.map((subCategory) => (
+              <RecursiveMenuItem
+                key={subCategory._id}
+                category={subCategory}
+                handleNavigate={handleNavigate}
+              />
+            ))}
+          </HoverMenu>
+        ) : (
+          // Tekil Ana Kategori (Alt dalı yok)
+          <Button
+            key={category._id}
+            variant="mustafa"
+            size="mustafa"
+            onClick={() => handleNavigate(category.slug)}
+            className="text-sm font-medium text-muted-foreground hover:text-primary px-2 whitespace-nowrap"
+          >
+            {category.name}
+          </Button>
+        )
+      )}
     </nav>
   );
 }
@@ -225,13 +403,14 @@ function TopStrip() {
 
   useEffect(() => {
     // Kur bilgisini çek
-    api.get('/common/currency/rate')
-      .then(response => {
+    api
+      .get("/common/currency/rate")
+      .then((response) => {
         if (response.data.success) {
           setExchangeRate(response.data.data.rate);
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Döviz kuru alınırken hata oluştu:", error);
       });
   }, []); // Sadece bileşen ilk yüklendiğinde çalışır

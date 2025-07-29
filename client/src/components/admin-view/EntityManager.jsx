@@ -17,16 +17,22 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { CardTitle } from "../ui/card";
 import PropTypes from "prop-types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 function EntityManager({
   entityName,
-  entityNamePlural,
   selector,
   actions,
   canManage,
-  listKey = "list", // entityList veya brandList gibi farklı key'ler için
+  listKey = "list",
+  parentList = [],
 }) {
   const dispatch = useDispatch();
   const stateData = useSelector(selector);
@@ -38,7 +44,12 @@ function EntityManager({
 
   const { toast } = useToast();
 
-  const initialEntityData = { name: "", slug: "", isActive: true };
+  const initialEntityData = {
+    name: "",
+    slug: "",
+    isActive: true,
+    parent: null,
+  };
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentEntity, setCurrentEntity] = useState(initialEntityData);
@@ -47,7 +58,7 @@ function EntityManager({
 
   useEffect(() => {
     dispatch(actions.fetchAll());
-  }, [dispatch, actions]);
+  }, [dispatch, actions.fetchAll]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -72,9 +83,16 @@ function EntityManager({
     setCurrentEntity((prev) => ({ ...prev, isActive: checked }));
   };
 
+  const handleSelectChange = (name, value) => {
+    setCurrentEntity((prev) => ({
+      ...prev,
+      [name]: value === "none" ? null : value, // "Ana Kategori Yok" seçilirse null yap
+    }));
+  };
+
   const openModalForEdit = (entity) => {
     setIsEditing(true);
-    setCurrentEntity({ ...entity });
+    setCurrentEntity({ ...entity, parent: entity.parent || null });
     setIsModalOpen(true);
   };
 
@@ -164,6 +182,75 @@ function EntityManager({
       });
   };
 
+  const renderEntityTree = (entities, level = 0) => {
+    return entities.map((entity) => (
+      <div key={entity._id}>
+        <div
+          className="flex items-center justify-between p-3 border rounded-md bg-muted/30 hover:bg-muted/60 transition-colors"
+          style={{ marginLeft: `${level * 32}px` }} // Girinti
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center gap-x-4 gap-y-1 flex-grow min-w-0 mr-4">
+            <div className="min-w-0">
+              <p
+                className="font-semibold text-base truncate"
+                title={entity.name}
+              >
+                {level > 0 ? `└─ ${entity.name}` : entity.name}
+              </p>
+              <p
+                className="text-xs text-muted-foreground truncate"
+                title={entity.slug}
+              >
+                /{entity.slug}
+              </p>
+            </div>
+            <Badge
+              variant={entity.isActive ? "default" : "secondary"}
+              className={`px-2 py-0.5 text-xs ${
+                entity.isActive
+                  ? "bg-green-100 text-green-800 border-green-300"
+                  : "bg-red-100 text-red-800 border-red-300"
+              }`}
+            >
+              {entity.isActive ? (
+                <BadgeCheck className="mr-1 h-3 w-3" />
+              ) : (
+                <BadgeX className="mr-1 h-3 w-3" />
+              )}
+              {entity.isActive ? "Aktif" : "Pasif"}
+            </Badge>
+          </div>
+          {canManage && (
+            <div className="flex-shrink-0 flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => openModalForEdit(entity)}
+              >
+                <Edit className="h-4 w-4" />
+                <span className="sr-only">Düzenle</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                onClick={() => handleDeleteClick(entity)}
+              >
+                <Trash2 className="h-4 w-4" />
+                <span className="sr-only">Sil</span>
+              </Button>
+            </div>
+          )}
+        </div>
+        {/* Recursive call for children */}
+        {entity.children && entity.children.length > 0 && (
+          renderEntityTree(entity.children, level + 1)
+        )}
+      </div>
+    ));
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -187,66 +274,7 @@ function EntityManager({
             Henüz {entityName.toLowerCase()} eklenmemiş.
           </p>
         ) : (
-          entityList.map((entity) => (
-            <div
-              key={entity._id}
-              className="flex items-center justify-between p-3 border rounded-md bg-muted/30 hover:bg-muted/60 transition-colors"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center gap-x-4 gap-y-1 flex-grow min-w-0 mr-4">
-                <div className="min-w-0">
-                  <p
-                    className="font-semibold text-base truncate"
-                    title={entity.name}
-                  >
-                    {entity.name}
-                  </p>
-                  <p
-                    className="text-xs text-muted-foreground truncate"
-                    title={entity.slug}
-                  >
-                    /{entity.slug}
-                  </p>
-                </div>
-                <Badge
-                  variant={entity.isActive ? "default" : "secondary"}
-                  className={`px-2 py-0.5 text-xs ${
-                    entity.isActive
-                      ? "bg-green-100 text-green-800 border-green-300"
-                      : "bg-red-100 text-red-800 border-red-300"
-                  }`}
-                >
-                  {entity.isActive ? (
-                    <BadgeCheck className="mr-1 h-3 w-3" />
-                  ) : (
-                    <BadgeX className="mr-1 h-3 w-3" />
-                  )}
-                  {entity.isActive ? "Aktif" : "Pasif"}
-                </Badge>
-              </div>
-              {canManage && (
-                <div className="flex-shrink-0 flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => openModalForEdit(entity)}
-                  >
-                    <Edit className="h-4 w-4" />
-                    <span className="sr-only">Düzenle</span>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                    onClick={() => handleDeleteClick(entity)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    <span className="sr-only">Sil</span>
-                  </Button>
-                </div>
-              )}
-            </div>
-          ))
+          renderEntityTree(entityList)
         )}
       </div>
       <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>
@@ -283,6 +311,35 @@ function EntityManager({
                 required
               />
             </div>
+
+            {/* YENİ: Sadece kategoriler için ana kategori seçme alanı */}
+            {entityName === "Kategori" && (
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="parent" className="text-right">
+                  Ana Kategori
+                </Label>
+                <Select
+                  name="parent"
+                  value={currentEntity.parent || "none"}
+                  onValueChange={(value) => handleSelectChange("parent", value)}
+                >
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Ana Kategori Seçin" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Ana Kategori Yok</SelectItem>
+                    {parentList
+                      .filter((cat) => cat._id !== currentEntity._id) // Kendisini parent olarak seçmesini engelle
+                      .map((cat) => (
+                        <SelectItem key={cat._id} value={cat._id}>
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="isActive" className="text-right">
                 Aktif
@@ -333,6 +390,7 @@ EntityManager.propTypes = {
   }).isRequired,
   canManage: PropTypes.bool.isRequired,
   listKey: PropTypes.string,
+  parentList: PropTypes.array,
 };
 
 export default EntityManager;

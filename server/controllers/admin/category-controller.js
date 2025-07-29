@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 // Yeni Kategori Ekle (Admin)
 const addCategoryAdmin = async (req, res) => {
   try {
-    const { name, slug, isActive } = req.body;
+    const { name, slug, isActive, parent } = req.body;
     if (!name || !slug) {
       return res
         .status(400)
@@ -22,7 +22,12 @@ const addCategoryAdmin = async (req, res) => {
       });
     }
 
-    const newCategory = new Category({ name, slug, isActive });
+    const newCategory = new Category({
+      name,
+      slug,
+      isActive,
+      parent: parent || null,
+    });
     await newCategory.save();
     res
       .status(201)
@@ -49,7 +54,7 @@ const updateCategoryAdmin = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Geçersiz Kategori ID formatı." });
     }
-    const { name, slug, isActive } = req.body;
+    const { name, slug, isActive, parent } = req.body;
 
     if (!name || !slug) {
       return res
@@ -71,7 +76,7 @@ const updateCategoryAdmin = async (req, res) => {
 
     const updatedCategory = await Category.findByIdAndUpdate(
       id,
-      { name, slug, isActive },
+      { name, slug, isActive, parent: parent || null },
       { new: true, runValidators: true } // Güncellenmiş veriyi döndür ve validasyonları çalıştır
     );
 
@@ -143,10 +148,37 @@ const deleteCategoryAdmin = async (req, res) => {
   }
 };
 
+// Kategorileri hiyerarşik yapıda döndürmek için yardımcı fonksiyon
+const buildCategoryTree = (categories, parentId = null) => {
+  const tree = [];
+  
+  for (const category of categories) {
+    // parent null ise ana kategori, değilse alt kategori
+    const categoryParentId = category.parent ? category.parent._id || category.parent : null;
+    
+    if (categoryParentId?.toString() === parentId?.toString()) {
+      const children = buildCategoryTree(categories, category._id);
+      const categoryWithChildren = {
+        ...category.toObject(),
+        children: children
+      };
+      tree.push(categoryWithChildren);
+    }
+  }
+  
+  return tree;
+};
+
 const getAllCategoriesAdmin = async (req, res) => {
   try {
-    const categories = await Category.find({}).sort({ name: 1 });
-    res.status(200).json({ success: true, data: categories });
+    const categories = await Category.find({})
+      .populate('parent', 'name slug')
+      .sort({ name: 1 });
+    
+    // Hiyerarşik yapıyı oluştur
+    const categoryTree = buildCategoryTree(categories);
+    
+    res.status(200).json({ success: true, data: categoryTree });
   } catch (error) {
     //console.error("Admin tüm kategorileri getirme hatası:", error);
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });

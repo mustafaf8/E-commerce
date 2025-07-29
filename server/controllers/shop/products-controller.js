@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const Brand = require("../../models/Brand");
 const { getExchangeRate } = require("../../utils/currencyConverter");
 const { roundToMarketingPrice } = require("../../utils/priceUtils");
+const Category = require("../../models/Category");
 
 const getFilteredProducts = async (req, res) => {
   try {
@@ -44,20 +45,35 @@ const getFilteredProducts = async (req, res) => {
     }
 
     if (categorySlugs.length > 0) {
-      const Category = mongoose.model("Category");
+      const categorySlugsArray = categorySlugs.split(",");
+      // Hem slug'ı hem de parent'ı bu slug olan kategorilerin ID'lerini bul
       const categories = await Category.find({
-        slug: { $in: categorySlugs.split(",") },
+        slug: { $in: categorySlugsArray },
       }).select("_id");
-      if (categories.length > 0) {
-        filters.category = { $in: categories.map((cat) => cat._id) };
+
+      let allCategoryIds = categories.map((cat) => cat._id);
+
+      // Ana kategorilerin alt kategorilerini bul
+      const childCategories = await Category.find({
+        parent: { $in: allCategoryIds },
+      }).select("_id");
+      const childCategoryIds = childCategories.map((cat) => cat._id);
+
+      // Tüm ID'leri birleştir
+      allCategoryIds = [...allCategoryIds, ...childCategoryIds];
+
+      if (allCategoryIds.length > 0) {
+        filters.category = { $in: allCategoryIds };
       } else {
         return res.status(200).json({ success: true, data: [] });
       }
     }
+
     if (brandSlugs.length > 0) {
       const brands = await Brand.find({
         slug: { $in: brandSlugs.split(",") },
       }).select("_id");
+
       if (brands.length > 0) {
         filters.brand = { $in: brands.map((b) => b._id) };
       } else {
@@ -74,19 +90,24 @@ const getFilteredProducts = async (req, res) => {
     // Fiyat sıralaması için aggregation pipeline kullan
     if (sortBy === "price-lowtohigh" || sortBy === "price-hightolow") {
       const sortDirection = sortBy === "price-lowtohigh" ? 1 : -1;
-      
+
       pipeline = [
         { $match: filters },
         {
           $addFields: {
             effectivePrice: {
               $cond: {
-                if: { $and: [{ $ne: ["$salePrice", null] }, { $gt: ["$salePrice", 0] }] },
+                if: {
+                  $and: [
+                    { $ne: ["$salePrice", null] },
+                    { $gt: ["$salePrice", 0] },
+                  ],
+                },
                 then: "$salePrice",
-                else: "$price"
-              }
-            }
-          }
+                else: "$price",
+              },
+            },
+          },
         },
         { $sort: { effectivePrice: sortDirection } },
         { $limit: parseInt(limit, 10) },
@@ -95,30 +116,30 @@ const getFilteredProducts = async (req, res) => {
             from: "categories",
             localField: "category",
             foreignField: "_id",
-            as: "category"
-          }
+            as: "category",
+          },
         },
         {
           $lookup: {
             from: "brands",
             localField: "brand",
             foreignField: "_id",
-            as: "brand"
-          }
+            as: "brand",
+          },
         },
         {
           $addFields: {
             category: { $arrayElemAt: ["$category", 0] },
-            brand: { $arrayElemAt: ["$brand", 0] }
-          }
+            brand: { $arrayElemAt: ["$brand", 0] },
+          },
         },
         {
           $project: {
             description: 0,
             costPrice: 0,
-            effectivePrice: 0
-          }
-        }
+            effectivePrice: 0,
+          },
+        },
       ];
     } else {
       // Diğer sıralama türleri için normal sort kullan
@@ -147,7 +168,9 @@ const getFilteredProducts = async (req, res) => {
           const rate = await getExchangeRate();
           product.price = roundToMarketingPrice(product.priceUSD * rate);
           if (product.salePriceUSD) {
-            product.salePrice = roundToMarketingPrice(product.salePriceUSD * rate);
+            product.salePrice = roundToMarketingPrice(
+              product.salePriceUSD * rate
+            );
           }
         }
       }
@@ -158,7 +181,7 @@ const getFilteredProducts = async (req, res) => {
         .populate("category", "name slug")
         .populate("brand", "name slug")
         .select("-description -costPrice");
-      
+
       // Her ürün için TL fiyatlarını hesapla
       for (const product of products) {
         await product.calculateTLPrices();
@@ -170,7 +193,7 @@ const getFilteredProducts = async (req, res) => {
       data: products,
     });
   } catch (error) {
-   // console.error("getFilteredProducts error:", error);
+    // console.error("getFilteredProducts error:", error);
     res.status(500).json({
       success: false,
       message: "Ürünler getirilirken bir hata oluştu.",
@@ -205,7 +228,7 @@ const getProductDetails = async (req, res) => {
       data: product,
     });
   } catch (error) {
-   // console.error("getProductDetails error:", error);
+    // console.error("getProductDetails error:", error);
     res.status(500).json({
       success: false,
       message: "Ürün detayı alınırken bir hata oluştu.",

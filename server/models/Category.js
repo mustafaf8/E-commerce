@@ -14,6 +14,11 @@ const CategorySchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
     },
+    parent: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      default: null, // Eğer null ise, bu bir ana kategoridir.
+    },
     isActive: {
       type: Boolean,
       default: true,
