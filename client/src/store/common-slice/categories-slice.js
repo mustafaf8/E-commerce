@@ -105,34 +105,24 @@ const categoriesSlice = createSlice({
         state.error = action.payload?.message || "Kategoriler alınamadı.";
         state.categoryList = [];
       })
-      // addCategory
+      // addCategory - Hiyerarşik yapıyı korumak için yeniden fetch et
       .addCase(addCategory.fulfilled, (state, action) => {
-        if (action.payload?.success && action.payload?.data) {
-          state.categoryList.push(action.payload.data);
-        }
+        // Kategori eklendiğinde hiyerarşik yapıyı korumak için
+        // state'i değiştirmiyoruz, component'te yeniden fetch edilecek
       })
       .addCase(addCategory.rejected, (state, action) => {
         state.error = action.payload?.message || "Kategori eklenemedi.";
       })
       .addCase(updateCategory.fulfilled, (state, action) => {
-        if (action.payload?.success && action.payload?.data) {
-          const index = state.categoryList.findIndex(
-            (cat) => cat._id === action.payload.data._id
-          );
-          if (index !== -1) {
-            state.categoryList[index] = action.payload.data;
-          }
-        }
+        // Kategori güncellendiğinde hiyerarşik yapıyı korumak için
+        // state'i değiştirmiyoruz, component'te yeniden fetch edilecek
       })
       .addCase(updateCategory.rejected, (state, action) => {
         state.error = action.payload?.message || "Kategori güncellenemedi.";
       })
       .addCase(deleteCategory.fulfilled, (state, action) => {
-        if (action.payload?.success && action.payload?.data?._id) {
-          state.categoryList = state.categoryList.filter(
-            (cat) => cat._id !== action.payload.data._id // Silineni çıkar
-          );
-        }
+        // Kategori silindiğinde hiyerarşik yapıyı korumak için
+        // state'i değiştirmiyoruz, component'te yeniden fetch edilecek
       })
       .addCase(deleteCategory.rejected, (state, action) => {
         state.error = action.payload?.message || "Kategori silinemedi.";

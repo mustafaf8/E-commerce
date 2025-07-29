@@ -127,6 +127,12 @@ const deleteCategoryAdmin = async (req, res) => {
       });
     }
 
+    // Alt kategorilerin parent referansını güncelle
+    await Category.updateMany(
+      { parent: id },
+      { parent: null }
+    );
+
     const deletedCategory = await Category.findByIdAndDelete(id);
 
     if (!deletedCategory) {
