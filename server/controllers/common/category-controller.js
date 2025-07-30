@@ -25,7 +25,7 @@ const getActiveCategories = async (req, res) => {
   try {
     const categories = await Category.find({ isActive: true })
       .populate('parent', 'name slug')
-      .sort({ name: 1 });
+      .sort({ headerOrder: 1, name: 1 }); // Header sıralamasını dikkate al
     
     // Hiyerarşik yapıyı oluştur
     const categoryTree = buildCategoryTree(categories);

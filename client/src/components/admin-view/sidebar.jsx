@@ -10,6 +10,7 @@ import {
   UserCog,
   Wrench,
   Users,
+  Menu,
 } from "lucide-react";
 import { Fragment } from "react";
 import { useSelector } from "react-redux";
@@ -20,10 +21,10 @@ import PropTypes from "prop-types";
 
 const adminSidebarMenuItems = [
   {
-    id: "orders",
-    label: "Siparişler",
-    path: "/admin/orders",
-    icon: <BadgeCheck size={18} />,
+    id: "dashboard",
+    label: "Banner",
+    path: "/admin/dashboard",
+    icon: <LayoutDashboard size={18} />,
   },
   {
     id: "products",
@@ -32,35 +33,22 @@ const adminSidebarMenuItems = [
     icon: <ShoppingBasket size={18} />,
   },
   {
-    id: "dashboard",
-    label: "Banner",
-    path: "/admin/dashboard",
-    icon: <LayoutDashboard size={18} />,
-  },
-  {
-    id: "stats",
-    label: "İstatistikler",
-    path: "/admin/stats",
-    icon: <ChartNoAxesCombined size={18} />,
-  },
-  {
     id: "coupons",
     label: "Kuponlar",
     path: "/admin/coupons",
     icon: <Ticket size={18} />,
   },
   {
-    id: "categories-brands",
-    label: "Kategori & Marka",
-    path: "/admin/categories-brands",
-    icon: <LayoutGrid size={18} />,
+    id: "orders",
+    label: "Siparişler",
+    path: "/admin/orders",
+    icon: <BadgeCheck size={18} />,
   },
- 
   {
-    id: "home-sections",
-    label: "AnaSayfa Yönetimi",
-    path: "/admin/home-sections",
-    icon: <Home size={18} />,
+    id: "stats",
+    label: "İstatistikler",
+    path: "/admin/stats",
+    icon: <ChartNoAxesCombined size={18} />,
   },
   {
     id: "users",
@@ -73,6 +61,24 @@ const adminSidebarMenuItems = [
     label: "Bakım Modu",
     path: "/admin/maintenance",
     icon: <Wrench size={18} />,
+  },
+  {
+    id: "header-management",
+    label: "Header Yönetimi",
+    path: "/admin/header-management",
+    icon: <Menu size={18} />,
+  },
+  {
+    id: "categories-brands",
+    label: "Kategori & Marka",
+    path: "/admin/categories-brands",
+    icon: <LayoutGrid size={18} />,
+  },
+  {
+    id: "home-sections",
+    label: "AnaSayfa Yönetimi",
+    path: "/admin/home-sections",
+    icon: <Home size={18} />,
   },
 ];
 

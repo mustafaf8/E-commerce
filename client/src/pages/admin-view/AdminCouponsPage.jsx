@@ -274,7 +274,6 @@ function AdminCouponsPage() {
             <DialogTrigger asChild>
               <Button
                 onClick={() => setEditingCoupon(null)}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
                 size="lg"
               >
                 <Plus className="w-5 h-5 mr-2" />
@@ -531,11 +530,10 @@ function AdminCouponsPage() {
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="px-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                    className="px-6"
                   >
                     {isLoading ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
                         {editingCoupon
                           ? "Güncelleniyor..."
                           : "Oluşturuluyor..."}
@@ -593,7 +591,7 @@ function AdminCouponsPage() {
               {[...Array(6)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-white rounded-xl border shadow-sm p-6 animate-pulse"
+                  className="bg-white rounded-xl border shadow-sm p-6"
                 >
                   <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
                   <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
@@ -615,7 +613,6 @@ function AdminCouponsPage() {
               {canManage && (
                 <Button
                   onClick={() => setIsModalOpen(true)}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   İlk Kuponunuzu Oluşturun
@@ -627,10 +624,10 @@ function AdminCouponsPage() {
               {coupons.map((coupon) => (
                 <div
                   key={coupon._id}
-                  className={`bg-white rounded-xl border-2 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 ${
+                  className={`bg-white rounded-xl border-2 ${
                     coupon.isActive
-                      ? "border-green-200 hover:border-green-300"
-                      : "border-gray-200 hover:border-gray-300"
+                      ? "border-green-200"
+                      : "border-gray-200"
                   }`}
                 >
                   {/* Kupon Header */}
@@ -763,7 +760,7 @@ function AdminCouponsPage() {
                           size="sm"
                           variant="outline"
                           onClick={() => handleToggleStatus(coupon._id)}
-                          className="flex-1 hover:bg-blue-50"
+                          className="flex-1"
                         >
                           {coupon.isActive ? (
                             <>
@@ -781,7 +778,6 @@ function AdminCouponsPage() {
                           size="sm"
                           variant="outline"
                           onClick={() => handleEdit(coupon)}
-                          className="hover:bg-green-50"
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
@@ -789,7 +785,6 @@ function AdminCouponsPage() {
                           size="sm"
                           variant="outline"
                           onClick={() => handleDelete(coupon._id)}
-                          className="hover:bg-red-50 hover:text-red-600"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>

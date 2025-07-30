@@ -32,6 +32,7 @@
     "lodash": "^4.17.21",
     "lucide-react": "^0.429.0",
     "react": "^18.3.1",
+    "react-beautiful-dnd": "^13.1.1",
     "react-day-picker": "^9.8.0",
     "react-dom": "^18.3.1",
     "react-phone-number-input": "^3.4.12",
