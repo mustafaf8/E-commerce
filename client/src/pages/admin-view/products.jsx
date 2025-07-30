@@ -339,11 +339,14 @@ function AdminProducts() {
 
   const closeConfirmationModal = useCallback(() => {
     setShowConfirmModal(false);
-    setProductIdToDelete(null);
+    setTimeout(() => {
+      setProductIdToDelete(null);
+    }, 100);
   }, []);
 
   const confirmDeleteHandler = useCallback(() => {
     if (productIdToDelete) {
+      closeConfirmationModal(); // Önce modal'ı kapat
       dispatch(deleteProduct(productIdToDelete)).then((data) => {
         if (data?.payload?.success) {
           dispatch(fetchAllProducts());
@@ -354,7 +357,12 @@ function AdminProducts() {
             title: data.payload?.message || "Ürün silinemedi.",
           });
         }
-        closeConfirmationModal();
+      }).catch((error) => {
+        console.error("Ürün silme hatası:", error);
+        toast({
+          variant: "destructive",
+          title: "Ürün silinirken bir hata oluştu.",
+        });
       });
     }
   }, [dispatch, productIdToDelete, toast, closeConfirmationModal]);

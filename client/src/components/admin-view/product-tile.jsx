@@ -20,6 +20,12 @@ function AdminProductTile({
   const getCategoryName = (categoryId) => {
     if (!categoryId) return "Kategori Yok";
     
+    // Eğer categoryId bir obje ise, name property'sini al
+    if (typeof categoryId === 'object' && categoryId !== null) {
+      return categoryId.name || "Bilinmeyen Kategori";
+    }
+    
+    // Eğer categoryId bir string ise, kategori listesinde ara
     const findCategory = (categories, targetId) => {
       for (const category of categories) {
         if (category._id === targetId) {
@@ -102,53 +108,37 @@ function AdminProductTile({
           </div>
         </CardContent>
       </div>
-
-      <CardFooter className="flex justify-end items-center p-3 pt-2 border-t bg-secondary/20 dark:bg-gray-700/20 min-h-[52px]">
-        {/* Yönetim butonları sadece canManage true ise render edilecek */}
-        {canManage ? (
-          <div className="flex w-full justify-between items-center">
-             <Button 
-              onClick={handleShowDetails} 
-              size="sm" 
-              variant="outline"
-              className="flex items-center gap-1 h-8"
-            >
-              <Eye size={14} />
-              <span>Detaylar</span>
-            </Button>
-            <div className="flex gap-1">
+      <CardFooter className="p-4 pt-0">
+        <div className="flex gap-2 w-full">
+          {canManage && (
+            <>
               <Button
-                onClick={handleEdit}
-                size="icon"
-                variant="ghost"
-                className="h-8 w-8 text-gray-500 hover:text-primary"
-                title="Düzenle"
+                size="sm"
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEdit();
+                }}
+                className="flex-1"
               >
-                <Edit size={16} />
+                <Edit className="h-4 w-4 mr-1" />
+                Düzenle
               </Button>
               <Button
-                onClick={() => handleDelete(product?._id)}
-                size="icon"
-                variant="ghost"
-                className="h-8 w-8 text-gray-500 hover:text-destructive"
-                title="Sil"
+                size="sm"
+                variant="outline"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleDelete();
+                }}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
               >
-                <Trash2 size={16} />
+                <Trash2 className="h-4 w-4" />
               </Button>
-            </div>
-          </div>
-        ) : (
-          // Yetkisi yoksa sadece "Detaylar" butonu görünür
-          <Button 
-            onClick={handleShowDetails} 
-            size="sm" 
-            variant="outline"
-            className="flex items-center gap-1 h-8 w-full"
-          >
-            <Eye size={14} />
-            <span>Detayları Görüntüle</span>
-          </Button>
-        )}
+            </>
+          )}
+        </div>
       </CardFooter>
     </Card>
   );
@@ -156,14 +146,17 @@ function AdminProductTile({
 
 AdminProductTile.propTypes = {
   product: PropTypes.shape({
-    _id: PropTypes.string,
-    image: PropTypes.string,
-    title: PropTypes.string,
-    price: PropTypes.number,
-    salePrice: PropTypes.number,
+    _id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    category: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.object
+    ]),
+    priceUSD: PropTypes.number,
+    salePriceUSD: PropTypes.number,
     totalStock: PropTypes.number,
     salesCount: PropTypes.number,
-    category: PropTypes.string,
+    image: PropTypes.string,
   }).isRequired,
   handleEdit: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,

@@ -7,8 +7,8 @@ const ConfirmationModal = ({ isOpen, message, onConfirm, onCancel }) => {
   if (!isOpen) return null;
   
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-xl max-w-sm w-full animate-in fade-in duration-200">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999999999]">
+      <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-xl max-w-sm w-full mx-4">
         <div className="flex flex-col items-center text-center space-y-4">
           <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center">
             <AlertTriangle className="h-6 w-6 text-amber-600" />

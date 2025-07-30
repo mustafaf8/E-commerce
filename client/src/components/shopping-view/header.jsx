@@ -456,6 +456,7 @@ function TopStrip() {
 
 function ShoppingHeader() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState({
     products: [],
@@ -466,6 +467,9 @@ function ShoppingHeader() {
   const [activeInput, setActiveInput] = useState("");
   const debounceRef = useRef();
   const [searchParams] = useSearchParams();
+  
+  // Account, wishlist ve checkout sayfalarında kategori menüsünü gizle
+  const shouldShowCategoryMenu = !location.pathname.includes('/shop/account') && !location.pathname.includes('/shop/wishlist') && !location.pathname.includes('/shop/checkout');
 
   // Portal dışına tıklandığında ve ESC tuşu ile suggestions'ı kapat
   useEffect(() => {
@@ -582,9 +586,8 @@ function ShoppingHeader() {
                   suggestions.brands.length > 0) &&
                 createPortal(
                   <div className="search-suggestions-portal fixed z-[9999999999] bg-background border shadow-lg rounded-md max-h-80 overflow-y-auto" style={{
-                    top: '120px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
+                    top: '100px',
+                    left: 'calc(50% - 320px)',
                     width: '600px',
                     maxWidth: '90vw'
                   }}>
@@ -600,7 +603,7 @@ function ShoppingHeader() {
                           )
                         }
                       >
-                        Ürün: {p.title}
+                        {p.title}
                       </div>
                     ))}
                     {suggestions.categories.map((c) => (
@@ -613,7 +616,7 @@ function ShoppingHeader() {
                           )
                         }
                       >
-                        Kategori: {c.name}
+                        {c.name}
                       </div>
                     ))}
                     {suggestions.brands.map((b) => (
@@ -624,7 +627,7 @@ function ShoppingHeader() {
                           handleSuggestionClick(`/shop/listing?brand=${b.slug}`)
                         }
                       >
-                        Marka: {b.name}
+                        {b.name}
                       </div>
                     ))}
                   </div>,
@@ -658,7 +661,7 @@ function ShoppingHeader() {
                 suggestions.brands.length > 0) &&
               createPortal(
                 <div className="search-suggestions-portal fixed z-[9999999999] bg-background border shadow-lg rounded-md max-h-80 overflow-y-auto" style={{
-                  top: '140px',
+                  top: '160px',
                   left: '20px',
                   right: '20px',
                   width: 'calc(100vw - 40px)'
@@ -673,7 +676,7 @@ function ShoppingHeader() {
                         )
                       }
                     >
-                      Ürün: {p.title}
+                      {p.title}
                     </div>
                   ))}
                   {suggestions.categories.map((c) => (
@@ -686,7 +689,7 @@ function ShoppingHeader() {
                         )
                       }
                     >
-                      Kategori: {c.name}
+                      {c.name}
                     </div>
                   ))}
                   {suggestions.brands.map((b) => (
@@ -697,7 +700,7 @@ function ShoppingHeader() {
                         handleSuggestionClick(`/shop/listing?brand=${b.slug}`)
                       }
                     >
-                      Marka: {b.name}
+                      {b.name}
                     </div>
                   ))}
                 </div>,
@@ -708,9 +711,11 @@ function ShoppingHeader() {
       </div>
 
       {/* Kategori Menü Satırı (Sadece masaüstünde header'ın altında) */}
-      <div className="hidden lg:block border-t border-border relative z-[99999999]">
-        <CategorySubMenu />
-      </div>
+      {shouldShowCategoryMenu && (
+        <div className="hidden lg:block border-t border-border relative z-[99999999]">
+          <CategorySubMenu />
+        </div>
+      )}
     </header>
   );
 }
