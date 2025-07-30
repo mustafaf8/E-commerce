@@ -469,7 +469,7 @@ function ShoppingHeader() {
   const [searchParams] = useSearchParams();
   
   // Account, wishlist ve checkout sayfalarında kategori menüsünü gizle
-  const shouldShowCategoryMenu = !location.pathname.includes('/shop/account') && !location.pathname.includes('/shop/wishlist') && !location.pathname.includes('/shop/checkout');
+  const shouldShowCategoryMenu = !location.pathname.includes('/shop/account') && !location.pathname.includes('/shop/wishlist') && !location.pathname.includes('/shop/checkout') && !location.pathname.includes('/shop/campaigns');
 
   // Portal dışına tıklandığında ve ESC tuşu ile suggestions'ı kapat
   useEffect(() => {
