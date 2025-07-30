@@ -46,6 +46,58 @@ const getFeatureImages = async (req, res) => {
   }
 };
 
+const updateFeatureImage = async (req, res) => {
+  try {
+    const { imageId } = req.params;
+    const { image, title, link } = req.body;
+
+    if (!imageId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Güncellenecek resim ID'si gerekli." });
+    }
+
+    if (!image) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Resim URL'si gerekli." });
+    }
+
+    const updatedImage = await Feature.findByIdAndUpdate(
+      imageId,
+      { image, title, link },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedImage) {
+      return res.status(404).json({
+        success: false,
+        message: "Güncellenecek banner resmi bulunamadı.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Banner resmi güncellendi.",
+      data: updatedImage,
+    });
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        message: "Doğrulama hatası.",
+        errors: error.errors,
+      });
+    }
+    if (error.name === "CastError") {
+      return res
+        .status(400)
+        .json({ success: false, message: "Geçersiz Resim ID formatı." });
+    }
+    res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
+  }
+};
+
 const deleteFeatureImage = async (req, res) => {
   try {
     const { imageId } = req.params;
@@ -80,5 +132,6 @@ const deleteFeatureImage = async (req, res) => {
 module.exports = {
   addFeatureImage,
   getFeatureImages,
+  updateFeatureImage,
   deleteFeatureImage,
 };

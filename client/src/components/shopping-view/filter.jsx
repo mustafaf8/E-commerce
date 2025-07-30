@@ -82,22 +82,20 @@ function ProductFilter({
   };
 
   return (
-    <Card className="bg-gradient-to-br from-background to-muted/20 border-2 p-2">
-      <CardHeader className="pb-4 p-2">
-        <CardTitle className="flex items-center gap-2 text-xl font-bold">
-          <Filter className="h-5 w-5 text-primary" />
+    <Card className="bg-gradient-to-br from-background to-muted/20 border p-1">
+      <CardHeader className="pb-2 p-2">
+        <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+          <Filter className="h-4 w-4 text-primary" />
           Filtrele
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4 p-2">
-        {/* Fiyat Aralığı - Modern Slider */}
+      <CardContent className="space-y-3 p-2">
+        {/* Fiyat Aralığı - Kompakt */}
         <div className="space-y-2">
-          <div className="flex items-center gap-2"> 
-            <h3 className="text-base font-medium">Fiyat Aralığı</h3>
-          </div>
+          <h3 className="text-sm font-medium">Fiyat Aralığı</h3>
           
-          <div className="space-y-4">
-            <div className="px-2 py-2 bg-muted/30 rounded-lg border">
+          <div className="space-y-2">
+            <div className="px-1 py-1 bg-muted/30 rounded border">
               <Slider
                 min={0}
                 max={1000000}
@@ -108,24 +106,22 @@ function ProductFilter({
               />
             </div>
             
-            <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>{formatPrice(priceRange[0])}</span>
               <span>{formatPrice(priceRange[1])}</span>
             </div>
           </div>
         </div>
 
-        {/* Minimum Puan - Gelişmiş */}
-        <div className="space-y-0">
-          <div className="flex items-center gap-2">
-            <h3 className="text-base font-medium">Minimum Puan</h3>
-          </div>
+        {/* Minimum Puan - Kompakt */}
+        <div className="space-y-1">
+          <h3 className="text-sm font-medium">Minimum Puan</h3>
           
           <Select
             value={filters.minRating || "all"}
             onValueChange={(value) => handleScalarFilter("minRating", value === "all" ? "" : value)}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full h-8">
               <SelectValue placeholder="Hepsi" />
             </SelectTrigger>
             <SelectContent>
@@ -191,13 +187,11 @@ function ProductFilter({
           </Select>
         </div>
 
-        {/* Stok Durumu - Modern */}
-        <div className="space-y-0">
-          <div className="flex items-center gap-2">
-            <h3 className="text-base font-medium">Stok Durumu</h3>
-          </div>
+        {/* Stok Durumu - Kompakt */}
+        <div className="space-y-1">
+          <h3 className="text-sm font-medium">Stok Durumu</h3>
           
-          <Label className="flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 cursor-pointer transition-colors">
+          <Label className="flex items-center gap-2 p-2 rounded border hover:bg-muted/50 cursor-pointer transition-colors">
             <Checkbox
               id="inStock"
               checked={filters.inStock === "true"}
@@ -208,17 +202,17 @@ function ProductFilter({
                 )
               }
             />
-            <span className="font-medium">Stokta Var/Yok</span>
+            <span className="text-sm">Stokta Var/Yok</span>
             {filters.inStock === "true" && (
-              <Badge variant="secondary" className="ml-auto">
+              <Badge variant="secondary" className="ml-auto text-xs">
                 Aktif
               </Badge>
             )}
           </Label>
         </div>
 
-        {/* Kategori / Marka - Modern */}
-        <div className="space-y-4">
+        {/* Kategori / Marka - Kompakt */}
+        <div className="space-y-3">
           {isLoading
             ? filterSections.map((section) => (
                 <div key={`${section.id}-skeleton`} className="space-y-3">
@@ -236,22 +230,21 @@ function ProductFilter({
                     <Fragment key={section.id}>
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                        
-                          <h3 className="text-base font-medium">{section.title}</h3>
+                          <h3 className="text-sm font-medium">{section.title}</h3>
                           {(filters[section.id] || []).length > 0 && (
-                            <Badge variant="secondary" className="ml-auto">
+                            <Badge variant="secondary" className="ml-auto text-xs">
                               {(filters[section.id] || []).length}
                             </Badge>
                           )}
                         </div>
                         
-                        <div className="space-y-2 max-h-48 overflow-y-auto">
+                        <div className="space-y-1 max-h-40 overflow-y-auto">
                           {section.options.map((option) => {
                             const isChecked = (filters[section.id] || []).includes(option.id);
                             return (
                               <Label
                                 key={option.id}
-                                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all hover:bg-muted/50 ${
+                                className={`flex items-center gap-2 p-2 rounded border cursor-pointer transition-all hover:bg-muted/50 ${
                                   isChecked ? 'bg-primary/5 border-primary/20' : ''
                                 }`}
                               >
@@ -262,11 +255,11 @@ function ProductFilter({
                                     handleFilter(section.id, option.id)
                                   }
                                 />
-                                <span className={`font-medium flex-1 ${isChecked ? 'text-primary' : ''}`}>
+                                <span className={`text-sm flex-1 ${isChecked ? 'text-primary' : ''}`}>
                                   {option.displayLabel || option.label}
                                 </span>
                                 {isChecked && (
-                                  <Badge variant="default" size="sm">
+                                  <Badge variant="default" size="sm" className="text-xs">
                                     ✓
                                   </Badge>
                                 )}
@@ -288,28 +281,28 @@ function ProductFilter({
             )}
         </div>
 
-        {/* Aktif Filtreler Özeti */}
+        {/* Aktif Filtreler Özeti - Kompakt */}
         {(Object.keys(filters).length > 0) && (
-          <div className="mt-6 pt-4 border-t">
-            <h4 className="text-sm font-semibold mb-3 text-muted-foreground">Aktif Filtreler</h4>
-            <div className="flex flex-wrap gap-2">
+          <div className="mt-3 pt-3 border-t">
+            <h4 className="text-xs font-semibold mb-2 text-muted-foreground">Aktif Filtreler</h4>
+            <div className="flex flex-wrap gap-1">
               {filters.minPrice && (
-                <Badge variant="outline">Min: {formatPrice(parseInt(filters.minPrice))}</Badge>
+                <Badge variant="outline" className="text-xs">Min: {formatPrice(parseInt(filters.minPrice))}</Badge>
               )}
               {filters.maxPrice && (
-                <Badge variant="outline">Max: {formatPrice(parseInt(filters.maxPrice))}</Badge>
+                <Badge variant="outline" className="text-xs">Max: {formatPrice(parseInt(filters.maxPrice))}</Badge>
               )}
               {filters.minRating && (
-                <Badge variant="outline">{filters.minRating}+ ⭐</Badge>
+                <Badge variant="outline" className="text-xs">{filters.minRating}+ ⭐</Badge>
               )}
               {filters.inStock === "true" && (
-                <Badge variant="outline">Stokta Var</Badge>
+                <Badge variant="outline" className="text-xs">Stokta Var</Badge>
               )}
               {filterSections.map(section => 
                 (filters[section.id] || []).map(optionId => {
                   const option = section.options.find(opt => opt.id === optionId);
                   return option ? (
-                    <Badge key={`${section.id}-${optionId}`} variant="outline">
+                    <Badge key={`${section.id}-${optionId}`} variant="outline" className="text-xs">
                       {option.displayLabel || option.label}
                     </Badge>
                   ) : null;

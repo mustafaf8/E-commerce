@@ -38,6 +38,58 @@ const addSideBanner = async (req, res) => {
   }
 };
 
+const updateSideBanner = async (req, res) => {
+  try {
+    const { bannerId } = req.params;
+    const { image, title, link } = req.body;
+
+    if (!bannerId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Güncellenecek banner ID'si gerekli." });
+    }
+
+    if (!image) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Resim URL'si zorunludur." });
+    }
+
+    const updatedBanner = await SideBanner.findByIdAndUpdate(
+      bannerId,
+      { image, title, link },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedBanner) {
+      return res.status(404).json({
+        success: false,
+        message: "Güncellenecek yan banner bulunamadı.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Yan banner güncellendi.",
+      data: updatedBanner,
+    });
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        message: "Doğrulama hatası.",
+        errors: error.errors,
+      });
+    }
+    if (error.name === "CastError") {
+      return res
+        .status(400)
+        .json({ success: false, message: "Geçersiz Banner ID formatı." });
+    }
+    res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
+  }
+};
+
 const deleteSideBanner = async (req, res) => {
   try {
     const { bannerId } = req.params;
@@ -71,5 +123,6 @@ const deleteSideBanner = async (req, res) => {
 module.exports = {
   getSideBanners,
   addSideBanner,
+  updateSideBanner,
   deleteSideBanner,
 };

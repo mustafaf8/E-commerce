@@ -51,7 +51,7 @@ function CookieConsentBanner() {
   return (
     <div
       aria-hidden={!isVisible}
-      className={`fixed bottom-0 left-0 right-0 w-full bg-background border-t border-border shadow-xl p-3 md:p-4 z-[60] transition-all duration-500 ease-in-out transform ${
+      className={`fixed bottom-0 left-0 right-0 w-full bg-background border-t border-border shadow-xl p-3 md:p-4 z-[9999998] transition-all duration-500 ease-in-out transform ${
         isVisible
           ? "translate-y-0 opacity-100"
           : "translate-y-full opacity-0 pointer-events-none"

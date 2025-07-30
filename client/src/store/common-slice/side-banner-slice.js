@@ -54,6 +54,26 @@ export const addSideBanner = createAsyncThunk(
     }
   }
 );
+export const updateSideBanner = createAsyncThunk(
+  "sideBanners/updateSideBanner",
+  async ({ bannerId, bannerData }, { rejectWithValue }) => {
+    try {
+      const response = await api.put(`/common/side-banners/update/${bannerId}`, bannerData);
+      if (response.data && response.data.success) {
+        return response.data;
+      } else {
+        return rejectWithValue(
+          response.data || { message: "Yan banner güncellenemedi." }
+        );
+      }
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || { message: "Yan banner güncellenemedi." }
+      );
+    }
+  }
+);
+
 export const deleteSideBanner = createAsyncThunk(
   "sideBanners/deleteSideBanner",
   async (bannerId, { rejectWithValue }) => {
@@ -107,6 +127,20 @@ const sideBannerSlice = createSlice({
       .addCase(addSideBanner.rejected, (state, action) => {
         state.error = action.payload?.message || action.error.message;
        // console.error("Yan banner ekleme hatası:", state.error);
+      })
+      .addCase(updateSideBanner.fulfilled, (state, action) => {
+        if (action.payload?.success && action.payload?.data) {
+          const index = state.sideBannerList.findIndex(
+            (banner) => banner._id === action.payload.data._id
+          );
+          if (index !== -1) {
+            state.sideBannerList[index] = action.payload.data;
+          }
+          state.error = null;
+        }
+      })
+      .addCase(updateSideBanner.rejected, (state, action) => {
+        state.error = action.payload?.message || action.error.message;
       })
       .addCase(deleteSideBanner.fulfilled, (state, action) => {
         if (action.payload?.success && action.payload?.data?._id) {

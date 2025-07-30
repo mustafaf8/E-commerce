@@ -71,9 +71,9 @@ function AdminProductCarousel({
   );
 
   return (
-    <section className="relative mb-6 border rounded-lg shadow-sm bg-white overflow-hidden">
-      <div className="flex items-center justify-between p-4 border-b">
-        <h2 className="text-lg font-bold text-gray-800 capitalize">
+    <section className="relative mb-6 border rounded-lg shadow-sm bg-white dark:bg-gray-800 overflow-hidden">
+      <div className="flex items-center justify-between p-4 border-b border-border">
+        <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 capitalize">
           {title} ({products?.length || 0} ürün)
         </h2>
       </div>
@@ -82,7 +82,7 @@ function AdminProductCarousel({
           variant="secondary"
           size="icon"
           className={cn(
-            "absolute left-1 top-1/2 -translate-y-1/2 z-10 rounded-full shadow-md bg-white/80 hover:bg-white h-8 w-8 transition-opacity duration-300",
+            "absolute left-1 top-1/2 -translate-y-1/2 z-10 rounded-full shadow-md bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-800 h-8 w-8 transition-opacity duration-300",
             !isLoading && canScrollLeft
               ? "opacity-100"
               : "opacity-0 pointer-events-none"
@@ -116,7 +116,7 @@ function AdminProductCarousel({
               </div>
             ))
           ) : (
-            <div className="w-full text-center py-6 text-gray-500">
+            <div className="w-full text-center py-6 text-gray-500 dark:text-gray-400">
               Bu kategoride ürün bulunamadı.
             </div>
           )}
@@ -125,7 +125,7 @@ function AdminProductCarousel({
           variant="secondary"
           size="icon"
           className={cn(
-            "absolute right-1 top-1/2 -translate-y-1/2 z-10 rounded-full shadow-md bg-white/80 hover:bg-white h-8 w-8 transition-opacity duration-300",
+            "absolute right-1 top-1/2 -translate-y-1/2 z-10 rounded-full shadow-md bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-800 h-8 w-8 transition-opacity duration-300",
             !isLoading && canScrollRight
               ? "opacity-100"
               : "opacity-0 pointer-events-none"

@@ -2,6 +2,8 @@ import { Button } from "../ui/button";
 import { Card, CardContent, CardFooter } from "../ui/card";
 import PropTypes from "prop-types";
 import { Edit, Trash2, Eye } from "lucide-react";
+import { useSelector } from "react-redux";
+import { formatPrice } from "../../lib/utils";
 
 function AdminProductTile({
   product,
@@ -10,18 +12,45 @@ function AdminProductTile({
   handleShowDetails,
   canManage,
 }) {
+  const { categoryList = [] } = useSelector(
+    (state) => state.categories || { categoryList: [] }
+  );
+
+  // Kategori adını bul
+  const getCategoryName = (categoryId) => {
+    if (!categoryId) return "Kategori Yok";
+    
+    const findCategory = (categories, targetId) => {
+      for (const category of categories) {
+        if (category._id === targetId) {
+          return category.name;
+        }
+        if (category.children && category.children.length > 0) {
+          const result = findCategory(category.children, targetId);
+          if (result) return result;
+        }
+      }
+      return null;
+    };
+    
+    return findCategory(categoryList, categoryId) || "Bilinmeyen Kategori";
+  };
+
+  const categoryName = getCategoryName(product?.category);
+  
   return (
-    <Card className="w-full overflow-hidden border border-border bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow duration-200 h-full flex flex-col">
+    <Card className="w-full overflow-hidden border border-border bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-200 h-full flex flex-col group">
       <div
         onClick={handleShowDetails}
         className="cursor-pointer flex-grow flex flex-col"
       >
         <div className="relative pt-3 px-3 pb-0 flex-shrink-0">
-          <div className="bg-secondary/30 rounded-md p-2 flex items-center justify-center h-[180px]">
+          <div className="bg-secondary/30 dark:bg-gray-700/30 rounded-md p-2 flex items-center justify-center h-[180px] group-hover:bg-secondary/50 dark:group-hover:bg-gray-700/50 transition-colors duration-200">
             <img
               src={product?.image || "/placeholder.png"}
               alt={product?.title}
               className="max-h-full max-w-full object-contain"
+              loading="lazy"
             />
           </div>
           {product?.salePrice && product.salePrice > 0 && product.salePrice < product.price && (
@@ -32,48 +61,49 @@ function AdminProductTile({
         </div>
         <CardContent className="flex-grow p-4">
           <h2
-            className="text-base font-semibold mb-2 truncate"
+            className="text-base font-semibold mb-1 truncate"
             title={product?.title}
           >
             {product?.title}
           </h2>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 truncate" title={categoryName}>
+            📂 {categoryName}
+          </p>
           <div className="flex justify-between items-center mb-3">
             <span
               className={`${
-                product?.salePrice &&
-                product.salePrice > 0 &&
-                product.salePrice < product.price
+                product?.salePriceUSD &&
+                product.salePriceUSD > 0 &&
+                product.salePriceUSD < product.priceUSD
                   ? "line-through-red text-sm"
                   : "text-primary font-medium"
               }`}
             >
-              {product?.price ? `${product.price.toFixed(2)} TL` : "N/A"}
+              {product?.priceUSD ? `$${formatPrice(product.priceUSD)}` : "Fiyat Yok"}
             </span>
-            {product?.salePrice &&
-            product.salePrice > 0 &&
-            product.salePrice < product.price ? (
-              <span className="font-bold text-primary">{`${product.salePrice.toFixed(
-                2
-              )} TL`}</span>
+            {product?.salePriceUSD &&
+            product.salePriceUSD > 0 &&
+            product.salePriceUSD < product.priceUSD ? (
+              <span className="font-bold text-primary">{`$${formatPrice(product.salePriceUSD)}`}</span>
             ) : null}
           </div>
 
           <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
             <div className="flex items-center gap-1">
               <span className="font-medium">Stok:</span> 
-              <span className={product?.totalStock > 0 ? "text-green-600 font-medium" : "text-red-500 font-medium"}>
-                {product?.totalStock ?? "N/A"}
+              <span className={product?.totalStock > 0 ? "text-green-600 dark:text-green-400 font-medium" : "text-red-500 dark:text-red-400 font-medium"}>
+                {product?.totalStock > 0 ? product.totalStock : "Stok Yok"}
               </span>
             </div>
             <div className="flex items-center gap-1">
               <span className="font-medium">Satış:</span> 
-              <span>{product?.salesCount ?? 0}</span>
+              <span className="font-medium">{product?.salesCount || 0}</span>
             </div>
           </div>
         </CardContent>
       </div>
 
-      <CardFooter className="flex justify-end items-center p-3 pt-2 border-t bg-secondary/20 min-h-[52px]">
+      <CardFooter className="flex justify-end items-center p-3 pt-2 border-t bg-secondary/20 dark:bg-gray-700/20 min-h-[52px]">
         {/* Yönetim butonları sadece canManage true ise render edilecek */}
         {canManage ? (
           <div className="flex w-full justify-between items-center">
@@ -133,6 +163,7 @@ AdminProductTile.propTypes = {
     salePrice: PropTypes.number,
     totalStock: PropTypes.number,
     salesCount: PropTypes.number,
+    category: PropTypes.string,
   }).isRequired,
   handleEdit: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,

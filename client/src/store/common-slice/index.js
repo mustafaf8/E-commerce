@@ -55,6 +55,26 @@ export const addFeatureImage = createAsyncThunk(
   }
 );
 
+export const updateFeatureImage = createAsyncThunk(
+  "commonFeature/updateFeatureImage",
+  async ({ bannerId, bannerData }, { rejectWithValue }) => {
+    try {
+      const response = await api.put(`/common/feature/update/${bannerId}`, bannerData);
+      if (response.data && response.data.success) {
+        return response.data;
+      } else {
+        return rejectWithValue(
+          response.data || { message: "Banner güncellenemedi." }
+        );
+      }
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || { message: "Banner güncellenemedi." }
+      );
+    }
+  }
+);
+
 export const deleteFeatureImage = createAsyncThunk(
   "commonFeature/deleteFeatureImage",
   async (bannerId, { rejectWithValue }) => {
@@ -110,6 +130,20 @@ const commonSlice = createSlice({
        // console.error("Banner ekleme hatası (Redux):", state.error);
       })
 
+      .addCase(updateFeatureImage.fulfilled, (state, action) => {
+        if (action.payload?.success && action.payload?.data) {
+          const index = state.featureImageList.findIndex(
+            (banner) => banner._id === action.payload.data._id
+          );
+          if (index !== -1) {
+            state.featureImageList[index] = action.payload.data;
+          }
+          state.error = null;
+        }
+      })
+      .addCase(updateFeatureImage.rejected, (state, action) => {
+        state.error = action.payload?.message || action.error.message;
+      })
       .addCase(deleteFeatureImage.fulfilled, (state, action) => {
         if (action.payload?.success && action.payload?.data?._id) {
           state.featureImageList = state.featureImageList.filter(

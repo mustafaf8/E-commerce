@@ -4,11 +4,11 @@ import ProductImageUpload from "@/components/admin-view/image-upload";
 import CommonForm from "@/components/common/form";
 import { Button } from "@/components/ui/button";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { addProductFormElements as initialFormElements } from "@/config";
@@ -41,9 +41,9 @@ const initialFormData = {
   totalStock: "",
   averageReview: 0,
   image: "",
-  images: [], // Ek resimler için array
+  images: [],
   costPrice: "",
-  technicalSpecs: [], // Yeni alan
+  technicalSpecs: [],
 };
 
 function AdminProducts() {
@@ -485,10 +485,23 @@ function AdminProducts() {
     </div>
   ) : null;
 
+  // Stats sayfasında kategori adlarını daha iyi göstermek için
+  const formatCategoryName = (categoryName) => {
+    if (categoryName.includes(' > ')) {
+      const [parent, child] = categoryName.split(' > ');
+      return (
+        <div>
+                     <div className="text-sm text-gray-500 dark:text-gray-400">{parent}</div>
+          <div className="font-medium">{child}</div>
+        </div>
+      );
+    }
+    return categoryName;
+  };
+
   return (
     <Fragment>
       {floatingActionButton}
-
       <div className="w-full overflow-hidden">
         <div className="space-y-6">
           {listLoading || categoriesLoading ? (
@@ -531,7 +544,7 @@ function AdminProducts() {
         </div>
       </div>
 
-      <Sheet
+      <Dialog
         open={openCreateProductsDialog}
         onOpenChange={(isOpen) => {
           if (!isOpen) {
@@ -542,16 +555,13 @@ function AdminProducts() {
           setOpenCreateProductsDialog(isOpen);
         }}
       >
-        <SheetContent
-          side="right"
-          className="w-[90vw] max-w-[700px] sm:w-[700px] flex flex-col"
-        >
-          <SheetHeader className="p-6 border-b">
-            <SheetTitle>
+        <DialogContent className="w-[45vw] max-w-[1600px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="p-6 border-b">
+            <DialogTitle>
               {currentEditedId !== null ? "Ürünü Düzenle" : "Yeni Ürün Ekle"}
-            </SheetTitle>
-          </SheetHeader>
-          <div className="flex-grow overflow-y-auto p-6 space-y-4">
+            </DialogTitle>
+          </DialogHeader>
+          <div className="p-6 space-y-4">
             {/* Resim Yükleme */}
             <ProductImageUpload
               id="product-image-upload"
@@ -579,101 +589,115 @@ function AdminProducts() {
               </div>
             )}
 
-            {/* Ek Resimler Bölümü */}
-            <div className="space-y-4 pt-4 border-t">
-              <h3 className="text-lg font-medium">Ek Resimler</h3>
-              
-              {/* Ek Resim Yükleme */}
-              <div>
-                <Label htmlFor="additional-images">Ek Resimler Seç (Çoklu)</Label>
-                <Input
-                  id="additional-images"
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={(e) => handleAdditionalImageUpload(e.target.files)}
-                  className="mt-1"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Birden fazla resim seçebilirsiniz. JPG, PNG, GIF desteklenir.
-                </p>
+            {/* Ek Resim Yükleme Göstergesi */}
+            {additionalImageLoadingState && (
+              <div className="flex items-center text-sm text-blue-600">
+                <Skeleton className="h-4 w-4 mr-2 rounded-full animate-spin" />
+                <span>Ek resimler yükleniyor...</span>
               </div>
+            )}
 
-              {/* Ek Resim Yükleme Göstergesi */}
-              {additionalImageLoadingState && (
-                <div className="flex items-center text-sm text-blue-600">
-                  <Skeleton className="h-4 w-4 mr-2 rounded-full animate-spin" />
-                  <span>Ek resimler yükleniyor...</span>
+            {/* Yüklenen Ek Resimler */}
+            {formData.images && formData.images.length > 0 && (
+              <div className="space-y-4 pt-4 border-t">
+                <h3 className="text-lg font-medium">Yüklenen Ek Resimler</h3>
+                <div className="grid grid-cols-3 gap-2">
+                  {formData.images.map((imageUrl, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={imageUrl}
+                        alt={`Ek Resim ${index + 1}`}
+                        className="w-full h-20 object-cover rounded border"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeAdditionalImage(index)}
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Trash className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              )}
-
-              {/* Yüklenen Ek Resimler */}
-              {formData.images && formData.images.length > 0 && (
-                <div>
-                  <p className="text-sm font-medium mb-2">Yüklenen Ek Resimler:</p>
-                  <div className="grid grid-cols-3 gap-2">
-                    {formData.images.map((imageUrl, index) => (
-                      <div key={index} className="relative group">
-                        <img
-                          src={imageUrl}
-                          alt={`Ek Resim ${index + 1}`}
-                          className="w-full h-20 object-cover rounded border"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => removeAdditionalImage(index)}
-                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <Trash className="h-3 w-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
 
             <form onSubmit={onSubmit} className="space-y-4">
-              {/* Form Alanları */}
-              {dynamicFormControls.map((control) => (
-                 <div key={control.name} className="space-y-1">
-                   <Label htmlFor={control.name}>{control.label}</Label>
-                   {control.componentType === 'input' && (
-                     <Input
-                       type={control.type}
-                       id={control.name}
-                       name={control.name}
-                       placeholder={control.placeholder}
-                       value={formData[control.name]}
-                       onChange={(e) => setFormData({ ...formData, [control.name]: e.target.value })}
-                     />
-                   )}
-                   {control.componentType === 'textarea' && (
-                     <Textarea
-                       id={control.name}
-                       name={control.name}
-                       placeholder={control.placeholder}
-                       value={formData[control.name]}
-                       onChange={(e) => setFormData({ ...formData, [control.name]: e.target.value })}
-                       rows={4}
-                     />
-                   )}
-                   {control.componentType === 'select' && (
-                      <select
-                        id={control.name}
-                        name={control.name}
-                        value={formData[control.name]}
-                        onChange={(e) => setFormData({ ...formData, [control.name]: e.target.value })}
-                        className="w-full p-2 border rounded-md"
-                      >
-                        <option value="">{control.placeholder}</option>
-                        {control.options.map(option => (
-                          <option key={option.id} value={option.id}>{option.label}</option>
-                        ))}
-                      </select>
-                   )}
-                 </div>
-              ))}
+              {/* Başlık ve Ek Resim Seçme - Yan Yana */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Başlık Alanı */}
+                <div className="space-y-1">
+                  <Label htmlFor="title">Başlık</Label>
+                  <Input
+                    type="text"
+                    id="title"
+                    name="title"
+                    placeholder="Ürün başlığı"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  />
+                </div>
+                
+                {/* Ek Resim Seçme */}
+                <div className="space-y-1">
+                  <Label htmlFor="additional-images">Ek Resimler Seç (Çoklu)</Label>
+                  <Input
+                    id="additional-images"
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={(e) => handleAdditionalImageUpload(e.target.files)}
+                  />
+                  <p className="text-xs text-gray-500">
+                    Birden fazla resim seçebilirsiniz. JPG, PNG, GIF desteklenir.
+                  </p>
+                </div>
+              </div>
+
+              {/* Diğer Form Alanları - İki Sütun */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {dynamicFormControls.filter(control => control.name !== 'title').map((control) => (
+                   <div key={control.name} className={`space-y-1 ${control.componentType === 'textarea' ? 'md:col-span-2' : ''}`}>
+                     <Label htmlFor={control.name}>{control.label}</Label>
+                     {control.componentType === 'input' && (
+                       <Input
+                         type={control.type}
+                         id={control.name}
+                         name={control.name}
+                         placeholder={control.placeholder}
+                         value={formData[control.name]}
+                         onChange={(e) => setFormData({ ...formData, [control.name]: e.target.value })}
+                       />
+                     )}
+                     {control.componentType === 'textarea' && (
+                       <Textarea
+                         id={control.name}
+                         name={control.name}
+                         placeholder={control.placeholder}
+                         value={formData[control.name]}
+                         onChange={(e) => setFormData({ ...formData, [control.name]: e.target.value })}
+                         rows={4}
+                       />
+                     )}
+                     {control.componentType === 'select' && (
+                        <select
+                          id={control.name}
+                          name={control.name}
+                          value={formData[control.name]}
+                          onChange={(e) => setFormData({ ...formData, [control.name]: e.target.value })}
+                          className="w-full p-2 border rounded-md"
+                        >
+                          <option value="">{control.placeholder}</option>
+                          {control.options.map(option => (
+                                                         <option key={option.id} value={option.id}>
+                               {option.displayLabel || option.label}
+                             </option>
+                          ))}
+                        </select>
+                     )}
+                   </div>
+                ))}
+              </div>
 
               {/* Teknik Özellikler Bölümü */}
               <div className="space-y-4 pt-4 border-t">
@@ -715,8 +739,8 @@ function AdminProducts() {
               </Button>
             </form>
           </div>
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
       <ConfirmationModal
         isOpen={showConfirmModal}
         message="Bu ürünü kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz."

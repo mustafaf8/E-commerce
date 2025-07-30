@@ -1,11 +1,11 @@
 import {
-  Heart,
   LogIn,
   LogOut,
   ShoppingCart,
   UserCog,
   Search,
   ChevronDown,
+  Heart
 } from "lucide-react";
 import {
   Link,
@@ -23,16 +23,14 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuPortal,
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { logoutUser } from "@/store/auth-slice";
 import UserCartWrapper from "./cart-wrapper";
 import { Sheet, SheetTrigger } from "../ui/sheet";
-import { useEffect, useState, useMemo, Fragment } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { fetchAllCategories } from "@/store/common-slice/categories-slice";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "../ui/use-toast";
@@ -57,7 +55,7 @@ const HoverMenu = ({ children, trigger, className = "" }) => {
   const handleMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
       setIsOpen(false);
-    }, 300); // 300ms gecikme ile kapat
+    }, 50);
   };
 
   const handleMenuMouseEnter = () => {
@@ -69,7 +67,7 @@ const HoverMenu = ({ children, trigger, className = "" }) => {
   const handleMenuMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
       setIsOpen(false);
-    }, 300);
+    }, 50);
   };
 
   return (
@@ -82,7 +80,7 @@ const HoverMenu = ({ children, trigger, className = "" }) => {
       {isOpen && (
         <div 
           ref={menuRef}
-          className="absolute top-full left-0 z-50 min-w-[220px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl py-2 transform transition-all duration-300 ease-out opacity-100 translate-y-0 scale-100"
+          className="absolute top-full left-0 z-[99999999] min-w-[220px] max-w-[280px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl py-2"
           onMouseEnter={handleMenuMouseEnter}
           onMouseLeave={handleMenuMouseLeave}
         >
@@ -93,35 +91,24 @@ const HoverMenu = ({ children, trigger, className = "" }) => {
   );
 };
 
-// Hover menü öğesi
-const HoverMenuItem = ({ children, onClick, className = "" }) => {
-  return (
-    <div
-      className={`px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-150 text-sm ${className}`}
-      onClick={onClick}
-    >
-      {children}
-    </div>
-  );
-};
 
-// Hover alt menü bileşeni
-const HoverSubMenu = ({ children, trigger, className = "" }) => {
-  const [isOpen, setIsOpen] = useState(false);
+
+// Recursive (Özyineli) Menü Bileşeni
+const RecursiveMenuItem = ({ category, handleNavigate }) => {
+  const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
   const timeoutRef = useRef(null);
-  const subMenuRef = useRef(null);
 
   const handleMouseEnter = () => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    setIsOpen(true);
+    setIsSubMenuOpen(true);
   };
 
   const handleMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
-      setIsOpen(false);
-    }, 300);
+      setIsSubMenuOpen(false);
+    }, 10);
   };
 
   const handleSubMenuMouseEnter = () => {
@@ -132,59 +119,46 @@ const HoverSubMenu = ({ children, trigger, className = "" }) => {
 
   const handleSubMenuMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
-      setIsOpen(false);
-    }, 300);
+      setIsSubMenuOpen(false);
+    }, 10);
   };
 
-  return (
-    <div
-      className={`relative ${className}`}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      {trigger}
-      {isOpen && (
-        <div 
-          ref={subMenuRef}
-          className="absolute left-full top-0 z-50 min-w-[220px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl py-2 transform transition-all duration-300 ease-out opacity-100 translate-x-0 scale-100"
-          onMouseEnter={handleSubMenuMouseEnter}
-          onMouseLeave={handleSubMenuMouseLeave}
-        >
-          {children}
-        </div>
-      )}
-    </div>
-  );
-};
-
-// Recursive (Özyineli) Menü Bileşeni
-const RecursiveMenuItem = ({ category, handleNavigate }) => {
   // Eğer kategorinin alt dalları varsa, bir alt menü oluştur
   if (category.children && category.children.length > 0) {
     return (
-      <div className="dropdown-hover relative">
+      <div 
+        className="relative"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         <div className="category-menu-item px-4 py-3 cursor-pointer text-sm flex items-center justify-between">
-          <span>{category.name}</span>
-          <ChevronDown className="h-4 w-4 rotate-[-90deg]" />
+          <span className="break-words flex-1">{category.name}</span>
+          <ChevronDown className="h-4 w-4 rotate-[-90deg] flex-shrink-0 ml-2" />
         </div>
-        <div className="dropdown-content absolute left-full top-0 z-50 min-w-[220px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl py-2">
-          {/* "Tümünü Gör" linki, ana dala gitmek için */}
+        {isSubMenuOpen && (
           <div 
-            className="submenu-item px-4 py-3 cursor-pointer text-sm"
-            onClick={() => handleNavigate(category.slug)}
+            className="absolute left-full top-0 z-[99999999] min-w-[220px] max-w-[280px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl py-2"
+            onMouseEnter={handleSubMenuMouseEnter}
+            onMouseLeave={handleSubMenuMouseLeave}
           >
-            Tüm {category.name}
+            {/* "Tümünü Gör" linki, ana dala gitmek için */}
+            <div 
+              className="submenu-item px-4 py-3 cursor-pointer text-sm"
+              onClick={() => handleNavigate(category.slug)}
+            >
+              <span className="break-words">Tüm {category.name}</span>
+            </div>
+            <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+            {/* Alt dalları için kendini tekrar çağır */}
+            {category.children.map((child) => (
+              <RecursiveMenuItem
+                key={child._id}
+                category={child}
+                handleNavigate={handleNavigate}
+              />
+            ))}
           </div>
-          <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
-          {/* Alt dalları için kendini tekrar çağır */}
-          {category.children.map((child) => (
-            <RecursiveMenuItem
-              key={child._id}
-              category={child}
-              handleNavigate={handleNavigate}
-            />
-          ))}
-        </div>
+        )}
       </div>
     );
   }
@@ -195,7 +169,7 @@ const RecursiveMenuItem = ({ category, handleNavigate }) => {
       className="submenu-item px-4 py-3 cursor-pointer text-sm"
       onClick={() => handleNavigate(category.slug)}
     >
-      {category.name}
+      <span className="break-words">{category.name}</span>
     </div>
   );
 };
@@ -231,7 +205,7 @@ function CategorySubMenu() {
   }
 
   return (
-    <nav className="flex flex-wrap items-center justify-center gap-x-1 md:gap-x-2 h-12 bg-muted/30 dark:bg-muted/10">
+    <nav className="flex items-center justify-center gap-x-1 md:gap-x-2 min-h-12  dark:bg-muted/10 overflow-x-auto px-2 category-menu-container relative z-[99999999] bg-background">
       {categoryList.map((category) =>
         category.children && category.children.length > 0 ? (
           // Ana Kategori (Alt dalları var) - Hover menü
@@ -241,10 +215,10 @@ function CategorySubMenu() {
               <Button
                 variant="mustafa"
                 size="mustafa"
-                className="text-sm font-medium text-muted-foreground hover:text-primary px-2 whitespace-nowrap flex items-center gap-1"
+                className="text-sm font-medium text-muted-foreground hover:text-primary px-2 whitespace-normal flex items-center gap-1 min-w-0 max-w-32 text-center h-auto py-2"
               >
-                {category.name}
-                <ChevronDown className="h-4 w-4 transition-transform duration-200" />
+                <span className="break-words">{category.name}</span>
+                <ChevronDown className="h-4 w-4 transition-transform duration-200 flex-shrink-0" />
               </Button>
             }
           >
@@ -253,7 +227,7 @@ function CategorySubMenu() {
               className="category-menu-item px-4 py-3 cursor-pointer text-sm"
               onClick={() => handleNavigate(category.slug)}
             >
-              Tüm {category.name}
+              <span className="break-words">Tüm {category.name}</span>
             </div>
             <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
             {/* Alt dallar için recursive bileşeni çağır */}
@@ -272,9 +246,9 @@ function CategorySubMenu() {
             variant="mustafa"
             size="mustafa"
             onClick={() => handleNavigate(category.slug)}
-            className="text-sm font-medium text-muted-foreground hover:text-primary px-2 whitespace-nowrap"
+            className="text-sm font-medium text-muted-foreground hover:text-primary px-2 whitespace-normal min-w-0 max-w-32 text-center h-auto py-2"
           >
-            {category.name}
+            <span className="break-words">{category.name}</span>
           </Button>
         )
       )}
@@ -337,23 +311,25 @@ function MainHeaderActions() {
               </div>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end" className="w-56">
-            <DropdownMenuLabel>Merhaba, {user.userName}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate("/shop/account")}>
-              <UserCog className="mr-2 h-4 w-4" />
-              Hesabım & Siparişlerim
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate("/shop/wishlist")}>
-              <Heart className="mr-2 h-4 w-4" />
-              Favorilerim
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Çıkış Yap
-            </DropdownMenuItem>
-          </DropdownMenuContent>
+          <DropdownMenuPortal>
+            <DropdownMenuContent side="bottom" align="end" className="w-56 z-[9999999999]">
+              <DropdownMenuLabel>Merhaba, {user.userName}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate("/shop/account")}>
+                <UserCog className="mr-2 h-4 w-4" />
+                Hesabım & Siparişlerim
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/shop/wishlist")}>
+                <Heart className="mr-2 h-4 w-4" />
+                Favorilerim
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Çıkış Yap
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenuPortal>
         </DropdownMenu>
       ) : (
         <Button
@@ -487,9 +463,38 @@ function ShoppingHeader() {
     brands: [],
   });
   const [showSuggest, setShowSuggest] = useState(false);
-  const [activeInput, setActiveInput] = useState(""); // 'desktop' veya 'mobile'
+  const [activeInput, setActiveInput] = useState("");
   const debounceRef = useRef();
   const [searchParams] = useSearchParams();
+
+  // Portal dışına tıklandığında ve ESC tuşu ile suggestions'ı kapat
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Eğer suggestions açıksa ve tıklanan element suggestions içinde değilse
+      if (showSuggest && !event.target.closest('.search-suggestions-portal')) {
+        setShowSuggest(false);
+        setSuggestions({ products: [], categories: [], brands: [] });
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      // ESC tuşu ile kapat
+      if (event.key === 'Escape' && showSuggest) {
+        setShowSuggest(false);
+        setSuggestions({ products: [], categories: [], brands: [] });
+      }
+    };
+
+    // Event listener'ları ekle
+    document.addEventListener('click', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+
+    // Cleanup
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showSuggest]);
 
   useEffect(() => {
     const keywordFromUrl = searchParams.get("keyword");
@@ -545,7 +550,7 @@ function ShoppingHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background shadow-sm">
+    <header className="sticky top-0 z-[99999999] w-full border-b bg-background shadow-sm">
       <TopStrip />
       <div className="container mx-auto px-4 md:px-20">
         <div className="flex h-20 items-center justify-between gap-4 md:gap-6">
@@ -574,8 +579,15 @@ function ShoppingHeader() {
                 activeInput === "desktop" &&
                 (suggestions.products.length > 0 ||
                   suggestions.categories.length > 0 ||
-                  suggestions.brands.length > 0) && (
-                  <div className="absolute z-50 mt-1 w-full bg-background border shadow-lg rounded-md max-h-80 overflow-y-auto ">
+                  suggestions.brands.length > 0) &&
+                createPortal(
+                  <div className="search-suggestions-portal fixed z-[9999999999] bg-background border shadow-lg rounded-md max-h-80 overflow-y-auto" style={{
+                    top: '120px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: '600px',
+                    maxWidth: '90vw'
+                  }}>
                     {suggestions.products.map((p) => (
                       <div
                         key={`prod-${p._id}`}
@@ -615,7 +627,8 @@ function ShoppingHeader() {
                         Marka: {b.name}
                       </div>
                     ))}
-                  </div>
+                  </div>,
+                  document.body
                 )}
               <button type="submit" className="hidden"></button>
             </div>
@@ -642,8 +655,14 @@ function ShoppingHeader() {
               activeInput === "mobile" &&
               (suggestions.products.length > 0 ||
                 suggestions.categories.length > 0 ||
-                suggestions.brands.length > 0) && (
-                <div className="absolute z-50 mt-1 w-full bg-background border shadow-lg rounded-md max-h-80 overflow-y-auto">
+                suggestions.brands.length > 0) &&
+              createPortal(
+                <div className="search-suggestions-portal fixed z-[9999999999] bg-background border shadow-lg rounded-md max-h-80 overflow-y-auto" style={{
+                  top: '140px',
+                  left: '20px',
+                  right: '20px',
+                  width: 'calc(100vw - 40px)'
+                }}>
                   {suggestions.products.map((p) => (
                     <div
                       key={`prod-${p._id}`}
@@ -681,14 +700,15 @@ function ShoppingHeader() {
                       Marka: {b.name}
                     </div>
                   ))}
-                </div>
+                </div>,
+                document.body
               )}
           </div>
         </form>
       </div>
 
       {/* Kategori Menü Satırı (Sadece masaüstünde header'ın altında) */}
-      <div className="hidden lg:block border-t border-border">
+      <div className="hidden lg:block border-t border-border relative z-[99999999]">
         <CategorySubMenu />
       </div>
     </header>

@@ -74,17 +74,32 @@ const updateHomeSectionAdmin = async (req, res) => {
       isActive,
     } = req.body;
 
+    // Eğer sadece isActive güncelleniyorsa, diğer alanları kontrol etme
+    if (Object.keys(req.body).length === 1 && req.body.hasOwnProperty('isActive')) {
+      const updatedSection = await HomeSection.findByIdAndUpdate(
+        id, 
+        { isActive }, 
+        { new: true }
+      );
+
+      if (!updatedSection) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Güncellenecek bölüm bulunamadı." });
+      }
+      
+      return res.status(200).json({
+        success: true,
+        message: "Bölüm durumu güncellendi.",
+        data: updatedSection,
+      });
+    }
+
     if (!title || !contentType) {
       return res
         .status(400)
         .json({ success: false, message: "Başlık ve İçerik Tipi zorunludur." });
     }
-    // if (contentType !== "BEST_SELLING" && !contentValue) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: "İçerik Değeri (En Çok Satanlar hariç) zorunludur.",
-    //   });
-    // }
 
     const updateData = {
       title,
@@ -94,6 +109,11 @@ const updateHomeSectionAdmin = async (req, res) => {
       itemLimit,
       isActive,
     };
+
+    // BEST_SELLING tipi için contentValue'yu null yap
+    if (contentType === "BEST_SELLING") {
+      updateData.contentValue = null;
+    }
 
     const updatedSection = await HomeSection.findByIdAndUpdate(id, updateData, {
       new: true,
