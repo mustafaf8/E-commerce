@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchCoupons,
@@ -66,6 +66,185 @@ const initialFormData = {
   imageUrl: "",
   showOnCampaignsPage: false,
 };
+
+// Kupon kartı bileşeni - memoized
+const CouponCard = React.memo(({ coupon, canManage, onEdit, onDelete, onToggleStatus }) => {
+  const formatDate = useCallback((dateString) => {
+    if (!dateString) return "Süresiz";
+    return new Date(dateString).toLocaleDateString("tr-TR");
+  }, []);
+
+  const formatDiscountValue = useCallback((type, value) => {
+    if (!value) return "0";
+    return type === "percentage" ? `%${value}` : `₺${value}`;
+  }, []);
+
+  const isExpired = useMemo(() => {
+    return coupon.expiryDate && new Date(coupon.expiryDate) < new Date();
+  }, [coupon.expiryDate]);
+
+  const cardClassName = useMemo(() => {
+    return `bg-white rounded-xl border-2 ${
+      coupon.isActive ? "border-green-200" : "border-gray-200"
+    }`;
+  }, [coupon.isActive]);
+
+  const headerClassName = useMemo(() => {
+    return `p-4 rounded-t-xl ${
+      coupon.isActive
+        ? "bg-green-50 border-b border-green-100"
+        : "bg-gray-50 border-b border-gray-100"
+    }`;
+  }, [coupon.isActive]);
+
+  return (
+    <div key={coupon._id} className={cardClassName}>
+      {/* Kupon Header */}
+      <div className={headerClassName}>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            {coupon.imageUrl && (
+              <img
+                src={coupon.imageUrl}
+                alt={coupon.code}
+                className="w-8 h-8 rounded-lg object-cover border"
+              />
+            )}
+            <span className="font-bold text-xl font-mono tracking-wider text-gray-800">
+              {coupon.code}
+            </span>
+          </div>
+          <Badge
+            variant={coupon.isActive ? "default" : "secondary"}
+            className={`${
+              coupon.isActive
+                ? "bg-green-100 text-green-800 border-green-200"
+                : "bg-gray-100 text-gray-600 border-gray-200"
+            }`}
+          >
+            {coupon.isActive ? (
+              <>
+                <Eye className="w-3 h-3 mr-1" />
+                Aktif
+              </>
+            ) : (
+              <>
+                <EyeOff className="w-3 h-3 mr-1" />
+                Pasif
+              </>
+            )}
+          </Badge>
+        </div>
+
+        {/* İndirim Değeri */}
+        <div className="text-center py-3">
+          <div
+            className={`text-3xl font-bold ${
+              coupon.isActive ? "text-green-600" : "text-gray-500"
+            }`}
+          >
+            {formatDiscountValue(coupon.discountType, coupon.discountValue)}
+          </div>
+          <div className="text-sm text-gray-500 mt-1">
+            {coupon.discountType === "percentage" ? "İndirim" : "TL İndirim"}
+          </div>
+        </div>
+      </div>
+
+      {/* Kupon Body */}
+      <div className="p-4 space-y-3">
+        {/* Açıklama */}
+        {coupon.description && (
+          <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+            {coupon.description}
+          </p>
+        )}
+
+        {/* Detaylar */}
+        <div className="space-y-2 text-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-gray-500 flex items-center gap-1">
+              <TrendingUp className="w-4 h-4" />
+              Min. Alışveriş:
+            </span>
+            <span className="font-medium">
+              {coupon.minPurchase > 0 ? `${coupon.minPurchase}₺` : "Yok"}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <span className="text-gray-500 flex items-center gap-1">
+              <Users className="w-4 h-4" />
+              Kullanım:
+            </span>
+            <span className="font-medium">
+              {coupon.usesCount} / {coupon.maxUses || "∞"}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <span className="text-gray-500 flex items-center gap-1">
+              <Calendar className="w-4 h-4" />
+              Son Tarih:
+            </span>
+            <span className={`font-medium ${isExpired ? "text-red-600" : "text-gray-700"}`}>
+              {formatDate(coupon.expiryDate)}
+            </span>
+          </div>
+
+          {coupon.showOnCampaignsPage && (
+            <div className="bg-blue-50 text-blue-700 px-3 py-2 rounded-lg text-center">
+              <span className="text-xs font-medium flex items-center justify-center gap-1">
+                <Eye className="w-3 h-3" />
+                Kampanyalar sayfasında görünür
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* İşlemler */}
+        {canManage && (
+          <div className="flex gap-2 pt-3 border-t">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onToggleStatus(coupon._id)}
+              className="flex-1"
+            >
+              {coupon.isActive ? (
+                <>
+                  <EyeOff className="w-4 h-4 mr-1" />
+                  Gizle
+                </>
+              ) : (
+                <>
+                  <Eye className="w-4 h-4 mr-1" />
+                  Aktif Et
+                </>
+              )}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onEdit(coupon)}
+            >
+              <Edit className="w-4 w-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onDelete(coupon._id)}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+});
+
+CouponCard.displayName = 'CouponCard';
 
 function AdminCouponsPage() {
   const dispatch = useDispatch();
@@ -167,7 +346,7 @@ function AdminCouponsPage() {
     }
   };
 
-  const handleEdit = (coupon) => {
+  const handleEdit = useCallback((coupon) => {
     if (!canManage) {
       toast({
         title: "Yetki Hatası",
@@ -193,9 +372,9 @@ function AdminCouponsPage() {
     });
     setImageFile(null);
     setIsModalOpen(true);
-  };
+  }, [canManage, toast]);
 
-  const handleDelete = async (id) => {
+  const handleDelete = useCallback(async (id) => {
     if (!canManage) {
       toast({
         title: "Yetki Hatası",
@@ -213,9 +392,9 @@ function AdminCouponsPage() {
         // Error is handled by useEffect
       }
     }
-  };
+  }, [canManage, dispatch, toast]);
 
-  const handleToggleStatus = async (id) => {
+  const handleToggleStatus = useCallback(async (id) => {
     if (!canManage) {
       toast({
         title: "Yetki Hatası",
@@ -231,7 +410,7 @@ function AdminCouponsPage() {
     } catch (err) {
       // Error is handled by useEffect
     }
-  };
+  }, [canManage, dispatch, toast]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -622,176 +801,14 @@ function AdminCouponsPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {coupons.map((coupon) => (
-                <div
+                <CouponCard
                   key={coupon._id}
-                  className={`bg-white rounded-xl border-2 ${
-                    coupon.isActive
-                      ? "border-green-200"
-                      : "border-gray-200"
-                  }`}
-                >
-                  {/* Kupon Header */}
-                  <div
-                    className={`p-4 rounded-t-xl ${
-                      coupon.isActive
-                        ? "bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100"
-                        : "bg-gradient-to-r from-gray-50 to-slate-50 border-b border-gray-100"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        {coupon.imageUrl && (
-                          <img
-                            src={coupon.imageUrl}
-                            alt={coupon.code}
-                            className="w-8 h-8 rounded-lg object-cover border"
-                          />
-                        )}
-                        <span className="font-bold text-xl font-mono tracking-wider text-gray-800">
-                          {coupon.code}
-                        </span>
-                      </div>
-                      <Badge
-                        variant={coupon.isActive ? "default" : "secondary"}
-                        className={`${
-                          coupon.isActive
-                            ? "bg-green-100 text-green-800 border-green-200"
-                            : "bg-gray-100 text-gray-600 border-gray-200"
-                        }`}
-                      >
-                        {coupon.isActive ? (
-                          <>
-                            <Eye className="w-3 h-3 mr-1" />
-                            Aktif
-                          </>
-                        ) : (
-                          <>
-                            <EyeOff className="w-3 h-3 mr-1" />
-                            Pasif
-                          </>
-                        )}
-                      </Badge>
-                    </div>
-
-                    {/* İndirim Değeri */}
-                    <div className="text-center py-3">
-                      <div
-                        className={`text-3xl font-bold ${
-                          coupon.isActive ? "text-green-600" : "text-gray-500"
-                        }`}
-                      >
-                        {formatDiscountValue(
-                          coupon.discountType,
-                          coupon.discountValue
-                        )}
-                      </div>
-                      <div className="text-sm text-gray-500 mt-1">
-                        {coupon.discountType === "percentage"
-                          ? "İndirim"
-                          : "TL İndirim"}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Kupon Body */}
-                  <div className="p-4 space-y-3">
-                    {/* Açıklama */}
-                    {coupon.description && (
-                      <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-                        {coupon.description}
-                      </p>
-                    )}
-
-                    {/* Detaylar */}
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-500 flex items-center gap-1">
-                          <TrendingUp className="w-4 h-4" />
-                          Min. Alışveriş:
-                        </span>
-                        <span className="font-medium">
-                          {coupon.minPurchase > 0
-                            ? `${coupon.minPurchase}₺`
-                            : "Yok"}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-500 flex items-center gap-1">
-                          <Users className="w-4 h-4" />
-                          Kullanım:
-                        </span>
-                        <span className="font-medium">
-                          {coupon.usesCount} / {coupon.maxUses || "∞"}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <span className="text-gray-500 flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          Son Tarih:
-                        </span>
-                        <span
-                          className={`font-medium ${
-                            coupon.expiryDate &&
-                            new Date(coupon.expiryDate) < new Date()
-                              ? "text-red-600"
-                              : "text-gray-700"
-                          }`}
-                        >
-                          {formatDate(coupon.expiryDate)}
-                        </span>
-                      </div>
-
-                      {coupon.showOnCampaignsPage && (
-                        <div className="bg-blue-50 text-blue-700 px-3 py-2 rounded-lg text-center">
-                          <span className="text-xs font-medium flex items-center justify-center gap-1">
-                            <Eye className="w-3 h-3" />
-                            Kampanyalar sayfasında görünür
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* İşlemler */}
-                    {canManage && (
-                      <div className="flex gap-2 pt-3 border-t">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleToggleStatus(coupon._id)}
-                          className="flex-1"
-                        >
-                          {coupon.isActive ? (
-                            <>
-                              <EyeOff className="w-4 h-4 mr-1" />
-                              Gizle
-                            </>
-                          ) : (
-                            <>
-                              <Eye className="w-4 h-4 mr-1" />
-                              Aktif Et
-                            </>
-                          )}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEdit(coupon)}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleDelete(coupon._id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                  coupon={coupon}
+                  canManage={canManage}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onToggleStatus={handleToggleStatus}
+                />
               ))}
             </div>
           )}
