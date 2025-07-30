@@ -26,7 +26,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -40,8 +39,6 @@ import {
   Trash2,
   Edit,
   Plus,
-  ToggleLeft,
-  ToggleRight,
   Percent,
   TrendingUp,
   Calendar,
@@ -53,7 +50,6 @@ import {
 import useAdminPermission from "@/hooks/useAdminPermission";
 import ProductImageUpload from "@/components/admin-view/image-upload";
 import { Switch } from "@/components/ui/switch";
-import EntityManager from "@/components/admin-view/EntityManager";
 
 const initialFormData = {
   code: "",
@@ -228,7 +224,7 @@ const CouponCard = React.memo(({ coupon, canManage, onEdit, onDelete, onToggleSt
               variant="outline"
               onClick={() => onEdit(coupon)}
             >
-              <Edit className="w-4 w-4" />
+              <Edit className="w-4 h-4" />
             </Button>
             <Button
               size="sm"
@@ -296,7 +292,6 @@ function AdminCouponsPage() {
 
     let imageUrlToSend = formData.imageUrl;
     if (imageFile) {
-      // Görseli yükle - mevcut product upload endpoint'ini kullan
       const uploadData = new FormData();
       uploadData.append("my_file", imageFile);
       try {
@@ -437,10 +432,10 @@ function AdminCouponsPage() {
   }
 
   return (
-    <div className="p-6 space-y-8 bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen">
+    <div className="p-6 space-y-8 min-h-screen">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold text-blue-600">
             Kupon Yönetimi
           </h1>
           <p className="text-gray-600 mt-2 flex items-center gap-2">
