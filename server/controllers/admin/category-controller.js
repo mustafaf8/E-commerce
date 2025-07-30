@@ -191,9 +191,65 @@ const getAllCategoriesAdmin = async (req, res) => {
   }
 };
 
+// Header için ana kategorileri getir (sadece parent null olanlar)
+const getHeaderCategories = async (req, res) => {
+  try {
+    const categories = await Category.find({ 
+      parent: null, 
+      isActive: true 
+    })
+    .sort({ headerOrder: 1, name: 1 });
+    
+    res.status(200).json({ success: true, data: categories });
+  } catch (error) {
+    //console.error("Header kategorileri getirme hatası:", error);
+    res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
+  }
+};
+
+// Header sıralamasını güncelle
+const updateHeaderOrder = async (req, res) => {
+  try {
+    const { categoryOrders } = req.body; // [{id: "categoryId", order: 1}, ...]
+    
+    if (!Array.isArray(categoryOrders)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Geçersiz sıralama verisi." 
+      });
+    }
+
+    // Her kategori için sıralamayı güncelle
+    for (const item of categoryOrders) {
+      if (!mongoose.Types.ObjectId.isValid(item.id)) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Geçersiz kategori ID formatı." 
+        });
+      }
+
+      await Category.findByIdAndUpdate(
+        item.id,
+        { headerOrder: item.order },
+        { new: true }
+      );
+    }
+
+    res.status(200).json({ 
+      success: true, 
+      message: "Header sıralaması güncellendi." 
+    });
+  } catch (error) {
+    //console.error("Header sıralaması güncelleme hatası:", error);
+    res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
+  }
+};
+
 module.exports = {
   addCategoryAdmin,
   updateCategoryAdmin,
   deleteCategoryAdmin,
   getAllCategoriesAdmin,
+  getHeaderCategories,
+  updateHeaderOrder,
 };

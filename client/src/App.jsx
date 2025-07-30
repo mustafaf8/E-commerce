@@ -50,6 +50,9 @@ const AdminUsers = lazy(() => import("./pages/admin-view/users"));
 const AdminMaintenanceMode = lazy(() =>
   import("./pages/admin-view/maintenance-mode")
 );
+const AdminHeaderManagement = lazy(() =>
+  import("./pages/admin-view/header-management")
+);
 
 const NotFound = lazy(() => import("./pages/not-found"));
 const ShoppingListing = lazy(() => import("./pages/shopping-view/listing"));
@@ -202,6 +205,7 @@ function App() {
             />
             <Route path="users" element={<AdminUsers />} />
             <Route path="maintenance" element={<AdminMaintenanceMode />} />
+            <Route path="header-management" element={<AdminHeaderManagement />} />
           </Route>
 
           <Route path="/shop" element={<ShoppingLayout />}>

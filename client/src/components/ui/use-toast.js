@@ -2,7 +2,7 @@ import * as React from "react";
 
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 10000;
-const DEFAULT_TOAST_DURATION = 2500; // 5 saniye
+const DEFAULT_TOAST_DURATION = 4000; // 4 saniye
 
 // const actionTypes = {
 //   ADD_TOAST: "ADD_TOAST",

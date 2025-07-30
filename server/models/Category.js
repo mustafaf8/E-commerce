@@ -23,6 +23,10 @@ const CategorySchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    headerOrder: {
+      type: Number,
+      default: 999, // Varsayılan olarak en sona koy
+    },
   },
   { timestamps: true }
 );

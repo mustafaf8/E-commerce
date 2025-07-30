@@ -6,6 +6,8 @@ const {
   updateCategoryAdmin,
   deleteCategoryAdmin,
   getAllCategoriesAdmin,
+  getHeaderCategories,
+  updateHeaderOrder,
 } = require("../../controllers/admin/category-controller");
 
 const router = express.Router();
@@ -25,6 +27,16 @@ router.get(
   "/list",
   [authMiddleware, adminCheckMiddleware],
   getAllCategoriesAdmin
+);
+router.get(
+  "/header",
+  [authMiddleware, adminCheckMiddleware],
+  getHeaderCategories
+);
+router.put(
+  "/header/order",
+  [authMiddleware, adminCheckMiddleware],
+  updateHeaderOrder
 );
 
 module.exports = router;
