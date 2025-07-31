@@ -194,17 +194,17 @@ const ShoppingProductTile = React.memo(function ShoppingProductTile({
             <div className="pt-1 max-[640px]:pt-0">
               {product?.salePrice !== undefined &&
               product.salePrice !== null ? (
-                <div className="flex items-baseline gap-2 max-[1200px]:flex-col max-[1200px]:gap-0">
+                <div className="flex flex-col gap-1">
                   {product?.price &&
                     product.price > 0 &&
                     product.price > product.salePrice && (
-                      <span className="line-through text-xs sm:text-sm text-gray-400 whitespace-nowrap">
+                      <span className="line-through text-xs sm:text-sm text-gray-400 break-words">
                         {`${formatPrice(product.price)} TL`}
                       </span>
                     )}
                   <span
                     className={cn(
-                      "font-medium text-sm sm:text-base whitespace-nowrap", // Dinamik boyutlandırma
+                      "font-medium text-sm sm:text-base break-words",
                       product?.price &&
                         product.price > 0 &&
                         product.price > product.salePrice
@@ -216,7 +216,7 @@ const ShoppingProductTile = React.memo(function ShoppingProductTile({
                   </span>
                 </div>
               ) : product?.price && product.price > 0 ? (
-                <span className="font-medium text-sm sm:text-base text-black whitespace-nowrap">
+                <span className="font-medium text-sm sm:text-base text-black break-words">
                   {`${formatPrice(product.price)} TL`}
                 </span>
               ) : (
