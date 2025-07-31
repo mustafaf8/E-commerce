@@ -234,7 +234,7 @@ function ProductSpecsPage() {
             <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 leading-tight mb-2">
               {productDetails.title}
             </h1>
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-2 pointer-events-none">
               <StarRatingComponent value={productDetails.rating || 0} readOnly size={22} />
               <span className="text-sm text-gray-500">({productDetails.numReviews || 0} Yorum)</span>
             </div>
