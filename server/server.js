@@ -69,24 +69,24 @@ const commonPromoCardRouter = require("./routes/common/promo-card-routes");
 const commonFeatureRouter = require("./routes/common/feature-routes");
 const shopWishlistRouter = require("./routes/shop/wishlist-routes");
 const commonSideBannerRouter = require("./routes/common/side-banner-routes");
-
-const adminCategoryRouter = require("./routes/admin/category-routes"); // Yeni
-const adminHomeSectionRouter = require("./routes/admin/home-section-routes"); // Yeni
-const commonCategoryRouter = require("./routes/common/category-routes"); // Yeni
+const adminCategoryRouter = require("./routes/admin/category-routes");
+const adminHomeSectionRouter = require("./routes/admin/home-section-routes"); 
+const commonCategoryRouter = require("./routes/common/category-routes"); 
 const shopHomeSectionRouter = require("./routes/shop/home-section-routes");
-const adminBrandRouter = require("./routes/admin/brand-routes"); // Yeni
+const adminBrandRouter = require("./routes/admin/brand-routes"); 
 const commonBrandRouter = require("./routes/common/brand-routes");
 const adminCouponRouter = require("./routes/admin/coupon-routes");
 const adminStatsRouter = require("./routes/admin/statsAdminRoutes");
 const adminAuthorizationRouter = require("./routes/admin/authorization-routes");
-const adminUserRouter = require("./routes/admin/user-routes"); // Kullanıcı yönetimi route'ları
+const adminUserRouter = require("./routes/admin/user-routes"); 
 const maintenanceRouter = require("./routes/common/maintenance-routes");
-const currencyRouter = require("./routes/common/currency-routes"); // Yeni rota
+const currencyRouter = require("./routes/common/currency-routes"); 
+const shopCouponRouter = require("./routes/shop/coupon-routes");
 const errorHandler = require("./middleware/errorHandler");
 const { scheduleAbandonedCartEmails } = require("./jobs/abandonedCartJob");
 const { startScheduledRateUpdates } = require("./utils/currencyConverter");
 require("./controllers/auth/auth-controller");
-const shopCouponRouter = require("./routes/shop/coupon-routes");
+
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -216,9 +216,9 @@ app.use("/api/common/brands", commonBrandRouter);
 app.use("/api/admin/coupons", adminCouponRouter);
 app.use("/api/admin/stats", adminStatsRouter);
 app.use("/api/admin/authorization", adminAuthorizationRouter);
-app.use("/api/admin/users", adminUserRouter); // Kullanıcı yönetimi route'ları
+app.use("/api/admin/users", adminUserRouter);
 app.use("/api/maintenance", maintenanceRouter);
-app.use("/api/common/currency", currencyRouter); // Yeni rotayı kullan
+app.use("/api/common/currency", currencyRouter); 
 app.use(errorHandler);
 if (process.env.NODE_ENV !== "test") {
   scheduleAbandonedCartEmails();
