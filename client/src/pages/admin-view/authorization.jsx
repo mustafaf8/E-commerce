@@ -117,11 +117,9 @@ function AuthorizationPage() {
 
   return (
     <div className="h-full flex flex-col max-h-screen overflow-hidden">
-      
-
-      <div className="flex-1 flex gap-6 min-h-0">
+      <div className="flex-1 flex flex-col lg:flex-row gap-4 lg:gap-6 min-h-0">
         {/* Admin List - Sol Panel */}
-        <div className="w-80 flex-shrink-0">
+        <div className="w-full lg:w-80 flex-shrink-0">
           <Card className="h-full">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center space-x-2">
@@ -130,11 +128,11 @@ function AuthorizationPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="space-y-2 max-h-[calc(100vh-300px)] overflow-y-auto p-4">
+              <div className="space-y-2 max-h-[300px] lg:max-h-[calc(100vh-300px)] overflow-y-auto p-4">
                 {localData.map((admin) => (
                   <div
                     key={admin._id}
-                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md ${
+                    className={`p-3 lg:p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md ${
                       selectedAdmin?._id === admin._id
                         ? 'border-primary bg-primary/5 shadow-md'
                         : 'border-border hover:border-primary/50'
@@ -142,13 +140,13 @@ function AuthorizationPage() {
                     onClick={() => setSelectedAdmin(admin)}
                   >
                     <div className="flex items-center space-x-3">
-                      <Avatar className="h-10 w-10 bg-gradient-to-br from-primary to-primary/80 text-white">
-                        <div className="flex items-center justify-center w-full h-full text-sm font-medium">
+                      <Avatar className="h-8 w-8 lg:h-10 lg:w-10 bg-gradient-to-br from-primary to-primary/80 text-white">
+                        <div className="flex items-center justify-center w-full h-full text-xs lg:text-sm font-medium">
                           {admin.userName?.charAt(0)?.toUpperCase() || 'A'}
                         </div>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{admin.userName}</p>
+                        <p className="font-medium text-xs lg:text-sm truncate">{admin.userName}</p>
                         <div className="flex items-center space-x-2 mt-1">
                           <Badge 
                             variant="secondary" 
@@ -177,16 +175,16 @@ function AuthorizationPage() {
           {selectedAdmin ? (
             <Card className="h-full">
               <CardHeader className="pb-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                   <div className="flex items-center space-x-3">
-                    <Avatar className="h-12 w-12 bg-gradient-to-br from-primary to-primary/80 text-white">
-                      <div className="flex items-center justify-center w-full h-full text-lg font-medium">
+                    <Avatar className="h-10 w-10 lg:h-12 lg:w-12 bg-gradient-to-br from-primary to-primary/80 text-white">
+                      <div className="flex items-center justify-center w-full h-full text-base lg:text-lg font-medium">
                         {selectedAdmin.userName?.charAt(0)?.toUpperCase() || 'A'}
                       </div>
                     </Avatar>
                     <div>
-                      <CardTitle className="text-xl">{selectedAdmin.userName}</CardTitle>
-                      <p className="text-muted-foreground text-sm">
+                      <CardTitle className="text-lg lg:text-xl">{selectedAdmin.userName}</CardTitle>
+                      <p className="text-muted-foreground text-xs lg:text-sm">
                         {ACCESS_LEVELS[selectedAdmin.adminAccessLevel]?.description || 'Yetki açıklaması bulunamadı'}
                       </p>
                     </div>
@@ -194,7 +192,7 @@ function AuthorizationPage() {
                   <Button
                     onClick={() => handleSave(selectedAdmin)}
                     disabled={isUpdating}
-                    className="bg-green-600 hover:bg-green-700"
+                    className="bg-green-600 hover:bg-green-700 w-full lg:w-auto"
                   >
                     {isUpdating ? (
                       <>
@@ -255,27 +253,27 @@ function AuthorizationPage() {
                     <span>Modül İzinleri</span>
                   </label>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 max-h-[calc(100vh-250px)] overflow-y-auto pr-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 lg:gap-4 max-h-[400px] lg:max-h-[calc(100vh-250px)] overflow-y-auto pr-2">
                     {MODULES.map((module) => {
                       const permissions = getModulePermissions(selectedAdmin, module.id);
                       return (
                         <Card key={module.id} className="relative overflow-hidden">
                           <div className={`absolute left-0 top-0 w-1 h-full ${module.color}`}></div>
-                          <CardContent className="p-4 pl-6">
+                          <CardContent className="p-3 lg:p-4 pl-5 lg:pl-6">
                             <div className="flex items-center justify-between mb-3">
-                              <div className="flex items-center space-x-3">
-                                <div className="text-2xl">{module.icon}</div>
+                              <div className="flex items-center space-x-2 lg:space-x-3">
+                                <div className="text-xl lg:text-2xl">{module.icon}</div>
                                 <div>
-                                  <h4 className="font-medium text-sm">{module.label}</h4>
+                                  <h4 className="font-medium text-xs lg:text-sm">{module.label}</h4>
                                 </div>
                               </div>
                             </div>
                             
-                            <div className="space-y-3">
+                            <div className="space-y-2 lg:space-y-3">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-2">
-                                  <Eye className="h-4 w-4 text-muted-foreground" />
-                                  <span className="text-sm text-muted-foreground">Görüntüleme</span>
+                                  <Eye className="h-3 w-3 lg:h-4 lg:w-4 text-muted-foreground" />
+                                  <span className="text-xs lg:text-sm text-muted-foreground">Görüntüleme</span>
                                 </div>
                                 <Switch
                                   checked={permissions.view}
@@ -287,8 +285,8 @@ function AuthorizationPage() {
                               
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-2">
-                                  <Settings className="h-4 w-4 text-muted-foreground" />
-                                  <span className="text-sm text-muted-foreground">Yönetim</span>
+                                  <Settings className="h-3 w-3 lg:h-4 lg:w-4 text-muted-foreground" />
+                                  <span className="text-xs lg:text-sm text-muted-foreground">Yönetim</span>
                                 </div>
                                 <Switch
                                   checked={permissions.manage}
@@ -308,10 +306,10 @@ function AuthorizationPage() {
             </Card>
           ) : (
             <Card className="h-full flex items-center justify-center">
-              <CardContent className="text-center py-12">
-                <User className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-                <h3 className="text-lg font-medium mb-2">Admin Seçin</h3>
-                <p className="text-muted-foreground">
+              <CardContent className="text-center py-8 lg:py-12">
+                <User className="h-12 w-12 lg:h-16 lg:w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+                <h3 className="text-base lg:text-lg font-medium mb-2">Admin Seçin</h3>
+                <p className="text-muted-foreground text-xs lg:text-sm">
                   Sol panelden bir admin kullanıcısı seçerek yetki ayarlarını düzenleyebilirsiniz.
                 </p>
               </CardContent>
