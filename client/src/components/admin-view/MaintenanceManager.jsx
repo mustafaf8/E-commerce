@@ -34,7 +34,15 @@ function MaintenanceManager({ canManage }) {
         isActive: status.isActive || false,
         message: status.message || "",
         returnDate: status.returnDate
-          ? new Date(status.returnDate).toISOString().slice(0, 16)
+          ? (() => {
+              const date = new Date(status.returnDate);
+              const year = date.getFullYear();
+              const month = String(date.getMonth() + 1).padStart(2, '0');
+              const day = String(date.getDate()).padStart(2, '0');
+              const hours = String(date.getHours()).padStart(2, '0');
+              const minutes = String(date.getMinutes()).padStart(2, '0');
+              return `${year}-${month}-${day}T${hours}:${minutes}`;
+            })()
           : "",
       });
     }
@@ -123,6 +131,7 @@ function MaintenanceManager({ canManage }) {
             id="return-date"
             type="datetime-local"
             value={localStatus.returnDate}
+            min={new Date().toISOString().slice(0, 16)}
             onChange={(e) =>
               setLocalStatus((prev) => ({
                 ...prev,
