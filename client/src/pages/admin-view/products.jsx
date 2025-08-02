@@ -563,13 +563,13 @@ function AdminProducts() {
           setOpenCreateProductsDialog(isOpen);
         }}
       >
-        <DialogContent className="w-[45vw] max-w-[1600px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="p-6 border-b">
+        <DialogContent className="w-[95vw] sm:w-[90vw] md:w-[80vw] lg:w-[70vw] xl:w-[60vw] max-w-[1600px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="p-4 sm:p-6 border-b">
             <DialogTitle>
               {currentEditedId !== null ? "Ürünü Düzenle" : "Yeni Ürün Ekle"}
             </DialogTitle>
           </DialogHeader>
-          <div className="p-6 space-y-4">
+          <div className="p-4 sm:p-6 space-y-4">
             {/* Resim Yükleme */}
             <ProductImageUpload
               id="product-image-upload"
@@ -609,13 +609,13 @@ function AdminProducts() {
             {formData.images && formData.images.length > 0 && (
               <div className="space-y-4 pt-4 border-t">
                 <h3 className="text-lg font-medium">Yüklenen Ek Resimler</h3>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
                   {formData.images.map((imageUrl, index) => (
                     <div key={index} className="relative group">
                       <img
                         src={imageUrl}
                         alt={`Ek Resim ${index + 1}`}
-                        className="w-full h-20 object-cover rounded border"
+                        className="w-full h-16 sm:h-20 object-cover rounded border"
                       />
                       <button
                         type="button"
@@ -632,7 +632,7 @@ function AdminProducts() {
 
             <form onSubmit={onSubmit} className="space-y-4">
               {/* Başlık ve Ek Resim Seçme - Yan Yana */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Başlık Alanı */}
                 <div className="space-y-1">
                   <Label htmlFor="title">Başlık</Label>
@@ -663,9 +663,9 @@ function AdminProducts() {
               </div>
 
               {/* Diğer Form Alanları - İki Sütun */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {dynamicFormControls.filter(control => control.name !== 'title').map((control) => (
-                   <div key={control.name} className={`space-y-1 ${control.componentType === 'textarea' ? 'md:col-span-2' : ''}`}>
+                   <div key={control.name} className={`space-y-1 ${control.componentType === 'textarea' ? 'lg:col-span-2' : ''}`}>
                      <Label htmlFor={control.name}>{control.label}</Label>
                      {control.componentType === 'input' && (
                        <Input
@@ -711,7 +711,7 @@ function AdminProducts() {
               <div className="space-y-4 pt-4 border-t">
                 <h3 className="text-lg font-medium">Teknik Özellikler</h3>
                 {formData.technicalSpecs.map((spec, index) => (
-                  <div key={index} className="flex items-center gap-2">
+                  <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
                     <Input
                       placeholder="Özellik Adı (örn. Renk)"
                       value={spec.key}
@@ -724,7 +724,7 @@ function AdminProducts() {
                       onChange={(e) => handleTechSpecChange(index, 'value', e.target.value)}
                       className="flex-1"
                     />
-                    <Button variant="ghost" size="icon" onClick={() => removeTechSpec(index)}>
+                    <Button variant="ghost" size="icon" onClick={() => removeTechSpec(index)} className="flex-shrink-0">
                       <Trash className="w-4 h-4 text-red-500" />
                     </Button>
                   </div>

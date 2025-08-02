@@ -13,16 +13,16 @@ const http = require("http");
 const { Server } = require("socket.io");
 
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 dakika
-  max: 2100, // her IP'den 15 dakikada en fazla 100 istek
+  windowMs: 3 * 60 * 1000, // 3 dakika
+  max: 1500, // her IP'den 3 dakikada en fazla xxx istek
   standardHeaders: true,
   legacyHeaders: false,
   message: "Çok fazla istek yaptınız, lütfen 15 dakika sonra tekrar deneyin.",
 });
 
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 dakika
-  max: 15, // 15 dakikada 10 giriş denemesi
+  windowMs: 5 * 60 * 1000, // 5 dakika
+  max: 15, // 5 dakikada 10 giriş denemesi
   message:
     "Çok fazla giriş denemesi yapıldı, lütfen daha sonra tekrar deneyin.",
 });
@@ -94,7 +94,6 @@ mongoose
   .catch((error) => console.log("MongoDB connection error:", error));
 
 const app = express();
-// HTTP sunucusunu oluştur ve Socket.io entegrasyonu yap
 const serverInstance = http.createServer(app);
 app.set("trust proxy", 1);
 app.use(helmet());
@@ -226,7 +225,6 @@ if (process.env.NODE_ENV !== "test") {
 }
 app.use("/api/shop/coupons", shopCouponRouter);
 
-// Express uygulamasını Socket.io ile beraber dinlemeye al
 serverInstance.listen(PORT, () =>
   console.log(`Server (with Socket.io) is now running on port ${PORT}`)
 );

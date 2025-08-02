@@ -1,36 +1,276 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
 
-    
-    <sitemap>
-        <loc>https://Deposun.com/shop/home-sitemap.xml</loc>
-        <lastmod>2025-06-23</lastmod>
+    <!-- Ana Sayfa -->
+    <url>
+        <loc>https://deposun.com/</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>daily</changefreq>
         <priority>1.0</priority>
-    </sitemap>
-    
-    <sitemap>
-        <loc>https://deposun.com/product-sitemap.xml</loc>
-        <lastmod>2025-07-01T10:00:00+03:00</lastmod>
-    </sitemap>
+    </url>
 
-    <sitemap>
-        <loc>https://deposun.com/category-sitemap.xml</loc>
-        <lastmod>2025-06-28T14:30:00+03:00</lastmod>
-    </sitemap>
+    <!-- Güneş Enerjisi Ana Kategorileri -->
+    <url>
+        <loc>https://deposun.com/gunes-enerjisi</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
 
-    <sitemap>
-        <loc>https://deposun.com/pages-sitemap.xml</loc>
-        <lastmod>2025-06-15T11:00:00+03:00</lastmod>
-    </sitemap>
+    <url>
+        <loc>https://deposun.com/solar-panel</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
 
-    <sitemap>
-        <loc>https://deposun.com/blog-sitemap.xml</loc>
-        <lastmod>2025-07-02T15:00:00+03:00</lastmod>
-    </sitemap>
+    <url>
+        <loc>https://deposun.com/inverter</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
 
-    <sitemap>
-        <loc>https://deposun.com/image-sitemap.xml</loc>
-        <lastmod>2025-07-01T10:00:00+03:00</lastmod>
-    </sitemap>
+    <url>
+        <loc>https://deposun.com/aku</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
 
-</sitemapindex>
+    <!-- Güneş Paneli Alt Kategorileri -->
+    <url>
+        <loc>https://deposun.com/gunes-paneli-fiyatlari-2024</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/monokristal-panel</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/polikristal-panel</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/half-cut-panel</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/bifacial-panel</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- İnverter Alt Kategorileri -->
+    <url>
+        <loc>https://deposun.com/tam-sinus-inverter</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/akilli-inverter</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/on-grid-inverter</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/off-grid-inverter</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/hibrit-inverter</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- Akü Alt Kategorileri -->
+    <url>
+        <loc>https://deposun.com/jel-aku</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/lityum-aku</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/deep-cycle-aku</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- GES Kurulum ve Hizmetler -->
+    <url>
+        <loc>https://deposun.com/ges-kurulumu</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/cati-ges</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/mahsuplasma</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/devlet-destegi</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- Marka Sayfaları -->
+    <url>
+        <loc>https://deposun.com/tommatech</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/lexron</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/mexxsun</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/orbus</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/powermaster</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- Güç Kapasitesi Sayfaları -->
+    <url>
+        <loc>https://deposun.com/3kw-gunes-enerjisi</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/5kw-gunes-enerjisi</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/10kw-gunes-enerjisi</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- Bölgesel Sayfalar -->
+    <url>
+        <loc>https://deposun.com/konya-gunes-enerjisi</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- Bilgi ve Rehber Sayfaları -->
+    <url>
+        <loc>https://deposun.com/gunes-enerjisi-nedir</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/solar-panel-verimliligi</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/inverter-secimi</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/aku-karsilastirma</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <!-- İletişim ve Hakkımızda -->
+    <url>
+        <loc>https://deposun.com/iletisim</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <url>
+        <loc>https://deposun.com/hakkimizda</loc>
+        <lastmod>2024-12-19T10:00:00+03:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+</urlset>
