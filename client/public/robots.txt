@@ -1,10 +1,24 @@
 # ===================================================================
-# Deposun.com için robots.txt Dosyası
-# Rapor Referansı: Bölüm 1.1 - robots.txt Optimizasyon Protokolü
+# Deposun.com - Konya Güneş Enerjisi Sistemleri için robots.txt
+# Güneş Enerjisi SEO Optimizasyonu - 2024
 # ===================================================================
 
 # Tüm arama motoru botları için geçerli kurallar
 User-agent: *
+
+# -------------------------------------------------------------------
+# GÜNEŞ ENERJİSİ İÇERİKLERİNE ÖNCELİK VERME
+# Ana sayfa ve kategori sayfalarına tam erişim
+# -------------------------------------------------------------------
+
+Allow: /
+Allow: /gunes-enerjisi/
+Allow: /solar-panel/
+Allow: /inverter/
+Allow: /aku/
+Allow: /ges-kurulumu/
+Allow: /mahsuplasma/
+Allow: /devlet-destegi/
 
 # -------------------------------------------------------------------
 # KULLANICIYA ÖZEL VE İŞLEVSEL SAYFALARIN ENGELLENMESİ
@@ -47,8 +61,53 @@ Allow: /*.js$
 Allow: /*.css$
 
 # -------------------------------------------------------------------
+# GÜNEŞ ENERJİSİ ÜRÜN GÖRSELLERİNE ERİŞİM
+# Ürün fotoğrafları ve teknik çizimler için izin
+# -------------------------------------------------------------------
+
+Allow: /images/gunes-paneli/
+Allow: /images/inverter/
+Allow: /images/aku/
+Allow: /images/ges-kurulumu/
+
+# -------------------------------------------------------------------
 # SİTE HARİTALARININ KONUMU
 # Ana site haritası indeksi burada belirtilir.
 # -------------------------------------------------------------------
 
-Sitemap: https://deposun.com/sitemap_index.xml
+Sitemap: https://deposun.com/sitemap.xml
+
+# -------------------------------------------------------------------
+# GOOGLE BOTLARI İÇİN ÖZEL KURALLAR
+# Google'ın güneş enerjisi içeriklerini daha iyi anlaması için
+# -------------------------------------------------------------------
+
+User-agent: Googlebot
+Allow: /
+Allow: /gunes-enerjisi/
+Allow: /solar-panel/
+Allow: /inverter/
+Allow: /aku/
+Allow: /ges-kurulumu/
+Allow: /mahsuplasma/
+Allow: /devlet-destegi/
+Allow: /konya-gunes-enerjisi/
+Allow: /gunes-paneli-fiyatlari-2024/
+Allow: /catı-ges/
+Allow: /off-grid-sistem/
+Allow: /on-grid-sistem/
+Allow: /hibrit-inverter/
+Allow: /tam-sinus-inverter/
+Allow: /akilli-inverter/
+Allow: /jel-aku/
+Allow: /lityum-aku/
+Allow: /monokristal-panel/
+Allow: /polikristal-panel/
+Allow: /tommatech/
+Allow: /lexron/
+Allow: /mexxsun/
+Allow: /orbus/
+Allow: /powermaster/
+
+# Crawl-delay: Google botları için özel bekleme süresi
+Crawl-delay: 1
