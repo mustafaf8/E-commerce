@@ -53,18 +53,23 @@ const getSalesOverview = async (req, res) => {
       match = { ...getPeriodMatch(period) };
     }
     
+    console.log("=== DEBUG: Sales Overview ===");
+    console.log("Match:", match);
+    
     // Önce siparişlerden toplam geliri hesapla
     const orderResults = await Order.aggregate([
       { $match: match },
       {
         $group: {
           _id: null,
-          totalRevenue: { $sum: "$totalAmount" },
+          totalRevenue: { $sum: "$totalAmountTRY" }, // ← DÜZELTME
           totalOrders: { $sum: 1 },
           totalDiscount: { $sum: { $ifNull: ["$appliedCoupon.discountAmount", 0] } },
         },
       },
     ]);
+
+    console.log("Order Results:", orderResults);
 
     // Sonra ürün detaylarından brüt satışı hesapla
     const grossRevenueResults = await Order.aggregate([
@@ -76,7 +81,7 @@ const getSalesOverview = async (req, res) => {
           totalGrossRevenue: { 
             $sum: { 
               $multiply: [
-                { $ifNull: ["$cartItems.originalPrice", "$cartItems.price"] }, 
+                { $ifNull: ["$cartItems.priceTRY", 0] }, // ← DÜZELTME
                 "$cartItems.quantity"
               ] 
             } 
@@ -84,6 +89,8 @@ const getSalesOverview = async (req, res) => {
         },
       },
     ]);
+
+    console.log("Gross Revenue Results:", grossRevenueResults);
 
     const orderData = orderResults[0] || {};
     const grossData = grossRevenueResults[0] || {};
@@ -95,6 +102,8 @@ const getSalesOverview = async (req, res) => {
       totalGrossRevenue: grossData.totalGrossRevenue || orderData.totalRevenue || 0,
       averageOrderValue: orderData.totalOrders > 0 ? (orderData.totalRevenue / orderData.totalOrders) : 0,
     };
+
+    console.log("Final Result:", result);
 
     res.status(200).json({ success: true, data: result });
   } catch (error) {
@@ -133,7 +142,7 @@ const getTopSellingProducts = async (req, res) => {
           $group: {
             _id: "$cartItems.productId",
             totalRevenue: {
-              $sum: { $multiply: ["$cartItems.price", "$cartItems.quantity"] },
+              $sum: { $multiply: ["$cartItems.priceTRY", "$cartItems.quantity"] }, // ← DÜZELTME
             },
             totalUnits: { $sum: "$cartItems.quantity" },
           },
@@ -169,7 +178,7 @@ const getTopSellingProducts = async (req, res) => {
       .select("_id title image salesCount salePrice");
     res.status(200).json({ success: true, data: products });
   } catch (error) {
-    //console.error(error);
+    console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -178,11 +187,20 @@ const getTopSellingProducts = async (req, res) => {
 const getSalesByCategory = async (_req, res) => {
   try {
     const pipeline = [
-      { $match: { salesCount: { $gt: 0 } } },
+      { $unwind: "$cartItems" },
+      {
+        $lookup: {
+          from: "products",
+          localField: "cartItems.productId",
+          foreignField: "_id",
+          as: "productInfo",
+        },
+      },
+      { $unwind: "$productInfo" },
       {
         $lookup: {
           from: "categories",
-          localField: "category",
+          localField: "productInfo.category",
           foreignField: "_id",
           as: "categoryInfo",
         },
@@ -191,16 +209,21 @@ const getSalesByCategory = async (_req, res) => {
       {
         $group: {
           _id: "$categoryInfo.name",
-          totalUnits: { $sum: "$salesCount" },
-          totalRevenue: { $sum: { $multiply: ["$salePrice", "$salesCount"] } },
+          category: { $first: "$categoryInfo.name" },
+          totalUnits: { $sum: "$cartItems.quantity" },
+          totalRevenue: { $sum: { $multiply: ["$cartItems.priceTRY", "$cartItems.quantity"] } },
         },
       },
       { $sort: { totalRevenue: -1 } },
     ];
-    const stats = await Product.aggregate(pipeline);
+    
+    console.log("=== DEBUG: Sales By Category ===");
+    const stats = await Order.aggregate(pipeline);
+    console.log("Category Stats:", stats);
+    
     res.status(200).json({ success: true, data: stats });
   } catch (error) {
-    //console.error(error);
+    console.error("Sales By Category Error:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -209,11 +232,20 @@ const getSalesByCategory = async (_req, res) => {
 const getSalesByBrand = async (_req, res) => {
   try {
     const pipeline = [
-      { $match: { salesCount: { $gt: 0 } } },
+      { $unwind: "$cartItems" },
+      {
+        $lookup: {
+          from: "products",
+          localField: "cartItems.productId",
+          foreignField: "_id",
+          as: "productInfo",
+        },
+      },
+      { $unwind: "$productInfo" },
       {
         $lookup: {
           from: "brands",
-          localField: "brand",
+          localField: "productInfo.brand",
           foreignField: "_id",
           as: "brandInfo",
         },
@@ -222,20 +254,24 @@ const getSalesByBrand = async (_req, res) => {
       {
         $group: {
           _id: "$brandInfo.name",
-          totalUnits: { $sum: "$salesCount" },
-          totalRevenue: { $sum: { $multiply: ["$salePrice", "$salesCount"] } },
+          brand: { $first: "$brandInfo.name" },
+          totalUnits: { $sum: "$cartItems.quantity" },
+          totalRevenue: { $sum: { $multiply: ["$cartItems.priceTRY", "$cartItems.quantity"] } },
         },
       },
       { $sort: { totalRevenue: -1 } },
     ];
-    const stats = await Product.aggregate(pipeline);
+    
+    console.log("=== DEBUG: Sales By Brand ===");
+    const stats = await Order.aggregate(pipeline);
+    console.log("Brand Stats:", stats);
+    
     res.status(200).json({ success: true, data: stats });
   } catch (error) {
-    //console.error(error);
+    console.error("Sales By Brand Error:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
-
 // 6. Kullanıcı Özeti
 const getUserSummary = async (req, res) => {
   try {
@@ -294,7 +330,7 @@ const getTopCustomers = async (req, res) => {
               "$guestInfo.email",
             ],
           },
-          totalSpent: { $sum: "$totalAmount" },
+          totalSpent: { $sum: "$totalAmountTRY" },
           orderCount: { $sum: 1 },
           isGuest: { $max: "$isGuestOrder" },
         },
@@ -390,7 +426,7 @@ const getSalesTrend = async (req, res) => {
               timezone: "Europe/Istanbul",
             },
           },
-          totalRevenue: { $sum: "$totalAmount" },
+          totalRevenue: { $sum: "$totalAmountTRY" },
           totalOrders: { $sum: 1 },
         },
       },
@@ -404,7 +440,7 @@ const getSalesTrend = async (req, res) => {
   }
 };
 
-// 10. Kullanıcı Kayıt Trendi (Zaman Serisi)
+// 10. Kullanıcı Kayıt Trendi
 const getUserRegistrationsTrend = async (req, res) => {
   try {
     const { period = "monthly" } = req.query;
@@ -425,21 +461,27 @@ const getUserRegistrationsTrend = async (req, res) => {
         start = null;
     }
 
-    const match = start ? { createdAt: { $gte: start, $lte: end } } : {};
+    const match = start ? { orderDate: { $gte: start, $lte: end } } : {};
 
     let dateFormat = "%Y-%m-%d";
     if (period === "daily") {
       dateFormat = "%H:00";
     }
 
-    const data = await User.aggregate([
-      { $match: match },
+    const data = await Order.aggregate([
+      { 
+        $match: { 
+          ...match,
+          isGuestOrder: false, // Sadece kayıtlı kullanıcılar
+          orderStatus: { $nin: ["pending_payment", "failed"] } // Sorunlu siparişleri hariç tut
+        } 
+      },
       {
         $group: {
           _id: {
             $dateToString: {
               format: dateFormat,
-              date: "$createdAt",
+              date: "$orderDate",
               timezone: "Europe/Istanbul",
             },
           },
@@ -449,9 +491,13 @@ const getUserRegistrationsTrend = async (req, res) => {
       { $sort: { _id: 1 } },
     ]);
 
+    console.log("=== DEBUG: User Registrations Trend ===");
+    console.log("Match:", match);
+    console.log("Data:", data);
+
     res.status(200).json({ success: true, data });
   } catch (e) {
-    //console.error(e);
+    console.error("getUserRegistrationsTrend error:", e);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -511,7 +557,7 @@ function getCostAndRevenueAggregation(match = {}) {
             { $toObjectId: "$cartItems.productId" },
           ],
         },
-        cartItemPrice: { $toDouble: "$cartItems.price" },
+        cartItemPrice: { $toDouble: "$cartItems.priceTRY" },
         cartQuantity: "$cartItems.quantity",
       },
     },
@@ -556,7 +602,7 @@ const getProfitOverview = async (req, res) => {
       {
         $group: {
           _id: "$_id", // group per order first
-          orderRevenue: { $first: "$totalAmount" },
+          orderRevenue: { $first: "$totalAmountTRY" },
           orderCost: {
             $sum: { $multiply: ["$costPrice", "$cartQuantity"] },
           },
