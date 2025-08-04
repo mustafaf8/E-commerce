@@ -15,7 +15,6 @@
     "@getbrevo/brevo": "^3.0.1",
     "axios": "^1.10.0",
     "bcryptjs": "^2.4.3",
-    "body-parser": "^1.20.3",
     "cloudinary": "^2.4.0",
     "connect-mongo": "^5.1.0",
     "cookie-parser": "^1.4.6",
@@ -32,11 +31,9 @@
     "mongoose": "^8.5.3",
     "multer": "^1.4.5-lts.1",
     "node-cron": "^4.0.7",
-    "nodemailer": "^7.0.3",
     "nodemon": "^3.1.4",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "punycode": "2.3.1",
     "socket.io": "^4.8.1"
   }
 }
