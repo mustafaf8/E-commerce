@@ -1,6 +1,7 @@
 const { imageUploadUtil } = require("../../helpers/cloudinary");
 const Product = require("../../models/Product");
 const mongoose = require("mongoose");
+const priceUpdateJob = require("../../jobs/priceUpdateJob");
 
 const handleImageUpload = async (req, res) => {
   try {
@@ -191,10 +192,62 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+// Manuel TL fiyat güncelleme
+const updateAllTLPrices = async (req, res) => {
+  try {
+    console.log("Manuel TL fiyat güncellemesi isteği alındı");
+    
+    // Job durumunu kontrol et
+    const status = priceUpdateJob.getStatus();
+    
+    if (status.isRunning) {
+      return res.status(409).json({
+        success: false,
+        message: "Fiyat güncelleme işlemi zaten çalışıyor. Lütfen bekleyin.",
+      });
+    }
+
+    // Manuel güncelleme başlat
+    await priceUpdateJob.manualUpdate();
+    
+    res.status(200).json({
+      success: true,
+      message: "TL fiyat güncelleme işlemi başlatıldı.",
+      status: priceUpdateJob.getStatus(),
+    });
+  } catch (error) {
+    console.error("Manuel fiyat güncelleme hatası:", error);
+    res.status(500).json({
+      success: false,
+      message: "Fiyat güncelleme işlemi sırasında hata oluştu.",
+    });
+  }
+};
+
+// Fiyat güncelleme job durumunu getir
+const getPriceUpdateStatus = async (req, res) => {
+  try {
+    const status = priceUpdateJob.getStatus();
+    
+    res.status(200).json({
+      success: true,
+      data: status,
+    });
+  } catch (error) {
+    console.error("Job durum sorgulama hatası:", error);
+    res.status(500).json({
+      success: false,
+      message: "Job durumu alınırken hata oluştu.",
+    });
+  }
+};
+
 module.exports = {
   handleImageUpload,
   addProduct,
   fetchAllProducts,
   editProduct,
   deleteProduct,
+  updateAllTLPrices,
+  getPriceUpdateStatus,
 };

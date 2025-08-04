@@ -49,15 +49,7 @@ const lowStockProducts = productList
     .slice(0, 10) // İlk 10 ürünü göster
 : [];
 
-// Debug için console.log ekleyelim
-console.log("=== DEBUG: Low Stock Products ===");
-console.log("Total products:", productList?.length || 0);
-console.log("Low stock products:", lowStockProducts.length);
-console.log("Low stock details:", lowStockProducts.map(p => ({
-title: p.title,
-totalStock: p.totalStock,
-id: p._id
-})));
+
 
   // Test için manuel veri (eğer profitOverview boşsa)
   const testProfitOverview = profitOverview || {

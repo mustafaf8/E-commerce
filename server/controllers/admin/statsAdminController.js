@@ -53,8 +53,6 @@ const getSalesOverview = async (req, res) => {
       match = { ...getPeriodMatch(period) };
     }
     
-    console.log("=== DEBUG: Sales Overview ===");
-    console.log("Match:", match);
     
     // Önce siparişlerden toplam geliri hesapla
     const orderResults = await Order.aggregate([
@@ -69,8 +67,7 @@ const getSalesOverview = async (req, res) => {
       },
     ]);
 
-    console.log("Order Results:", orderResults);
-
+    
     // Sonra ürün detaylarından brüt satışı hesapla
     const grossRevenueResults = await Order.aggregate([
       { $match: match },
@@ -90,8 +87,7 @@ const getSalesOverview = async (req, res) => {
       },
     ]);
 
-    console.log("Gross Revenue Results:", grossRevenueResults);
-
+    
     const orderData = orderResults[0] || {};
     const grossData = grossRevenueResults[0] || {};
     
@@ -103,8 +99,7 @@ const getSalesOverview = async (req, res) => {
       averageOrderValue: orderData.totalOrders > 0 ? (orderData.totalRevenue / orderData.totalOrders) : 0,
     };
 
-    console.log("Final Result:", result);
-
+    
     res.status(200).json({ success: true, data: result });
   } catch (error) {
     console.error("Sales Overview Error:", error);
@@ -217,9 +212,9 @@ const getSalesByCategory = async (_req, res) => {
       { $sort: { totalRevenue: -1 } },
     ];
     
-    console.log("=== DEBUG: Sales By Category ===");
+    
     const stats = await Order.aggregate(pipeline);
-    console.log("Category Stats:", stats);
+    
     
     res.status(200).json({ success: true, data: stats });
   } catch (error) {
@@ -262,9 +257,9 @@ const getSalesByBrand = async (_req, res) => {
       { $sort: { totalRevenue: -1 } },
     ];
     
-    console.log("=== DEBUG: Sales By Brand ===");
+    
     const stats = await Order.aggregate(pipeline);
-    console.log("Brand Stats:", stats);
+    
     
     res.status(200).json({ success: true, data: stats });
   } catch (error) {
@@ -491,13 +486,11 @@ const getUserRegistrationsTrend = async (req, res) => {
       { $sort: { _id: 1 } },
     ]);
 
-    console.log("=== DEBUG: User Registrations Trend ===");
-    console.log("Match:", match);
-    console.log("Data:", data);
+    
 
     res.status(200).json({ success: true, data });
   } catch (e) {
-    console.error("getUserRegistrationsTrend error:", e);
+    //  console.error("getUserRegistrationsTrend error:", e);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -572,22 +565,28 @@ function getCostAndRevenueAggregation(match = {}) {
     { $unwind: "$productInfo" },
     {
       $addFields: {
-        costPrice: { 
+        costPriceUSD: { 
           $ifNull: [
             { $toDouble: "$productInfo.costPrice" }, 
-            { $multiply: ["$cartItemPrice", 0.7] } // Eğer costPrice yoksa %70'ini al
+            0 // Eğer costPrice yoksa 0 al
           ] 
+        },
+      },
+    },
+    {
+      $addFields: {
+        costPriceTRY: { 
+          $multiply: ["$costPriceUSD", 30] // USD'yi TL'ye çevir (30 kuruş oranı)
         },
       },
     },
   ];
 }
-
 // 12. Profit Overview
 const getProfitOverview = async (req, res) => {
   try {
     const { period, startDate, endDate } = req.query;
-    console.log("Profit Overview Request - period:", period, "startDate:", startDate, "endDate:", endDate);
+    //console.log("Profit Overview Request - period:", period, "startDate:", startDate, "endDate:", endDate);
     
     let match = {};
     if (startDate && endDate) {
@@ -595,7 +594,7 @@ const getProfitOverview = async (req, res) => {
     } else {
       match = { ...getPeriodMatch(period) };
     }
-    console.log("Match condition:", match);
+    //console.log("Match condition:", match);
 
     const pipeline = [
       ...getCostAndRevenueAggregation(match),
@@ -625,12 +624,12 @@ const getProfitOverview = async (req, res) => {
       },
     ];
 
-    console.log("Pipeline:", JSON.stringify(pipeline, null, 2));
+    //console.log("Pipeline:", JSON.stringify(pipeline, null, 2));
     const result = await Order.aggregate(pipeline);
-    console.log("Aggregation result:", result);
+    //console.log("Aggregation result:", result);
     
     const data = result[0] || { totalRevenue: 0, totalCost: 0, netProfit: 0 };
-    console.log("Final data:", data);
+    //console.log("Final data:", data);
     
     res.status(200).json({ success: true, data });
   } catch (error) {
