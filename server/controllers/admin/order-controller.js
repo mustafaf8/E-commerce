@@ -120,35 +120,17 @@ const getUsersWithOrders = async (req, res) => {
   try {
     const usersWithOrders = await Order.aggregate([
       {
+        $match: {
+          isGuestOrder: false,
+          orderStatus: { $nin: ["pending_payment", "failed"] }
+        },
+      },
+      {
         $group: {
-          _id: {
-            $cond: {
-              if: { $eq: ["$isGuestOrder", true] },
-              then: "GUEST_ORDERS_VIRTUAL_ID",
-              else: "$userId",
-            },
-          },
+          _id: "$userId",
           orderCount: { $sum: 1 },
           lastOrderDate: { $max: "$orderDate" },
-          statuses: { $addToSet: "$orderStatus" },
-          firstGuestEmail: {
-            $first: {
-              $cond: {
-                if: "$isGuestOrder",
-                then: "$guestInfo.email",
-                else: null,
-              },
-            },
-          },
-          firstGuestFullName: {
-            $first: {
-              $cond: {
-                if: "$isGuestOrder",
-                then: "$guestInfo.fullName",
-                else: null,
-              },
-            },
-          },
+          totalSpent: { $sum: "$totalAmount" },
         },
       },
       {
@@ -160,51 +142,42 @@ const getUsersWithOrders = async (req, res) => {
         },
       },
       {
-        $unwind: {
-          path: "$userInfo",
-          preserveNullAndEmptyArrays: true,
-        },
+        $unwind: "$userInfo",
       },
       {
         $project: {
-          _id: 0,
           userId: "$_id",
-          userName: {
-            $cond: {
-              if: { $eq: ["$_id", "GUEST_ORDERS_VIRTUAL_ID"] },
-              then: "Misafir Siparişleri",
-              else: "$userInfo.userName",
-            },
-          },
-          email: {
-            $cond: {
-              if: { $eq: ["$_id", "GUEST_ORDERS_VIRTUAL_ID"] },
-              then: "$firstGuestEmail",
-              else: "$userInfo.email",
-            },
-          },
-          phoneNumber: {
-            $cond: {
-              if: { $eq: ["$_id", "GUEST_ORDERS_VIRTUAL_ID"] },
-              then: null,
-              else: "$userInfo.phoneNumber",
-            },
-          },
+          userName: "$userInfo.userName",
+          email: "$userInfo.email",
+          phoneNumber: "$userInfo.phoneNumber",
           orderCount: 1,
           lastOrderDate: 1,
+          totalSpent: 1,
           hasNewOrder: {
-            $or: [
-              { $in: ["pending", { $ifNull: ["$statuses", []] }] },
-              { $in: ["pending_payment", { $ifNull: ["$statuses", []] }] },
-              { $in: ["confirmed", { $ifNull: ["$statuses", []] }] },
-            ],
+            $cond: {
+              if: {
+                $in: [
+                  "$lastOrderStatus",
+                  ["pending", "pending_payment", "confirmed", "failed"],
+                ],
+              },
+              then: true,
+              else: false,
+            },
           },
         },
       },
       {
-        $sort: { hasNewOrder: -1, lastOrderDate: -1 },
+        $sort: { lastOrderDate: -1 },
       },
     ]);
+
+    if (!usersWithOrders.length) {
+      return res.status(404).json({
+        success: false,
+        message: "Siparişi olan kullanıcı bulunamadı!",
+      });
+    }
 
     res.status(200).json({
       success: true,
@@ -214,7 +187,7 @@ const getUsersWithOrders = async (req, res) => {
     //console.error("getUsersWithOrders error:", e);
     res.status(500).json({
       success: false,
-      message: "Kullanıcı sipariş listesi alınırken bir hata oluştu!",
+      message: "Kullanıcı listesi alınırken hata oluştu.",
       error: e.message,
     });
   }
@@ -226,34 +199,20 @@ const getOrdersByUserIdForAdmin = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res
         .status(400)
-        .json({ success: false, message: "Geçersiz Sipariş ID formatı." });
+        .json({ success: false, message: "Geçersiz Kullanıcı ID formatı." });
     }
-    if (!userId) {
-      return res.status(400).json({
+
+    const orders = await Order.find({
+      userId: userId,
+      orderStatus: { $nin: ["pending_payment", "failed"] }
+    }).sort({ orderDate: -1 });
+
+    if (!orders.length) {
+      return res.status(404).json({
         success: false,
-        message: "Kullanıcı ID veya misafir grubu ID'si gerekli!",
+        message: "Bu kullanıcıya ait sipariş bulunamadı!",
       });
     }
-
-    let query = {};
-    if (userId === "GUEST_ORDERS_VIRTUAL_ID") {
-      query = { isGuestOrder: true };
-    } else {
-      query = {
-        userId: userId,
-        $or: [{ isGuestOrder: false }, { isGuestOrder: { $exists: false } }],
-      };
-    }
-
-    const ordersDocs = await Order.find(query)
-      .sort({ orderDate: -1 })
-      .populate({
-        path: "userId",
-        select: "userName email",
-        options: { omitUndefined: true },
-      });
-
-    const orders = ordersDocs.map((doc) => doc.toJSON());
 
     res.status(200).json({
       success: true,
@@ -263,7 +222,7 @@ const getOrdersByUserIdForAdmin = async (req, res) => {
     //console.error("getOrdersByUserIdForAdmin error:", e);
     res.status(500).json({
       success: false,
-      message: "Belirli kullanıcıya ait siparişler alınırken bir hata oluştu!",
+      message: "Kullanıcı siparişleri alınırken hata oluştu.",
       error: e.message,
     });
   }
@@ -271,10 +230,18 @@ const getOrdersByUserIdForAdmin = async (req, res) => {
 
 const getAllGuestOrdersForAdmin = async (req, res) => {
   try {
-    const guestOrderDocs = await Order.find({ isGuestOrder: true })
-      .sort({ orderDate: -1 });
+    const guestOrders = await Order.find({
+      isGuestOrder: true,
+      orderStatus: { $nin: ["pending_payment", "failed"] }
+    }).sort({ orderDate: -1 });
 
-    const guestOrders = guestOrderDocs.map((doc) => doc.toJSON());
+    if (!guestOrders.length) {
+      return res.status(404).json({
+        success: false,
+        message: "Misafir siparişi bulunamadı!",
+      });
+    }
+
     res.status(200).json({
       success: true,
       data: guestOrders,
@@ -283,7 +250,27 @@ const getAllGuestOrdersForAdmin = async (req, res) => {
     //console.error("getAllGuestOrdersForAdmin error:", e);
     res.status(500).json({
       success: false,
-      message: "Misafir siparişleri alınırken bir hata oluştu!",
+      message: "Misafir siparişleri alınırken hata oluştu.",
+      error: e.message,
+    });
+  }
+};
+
+const getPendingAndFailedOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({
+      orderStatus: { $in: ["pending_payment", "failed"] }
+    }).sort({ orderDate: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: orders,
+    });
+  } catch (e) {
+    //console.error("getPendingAndFailedOrders error:", e);
+    res.status(500).json({
+      success: false,
+      message: "Bekleyen ve başarısız siparişler alınırken hata oluştu.",
       error: e.message,
     });
   }
@@ -296,4 +283,5 @@ module.exports = {
   getUsersWithOrders,
   getOrdersByUserIdForAdmin,
   getAllGuestOrdersForAdmin,
+  getPendingAndFailedOrders,
 };

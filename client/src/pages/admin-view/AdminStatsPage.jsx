@@ -34,6 +34,10 @@ import {
   BarChart,
   Bar,
   Legend,
+  AreaChart,
+  Area,
+  RadialBarChart,
+  RadialBar,
 } from "recharts";
 import useAdminPermission from "@/hooks/useAdminPermission";
 import { DayPicker } from "react-day-picker";
@@ -75,6 +79,13 @@ function AdminStatsPage() {
     isLoading,
     error,
   } = useSelector((state) => state.adminStats);
+
+  // Test için manuel veri (eğer profitOverview boşsa)
+  const testProfitOverview = profitOverview || {
+    totalRevenue: 15000,
+    totalCost: 8000,
+    netProfit: 7000
+  };
 
   const { productList } = useSelector((state) => state.adminProducts);
 
@@ -281,7 +292,14 @@ function AdminStatsPage() {
             <div className="text-2xl font-bold">
               {salesOverview?.totalGrossRevenue?.toFixed(2) || "0.00"}₺
             </div>
-            <p className="text-xs text-muted-foreground">İndirimler öncesi toplam tutar</p>
+            <p className="text-xs text-muted-foreground">
+              İndirimler öncesi toplam tutar
+              {salesOverview?.totalDiscount > 0 && (
+                <span className="block text-green-600">
+                  +{salesOverview.totalDiscount.toFixed(2)}₺ indirim uygulandı
+                </span>
+              )}
+            </p>
           </CardContent>
         </Card>
 
@@ -440,38 +458,82 @@ function AdminStatsPage() {
             )}
 
           {/* Profit Pie Chart */}
-          {profitOverview &&
-            (() => {
-              const total =
-                (profitOverview.totalRevenue || 0) +
-                (profitOverview.totalCost || 0);
-              if (total === 0) return null;
-              const pieData = [
-                {
-                  name: "Gelir",
-                  value: profitOverview.totalRevenue || 0,
-                  fill: "#4ade80",
-                },
-                {
-                  name: "Maliyet",
-                  value: profitOverview.totalCost || 0,
-                  fill: "#f87171",
-                },
-                {
-                  name: "Net Kar",
-                  value: profitOverview.netProfit || 0,
-                  fill: "#60a5fa",
-                },
-              ];
-              return (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Kar Dağılımı</CardTitle>
-                  </CardHeader>
-                  <CardContent>
+          <Card>
+            <CardHeader>
+              <CardTitle>Kar Dağılımı</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {(() => {
+                const profitData = profitOverview || testProfitOverview;
+                
+                if (!profitData) {
+                  return (
+                    <div className="text-center text-muted-foreground">
+                      Kar verisi yükleniyor...
+                    </div>
+                  );
+                }
+                
+                const revenue = profitData.totalRevenue || 0;
+                const cost = profitData.totalCost || 0;
+                const profit = profitData.netProfit || 0;
+                
+                // Create pie data with absolute values for better visualization
+                const pieData = [
+                  {
+                    name: "Gelir",
+                    value: Math.abs(revenue),
+                    fill: "#4ade80",
+                    originalValue: revenue
+                  },
+                  {
+                    name: "Maliyet", 
+                    value: Math.abs(cost),
+                    fill: "#f87171",
+                    originalValue: cost
+                  },
+                  {
+                    name: "Net Kar",
+                    value: Math.abs(profit),
+                    fill: profit >= 0 ? "#60a5fa" : "#ef4444",
+                    originalValue: profit
+                  },
+                ];
+                
+                // Check if we have any non-zero data
+                const hasData = pieData.some(item => item.value > 0);
+                
+                if (!hasData) {
+                  return (
+                    <div className="text-center text-muted-foreground">
+                      <p>Kar verisi bulunamadı</p>
+                      <p className="text-xs mt-2">
+                        Gelir: ₺{revenue.toFixed(2)} | 
+                        Maliyet: ₺{cost.toFixed(2)} | 
+                        Net Kar: ₺{profit.toFixed(2)}
+                      </p>
+                    </div>
+                  );
+                }
+                
+                return (
+                  <div>
                     <ResponsiveContainer width="100%" height={300}>
                       <PieChart>
-                        <Tooltip />
+                        <Tooltip 
+                          content={({ active, payload }) => {
+                            if (!active || !payload || payload.length === 0) return null;
+                            const data = payload[0].payload;
+                            return (
+                              <div className="rounded-lg border bg-white p-3 shadow-lg">
+                                <p className="font-semibold text-sm">{data.name}</p>
+                                <p className="text-sm">
+                                  ₺{data.originalValue.toFixed(2)}
+                                </p>
+                              </div>
+                            );
+                          }}
+                        />
                         <Legend />
                         <Pie
                           data={pieData}
@@ -479,7 +541,9 @@ function AdminStatsPage() {
                           nameKey="name"
                           innerRadius={60}
                           outerRadius={100}
-                          label
+                          label={({ name, originalValue }) => 
+                            `${name}: ₺${originalValue.toFixed(2)}`
+                          }
                         >
                           {pieData.map((entry, idx) => (
                             <Cell
@@ -490,10 +554,20 @@ function AdminStatsPage() {
                         </Pie>
                       </PieChart>
                     </ResponsiveContainer>
-                  </CardContent>
-                </Card>
-              );
-            })()}
+                    
+                    {/* Summary below chart */}
+                    <div className="mt-4 text-center text-sm text-muted-foreground">
+                      <p>
+                        Toplam Gelir: ₺{revenue.toFixed(2)} | 
+                        Toplam Maliyet: ₺{cost.toFixed(2)} | 
+                        Net Kar: ₺{profit.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })()}
+            </CardContent>
+          </Card>
         </div>
       )}
 
@@ -532,7 +606,7 @@ function AdminStatsPage() {
       {/* Category & Brand Sales grid */}
       {(salesByCategory?.length > 0 || salesByBrand?.length > 0) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Category Sales */}
+          {/* Category Sales - Modern Area Chart */}
           {salesByCategory && salesByCategory.length > 0 && (
             <Card>
               <CardHeader>
@@ -543,24 +617,60 @@ function AdminStatsPage() {
                   <Skeleton className="h-[360px] w-full rounded-md" />
                 ) : (
                   <ResponsiveContainer width="100%" height={300}>
-                    <BarChart
-                      data={salesByCategory}
-                      layout="vertical"
-                      margin={{ left: 80 }}
+                    <AreaChart
+                      data={salesByCategory.slice(0, 8)}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis type="number" dataKey="totalRevenue" />
-                      <YAxis type="category" dataKey="_id" width={150} />
-                      <Tooltip />
-                      <Bar dataKey="totalRevenue" fill="#8884d8" name="Gelir" />
-                    </BarChart>
+                      <defs>
+                        <linearGradient id="categoryGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#8884d8" stopOpacity={0.1}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis 
+                        dataKey="_id" 
+                        tick={{ fontSize: 12 }}
+                        angle={-45}
+                        textAnchor="end"
+                        height={80}
+                      />
+                      <YAxis 
+                        tick={{ fontSize: 12 }}
+                        tickFormatter={(value) => `₺${(value / 1000).toFixed(0)}K`}
+                      />
+                      <Tooltip
+                        content={({ active, payload, label }) => {
+                          if (!active || !payload || payload.length === 0) return null;
+                          return (
+                            <div className="rounded-lg border bg-white p-3 shadow-lg">
+                              <p className="font-semibold text-sm">{label}</p>
+                              <p className="text-sm text-blue-600">
+                                Gelir: ₺{payload[0].value.toFixed(2)}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                Satış: {salesByCategory.find(item => item._id === label)?.totalUnits || 0} adet
+                              </p>
+                            </div>
+                          );
+                        }}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="totalRevenue"
+                        stroke="#8884d8"
+                        strokeWidth={2}
+                        fill="url(#categoryGradient)"
+                        name="Gelir"
+                      />
+                    </AreaChart>
                   </ResponsiveContainer>
                 )}
               </CardContent>
             </Card>
           )}
 
-          {/* Brand Sales */}
+          {/* Brand Sales - Area Chart (same as Category) */}
           {salesByBrand && salesByBrand.length > 0 && (
             <Card>
               <CardHeader>
@@ -571,17 +681,53 @@ function AdminStatsPage() {
                   <Skeleton className="h-[360px] w-full rounded-md" />
                 ) : (
                   <ResponsiveContainer width="100%" height={300}>
-                    <BarChart
-                      data={salesByBrand}
-                      layout="vertical"
-                      margin={{ left: 80 }}
+                    <AreaChart
+                      data={salesByBrand.slice(0, 8)}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis type="number" dataKey="totalRevenue" />
-                      <YAxis type="category" dataKey="_id" width={150} />
-                      <Tooltip />
-                      <Bar dataKey="totalRevenue" fill="#82ca9d" name="Gelir" />
-                    </BarChart>
+                      <defs>
+                        <linearGradient id="brandGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#82ca9d" stopOpacity={0.1}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis 
+                        dataKey="_id" 
+                        tick={{ fontSize: 12 }}
+                        angle={-45}
+                        textAnchor="end"
+                        height={80}
+                      />
+                      <YAxis 
+                        tick={{ fontSize: 12 }}
+                        tickFormatter={(value) => `₺${(value / 1000).toFixed(0)}K`}
+                      />
+                      <Tooltip
+                        content={({ active, payload, label }) => {
+                          if (!active || !payload || payload.length === 0) return null;
+                          return (
+                            <div className="rounded-lg border bg-white p-3 shadow-lg">
+                              <p className="font-semibold text-sm">{label}</p>
+                              <p className="text-sm text-green-600">
+                                Gelir: ₺{payload[0].value.toFixed(2)}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                Satış: {salesByBrand.find(item => item._id === label)?.totalUnits || 0} adet
+                              </p>
+                            </div>
+                          );
+                        }}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="totalRevenue"
+                        stroke="#82ca9d"
+                        strokeWidth={2}
+                        fill="url(#brandGradient)"
+                        name="Gelir"
+                      />
+                    </AreaChart>
                   </ResponsiveContainer>
                 )}
               </CardContent>

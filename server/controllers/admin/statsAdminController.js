@@ -52,7 +52,9 @@ const getSalesOverview = async (req, res) => {
     } else {
       match = { ...getPeriodMatch(period) };
     }
-    const results = await Order.aggregate([
+    
+    // Önce siparişlerden toplam geliri hesapla
+    const orderResults = await Order.aggregate([
       { $match: match },
       {
         $group: {
@@ -62,26 +64,41 @@ const getSalesOverview = async (req, res) => {
           totalDiscount: { $sum: { $ifNull: ["$appliedCoupon.discountAmount", 0] } },
         },
       },
+    ]);
+
+    // Sonra ürün detaylarından brüt satışı hesapla
+    const grossRevenueResults = await Order.aggregate([
+      { $match: match },
+      { $unwind: "$cartItems" },
       {
-        $project: {
-          _id: 0,
-          totalNetRevenue: "$totalRevenue",
-          totalOrders: 1,
-          totalDiscount: 1,
-          totalGrossRevenue: { $add: ["$totalRevenue", "$totalDiscount"] },
-          averageOrderValue: {
-            $cond: [
-              { $eq: ["$totalOrders", 0] },
-              0,
-              { $divide: ["$totalRevenue", "$totalOrders"] },
-            ],
+        $group: {
+          _id: null,
+          totalGrossRevenue: { 
+            $sum: { 
+              $multiply: [
+                { $ifNull: ["$cartItems.originalPrice", "$cartItems.price"] }, 
+                "$cartItems.quantity"
+              ] 
+            } 
           },
         },
       },
     ]);
-    res.status(200).json({ success: true, data: results[0] || {} });
+
+    const orderData = orderResults[0] || {};
+    const grossData = grossRevenueResults[0] || {};
+    
+    const result = {
+      totalNetRevenue: orderData.totalRevenue || 0,
+      totalOrders: orderData.totalOrders || 0,
+      totalDiscount: orderData.totalDiscount || 0,
+      totalGrossRevenue: grossData.totalGrossRevenue || orderData.totalRevenue || 0,
+      averageOrderValue: orderData.totalOrders > 0 ? (orderData.totalRevenue / orderData.totalOrders) : 0,
+    };
+
+    res.status(200).json({ success: true, data: result });
   } catch (error) {
-    //console.error(error);
+    console.error("Sales Overview Error:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -263,6 +280,11 @@ const getTopCustomers = async (req, res) => {
   try {
     const { limit = 10 } = req.query;
     const pipeline = [
+      {
+        $match: {
+          orderStatus: { $nin: ["pending_payment", "failed"] }
+        }
+      },
       {
         $group: {
           _id: {
@@ -504,7 +526,12 @@ function getCostAndRevenueAggregation(match = {}) {
     { $unwind: "$productInfo" },
     {
       $addFields: {
-        costPrice: "$productInfo.costPrice",
+        costPrice: { 
+          $ifNull: [
+            { $toDouble: "$productInfo.costPrice" }, 
+            { $multiply: ["$cartItemPrice", 0.7] } // Eğer costPrice yoksa %70'ini al
+          ] 
+        },
       },
     },
   ];
@@ -514,12 +541,15 @@ function getCostAndRevenueAggregation(match = {}) {
 const getProfitOverview = async (req, res) => {
   try {
     const { period, startDate, endDate } = req.query;
+    console.log("Profit Overview Request - period:", period, "startDate:", startDate, "endDate:", endDate);
+    
     let match = {};
     if (startDate && endDate) {
       match = getDateRangeMatch(startDate, endDate, "orderDate");
     } else {
       match = { ...getPeriodMatch(period) };
     }
+    console.log("Match condition:", match);
 
     const pipeline = [
       ...getCostAndRevenueAggregation(match),
@@ -542,17 +572,23 @@ const getProfitOverview = async (req, res) => {
       {
         $project: {
           _id: 0,
-          totalRevenue: 1,
-          totalCost: 1,
-          netProfit: { $subtract: ["$totalRevenue", "$totalCost"] },
+          totalRevenue: { $round: ["$totalRevenue", 2] },
+          totalCost: { $round: ["$totalCost", 2] },
+          netProfit: { $round: [{ $subtract: ["$totalRevenue", "$totalCost"] }, 2] },
         },
       },
     ];
 
+    console.log("Pipeline:", JSON.stringify(pipeline, null, 2));
     const result = await Order.aggregate(pipeline);
-    res.status(200).json({ success: true, data: result[0] || {} });
+    console.log("Aggregation result:", result);
+    
+    const data = result[0] || { totalRevenue: 0, totalCost: 0, netProfit: 0 };
+    console.log("Final data:", data);
+    
+    res.status(200).json({ success: true, data });
   } catch (error) {
-    //console.error(error);
+    console.error("Profit Overview Error:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

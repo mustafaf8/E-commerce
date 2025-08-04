@@ -9,6 +9,7 @@ const {
   getUsersWithOrders,
   getOrdersByUserIdForAdmin,
   getAllGuestOrdersForAdmin,
+  getPendingAndFailedOrders,
 } = require("../../controllers/admin/order-controller");
 
 const router = express.Router();
@@ -21,5 +22,6 @@ router.put("/update/:id", updateOrderStatus);
 router.get("/users-list", getUsersWithOrders);
 router.get("/user/:userId", getOrdersByUserIdForAdmin);
 router.get("/guest-orders", getAllGuestOrdersForAdmin);
+router.get("/pending-failed", getPendingAndFailedOrders);
 
 module.exports = router;
