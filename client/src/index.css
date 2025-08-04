@@ -90,7 +90,7 @@
     --chart-3: 214 40% 80%;
     --chart-4: 197 70% 55%;
     --chart-5: 230 70% 60%;
-    
+
     /* Shop specific colors */
     --shop-primary: 214 80% 50%;
     --shop-primary-light: 214 80% 90%;
@@ -128,7 +128,7 @@
     --chart-3: 214 40% 80%;
     --chart-4: 197 70% 55%;
     --chart-5: 230 70% 60%;
-    
+
     /* Shop specific colors - dark mode */
     --shop-primary: 214 70% 50%;
     --shop-primary-light: 214 70% 25%;
@@ -169,15 +169,15 @@
     --shop-footer-height: 12rem;
     --shop-bottom-nav-height: 4rem;
   }
-  
+
   .shop-product-card {
     @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-border overflow-hidden transition-all duration-200;
   }
-  
+
   .shop-section {
     @apply py-4 md:py-6;
   }
-  
+
   .shop-container {
     @apply container mx-auto px-4 lg:px-20;
   }
@@ -185,11 +185,11 @@
   .shop-button-primary {
     @apply bg-gradient-to-r from-[hsl(var(--shop-primary))] to-[hsl(var(--shop-accent))] text-white;
   }
-  
+
   .shop-badge-discount {
     @apply bg-[hsl(var(--shop-discount))];
   }
-  
+
   .shop-badge-stock {
     @apply bg-[hsl(var(--shop-warning))];
   }
@@ -265,7 +265,7 @@
   z-index: 10;
   min-width: 0.8rem;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 * {
@@ -319,7 +319,7 @@
     height: 90px;
     border-radius: 8px;
   }
-  
+
   .promo-card-skeleton {
     width: 100%;
     height: 90px;
@@ -338,7 +338,7 @@
     width: 100%;
     height: 100px;
   }
-  
+
   .promo-card-skeleton {
     width: 100%;
     height: 100px;
@@ -357,7 +357,7 @@
     width: 100%;
     height: 110px;
   }
-  
+
   .promo-card-skeleton {
     width: 100%;
     height: 110px;
@@ -368,7 +368,7 @@
   .promo-card {
     height: 125px;
   }
-  
+
   .promo-card-skeleton {
     height: 125px;
   }
