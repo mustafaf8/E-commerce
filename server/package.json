@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "migrate-prices": "node scripts/migrateTLPrices.js"
   },
   "author": "mustafa nahsan",
   "license": "ISC",

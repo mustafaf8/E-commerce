@@ -13,6 +13,8 @@ const initialState = {
   error: null,
   guestOrderList: [],
   isGuestOrdersLoading: false,
+  pendingFailedOrders: [],
+  isPendingFailedLoading: false,
 };
 
 export const fetchAllGuestOrdersForAdmin = createAsyncThunk(
@@ -73,6 +75,18 @@ export const fetchOrdersByUserIdForAdmin = createAsyncThunk(
   async (userId, { rejectWithValue }) => {
     try {
       const response = await api.get(`/admin/orders/user/${userId}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+
+export const fetchPendingFailedOrders = createAsyncThunk(
+  "adminOrder/fetchPendingFailedOrders",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/admin/orders/pending-failed`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data);
@@ -207,6 +221,25 @@ const adminOrderSlice = createSlice({
           action.payload?.message ||
           action.error?.message ||
           "Misafir siparişleri alınamadı.";
+      })
+      .addCase(fetchPendingFailedOrders.pending, (state) => {
+        state.isPendingFailedLoading = true;
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchPendingFailedOrders.fulfilled, (state, action) => {
+        state.isPendingFailedLoading = false;
+        state.isLoading = false;
+        state.pendingFailedOrders = action.payload?.data || [];
+      })
+      .addCase(fetchPendingFailedOrders.rejected, (state, action) => {
+        state.isPendingFailedLoading = false;
+        state.isLoading = false;
+        state.pendingFailedOrders = [];
+        state.error =
+          action.payload?.message ||
+          action.error?.message ||
+          "Bekleyen ve başarısız siparişler alınamadı.";
       });
   },
 });

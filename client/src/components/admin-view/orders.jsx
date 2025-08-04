@@ -26,6 +26,7 @@ import {
   resetOrderDetails,
   clearSelectedUserOrders,
   fetchAllGuestOrdersForAdmin,
+  fetchPendingFailedOrders,
 } from "@/store/admin/order-slice";
 import { Badge } from "../ui/badge";
 import { format, parseISO, isValid } from "date-fns";
@@ -36,6 +37,7 @@ import {
   UserCog,
   UserMinus,
   ShoppingBag,
+  AlertTriangle,
 } from "lucide-react";
 import PropTypes from "prop-types";
 import { orderStatusMappingAdmin } from "@/config";
@@ -461,6 +463,7 @@ function AdminOrdersView() {
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [selectedOrderIdForDetails, setSelectedOrderIdForDetails] =
     useState(null);
+  const [isPendingModalOpen, setIsPendingModalOpen] = useState(false);
 
   const dispatch = useDispatch();
   const {
@@ -473,6 +476,8 @@ function AdminOrdersView() {
     error,
     guestOrderList,
     isGuestOrdersLoading,
+    pendingFailedOrders,
+    isPendingFailedLoading,
   } = useSelector(
     (state) =>
       state.adminOrder || {
@@ -485,6 +490,8 @@ function AdminOrdersView() {
         error: null,
         guestOrderList: [],
         isGuestOrdersLoading: false,
+        pendingFailedOrders: [],
+        isPendingFailedLoading: false,
       }
   );
 
@@ -518,6 +525,12 @@ function AdminOrdersView() {
     }
   }, [selectedUserId, dispatch]);
 
+  useEffect(() => {
+    if (isPendingModalOpen) {
+      dispatch(fetchPendingFailedOrders());
+    }
+  }, [isPendingModalOpen, dispatch]);
+
   const handleViewUserOrders = (userId) => {
     setSelectedUserId(userId);
   };
@@ -547,11 +560,29 @@ function AdminOrdersView() {
   return (
     <div className="space-y-3">
       {error && (
-        <p className="text-red-600 text-xs p-2 bg-red-50 rounded-md">hata</p>
+        <p className="text-red-600 text-xs p-2 bg-red-50 rounded-md">
+          {error}
+        </p>
       )}
 
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Sipariş Yönetimi</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-lg font-semibold">Sipariş Yönetimi</h2>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsPendingModalOpen(true)}
+            className="flex items-center gap-2"
+          >
+            <AlertTriangle className="h-4 w-4 text-amber-600" />
+            Sorunlu Ödemeler
+            {pendingFailedOrders.length > 0 && (
+              <Badge variant="destructive" className="ml-1">
+                {pendingFailedOrders.length}
+              </Badge>
+            )}
+          </Button>
+        </div>
         <Card className="p-2 shadow-sm">
           <div className="flex items-center gap-3 text-sm">
             <div className="flex items-center gap-1.5">
@@ -675,6 +706,120 @@ function AdminOrdersView() {
               <p className="text-sm text-muted-foreground mt-1">
                 Lütfen daha sonra tekrar deneyin veya sistem yöneticisiyle
                 iletişime geçin.
+              </p>
+            </div>
+          )}
+
+          <DialogFooter className="px-6 py-3 border-t bg-gray-50 dark:bg-gray-900">
+            <DialogClose asChild>
+              <Button type="button" variant="secondary">
+                Kapat
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Pending and Failed Orders Dialog */}
+      <Dialog
+        open={isPendingModalOpen}
+        onOpenChange={setIsPendingModalOpen}
+      >
+        <DialogContent className="sm:max-w-[900px] p-0 overflow-hidden">
+          <DialogHeader className="px-6 py-4 border-b">
+            <DialogTitle className="flex items-center gap-2 text-lg">
+              <AlertTriangle className="h-5 w-5 text-amber-600" />
+              Sorunlu Ödemeler
+              {pendingFailedOrders.length > 0 && (
+                <Badge variant="destructive" className="ml-2">
+                  {pendingFailedOrders.length}
+                </Badge>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+
+          {isPendingFailedLoading ? (
+            <div className="p-8 text-center">
+              <Loader2 className="mx-auto h-8 w-8 animate-spin text-muted-foreground" />
+              <p className="mt-2 text-sm text-muted-foreground">
+                Sorunlu ödemeler yükleniyor...
+              </p>
+            </div>
+          ) : pendingFailedOrders.length > 0 ? (
+            <div className="max-h-[70vh] overflow-y-auto px-6 py-4">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-xs">Sipariş No</TableHead>
+                    <TableHead className="text-xs">Tarih</TableHead>
+                    <TableHead className="text-xs">Müşteri Bilgisi</TableHead>
+                    <TableHead className="text-xs">Tutar</TableHead>
+                    <TableHead className="text-xs">Durum</TableHead>
+                    <TableHead className="text-xs">İşlem</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pendingFailedOrders.map((order) => {
+                    const orderDate = isValid(parseISO(order.orderDate))
+                      ? format(parseISO(order.orderDate), "dd.MM.yyyy HH:mm")
+                      : "Geçersiz tarih";
+
+                    const customerInfo = order.isGuestOrder
+                      ? `${order.guestInfo?.name || "Misafir"} - ${order.guestInfo?.email || order.guestInfo?.phoneNumber || "N/A"}`
+                      : `${order.userId?.userName || "N/A"} - ${order.userId?.email || order.userId?.phoneNumber || "N/A"}`;
+
+                    return (
+                      <TableRow key={order._id}>
+                        <TableCell className="text-xs font-mono">
+                          {order._id}
+                        </TableCell>
+                        <TableCell className="text-xs">
+                          {orderDate}
+                        </TableCell>
+                        <TableCell className="text-xs max-w-[200px] truncate">
+                          {customerInfo}
+                        </TableCell>
+                        <TableCell className="text-xs font-medium">
+                          ₺{order.totalAmount?.toFixed(2) || "0.00"}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              order.orderStatus === "pending_payment"
+                                ? "secondary"
+                                : "destructive"
+                            }
+                            className="text-xs"
+                          >
+                            {orderStatusMappingAdmin[order.orderStatus]?.label || order.orderStatus}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedOrderIdForDetails(order._id);
+                              dispatch(getOrderDetailsForAdmin(order._id));
+                              setIsPendingModalOpen(false);
+                            }}
+                            className="h-6 px-2 text-xs"
+                          >
+                            Detay
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <div className="p-8 text-center text-muted-foreground">
+              <AlertTriangle className="mx-auto h-12 w-12 text-amber-200 mb-4" />
+              <p className="text-lg font-medium mb-2">Sorunlu Ödeme Yok</p>
+              <p className="text-sm">
+                Şu anda bekleyen veya başarısız ödeme bulunmuyor.
               </p>
             </div>
           )}

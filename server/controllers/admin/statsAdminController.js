@@ -6,6 +6,7 @@ const Brand = require("../../models/Brand");
 const mongoose = require("mongoose");
 const Wishlist = require("../../models/Wishlist");
 const { Parser } = require("json2csv");
+const { getExchangeRate } = require("../../utils/currencyConverter");
 
 function getPeriodMatch(period) {
   if (!period) return {};
@@ -52,36 +53,57 @@ const getSalesOverview = async (req, res) => {
     } else {
       match = { ...getPeriodMatch(period) };
     }
-    const results = await Order.aggregate([
+    
+    
+    // Önce siparişlerden toplam geliri hesapla
+    const orderResults = await Order.aggregate([
       { $match: match },
       {
         $group: {
           _id: null,
-          totalRevenue: { $sum: "$totalAmount" },
+          totalRevenue: { $sum: "$totalAmountTRY" }, // ← DÜZELTME
           totalOrders: { $sum: 1 },
           totalDiscount: { $sum: { $ifNull: ["$appliedCoupon.discountAmount", 0] } },
         },
       },
+    ]);
+
+    
+    // Sonra ürün detaylarından brüt satışı hesapla
+    const grossRevenueResults = await Order.aggregate([
+      { $match: match },
+      { $unwind: "$cartItems" },
       {
-        $project: {
-          _id: 0,
-          totalNetRevenue: "$totalRevenue",
-          totalOrders: 1,
-          totalDiscount: 1,
-          totalGrossRevenue: { $add: ["$totalRevenue", "$totalDiscount"] },
-          averageOrderValue: {
-            $cond: [
-              { $eq: ["$totalOrders", 0] },
-              0,
-              { $divide: ["$totalRevenue", "$totalOrders"] },
-            ],
+        $group: {
+          _id: null,
+          totalGrossRevenue: { 
+            $sum: { 
+              $multiply: [
+                { $ifNull: ["$cartItems.priceTRY", 0] }, // ← DÜZELTME
+                "$cartItems.quantity"
+              ] 
+            } 
           },
         },
       },
     ]);
-    res.status(200).json({ success: true, data: results[0] || {} });
+
+    
+    const orderData = orderResults[0] || {};
+    const grossData = grossRevenueResults[0] || {};
+    
+    const result = {
+      totalNetRevenue: orderData.totalRevenue || 0,
+      totalOrders: orderData.totalOrders || 0,
+      totalDiscount: orderData.totalDiscount || 0,
+      totalGrossRevenue: grossData.totalGrossRevenue || orderData.totalRevenue || 0,
+      averageOrderValue: orderData.totalOrders > 0 ? (orderData.totalRevenue / orderData.totalOrders) : 0,
+    };
+
+    
+    res.status(200).json({ success: true, data: result });
   } catch (error) {
-    //console.error(error);
+    console.error("Sales Overview Error:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -116,7 +138,7 @@ const getTopSellingProducts = async (req, res) => {
           $group: {
             _id: "$cartItems.productId",
             totalRevenue: {
-              $sum: { $multiply: ["$cartItems.price", "$cartItems.quantity"] },
+              $sum: { $multiply: ["$cartItems.priceTRY", "$cartItems.quantity"] }, // ← DÜZELTME
             },
             totalUnits: { $sum: "$cartItems.quantity" },
           },
@@ -152,7 +174,7 @@ const getTopSellingProducts = async (req, res) => {
       .select("_id title image salesCount salePrice");
     res.status(200).json({ success: true, data: products });
   } catch (error) {
-    //console.error(error);
+    console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -161,11 +183,20 @@ const getTopSellingProducts = async (req, res) => {
 const getSalesByCategory = async (_req, res) => {
   try {
     const pipeline = [
-      { $match: { salesCount: { $gt: 0 } } },
+      { $unwind: "$cartItems" },
+      {
+        $lookup: {
+          from: "products",
+          localField: "cartItems.productId",
+          foreignField: "_id",
+          as: "productInfo",
+        },
+      },
+      { $unwind: "$productInfo" },
       {
         $lookup: {
           from: "categories",
-          localField: "category",
+          localField: "productInfo.category",
           foreignField: "_id",
           as: "categoryInfo",
         },
@@ -174,16 +205,21 @@ const getSalesByCategory = async (_req, res) => {
       {
         $group: {
           _id: "$categoryInfo.name",
-          totalUnits: { $sum: "$salesCount" },
-          totalRevenue: { $sum: { $multiply: ["$salePrice", "$salesCount"] } },
+          category: { $first: "$categoryInfo.name" },
+          totalUnits: { $sum: "$cartItems.quantity" },
+          totalRevenue: { $sum: { $multiply: ["$cartItems.priceTRY", "$cartItems.quantity"] } },
         },
       },
       { $sort: { totalRevenue: -1 } },
     ];
-    const stats = await Product.aggregate(pipeline);
+    
+    
+    const stats = await Order.aggregate(pipeline);
+    
+    
     res.status(200).json({ success: true, data: stats });
   } catch (error) {
-    //console.error(error);
+    console.error("Sales By Category Error:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -192,11 +228,20 @@ const getSalesByCategory = async (_req, res) => {
 const getSalesByBrand = async (_req, res) => {
   try {
     const pipeline = [
-      { $match: { salesCount: { $gt: 0 } } },
+      { $unwind: "$cartItems" },
+      {
+        $lookup: {
+          from: "products",
+          localField: "cartItems.productId",
+          foreignField: "_id",
+          as: "productInfo",
+        },
+      },
+      { $unwind: "$productInfo" },
       {
         $lookup: {
           from: "brands",
-          localField: "brand",
+          localField: "productInfo.brand",
           foreignField: "_id",
           as: "brandInfo",
         },
@@ -205,20 +250,24 @@ const getSalesByBrand = async (_req, res) => {
       {
         $group: {
           _id: "$brandInfo.name",
-          totalUnits: { $sum: "$salesCount" },
-          totalRevenue: { $sum: { $multiply: ["$salePrice", "$salesCount"] } },
+          brand: { $first: "$brandInfo.name" },
+          totalUnits: { $sum: "$cartItems.quantity" },
+          totalRevenue: { $sum: { $multiply: ["$cartItems.priceTRY", "$cartItems.quantity"] } },
         },
       },
       { $sort: { totalRevenue: -1 } },
     ];
-    const stats = await Product.aggregate(pipeline);
+    
+    
+    const stats = await Order.aggregate(pipeline);
+    
+    
     res.status(200).json({ success: true, data: stats });
   } catch (error) {
-    //console.error(error);
+    console.error("Sales By Brand Error:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
-
 // 6. Kullanıcı Özeti
 const getUserSummary = async (req, res) => {
   try {
@@ -264,6 +313,11 @@ const getTopCustomers = async (req, res) => {
     const { limit = 10 } = req.query;
     const pipeline = [
       {
+        $match: {
+          orderStatus: { $nin: ["pending_payment", "failed"] }
+        }
+      },
+      {
         $group: {
           _id: {
             $cond: [
@@ -272,7 +326,7 @@ const getTopCustomers = async (req, res) => {
               "$guestInfo.email",
             ],
           },
-          totalSpent: { $sum: "$totalAmount" },
+          totalSpent: { $sum: "$totalAmountTRY" },
           orderCount: { $sum: 1 },
           isGuest: { $max: "$isGuestOrder" },
         },
@@ -368,7 +422,7 @@ const getSalesTrend = async (req, res) => {
               timezone: "Europe/Istanbul",
             },
           },
-          totalRevenue: { $sum: "$totalAmount" },
+          totalRevenue: { $sum: "$totalAmountTRY" },
           totalOrders: { $sum: 1 },
         },
       },
@@ -382,7 +436,7 @@ const getSalesTrend = async (req, res) => {
   }
 };
 
-// 10. Kullanıcı Kayıt Trendi (Zaman Serisi)
+// 10. Kullanıcı Kayıt Trendi
 const getUserRegistrationsTrend = async (req, res) => {
   try {
     const { period = "monthly" } = req.query;
@@ -403,21 +457,27 @@ const getUserRegistrationsTrend = async (req, res) => {
         start = null;
     }
 
-    const match = start ? { createdAt: { $gte: start, $lte: end } } : {};
+    const match = start ? { orderDate: { $gte: start, $lte: end } } : {};
 
     let dateFormat = "%Y-%m-%d";
     if (period === "daily") {
       dateFormat = "%H:00";
     }
 
-    const data = await User.aggregate([
-      { $match: match },
+    const data = await Order.aggregate([
+      { 
+        $match: { 
+          ...match,
+          isGuestOrder: false, // Sadece kayıtlı kullanıcılar
+          orderStatus: { $nin: ["pending_payment", "failed"] } // Sorunlu siparişleri hariç tut
+        } 
+      },
       {
         $group: {
           _id: {
             $dateToString: {
               format: dateFormat,
-              date: "$createdAt",
+              date: "$orderDate",
               timezone: "Europe/Istanbul",
             },
           },
@@ -427,9 +487,11 @@ const getUserRegistrationsTrend = async (req, res) => {
       { $sort: { _id: 1 } },
     ]);
 
+    
+
     res.status(200).json({ success: true, data });
   } catch (e) {
-    //console.error(e);
+    //  console.error("getUserRegistrationsTrend error:", e);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -489,7 +551,7 @@ function getCostAndRevenueAggregation(match = {}) {
             { $toObjectId: "$cartItems.productId" },
           ],
         },
-        cartItemPrice: { $toDouble: "$cartItems.price" },
+        cartItemPrice: { $toDouble: "$cartItems.priceTRY" },
         cartQuantity: "$cartItems.quantity",
       },
     },
@@ -504,16 +566,21 @@ function getCostAndRevenueAggregation(match = {}) {
     { $unwind: "$productInfo" },
     {
       $addFields: {
-        costPrice: "$productInfo.costPrice",
+        costPriceUSD: { 
+          $ifNull: [
+            { $toDouble: "$productInfo.costPrice" }, 
+            0 // Eğer costPrice yoksa 0 al
+          ] 
+        },
       },
     },
   ];
 }
-
 // 12. Profit Overview
 const getProfitOverview = async (req, res) => {
   try {
     const { period, startDate, endDate } = req.query;
+    
     let match = {};
     if (startDate && endDate) {
       match = getDateRangeMatch(startDate, endDate, "orderDate");
@@ -521,14 +588,24 @@ const getProfitOverview = async (req, res) => {
       match = { ...getPeriodMatch(period) };
     }
 
+    // Güncel döviz kurunu al
+    const exchangeRate = await getExchangeRate();
+    
     const pipeline = [
       ...getCostAndRevenueAggregation(match),
       {
+        $addFields: {
+          costPriceTRY: { 
+            $multiply: ["$costPriceUSD", exchangeRate] // Gerçek döviz kuru ile hesapla
+          },
+        },
+      },
+      {
         $group: {
           _id: "$_id", // group per order first
-          orderRevenue: { $first: "$totalAmount" },
+          orderRevenue: { $first: "$totalAmountTRY" },
           orderCost: {
-            $sum: { $multiply: ["$costPrice", "$cartQuantity"] },
+            $sum: { $multiply: ["$costPriceTRY", "$cartQuantity"] },
           },
         },
       },
@@ -542,17 +619,19 @@ const getProfitOverview = async (req, res) => {
       {
         $project: {
           _id: 0,
-          totalRevenue: 1,
-          totalCost: 1,
-          netProfit: { $subtract: ["$totalRevenue", "$totalCost"] },
+          totalRevenue: { $round: ["$totalRevenue", 2] },
+          totalCost: { $round: ["$totalCost", 2] },
+          netProfit: { $round: [{ $subtract: ["$totalRevenue", "$totalCost"] }, 2] },
         },
       },
     ];
 
     const result = await Order.aggregate(pipeline);
-    res.status(200).json({ success: true, data: result[0] || {} });
+    const data = result[0] || { totalRevenue: 0, totalCost: 0, netProfit: 0 };
+    
+    res.status(200).json({ success: true, data });
   } catch (error) {
-    //console.error(error);
+    console.error("Profit Overview Error:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -561,8 +640,19 @@ const getProfitOverview = async (req, res) => {
 const getProfitByProduct = async (req, res) => {
   try {
     const { limit = 20 } = req.query;
+    
+    // Güncel döviz kurunu al
+    const exchangeRate = await getExchangeRate();
+    
     const pipeline = [
       ...getCostAndRevenueAggregation({}),
+      {
+        $addFields: {
+          costPriceTRY: { 
+            $multiply: ["$costPriceUSD", exchangeRate] // Gerçek döviz kuru ile hesapla
+          },
+        },
+      },
       {
         $group: {
           _id: "$productInfo._id",
@@ -573,7 +663,7 @@ const getProfitByProduct = async (req, res) => {
             $sum: { $multiply: ["$cartItemPrice", "$cartQuantity"] },
           },
           cost: {
-            $sum: { $multiply: ["$costPrice", "$cartQuantity"] },
+            $sum: { $multiply: ["$costPriceTRY", "$cartQuantity"] },
           },
         },
       },
@@ -596,8 +686,18 @@ const getProfitByProduct = async (req, res) => {
 // 14. Profit by Category
 const getProfitByCategory = async (_req, res) => {
   try {
+    // Güncel döviz kurunu al
+    const exchangeRate = await getExchangeRate();
+    
     const pipeline = [
       ...getCostAndRevenueAggregation({}),
+      {
+        $addFields: {
+          costPriceTRY: { 
+            $multiply: ["$costPriceUSD", exchangeRate] // Gerçek döviz kuru ile hesapla
+          },
+        },
+      },
       {
         $group: {
           _id: "$productInfo.category",
@@ -606,7 +706,7 @@ const getProfitByCategory = async (_req, res) => {
             $sum: { $multiply: ["$cartItemPrice", "$cartQuantity"] },
           },
           cost: {
-            $sum: { $multiply: ["$costPrice", "$cartQuantity"] },
+            $sum: { $multiply: ["$costPriceTRY", "$cartQuantity"] },
           },
         },
       },
@@ -647,8 +747,18 @@ const getProfitByCategory = async (_req, res) => {
 // 15. Profit by Brand
 const getProfitByBrand = async (_req, res) => {
   try {
+    // Güncel döviz kurunu al
+    const exchangeRate = await getExchangeRate();
+    
     const pipeline = [
       ...getCostAndRevenueAggregation({}),
+      {
+        $addFields: {
+          costPriceTRY: { 
+            $multiply: ["$costPriceUSD", exchangeRate] // Gerçek döviz kuru ile hesapla
+          },
+        },
+      },
       {
         $group: {
           _id: "$productInfo.brand",
@@ -657,7 +767,7 @@ const getProfitByBrand = async (_req, res) => {
             $sum: { $multiply: ["$cartItemPrice", "$cartQuantity"] },
           },
           cost: {
-            $sum: { $multiply: ["$costPrice", "$cartQuantity"] },
+            $sum: { $multiply: ["$costPriceTRY", "$cartQuantity"] },
           },
         },
       },

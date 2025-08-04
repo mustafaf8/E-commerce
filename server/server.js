@@ -85,6 +85,7 @@ const shopCouponRouter = require("./routes/shop/coupon-routes");
 const errorHandler = require("./middleware/errorHandler");
 const { scheduleAbandonedCartEmails } = require("./jobs/abandonedCartJob");
 const { startScheduledRateUpdates } = require("./utils/currencyConverter");
+const priceUpdateJob = require("./jobs/priceUpdateJob");
 require("./controllers/auth/auth-controller");
 
 
@@ -222,6 +223,7 @@ app.use(errorHandler);
 if (process.env.NODE_ENV !== "test") {
   scheduleAbandonedCartEmails();
   startScheduledRateUpdates();
+  priceUpdateJob.start();
 }
 app.use("/api/shop/coupons", shopCouponRouter);
 
