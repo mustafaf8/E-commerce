@@ -257,6 +257,11 @@ function AdminCouponsPage() {
   const canViewCoupons = useAdminPermission("coupons", "view");
   const canManage = useAdminPermission("coupons", "manage");
 
+  // Toast fonksiyonunu memoize et
+  const showToast = useCallback(({ title, description, variant = "default" }) => {
+    toast({ title, description, variant });
+  }, [toast]);
+
   useEffect(() => {
     if (canViewCoupons) {
       dispatch(fetchCoupons());
@@ -265,14 +270,14 @@ function AdminCouponsPage() {
 
   useEffect(() => {
     if (error) {
-      toast({
+      showToast({
         title: "Hata",
         description: error,
         variant: "destructive",
       });
       dispatch(clearError());
     }
-  }, [error, toast, dispatch]);
+  }, [error, showToast, dispatch]);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -282,7 +287,7 @@ function AdminCouponsPage() {
     e.preventDefault();
 
     if (!canManage) {
-      toast({
+      showToast({
         title: "Yetki Hatası",
         description: "Bu işlem için yetkiniz yok.",
         variant: "destructive",
@@ -307,7 +312,7 @@ function AdminCouponsPage() {
           throw new Error(uploadJson.message || "Resim yükleme başarısız");
         }
       } catch (uploadError) {
-        toast({
+        showToast({
           title: "Hata",
           description: "Resim yüklenirken hata oluştu: " + uploadError.message,
           variant: "destructive",
@@ -330,10 +335,10 @@ function AdminCouponsPage() {
         await dispatch(
           updateCoupon({ id: editingCoupon._id, couponData })
         ).unwrap();
-        toast({ title: "Başarılı", description: "Kupon güncellendi." });
+        showToast({ title: "Başarılı", description: "Kupon güncellendi." });
       } else {
         await dispatch(createCoupon(couponData)).unwrap();
-        toast({ title: "Başarılı", description: "Kupon oluşturuldu." });
+        showToast({ title: "Başarılı", description: "Kupon oluşturuldu." });
       }
       handleCloseModal();
     } catch (err) {
@@ -343,7 +348,7 @@ function AdminCouponsPage() {
 
   const handleEdit = useCallback((coupon) => {
     if (!canManage) {
-      toast({
+      showToast({
         title: "Yetki Hatası",
         description: "Bu işlem için yetkiniz yok.",
         variant: "destructive",
@@ -367,11 +372,11 @@ function AdminCouponsPage() {
     });
     setImageFile(null);
     setIsModalOpen(true);
-  }, [canManage, toast]);
+  }, [canManage, showToast]);
 
   const handleDelete = useCallback(async (id) => {
     if (!canManage) {
-      toast({
+      showToast({
         title: "Yetki Hatası",
         description: "Bu işlem için yetkiniz yok.",
         variant: "destructive",
@@ -382,16 +387,16 @@ function AdminCouponsPage() {
     if (confirm("Bu kuponu silmek istediğinizden emin misiniz?")) {
       try {
         await dispatch(deleteCoupon(id)).unwrap();
-        toast({ title: "Başarılı", description: "Kupon silindi." });
+        showToast({ title: "Başarılı", description: "Kupon silindi." });
       } catch (err) {
         // Error is handled by useEffect
       }
     }
-  }, [canManage, dispatch, toast]);
+  }, [canManage, dispatch, showToast]);
 
   const handleToggleStatus = useCallback(async (id) => {
     if (!canManage) {
-      toast({
+      showToast({
         title: "Yetki Hatası",
         description: "Bu işlem için yetkiniz yok.",
         variant: "destructive",
@@ -401,11 +406,11 @@ function AdminCouponsPage() {
 
     try {
       await dispatch(toggleCouponStatus(id)).unwrap();
-      toast({ title: "Başarılı", description: "Kupon durumu güncellendi." });
+      showToast({ title: "Başarılı", description: "Kupon durumu güncellendi." });
     } catch (err) {
       // Error is handled by useEffect
     }
-  }, [canManage, dispatch, toast]);
+  }, [canManage, dispatch, showToast]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
