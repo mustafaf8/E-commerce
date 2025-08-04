@@ -12,13 +12,41 @@ User-agent: *
 # -------------------------------------------------------------------
 
 Allow: /
-Allow: /gunes-enerjisi/
-Allow: /solar-panel/
-Allow: /inverter/
-Allow: /aku/
-Allow: /ges-kurulumu/
-Allow: /mahsuplasma/
-Allow: /devlet-destegi/
+Allow: /shop/
+Allow: /shop/listing
+Allow: /shop/iletisim
+Allow: /shop/hakkimizda
+Allow: /shop/islem-rehberi
+
+# Güneş Enerjisi Kategorileri
+Allow: /shop/listing?category=monokristal-gunes-panelleri
+Allow: /shop/listing?category=dc-pompalar
+Allow: /shop/listing?category=off-grid-inverterler
+Allow: /shop/listing?category=lityum-akuler
+Allow: /shop/listing?category=pompa-suruculeri
+Allow: /shop/listing?category=on-grid-inverterler
+Allow: /shop/listing?category=solar-kablolar
+Allow: /shop/listing?category=ac-dc-aku-sarj-cihazlari
+Allow: /shop/listing?category=mppt-sarj-regulatorleri
+Allow: /shop/listing?category=pwm-sarj-regulatorleri
+Allow: /shop/listing?category=modifiye-sinus-inverterler
+Allow: /shop/listing?category=tam-sinus-akill-inverterler
+Allow: /shop/listing?category=tam-sinus-ups-karavan-inverterler
+Allow: /shop/listing?category=tam-sinus-inverterler
+Allow: /shop/listing?category=auxsol-string-inverterler
+Allow: /shop/listing?category=deye-hibrit-inverterler
+Allow: /shop/listing?category=deye-string-inverterler
+
+# Marka Sayfaları
+Allow: /shop/listing?brand=mexxsun
+Allow: /shop/listing?brand=deye
+Allow: /shop/listing?brand=sako
+Allow: /shop/listing?brand=rmr
+
+# Güç Kapasitesi Sayfaları
+Allow: /3kw-gunes-enerjisi
+Allow: /5kw-gunes-enerjisi
+Allow: /10kw-gunes-enerjisi
 
 # -------------------------------------------------------------------
 # KULLANICIYA ÖZEL VE İŞLEVSEL SAYFALARIN ENGELLENMESİ
@@ -47,7 +75,15 @@ Disallow: /search
 
 # URL parametreleri (filtreleme, sıralama, izleme vb.)
 # Bu kural, '?' içeren tüm URL'leri engelleyerek en kapsamlı korumayı sağlar.
-Disallow: /*?
+# Ancak sitemap'teki kategori ve marka sayfalarına izin veriyoruz
+Disallow: /*?sort=
+Disallow: /*?page=
+Disallow: /*?filter=
+Disallow: /*?price=
+Disallow: /*?brand=
+Disallow: /*?category=
+Disallow: /*?search=
+Disallow: /*?q=
 
 # -------------------------------------------------------------------
 # TARAYICININ SAYFAYI DOĞRU RENDER ETMESİ İÇİN GEREKLİ İZİNLER
@@ -69,6 +105,8 @@ Allow: /images/gunes-paneli/
 Allow: /images/inverter/
 Allow: /images/aku/
 Allow: /images/ges-kurulumu/
+Allow: /images/products/
+Allow: /images/brands/
 
 # -------------------------------------------------------------------
 # SİTE HARİTALARININ KONUMU
@@ -84,30 +122,60 @@ Sitemap: https://deposun.com/sitemap.xml
 
 User-agent: Googlebot
 Allow: /
-Allow: /gunes-enerjisi/
-Allow: /solar-panel/
-Allow: /inverter/
-Allow: /aku/
-Allow: /ges-kurulumu/
-Allow: /mahsuplasma/
-Allow: /devlet-destegi/
-Allow: /konya-gunes-enerjisi/
-Allow: /gunes-paneli-fiyatlari-2024/
-Allow: /catı-ges/
-Allow: /off-grid-sistem/
-Allow: /on-grid-sistem/
-Allow: /hibrit-inverter/
-Allow: /tam-sinus-inverter/
-Allow: /akilli-inverter/
-Allow: /jel-aku/
-Allow: /lityum-aku/
-Allow: /monokristal-panel/
-Allow: /polikristal-panel/
-Allow: /tommatech/
-Allow: /lexron/
-Allow: /mexxsun/
-Allow: /orbus/
-Allow: /powermaster/
+Allow: /shop/
+Allow: /shop/listing
+Allow: /shop/listing?category=*
+Allow: /shop/listing?brand=*
+Allow: /shop/iletisim
+Allow: /shop/hakkimizda
+Allow: /shop/islem-rehberi
+Allow: /3kw-gunes-enerjisi
+Allow: /5kw-gunes-enerjisi
+Allow: /10kw-gunes-enerjisi
+
+# Güneş Enerjisi Kategorileri
+Allow: /shop/listing?category=monokristal-gunes-panelleri
+Allow: /shop/listing?category=dc-pompalar
+Allow: /shop/listing?category=off-grid-inverterler
+Allow: /shop/listing?category=lityum-akuler
+Allow: /shop/listing?category=pompa-suruculeri
+Allow: /shop/listing?category=on-grid-inverterler
+Allow: /shop/listing?category=solar-kablolar
+Allow: /shop/listing?category=ac-dc-aku-sarj-cihazlari
+Allow: /shop/listing?category=mppt-sarj-regulatorleri
+Allow: /shop/listing?category=pwm-sarj-regulatorleri
+Allow: /shop/listing?category=modifiye-sinus-inverterler
+Allow: /shop/listing?category=tam-sinus-akill-inverterler
+Allow: /shop/listing?category=tam-sinus-ups-karavan-inverterler
+Allow: /shop/listing?category=tam-sinus-inverterler
+Allow: /shop/listing?category=auxsol-string-inverterler
+Allow: /shop/listing?category=deye-hibrit-inverterler
+Allow: /shop/listing?category=deye-string-inverterler
+
+# Marka Sayfaları
+Allow: /shop/listing?brand=mexxsun
+Allow: /shop/listing?brand=deye
+Allow: /shop/listing?brand=sako
+Allow: /shop/listing?brand=rmr
 
 # Crawl-delay: Google botları için özel bekleme süresi
+Crawl-delay: 1
+
+# -------------------------------------------------------------------
+# BING BOTLARI İÇİN ÖZEL KURALLAR
+# -------------------------------------------------------------------
+
+User-agent: Bingbot
+Allow: /
+Allow: /shop/
+Allow: /shop/listing
+Allow: /shop/listing?category=*
+Allow: /shop/listing?brand=*
+Allow: /shop/iletisim
+Allow: /shop/hakkimizda
+Allow: /shop/islem-rehberi
+Allow: /3kw-gunes-enerjisi
+Allow: /5kw-gunes-enerjisi
+Allow: /10kw-gunes-enerjisi
+
 Crawl-delay: 1

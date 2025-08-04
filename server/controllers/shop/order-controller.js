@@ -25,6 +25,42 @@ const createOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: "TC Kimlik No 11 haneli sayı olmalıdır." });
     }
 
+    // STOK KONTROLÜ - Ödeme işlemi başlatılmadan önce
+    // Tüm ürün ID'lerini topla
+    const productIds = cartItems.map(item => item.productId);
+    
+    // Tek sorgu ile tüm ürünleri getir
+    const products = await Product.find({ '_id': { $in: productIds } });
+    
+    // Ürünleri ID'ye göre map'le (hızlı erişim için)
+    const productMap = new Map();
+    products.forEach(product => {
+      productMap.set(product._id.toString(), product);
+    });
+    
+    // Stok kontrolü
+    for (const item of cartItems) {
+      const product = productMap.get(item.productId.toString());
+      if (!product) {
+        return res.status(400).json({ 
+          success: false, 
+          message: `Ürün bulunamadı: ${item.productId}`,
+          isStockError: true 
+        });
+      }
+      
+      if (item.quantity > product.totalStock) {
+        return res.status(400).json({ 
+          success: false, 
+          message: `Stok yetersiz: ${product.title}. Stokta kalan: ${product.totalStock}`,
+          isStockError: true,
+          productId: product._id,
+          availableStock: product.totalStock,
+          requestedQuantity: item.quantity
+        });
+      }
+    }
+
     let totalAmountUSD = 0;
     let totalAmountTRY = 0;
     const basketItemsForIyzico = [];
@@ -35,7 +71,7 @@ const createOrder = async (req, res) => {
     console.log("Cart Items:", cartItems.length);
 
     for (const item of cartItems) {
-      const product = await Product.findById(item.productId);
+      const product = productMap.get(item.productId.toString());
       if (product) {
         // TL fiyatlarını hesapla
         await product.calculateTLPrices();
@@ -219,15 +255,47 @@ const createGuestOrder = async (req, res) => {
         const basketItemsForIyzico = [];
         const orderCartItemsDetails = [];
 
+        // STOK KONTROLÜ - Ödeme işlemi başlatılmadan önce
+        // Tüm ürün ID'lerini topla
+        const productIds = cartItems.map(item => item.productId);
+        
+        // Tek sorgu ile tüm ürünleri getir
+        const products = await Product.find({ '_id': { $in: productIds } });
+        
+        // Ürünleri ID'ye göre map'le (hızlı erişim için)
+        const productMap = new Map();
+        products.forEach(product => {
+          productMap.set(product._id.toString(), product);
+        });
+        
+        // Stok kontrolü
         for (const item of cartItems) {
-            const product = await Product.findById(item.productId);
+            const product = productMap.get(item.productId.toString());
+            if (!product) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: `Ürün bulunamadı: ${item.productId}`,
+                    isStockError: true 
+                });
+            }
+            
+            if (item.quantity > product.totalStock) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: `Stok yetersiz: ${product.title}. Stokta kalan: ${product.totalStock}`,
+                    isStockError: true,
+                    productId: product._id,
+                    availableStock: product.totalStock,
+                    requestedQuantity: item.quantity
+                });
+            }
+        }
+
+        for (const item of cartItems) {
+            const product = productMap.get(item.productId.toString());
             if (product) {
                 // TL fiyatlarını hesapla
                 await product.calculateTLPrices();
-                
-                if (item.quantity > product.totalStock) {
-                    return res.status(400).json({ success: false, message: `Stokta yeterli ürün bulunmamaktadır: ${product.title}.`, isStockError: true, productId: product._id, availableStock: product.totalStock });
-                }
                 const priceTRY = product.salePrice > 0 ? product.salePrice : product.price;
                 const itemTotalPriceTRY = priceTRY * item.quantity;
                 const priceUSD = product.salePriceUSD > 0 ? product.salePriceUSD : product.priceUSD;

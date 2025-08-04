@@ -591,15 +591,18 @@ const forgotPassword = async (req, res) => {
       return res.status(404).json({ success: false, message: "Bu e-posta adresiyle kayıtlı kullanıcı bulunamadı." });
     }
 
-    // Sıfırlama token'ı oluştur
+    // Orijinal sıfırlama token'ı oluştur (e-posta ile gönderilecek)
     const resetToken = crypto.randomBytes(20).toString('hex');
+    
+    // Token'ı SHA256 ile hash'le (veritabanına kaydedilecek)
+    const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
 
-    user.resetPasswordToken = resetToken;
+    user.resetPasswordToken = hashedToken;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 saat geçerli
 
     await user.save();
 
-    // E-posta gönder
+    // E-posta gönder (orijinal token ile)
     const emailSent = await sendPasswordResetEmail(user.email, resetToken);
 
     if (emailSent) {
@@ -621,8 +624,11 @@ const resetPassword = async (req, res) => {
         const { token } = req.params;
         const { password } = req.body;
 
+        // URL'den gelen token'ı SHA256 ile hash'le
+        const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
         const user = await User.findOne({
-            resetPasswordToken: token,
+            resetPasswordToken: hashedToken,
             resetPasswordExpires: { $gt: Date.now() },
         });
 

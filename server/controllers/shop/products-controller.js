@@ -236,4 +236,39 @@ const getProductDetails = async (req, res) => {
   }
 };
 
-module.exports = { getFilteredProducts, getProductDetails };
+const getProductStock = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Geçersiz Ürün ID formatı." });
+    }
+    
+    const product = await Product.findById(id).select("totalStock title");
+    
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Ürün bulunamadı!",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        productId: product._id,
+        title: product.title,
+        totalStock: product.totalStock,
+      },
+    });
+  } catch (error) {
+    // console.error("getProductStock error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Ürün stok bilgisi alınırken bir hata oluştu.",
+    });
+  }
+};
+
+module.exports = { getFilteredProducts, getProductDetails, getProductStock };

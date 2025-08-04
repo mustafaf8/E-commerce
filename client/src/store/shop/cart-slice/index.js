@@ -28,6 +28,19 @@ export const addToCart = createAsyncThunk(
 
     if (!auth.isAuthenticated) {
       try {
+        // Sunucu tarafında anlık stok kontrolü
+        const stockResponse = await api.get(`/shop/products/stock/${productId}`);
+        
+        if (!stockResponse.data.success) {
+          return rejectWithValue({
+            success: false,
+            message: "Ürün stok bilgisi alınamadı.",
+          });
+        }
+
+        const currentStock = stockResponse.data.data.totalStock;
+        const productTitle = stockResponse.data.data.title;
+
         if (!productDetails || productDetails.totalStock === undefined) {
           return rejectWithValue({
             success: false,
@@ -42,12 +55,13 @@ export const addToCart = createAsyncThunk(
         );
         const currentQuantityInCart = existingItem ? existingItem.quantity : 0;
 
-        if (currentQuantityInCart + quantity > productDetails.totalStock) {
+        // Anlık stok kontrolü
+        if (currentQuantityInCart + quantity > currentStock) {
           return rejectWithValue({
             success: false,
-            message: "Stokta yeterli ürün bulunmamaktadır.",
+            message: `Stok yetersiz: ${productTitle}. Stokta kalan: ${currentStock - currentQuantityInCart}`,
             isStockError: true,
-            availableStock: productDetails.totalStock - currentQuantityInCart,
+            availableStock: currentStock - currentQuantityInCart,
             requestedQuantity: quantity,
           });
         }
@@ -70,7 +84,7 @@ export const addToCart = createAsyncThunk(
             salePrice: productDetails.salePrice,
             title: productDetails.title,
             image: productDetails.image,
-            totalStock: productDetails.totalStock,
+            totalStock: currentStock, // Anlık stok bilgisini kullan
           });
         }
         const newGuestCart = { ...localCart, items: updatedCartItems };
