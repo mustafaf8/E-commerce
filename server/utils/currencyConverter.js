@@ -27,14 +27,14 @@ const getExchangeRate = async () => {
     }
 
     try {
-        console.log("API'den yeni döviz kuru çekiliyor...");
+        //console.log("API'den yeni döviz kuru çekiliyor...");
         const response = await axios.get(API_URL);
 
         if (response.data && response.data.result === 'success' && response.data.conversion_rates.TRY) {
             const rate = response.data.conversion_rates.TRY;
             cache.rate = rate;
             cache.lastFetch = now;
-            console.log(`Döviz kuru başarıyla güncellendi: 1 USD = ${rate} TRY`);
+            //console.log(`Döviz kuru başarıyla güncellendi: 1 USD = ${rate} TRY`);
             return rate;
         } else {
             console.error("Döviz kuru API yanıtı geçersiz:", response.data);

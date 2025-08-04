@@ -37,14 +37,14 @@ const scheduleAbandonedCartEmails = () => {
         },
       }).populate("userId", "email userName"); // Kullanıcı bilgilerini al (sadece email ve userName yeterli)
 
-      console.log(
-        `Kontrol edilecek ${potentialCarts.length} potansiyel terk edilmiş sepet bulundu.`
-      );
+     // console.log(
+     //   `Kontrol edilecek ${potentialCarts.length} potansiyel terk edilmiş sepet bulundu.`
+     // );
 
       for (const cart of potentialCarts) {
         if (!cart.userId || !cart.userId.email) {
-          console.log(
-            `Sepet ID ${cart._id}: Kullanıcı bilgisi veya e-postası eksik, atlanıyor.`
+         console.log(
+           `Sepet ID ${cart._id}: Kullanıcı bilgisi veya e-postası eksik, atlanıyor.`
           );
           continue;
         }
@@ -119,9 +119,9 @@ const scheduleAbandonedCartEmails = () => {
             cartId: cart._id,
             status: "sent",
           });
-          console.log(
-            `Kullanıcı ${cart.userId.email} için hatırlatma kaydedildi (Sepet ID: ${cart._id}).`
-          );
+         // console.log(
+         //   `Kullanıcı ${cart.userId.email} için hatırlatma kaydedildi (Sepet ID: ${cart._id}).`
+         // );
         } else {
           await AbandonedCartReminder.create({
             userId: cart.userId._id,
