@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
 const passport = require("passport");
 const admin = require("firebase-admin");
 const rateLimit = require("express-rate-limit");
@@ -51,7 +52,7 @@ try {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   });
-  console.log("Firebase Admin SDK başarıyla başlatıldı.");
+  //console.log("Firebase Admin SDK başarıyla başlatıldı.");
 } catch (error) {
   console.error("Firebase Admin SDK başlatılamadı:", error.message);
 }
@@ -70,24 +71,23 @@ const commonFeatureRouter = require("./routes/common/feature-routes");
 const shopWishlistRouter = require("./routes/shop/wishlist-routes");
 const commonSideBannerRouter = require("./routes/common/side-banner-routes");
 const adminCategoryRouter = require("./routes/admin/category-routes");
-const adminHomeSectionRouter = require("./routes/admin/home-section-routes"); 
-const commonCategoryRouter = require("./routes/common/category-routes"); 
+const adminHomeSectionRouter = require("./routes/admin/home-section-routes");
+const commonCategoryRouter = require("./routes/common/category-routes");
 const shopHomeSectionRouter = require("./routes/shop/home-section-routes");
-const adminBrandRouter = require("./routes/admin/brand-routes"); 
+const adminBrandRouter = require("./routes/admin/brand-routes");
 const commonBrandRouter = require("./routes/common/brand-routes");
 const adminCouponRouter = require("./routes/admin/coupon-routes");
 const adminStatsRouter = require("./routes/admin/statsAdminRoutes");
 const adminAuthorizationRouter = require("./routes/admin/authorization-routes");
-const adminUserRouter = require("./routes/admin/user-routes"); 
+const adminUserRouter = require("./routes/admin/user-routes");
 const maintenanceRouter = require("./routes/common/maintenance-routes");
-const currencyRouter = require("./routes/common/currency-routes"); 
+const currencyRouter = require("./routes/common/currency-routes");
 const shopCouponRouter = require("./routes/shop/coupon-routes");
 const errorHandler = require("./middleware/errorHandler");
 const { scheduleAbandonedCartEmails } = require("./jobs/abandonedCartJob");
 const { startScheduledRateUpdates } = require("./utils/currencyConverter");
 const priceUpdateJob = require("./jobs/priceUpdateJob");
 require("./controllers/auth/auth-controller");
-
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -180,6 +180,11 @@ app.use(
     secret: process.env.SESSION_SECRET || "defaultSecretKeyForSession",
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+      collectionName: "sessions",
+      ttl: 24 * 60 * 60, // 24 saat
+    }),
     cookie: {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
@@ -218,7 +223,7 @@ app.use("/api/admin/stats", adminStatsRouter);
 app.use("/api/admin/authorization", adminAuthorizationRouter);
 app.use("/api/admin/users", adminUserRouter);
 app.use("/api/maintenance", maintenanceRouter);
-app.use("/api/common/currency", currencyRouter); 
+app.use("/api/common/currency", currencyRouter);
 app.use(errorHandler);
 if (process.env.NODE_ENV !== "test") {
   scheduleAbandonedCartEmails();

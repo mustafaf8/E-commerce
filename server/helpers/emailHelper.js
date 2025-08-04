@@ -28,7 +28,7 @@ const sendEmail = async (options) => {
 
   try {
     await apiInstance.sendTransacEmail(sendSmtpEmail);
-    console.log(`Brevo ile e-posta başarıyla gönderildi: ${options.to}`);
+    //console.log(`Brevo ile e-posta başarıyla gönderildi: ${options.to}`);
     return true;
   } catch (error) {
     console.error(
