@@ -560,7 +560,9 @@ function AdminOrdersView() {
   return (
     <div className="space-y-3">
       {error && (
-        <p className="text-red-600 text-xs p-2 bg-red-50 rounded-md">hata</p>
+        <p className="text-red-600 text-xs p-2 bg-red-50 rounded-md">
+          {error}
+        </p>
       )}
 
       <div className="flex justify-between items-center">

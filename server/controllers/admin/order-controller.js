@@ -172,16 +172,10 @@ const getUsersWithOrders = async (req, res) => {
       },
     ]);
 
-    if (!usersWithOrders.length) {
-      return res.status(404).json({
-        success: false,
-        message: "Siparişi olan kullanıcı bulunamadı!",
-      });
-    }
-
     res.status(200).json({
       success: true,
       data: usersWithOrders,
+      message: usersWithOrders.length === 0 ? "Siparişi olan kullanıcı bulunamadı!" : null
     });
   } catch (e) {
     //console.error("getUsersWithOrders error:", e);

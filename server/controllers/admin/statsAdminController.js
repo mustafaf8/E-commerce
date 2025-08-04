@@ -6,6 +6,7 @@ const Brand = require("../../models/Brand");
 const mongoose = require("mongoose");
 const Wishlist = require("../../models/Wishlist");
 const { Parser } = require("json2csv");
+const { getExchangeRate } = require("../../utils/currencyConverter");
 
 function getPeriodMatch(period) {
   if (!period) return {};
@@ -573,20 +574,12 @@ function getCostAndRevenueAggregation(match = {}) {
         },
       },
     },
-    {
-      $addFields: {
-        costPriceTRY: { 
-          $multiply: ["$costPriceUSD", 30] // USD'yi TL'ye çevir (30 kuruş oranı)
-        },
-      },
-    },
   ];
 }
 // 12. Profit Overview
 const getProfitOverview = async (req, res) => {
   try {
     const { period, startDate, endDate } = req.query;
-    //console.log("Profit Overview Request - period:", period, "startDate:", startDate, "endDate:", endDate);
     
     let match = {};
     if (startDate && endDate) {
@@ -594,16 +587,25 @@ const getProfitOverview = async (req, res) => {
     } else {
       match = { ...getPeriodMatch(period) };
     }
-    //console.log("Match condition:", match);
 
+    // Güncel döviz kurunu al
+    const exchangeRate = await getExchangeRate();
+    
     const pipeline = [
       ...getCostAndRevenueAggregation(match),
+      {
+        $addFields: {
+          costPriceTRY: { 
+            $multiply: ["$costPriceUSD", exchangeRate] // Gerçek döviz kuru ile hesapla
+          },
+        },
+      },
       {
         $group: {
           _id: "$_id", // group per order first
           orderRevenue: { $first: "$totalAmountTRY" },
           orderCost: {
-            $sum: { $multiply: ["$costPrice", "$cartQuantity"] },
+            $sum: { $multiply: ["$costPriceTRY", "$cartQuantity"] },
           },
         },
       },
@@ -624,12 +626,8 @@ const getProfitOverview = async (req, res) => {
       },
     ];
 
-    //console.log("Pipeline:", JSON.stringify(pipeline, null, 2));
     const result = await Order.aggregate(pipeline);
-    //console.log("Aggregation result:", result);
-    
     const data = result[0] || { totalRevenue: 0, totalCost: 0, netProfit: 0 };
-    //console.log("Final data:", data);
     
     res.status(200).json({ success: true, data });
   } catch (error) {
@@ -642,8 +640,19 @@ const getProfitOverview = async (req, res) => {
 const getProfitByProduct = async (req, res) => {
   try {
     const { limit = 20 } = req.query;
+    
+    // Güncel döviz kurunu al
+    const exchangeRate = await getExchangeRate();
+    
     const pipeline = [
       ...getCostAndRevenueAggregation({}),
+      {
+        $addFields: {
+          costPriceTRY: { 
+            $multiply: ["$costPriceUSD", exchangeRate] // Gerçek döviz kuru ile hesapla
+          },
+        },
+      },
       {
         $group: {
           _id: "$productInfo._id",
@@ -654,7 +663,7 @@ const getProfitByProduct = async (req, res) => {
             $sum: { $multiply: ["$cartItemPrice", "$cartQuantity"] },
           },
           cost: {
-            $sum: { $multiply: ["$costPrice", "$cartQuantity"] },
+            $sum: { $multiply: ["$costPriceTRY", "$cartQuantity"] },
           },
         },
       },
@@ -677,8 +686,18 @@ const getProfitByProduct = async (req, res) => {
 // 14. Profit by Category
 const getProfitByCategory = async (_req, res) => {
   try {
+    // Güncel döviz kurunu al
+    const exchangeRate = await getExchangeRate();
+    
     const pipeline = [
       ...getCostAndRevenueAggregation({}),
+      {
+        $addFields: {
+          costPriceTRY: { 
+            $multiply: ["$costPriceUSD", exchangeRate] // Gerçek döviz kuru ile hesapla
+          },
+        },
+      },
       {
         $group: {
           _id: "$productInfo.category",
@@ -687,7 +706,7 @@ const getProfitByCategory = async (_req, res) => {
             $sum: { $multiply: ["$cartItemPrice", "$cartQuantity"] },
           },
           cost: {
-            $sum: { $multiply: ["$costPrice", "$cartQuantity"] },
+            $sum: { $multiply: ["$costPriceTRY", "$cartQuantity"] },
           },
         },
       },
@@ -728,8 +747,18 @@ const getProfitByCategory = async (_req, res) => {
 // 15. Profit by Brand
 const getProfitByBrand = async (_req, res) => {
   try {
+    // Güncel döviz kurunu al
+    const exchangeRate = await getExchangeRate();
+    
     const pipeline = [
       ...getCostAndRevenueAggregation({}),
+      {
+        $addFields: {
+          costPriceTRY: { 
+            $multiply: ["$costPriceUSD", exchangeRate] // Gerçek döviz kuru ile hesapla
+          },
+        },
+      },
       {
         $group: {
           _id: "$productInfo.brand",
@@ -738,7 +767,7 @@ const getProfitByBrand = async (_req, res) => {
             $sum: { $multiply: ["$cartItemPrice", "$cartQuantity"] },
           },
           cost: {
-            $sum: { $multiply: ["$costPrice", "$cartQuantity"] },
+            $sum: { $multiply: ["$costPriceTRY", "$cartQuantity"] },
           },
         },
       },
