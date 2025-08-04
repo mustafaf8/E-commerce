@@ -5,7 +5,7 @@ import {
   UserCog,
   Search,
   ChevronDown,
-  Heart
+  Heart,
 } from "lucide-react";
 import {
   Link,
@@ -78,7 +78,7 @@ const HoverMenu = ({ children, trigger, className = "" }) => {
     >
       {trigger}
       {isOpen && (
-        <div 
+        <div
           ref={menuRef}
           className="absolute top-full left-0 z-[99999999] min-w-[220px] max-w-[280px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl py-2"
           onMouseEnter={handleMenuMouseEnter}
@@ -90,8 +90,6 @@ const HoverMenu = ({ children, trigger, className = "" }) => {
     </div>
   );
 };
-
-
 
 // Recursive (Özyineli) Menü Bileşeni
 const RecursiveMenuItem = ({ category, handleNavigate }) => {
@@ -126,7 +124,7 @@ const RecursiveMenuItem = ({ category, handleNavigate }) => {
   // Eğer kategorinin alt dalları varsa, bir alt menü oluştur
   if (category.children && category.children.length > 0) {
     return (
-      <div 
+      <div
         className="relative"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -136,13 +134,13 @@ const RecursiveMenuItem = ({ category, handleNavigate }) => {
           <ChevronDown className="h-4 w-4 rotate-[-90deg] flex-shrink-0 ml-2" />
         </div>
         {isSubMenuOpen && (
-          <div 
+          <div
             className="absolute left-full top-0 z-[99999999] min-w-[220px] max-w-[280px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl py-2"
             onMouseEnter={handleSubMenuMouseEnter}
             onMouseLeave={handleSubMenuMouseLeave}
           >
             {/* "Tümünü Gör" linki, ana dala gitmek için */}
-            <div 
+            <div
               className="submenu-item px-4 py-3 cursor-pointer text-sm"
               onClick={() => handleNavigate(category.slug)}
             >
@@ -165,7 +163,7 @@ const RecursiveMenuItem = ({ category, handleNavigate }) => {
 
   // Eğer alt dalı yoksa, direkt tıklanabilir bir menü öğesi oluştur
   return (
-    <div 
+    <div
       className="submenu-item px-4 py-3 cursor-pointer text-sm"
       onClick={() => handleNavigate(category.slug)}
     >
@@ -223,7 +221,7 @@ function CategorySubMenu() {
             }
           >
             {/* Ana kategorinin kendisine gitmek için link */}
-            <div 
+            <div
               className="category-menu-item px-4 py-3 cursor-pointer text-sm"
               onClick={() => handleNavigate(category.slug)}
             >
@@ -312,7 +310,11 @@ function MainHeaderActions() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuPortal>
-            <DropdownMenuContent side="bottom" align="end" className="w-56 z-[9999999999]">
+            <DropdownMenuContent
+              side="bottom"
+              align="end"
+              className="w-56 z-[9999999999]"
+            >
               <DropdownMenuLabel>Merhaba, {user.userName}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => navigate("/shop/account")}>
@@ -467,15 +469,21 @@ function ShoppingHeader() {
   const [activeInput, setActiveInput] = useState("");
   const debounceRef = useRef();
   const [searchParams] = useSearchParams();
-  
-  // Account, wishlist ve checkout sayfalarında kategori menüsünü gizle
-  const shouldShowCategoryMenu = !location.pathname.includes('/shop/account') && !location.pathname.includes('/shop/wishlist') && !location.pathname.includes('/shop/checkout') && !location.pathname.includes('/shop/campaigns');
+
+  // Account, wishlist, checkout, payment success ve failure sayfalarında kategori menüsünü gizle
+  const shouldShowCategoryMenu =
+    !location.pathname.includes("/shop/account") &&
+    !location.pathname.includes("/shop/wishlist") &&
+    !location.pathname.includes("/shop/checkout") &&
+    !location.pathname.includes("/shop/campaigns") &&
+    !location.pathname.includes("/shop/payment-success") &&
+    !location.pathname.includes("/shop/payment-failure");
 
   // Portal dışına tıklandığında ve ESC tuşu ile suggestions'ı kapat
   useEffect(() => {
     const handleClickOutside = (event) => {
       // Eğer suggestions açıksa ve tıklanan element suggestions içinde değilse
-      if (showSuggest && !event.target.closest('.search-suggestions-portal')) {
+      if (showSuggest && !event.target.closest(".search-suggestions-portal")) {
         setShowSuggest(false);
         setSuggestions({ products: [], categories: [], brands: [] });
       }
@@ -483,20 +491,20 @@ function ShoppingHeader() {
 
     const handleKeyDown = (event) => {
       // ESC tuşu ile kapat
-      if (event.key === 'Escape' && showSuggest) {
+      if (event.key === "Escape" && showSuggest) {
         setShowSuggest(false);
         setSuggestions({ products: [], categories: [], brands: [] });
       }
     };
 
     // Event listener'ları ekle
-    document.addEventListener('click', handleClickOutside);
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener("click", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
 
     // Cleanup
     return () => {
-      document.removeEventListener('click', handleClickOutside);
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, [showSuggest]);
 
@@ -585,12 +593,15 @@ function ShoppingHeader() {
                   suggestions.categories.length > 0 ||
                   suggestions.brands.length > 0) &&
                 createPortal(
-                  <div className="search-suggestions-portal fixed z-[9999999999] bg-background border shadow-lg rounded-md max-h-80 overflow-y-auto" style={{
-                    top: '100px',
-                    left: 'calc(50% - 320px)',
-                    width: '600px',
-                    maxWidth: '90vw'
-                  }}>
+                  <div
+                    className="search-suggestions-portal fixed z-[9999999999] bg-background border shadow-lg rounded-md max-h-80 overflow-y-auto"
+                    style={{
+                      top: "100px",
+                      left: "calc(50% - 320px)",
+                      width: "600px",
+                      maxWidth: "90vw",
+                    }}
+                  >
                     {suggestions.products.map((p) => (
                       <div
                         key={`prod-${p._id}`}
@@ -660,12 +671,15 @@ function ShoppingHeader() {
                 suggestions.categories.length > 0 ||
                 suggestions.brands.length > 0) &&
               createPortal(
-                <div className="search-suggestions-portal fixed z-[9999999999] bg-background border shadow-lg rounded-md max-h-80 overflow-y-auto" style={{
-                  top: '160px',
-                  left: '20px',
-                  right: '20px',
-                  width: 'calc(100vw - 40px)'
-                }}>
+                <div
+                  className="search-suggestions-portal fixed z-[9999999999] bg-background border shadow-lg rounded-md max-h-80 overflow-y-auto"
+                  style={{
+                    top: "160px",
+                    left: "20px",
+                    right: "20px",
+                    width: "calc(100vw - 40px)",
+                  }}
+                >
                   {suggestions.products.map((p) => (
                     <div
                       key={`prod-${p._id}`}
