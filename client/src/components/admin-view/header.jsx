@@ -42,7 +42,7 @@ function AdminHeader({ setOpen }) {
 useEffect(() => {
   // Vite ortam değişkenleri VITE_ ile başlamalıdır.
   const socketURL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin);
-  console.log("Socket.IO sunucusuna bağlanılıyor:", socketURL);
+ // console.log("Socket.IO sunucusuna bağlanılıyor:", socketURL);
 
   const socket = io(socketURL, {
     withCredentials: true,
@@ -50,9 +50,9 @@ useEffect(() => {
   });
 
   socket.on("connect", () => {
-    console.log("Socket.IO başarıyla bağlandı, ID:", socket.id);
+  //  console.log("Socket.IO başarıyla bağlandı, ID:", socket.id);
     socket.emit("register_admin");
-    console.log("'register_admin' olayı gönderildi.");
+ //   console.log("'register_admin' olayı gönderildi.");
   });
 
   socket.on("disconnect", (reason) => {
@@ -65,12 +65,12 @@ useEffect(() => {
   });
 
   socket.on("visitor_count", (count) => {
-    console.log("Ziyaretçi sayısı alındı:", count);
+ //   console.log("Ziyaretçi sayısı alındı:", count);
     setLiveVisitorCount(count);
   });
 
   return () => {
-    console.log("Socket.IO bağlantısı kesiliyor...");
+ //   console.log("Socket.IO bağlantısı kesiliyor...");
     socket.disconnect();
   };
 }, []); 

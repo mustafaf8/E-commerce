@@ -432,7 +432,7 @@ function GuestOrdersTable({ orders, onViewDetailsClick, isLoading }) {
           ) : (
             <TableRow>
               <TableCell colSpan={6} className="text-center text-xs py-2">
-                Misafir siparişi bulunamadı.
+                {/* Misafir siparişi bulunamadı mesajı kaldırıldı */}
               </TableCell>
             </TableRow>
           )}
