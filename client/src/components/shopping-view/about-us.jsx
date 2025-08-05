@@ -16,7 +16,7 @@ import {
 const AboutUs = () => {
   const stats = [
     { icon: Users, number: "10K+", label: "Mutlu Müşteri" },
-    { icon: Store, number: "50+", label: "Ürün Çeşidi" },
+    { icon: Store, number: "200+", label: "Ürün Çeşidi" },
     { icon: Award, number: "7", label: "Yıllık Deneyim" },
     { icon: Truck, number: "24/7", label: "Hızlı Teslimat" }
   ];
@@ -72,7 +72,7 @@ const AboutUs = () => {
       {/* Hero Section */}
       <div className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 text-white overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative container mx-auto px-4 py-20 md:py-32">
+        <div className="relative container mx-auto px-4 py-16 md:py-24">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
               <span className="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">

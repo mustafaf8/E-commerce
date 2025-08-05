@@ -4,21 +4,16 @@ const SSLCertificate = () => {
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-green-600 to-emerald-700 text-white py-12 mb-6">
+      <div className="bg-gradient-to-r from-green-600 to-emerald-700 text-white py-12 mb-6 text-center">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between flex-col md:flex-row">
             <div className="mb-6 md:mb-0">
               <h1 className="text-4xl md:text-5xl font-bold mb-4">
                 SSL Sertifikası
               </h1>
-              <p className="text-xl opacity-90 md:w-3/4">
+              <p className="text-xl opacity-90 ">
                 Verileriniz şifrelenmiş bağlantılarla korunuyor. 
                 SSL güvenliği hakkında bilgi edinin.
-              </p>
-            </div>
-            <div className="hidden md:block">
-              <Shield className="h-24 w-24 text-white opacity-80" />
-            </div>
+              </p>          
           </div>
         </div>
       </div>

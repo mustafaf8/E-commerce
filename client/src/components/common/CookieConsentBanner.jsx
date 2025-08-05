@@ -51,40 +51,39 @@ function CookieConsentBanner() {
   return (
     <div
       aria-hidden={!isVisible}
-      className={`fixed bottom-0 left-0 right-0 w-full bg-background border-t border-border shadow-xl p-3 md:p-4 z-[9999998] transition-all duration-500 ease-in-out transform ${
+      className={`fixed bottom-0 left-0 right-0 w-full bg-background border-t border-border shadow-xl p-2 sm:p-3 md:p-4 z-[9999998] transition-all duration-500 ease-in-out transform hidden sm:block ${
         isVisible
           ? "translate-y-0 opacity-100"
           : "translate-y-full opacity-0 pointer-events-none"
       }`}
     >
-      <div className="container mx-auto flex flex-col lg:flex-row items-center justify-between gap-3 md:gap-4">
-        <div className="flex items-start lg:items-center gap-2 md:gap-3 text-sm text-muted-foreground">
-          <Info className="h-5 w-5 md:h-6 md:w-6 text-primary flex-shrink-0 mt-0.5 lg:mt-0" />
+      <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3 md:gap-4">
+        <div className="flex items-start sm:items-center gap-2 md:gap-3 text-xs sm:text-sm text-muted-foreground w-full sm:w-auto">
+          <Info className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-primary flex-shrink-0 mt-0.5 sm:mt-0" />
           <p>
-            Sitemizde size daha iyi hizmet verebilmek ve alışveriş deneyiminizi
-            kişiselleştirmek için çerezler kullanıyoruz.{" "}
+            Sitemizde size daha iyi hizmet verebilmek çerezler kullanıyoruz.{' '}
             <Link
               to="/shop/kvkk"
               className="underline hover:text-primary font-medium"
             >
               Çerez Politikamız ve KVKK Aydınlatma Metni
-            </Link>{" "}
+            </Link>{' '}
             hakkında detaylı bilgiye ulaşabilirsiniz.
           </p>
         </div>
-        <div className="flex items-center gap-2 md:gap-3 flex-shrink-0 w-full lg:w-auto mt-3 lg:mt-0">
+        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
           <Button
             variant="outline"
             size="sm"
             onClick={handleDecline}
-            className="flex-1 lg:flex-none py-2 px-4 h-9 text-sm"
+            className="flex-1 sm:flex-none py-2 px-2 sm:px-4 h-8 sm:h-9 text-xs sm:text-sm"
           >
             Reddet
           </Button>
           <Button
             size="sm"
             onClick={handleAccept}
-            className="flex-1 lg:flex-none bg-primary hover:bg-primary/90 text-primary-foreground py-2 px-4 h-9 text-sm"
+            className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 text-primary-foreground py-2 px-2 sm:px-4 h-8 sm:h-9 text-xs sm:text-sm"
           >
             Kabul Et
           </Button>
