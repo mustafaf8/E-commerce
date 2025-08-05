@@ -4,22 +4,17 @@ const DeliveryReturnTerms = () => {
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-cyan-700 text-white py-12 mb-6">
+      <div className="bg-gradient-to-r from-blue-600 to-cyan-700 text-white py-12 mb-6 text-center">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between flex-col md:flex-row">
             <div className="mb-6 md:mb-0">
               <h1 className="text-4xl md:text-5xl font-bold mb-4">
                 Teslimat ve İade Şartları
               </h1>
-              <p className="text-xl opacity-90 md:w-3/4">
+              <p className="text-xl opacity-90">
                 Kargo, teslimat ve iade süreçlerimiz hakkında 
                 detaylı bilgiler burada.
               </p>
             </div>
-            <div className="hidden md:block">
-              <Truck className="h-24 w-24 text-white opacity-80" />
-            </div>
-          </div>
         </div>
       </div>
 

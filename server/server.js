@@ -106,12 +106,15 @@ const allowedOrigins = [
   "http://localhost:5173",
 ];
 
-// Socket.io kurulumu (allowedOrigins kullanarak CORS ayarı)
+// YUKARIDAKİ KODU BUNUNLA DEĞİŞTİRİN:
 const io = new Server(serverInstance, {
+  path: "/socket.io/", // Socket.IO'nun çalışacağı yolu açıkça belirtiyoruz.
   cors: {
     origin: allowedOrigins,
+    methods: ["GET", "POST"], // Bağlantı kurmak için gereken HTTP metodları
     credentials: true,
   },
+  transports: ['websocket', 'polling'] // Hem WebSocket hem de gerekirse polling'e izin ver
 });
 
 

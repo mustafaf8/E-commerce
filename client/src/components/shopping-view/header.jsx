@@ -477,7 +477,16 @@ function ShoppingHeader() {
     !location.pathname.includes("/shop/checkout") &&
     !location.pathname.includes("/shop/campaigns") &&
     !location.pathname.includes("/shop/payment-success") &&
-    !location.pathname.includes("/shop/payment-failure");
+    !location.pathname.includes("/shop/payment-failure") &&
+    !location.pathname.includes("/shop/iletisim") &&
+    !location.pathname.includes("/shop/hakkimizda") &&
+    !location.pathname.includes("/shop/bilgi-guvenligi") &&
+    !location.pathname.includes("/shop/kvkk") &&
+    !location.pathname.includes("/shop/ssl-sertifikasi") &&
+    !location.pathname.includes("/shop/gizlilik-sozlesmesi") &&
+    !location.pathname.includes("/shop/teslimat-iade") &&
+    !location.pathname.includes("/shop/mesafeli-satis") &&
+    !location.pathname.includes("/shop/islem-rehberi");
 
   // Portal dışına tıklandığında ve ESC tuşu ile suggestions'ı kapat
   useEffect(() => {

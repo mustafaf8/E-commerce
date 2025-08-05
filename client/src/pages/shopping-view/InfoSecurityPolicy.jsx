@@ -11,12 +11,12 @@ const InfoSecurityPolicy = () => {
   return (
     <div className="bg-gray-50 dark:bg-gray-900">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-12 mb-6">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-12 mb-6 text-center">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 ">
             Bilgi Güvenliği Politikası
           </h1>
-          <p className="text-xl md:w-3/4 opacity-90">
+          <p className="text-xl opacity-90">
             Müşterilerimizin güvenliği ve veri gizliliği her zaman
             önceliğimizdir
           </p>
