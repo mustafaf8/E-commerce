@@ -1,5 +1,6 @@
 const Order = require("../../models/Order");
 const mongoose = require("mongoose");
+const { sendOrderNotificationToAdmin } = require("../../helpers/emailHelper");
 
 const getAllOrdersOfAllUsers = async (req, res) => {
   try {
@@ -101,6 +102,16 @@ const updateOrderStatus = async (req, res) => {
       path: "userId",
       select: "userName email phoneNumber tcKimlikNo",
     });
+
+    // Sipariş "confirmed" durumuna geçtiğinde admin e-posta bildirimi gönder
+    if (orderStatus === "confirmed") {
+      try {
+        await sendOrderNotificationToAdmin(updatedOrder);
+      } catch (mailErr) {
+        console.error("Admin bildirim e-postası hatası:", mailErr.message);
+        // E-posta hatası sipariş güncelleme işlemini etkilemesin
+      }
+    }
 
     res.status(200).json({
       success: true,
