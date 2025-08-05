@@ -114,30 +114,40 @@ const io = new Server(serverInstance, {
   },
 });
 
+
 let activeVisitorCount = 0;
 
 io.on("connection", (socket) => {
+  console.log(`[Socket.IO] Yeni bağlantı: ${socket.id}`);
+
   // Ziyaretçi olarak kayıt
   socket.on("register_visitor", () => {
+    console.log(`[Socket.IO] ${socket.id} ziyaretçi olarak kayıt oldu.`);
     socket.data.isVisitor = true;
     activeVisitorCount += 1;
+    console.log(`[Socket.IO] Aktif ziyaretçi: ${activeVisitorCount}. Adminlere yayınlanıyor.`);
     io.to("admins").emit("visitor_count", activeVisitorCount);
   });
 
   // Admin olarak kayıt ve mevcut sayıyı gönder
   socket.on("register_admin", () => {
+    console.log(`[Socket.IO] ${socket.id} admin olarak kayıt oldu.`);
     socket.join("admins");
+    console.log(`[Socket.IO] Yeni admine mevcut sayı (${activeVisitorCount}) gönderiliyor: ${socket.id}.`);
     socket.emit("visitor_count", activeVisitorCount);
   });
 
   // Bağlantı koptuğunda ziyaretçi sayaç güncellemesi
-  socket.on("disconnect", () => {
+  socket.on("disconnect", (reason) => {
+    console.log(`[Socket.IO] Bağlantı kesildi: ${socket.id}. Sebep: ${reason}`);
     if (socket.data.isVisitor) {
       activeVisitorCount = Math.max(activeVisitorCount - 1, 0);
+      console.log(`[Socket.IO] Ziyaretçi ayrıldı. Aktif ziyaretçi: ${activeVisitorCount}. Adminlere yayınlanıyor.`);
       io.to("admins").emit("visitor_count", activeVisitorCount);
     }
   });
 });
+
 
 const IYZICO_CALLBACK_PATH = "/api/shop/order/iyzico-callback";
 

@@ -38,25 +38,42 @@ function AdminHeader({ setOpen }) {
     setNewOrderCount(registeredNewOrders + guestNewOrders);
   }, [userList, guestOrderList]);
 
-  // Socket.io bağlantısı (yalnızca adminler için canlı ziyaretçi sayısı)
-  useEffect(() => {
-    // Geliştirme ortamında backend localhost:5000, prod'da aynı origin
-    const socketURL = import.meta.env.DEV
-      ? "http://localhost:5000"
-      : window.location.origin;
+// ... (diğer importlar ve kodlar)
+useEffect(() => {
+  // Vite ortam değişkenleri VITE_ ile başlamalıdır.
+  const socketURL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin);
+  console.log("Socket.IO sunucusuna bağlanılıyor:", socketURL);
 
-    const socket = io(socketURL, { withCredentials: true });
+  const socket = io(socketURL, {
+    withCredentials: true,
+    transports: ['websocket', 'polling'] // WebSocket çalışmazsa polling'e geçer
+  });
 
-    socket.on("visitor_count", (count) => {
-      setLiveVisitorCount(count);
-    });
-
+  socket.on("connect", () => {
+    console.log("Socket.IO başarıyla bağlandı, ID:", socket.id);
     socket.emit("register_admin");
+    console.log("'register_admin' olayı gönderildi.");
+  });
 
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+  socket.on("disconnect", (reason) => {
+    console.log("Socket.IO bağlantısı kesildi:", reason);
+    setLiveVisitorCount(null); // Bağlantı kopunca sayacı sıfırla
+  });
+
+  socket.on("connect_error", (error) => {
+    console.error("Socket.IO bağlantı hatası:", error.message);
+  });
+
+  socket.on("visitor_count", (count) => {
+    console.log("Ziyaretçi sayısı alındı:", count);
+    setLiveVisitorCount(count);
+  });
+
+  return () => {
+    console.log("Socket.IO bağlantısı kesiliyor...");
+    socket.disconnect();
+  };
+}, []); 
 
   function handleLogout() {
     dispatch(logoutUser())
