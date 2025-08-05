@@ -9,7 +9,7 @@ const crypto = require("crypto");
 const mongoose = require("mongoose");
 const { getExchangeRate } = require("../../utils/currencyConverter");
 const { roundToMarketingPrice } = require("../../utils/priceUtils");
-const { sendOrderConfirmationEmail } = require("../../helpers/emailHelper");
+const { sendOrderConfirmationEmail, sendOrderNotificationToAdmin } = require("../../helpers/emailHelper");
 
 const createOrder = async (req, res) => {
   try {
@@ -542,6 +542,13 @@ const handleIyzicoCallback = async (req, res) => {
              sendOrderConfirmationEmail(order);
            } catch (mailErr) {
              console.error("Onay e-postası hatası:", mailErr.message);
+           }
+
+           // Admin e-posta bildirimi gönder – hata sipariş akışını etkilemesin
+           try {
+             sendOrderNotificationToAdmin(order);
+           } catch (adminMailErr) {
+             console.error("Admin bildirim e-postası hatası:", adminMailErr.message);
            }
           // console.log(
           //   `Iyzico callback - Ödeme başarılı, sipariş güncellendi (Order ID: ${orderId})`

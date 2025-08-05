@@ -296,9 +296,128 @@ const sendOrderConfirmationEmail = async (order) => {
   }
 };
 
+/**
+ * Sipariş onaylandığında admin e-posta adresine bildirim gönderir.
+ * @param {import("mongoose").Document} order Order belgesi (confirmed)
+ */
+const sendOrderNotificationToAdmin = async (order) => {
+  if (!order) return false;
+
+  try {
+    // Alıcı bilgileri
+    const isGuest = order.isGuestOrder;
+    let customerName = isGuest
+      ? order.guestInfo?.fullName || "Misafir Müşteri"
+      : order.userId?.userName || "Kayıtlı Müşteri";
+    let customerEmail = isGuest
+      ? order.guestInfo?.email
+      : order.userId?.email;
+
+    // Eğer kayıtlı kullanıcı ama populate edilmemişse, DB'den çek
+    if (!isGuest && (!customerEmail || !customerName)) {
+      try {
+        const User = require("../models/User");
+        const dbUser = await User.findById(order.userId).select("userName email");
+        if (dbUser) {
+          customerEmail = customerEmail || dbUser.email;
+          if (!customerName || customerName === "Kayıtlı Müşteri") {
+            customerName = dbUser.userName || dbUser.email?.split("@")[0] || "Kayıtlı Müşteri";
+          }
+        }
+      } catch (popErr) {
+        console.error("Admin bildirim e-postası: kullanıcı bilgisi çekilemedi", popErr.message);
+      }
+    }
+
+    // Ürün listesi HTML
+    const itemsHtml = order.cartItems
+      .map((item) => {
+        const effectivePrice = item.priceTRY;
+        const totalLine = (effectivePrice * item.quantity).toFixed(2);
+        return `
+          <tr>
+            <td style="padding:8px 4px; border:1px solid #ddd;">
+              <img src="${item.image}" alt="${item.title}" style="width:60px;height:60px;object-fit:cover;border-radius:4px;" />
+            </td>
+            <td style="padding:8px 4px; border:1px solid #ddd; font-size:14px;">${item.title}</td>
+            <td style="padding:8px 4px; border:1px solid #ddd; text-align:center;">${item.quantity}</td>
+            <td style="padding:8px 4px; border:1px solid #ddd; text-align:right;">${effectivePrice.toFixed(2)} TL</td>
+            <td style="padding:8px 4px; border:1px solid #ddd; text-align:right;">${totalLine} TL</td>
+          </tr>
+        `;
+      })
+      .join("");
+
+    // Finansal özet
+    const subTotal = order.cartItems.reduce(
+      (sum, it) => sum + it.priceTRY * it.quantity,
+      0
+    );
+    const couponDiscount = order.appliedCoupon?.discountAmount || 0;
+    const shippingFee = 0; // İstenirse ek alan
+    const grandTotal = order.totalAmountTRY;
+
+    const emailHtml = `
+      <div style="font-family:Helvetica,Arial,sans-serif;max-width:680px;margin:20px auto;border:1px solid #e5e5e5;border-radius:6px;padding:24px;background:#fafafa;">
+        <h2 style="color:#333;text-align:center;">Yeni Sipariş Bildirimi - No: ${order._id}</h2>
+        <p><strong>Yeni bir sipariş onaylandı!</strong></p>
+        
+        <h3 style="margin-top:24px;">Müşteri Bilgileri</h3>
+        <table style="width:100%;font-size:14px;margin-bottom:20px;">
+          <tr><td><strong>Müşteri Adı:</strong></td><td>${customerName}</td></tr>
+          <tr><td><strong>E-posta:</strong></td><td>${customerEmail || "Belirtilmemiş"}</td></tr>
+          <tr><td><strong>Sipariş Tarihi:</strong></td><td>${new Date(order.orderDate).toLocaleString('tr-TR')}</td></tr>
+          <tr><td><strong>Ödeme Yöntemi:</strong></td><td>${order.paymentMethod}</td></tr>
+          <tr><td><strong>Sipariş Durumu:</strong></td><td style="color:green;font-weight:bold;">${order.orderStatus}</td></tr>
+        </table>
+
+        <h3 style="margin-top:24px;">Ürünler</h3>
+        <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead>
+            <tr>
+              <th style="border:1px solid #ddd;padding:8px 4px;text-align:left;">&nbsp;</th>
+              <th style="border:1px solid #ddd;padding:8px 4px;text-align:left;">Ürün</th>
+              <th style="border:1px solid #ddd;padding:8px 4px;">Adet</th>
+              <th style="border:1px solid #ddd;padding:8px 4px;text-align:right;">Birim</th>
+              <th style="border:1px solid #ddd;padding:8px 4px;text-align:right;">Toplam</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemsHtml}
+          </tbody>
+        </table>
+
+        <h3 style="margin-top:24px;">Özet</h3>
+        <table style="width:100%;font-size:14px;">
+          <tr><td>Ara Toplam:</td><td style="text-align:right;">${subTotal.toFixed(2)} TL</td></tr>
+          ${couponDiscount > 0 ? `<tr><td>Kupon İndirimi (${order.appliedCoupon.code}):</td><td style="text-align:right;">- ${couponDiscount.toFixed(2)} TL</td></tr>` : ""}
+          ${shippingFee > 0 ? `<tr><td>Kargo:</td><td style="text-align:right;">${shippingFee.toFixed(2)} TL</td></tr>` : ""}
+          <tr style="font-weight:bold;"><td>Genel Toplam:</td><td style="text-align:right;">${grandTotal.toFixed(2)} TL</td></tr>
+        </table>
+
+        <h3 style="margin-top:24px;">Teslimat Adresi</h3>
+        <p style="white-space:pre-line;">${order.addressInfo.fullName}\n${order.addressInfo.address}\n${order.addressInfo.city} ${order.addressInfo.pincode || ""}</p>
+
+        <p style="margin-top:32px;">Bu siparişi yönetmek için admin panelini kullanabilirsiniz.</p>
+        <p style="margin-top:24px;">Teşekkürler,<br/>Deposun Sistemi</p>
+      </div>
+    `;
+
+    return await sendEmail({
+      to: "siparis@deposun.com",
+      subject: `Yeni Sipariş Bildirimi - No: ${order._id}`,
+      htmlContent: emailHtml,
+    });
+  } catch (err) {
+    console.error("Admin bildirim e-postası gönderilemedi:", err.message);
+    return false;
+  }
+};
+
 module.exports = {
   sendAbandonedCartEmail,
   sendPasswordResetEmail,
   sendEmail,
   sendOrderConfirmationEmail,
+  sendOrderNotificationToAdmin,
 };
