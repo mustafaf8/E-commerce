@@ -53,6 +53,13 @@ const AdminMaintenanceMode = lazy(() =>
 const AdminHeaderManagement = lazy(() =>
   import("./pages/admin-view/header-management")
 );
+// Yeni sayfa bileşenleri
+const AdminReviews = lazy(() => import("./pages/admin-view/reviews"));
+const AdminPromotions = lazy(() => import("./pages/admin-view/promotions"));
+const AdminBlog = lazy(() => import("./pages/admin-view/blog"));
+const AdminMessages = lazy(() => import("./pages/admin-view/messages"));
+const AdminSettings = lazy(() => import("./pages/admin-view/settings"));
+const AdminLogs = lazy(() => import("./pages/admin-view/logs"));
 
 const NotFound = lazy(() => import("./pages/not-found"));
 const ShoppingListing = lazy(() => import("./pages/shopping-view/listing"));
@@ -206,6 +213,13 @@ function App() {
             <Route path="users" element={<AdminUsers />} />
             <Route path="maintenance" element={<AdminMaintenanceMode />} />
             <Route path="header-management" element={<AdminHeaderManagement />} />
+            {/* Yeni rotalar */}
+            <Route path="reviews" element={<AdminReviews />} />
+            <Route path="promotions" element={<AdminPromotions />} />
+            <Route path="blog" element={<AdminBlog />} />
+            <Route path="messages" element={<AdminMessages />} />
+            <Route path="settings" element={<AdminSettings />} />
+            <Route path="logs" element={<AdminLogs />} />
           </Route>
 
           <Route path="/shop" element={<ShoppingLayout />}>

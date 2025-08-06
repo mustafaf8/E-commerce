@@ -149,13 +149,14 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
         reviewMessage: reviewMsg,
         reviewValue: rating,
       };
-      await dispatch(addReview(reviewData)).unwrap();
+      const result = await dispatch(addReview(reviewData)).unwrap();
       setRating(0);
       setReviewMsg("");
       dispatch(getReviews(productDetails?._id));
       toast({
         variant: "success",
         title: "Yorum Başarıyla Eklendi!",
+        description: "Yorumunuz onay için bekliyor. Onaylandıktan sonra görünür olacaktır.",
       });
     } catch (error) {
      // console.error("Yorum ekleme hatası yakalandı:", error);
@@ -308,51 +309,52 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                   Stokta Yok
                 </Button>
               ) : (
-                <div className="flex items-center gap-3">
-                  {/* Quantity Stepper - Left */}
-                  <div className="flex items-center border rounded-full p-0.5 gap-1">
+                <div className="flex flex-col sm:flex-row gap-2 w-full">
+                  <div className="flex items-center gap-3 w-full">
+                    {/* Quantity Stepper - Left */}
+                    <div className="flex items-center border rounded-full p-0.5 gap-1">
+                      <Button
+                        variant="ghost"
+                        className="h-7 w-7 rounded-full p-0 hover:bg-gray-100"
+                        size="icon"
+                        disabled={quantity <= 1 || isAddingToCart}
+                        onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                      >
+                        <Minus className="w-3.5 h-3.5" />
+                        <span className="sr-only">Azalt</span>
+                      </Button>
+                      <span className="font-medium text-sm w-7 text-center">
+                        {quantity}
+                      </span>
+                      <Button
+                        variant="ghost"
+                        className="h-7 w-7 rounded-full p-0 hover:bg-gray-100"
+                        size="icon"
+                        disabled={quantity >= productDetails.totalStock || isAddingToCart}
+                        onClick={() =>
+                          setQuantity((prev) =>
+                            Math.min(productDetails.totalStock, prev + 1)
+                          )
+                        }
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span className="sr-only">Arttır</span>
+                      </Button>
+                    </div>
+
+                    {/* Add to Cart Button - Center */}
                     <Button
-                      variant="ghost"
-                      className="h-7 w-7 rounded-full p-0 hover:bg-gray-100"
-                      size="icon"
-                      disabled={quantity <= 1 || isAddingToCart}
-                      onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                      className="flex-1 h-8 text-sm"
+                      onClick={handleAddToCart}
+                      disabled={isAddingToCart}
                     >
-                      <Minus className="w-3.5 h-3.5" />
-                      <span className="sr-only">Azalt</span>
-                    </Button>
-                    <span className="font-medium text-sm w-7 text-center">
-                      {quantity}
-                    </span>
-                    <Button
-                      variant="ghost"
-                      className="h-7 w-7 rounded-full p-0 hover:bg-gray-100"
-                      size="icon"
-                      disabled={quantity >= productDetails.totalStock || isAddingToCart}
-                      onClick={() =>
-                        setQuantity((prev) =>
-                          Math.min(productDetails.totalStock, prev + 1)
-                        )
-                      }
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                      <span className="sr-only">Arttır</span>
+                      {isAddingToCart ? "Ekleniyor..." : `Sepete Ekle (${quantity})`}
                     </Button>
                   </div>
-
-                  {/* Add to Cart Button - Center */}
-                  <Button
-                    className="flex-1 h-8 text-sm"
-                    onClick={handleAddToCart}
-                    disabled={isAddingToCart}
-                  >
-                    {isAddingToCart ? "Ekleniyor..." : `Sepete Ekle (${quantity})`}
-                  </Button>
-
-                  {/* Specs Button - Right */}
+                  {/* Özellikler butonu küçük ekranda alta, büyük ekranda sağda */}
                   <Button
                     variant="outline"
-                    className="h-8 text-sm"
+                    className="h-8 text-sm w-full sm:w-auto"
                     onClick={() => navigate(`/shop/product/${productDetails._id}/specs`)}
                     disabled={isAddingToCart}
                   >

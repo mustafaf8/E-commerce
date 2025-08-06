@@ -269,28 +269,28 @@ const UsersPage = () => {
                 <TableBody>
                   {filteredAdminUsers.length > 0 ? (
                     filteredAdminUsers.map((user) => (
-                      <TableRow key={user._id} className="hover:bg-gray-50/50">
-                        <TableCell className="font-medium">{user.userName}</TableCell>
-                        <TableCell>{user.email || "-"}</TableCell>
-                        <TableCell className="whitespace-nowrap">
+                      <TableRow key={user._id} className="hover:bg-gray-50/50 h-8">
+                        <TableCell className="font-medium py-1">{user.userName}</TableCell>
+                        <TableCell className="py-1">{user.email || "-"}</TableCell>
+                        <TableCell className="whitespace-nowrap py-1">
                           <div className="flex items-center gap-1 text-sm">
                             <Calendar size={14} className="text-gray-500" />
                             {formatDate(user.createdAt)}
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="py-1">
                           <AuthProviderBadge provider={user.authProvider} />
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="py-1">
                           <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200">
                             Admin
                           </Badge>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="py-1">
                           <Button 
                             variant="outline" 
                             size="sm"
-                            className="border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800 flex items-center gap-1"
+                            className="border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800 flex items-center gap-1 py-1"
                             onClick={() => onRemoveAdminClick(user)}
                             disabled={actionLoading}
                           >
@@ -306,7 +306,7 @@ const UsersPage = () => {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-6 text-gray-500">
+                      <TableCell colSpan={6} className="text-center py-2 text-gray-500">
                         {searchTerm ? "Aranan kritere uygun yönetici bulunamadı." : "Hiç yönetici bulunamadı."}
                       </TableCell>
                     </TableRow>
@@ -345,28 +345,28 @@ const UsersPage = () => {
                 <TableBody>
                   {filteredRegularUsers.length > 0 ? (
                     filteredRegularUsers.map((user) => (
-                      <TableRow key={user._id} className="hover:bg-gray-50/50">
-                        <TableCell className="font-medium">{user.userName}</TableCell>
-                        <TableCell>{user.email || "-"}</TableCell>
-                        <TableCell className="whitespace-nowrap">
+                      <TableRow key={user._id} className="hover:bg-gray-50/50 h-8">
+                        <TableCell className="font-medium py-1">{user.userName}</TableCell>
+                        <TableCell className="py-1">{user.email || "-"}</TableCell>
+                        <TableCell className="whitespace-nowrap py-1">
                           <div className="flex items-center gap-1 text-sm">
                             <Calendar size={14} className="text-gray-500" />
                             {formatDate(user.createdAt)}
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="py-1">
                           <AuthProviderBadge provider={user.authProvider} />
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="py-1">
                           <Badge variant="outline" className="bg-blue-50 text-blue-800 border-blue-200">
                             Kullanıcı
                           </Badge>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="py-1">
                           <Button 
                             variant="outline" 
                             size="sm"
-                            className="border-amber-200 text-amber-700 hover:bg-amber-50 hover:text-amber-800 flex items-center gap-1"
+                            className="border-amber-200 text-amber-700 hover:bg-amber-50 hover:text-amber-800 flex items-center gap-1 py-1"
                             onClick={() => onMakeAdminClick(user)}
                             disabled={actionLoading}
                           >
@@ -382,7 +382,7 @@ const UsersPage = () => {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-6 text-gray-500">
+                      <TableCell colSpan={6} className="text-center py-2 text-gray-500">
                         {searchTerm ? "Aranan kritere uygun kullanıcı bulunamadı." : "Hiç kullanıcı bulunamadı."}
                       </TableCell>
                     </TableRow>
