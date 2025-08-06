@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from '../../api/axiosInstance';
+import axios from '@/api/axiosInstance';
 
 // Async thunk: logları çek
 export const fetchLogs = createAsyncThunk(
@@ -7,7 +7,7 @@ export const fetchLogs = createAsyncThunk(
   async (params = {}, { rejectWithValue }) => {
     try {
       const { page = 1, limit = 20, level, action, userId, search } = params;
-      const response = await axios.get('/api/admin/logs', {
+      const response = await axios.get('/admin/logs', {
         params: { page, limit, level, action, userId, search },
       });
       return response.data.data;
