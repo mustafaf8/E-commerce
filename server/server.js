@@ -89,16 +89,33 @@ const priceUpdateJob = require("./jobs/priceUpdateJob");
 const contactRoutes = require("./routes/common/contact-routes");
 const adminMessageRoutes = require("./routes/admin/message-routes.js");
 const shopMessageRoutes = require("./routes/shop/message-routes.js");
+const adminLogRoutes = require("./routes/admin/log-routes.js");
 const errorHandler = require("./middleware/errorHandler");
 const { scheduleAbandonedCartEmails } = require("./jobs/abandonedCartJob");
 const { startScheduledRateUpdates } = require("./utils/currencyConverter");
+const { logInfo } = require("./helpers/logger");
 require("./controllers/auth/auth-controller");
 
 
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch((error) => console.log("MongoDB connection error:", error));
+  .then(() => {
+    console.log("MongoDB connected");
+    logInfo("Sunucu başlatıldı ve MongoDB'ye bağlandı", null, {
+      action: "SERVER_START",
+      additionalData: {
+        port: process.env.PORT || 5000,
+        environment: process.env.NODE_ENV || "development",
+      },
+    });
+  })
+  .catch((error) => {
+    console.log("MongoDB connection error:", error);
+    logInfo("MongoDB bağlantı hatası", null, {
+      action: "MONGODB_CONNECTION_ERROR",
+      error: error.message,
+    });
+  });
 
 const app = express();
 const serverInstance = http.createServer(app);
@@ -248,6 +265,7 @@ app.use("/api/common/currency", currencyRouter);
 app.use("/api/shop/coupons", shopCouponRouter);
 app.use("/api/admin/messages", adminMessageRoutes);
 app.use("/api/shop/messages", shopMessageRoutes);
+app.use("/api/admin/logs", adminLogRoutes);
 app.use("/api/contact", contactRoutes);
 app.use(errorHandler);
 if (process.env.NODE_ENV !== "test") {

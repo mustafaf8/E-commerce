@@ -2,6 +2,7 @@ const { imageUploadUtil } = require("../../helpers/cloudinary");
 const Product = require("../../models/Product");
 const mongoose = require("mongoose");
 const priceUpdateJob = require("../../jobs/priceUpdateJob");
+const { logInfo, logError } = require("../../helpers/logger");
 
 const handleImageUpload = async (req, res) => {
   try {
@@ -171,20 +172,45 @@ const deleteProduct = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Geçersiz Ürün ID formatı." });
     }
-    const product = await Product.findByIdAndDelete(id);
-
-    if (!product)
+    
+    // Ürünü silmeden önce bilgilerini al
+    const product = await Product.findById(id);
+    
+    if (!product) {
       return res.status(404).json({
         success: false,
         message: "Product not found",
       });
+    }
+
+    // Ürünü sil
+    await Product.findByIdAndDelete(id);
+
+    // Başarılı silme işlemini logla
+    logInfo("Ürün başarıyla silindi", req, {
+      action: "DELETE_PRODUCT",
+      resourceId: id,
+      resourceType: "Product",
+      additionalData: {
+        productTitle: product.title,
+        productCategory: product.category,
+        productBrand: product.brand,
+      },
+    });
 
     res.status(200).json({
       success: true,
       message: "Product delete successfully",
     });
   } catch (e) {
-    //console.log(e);
+    // Hata durumunu logla
+    logError("Ürün silme hatası", req, {
+      action: "DELETE_PRODUCT_ERROR",
+      resourceId: req.params.id,
+      resourceType: "Product",
+      error: e.message,
+    });
+
     res.status(500).json({
       success: false,
       message: "Error occured",

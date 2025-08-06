@@ -8,7 +8,8 @@
     "start": "server.js",
     "dev": "nodemon server.js",
     "migrate-prices": "node scripts/migrateTLPrices.js",
-    "update-reviews": "node scripts/updateProductReviews.js"
+    "update-reviews": "node scripts/updateProductReviews.js",
+    "test-logging": "node test-logging.js"
   },
   "author": "mustafa nahsan",
   "license": "ISC",
@@ -35,6 +36,8 @@
     "nodemon": "^3.1.4",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "winston": "^3.17.0",
+    "winston-mongodb": "^7.0.0"
   }
 }
