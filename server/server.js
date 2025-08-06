@@ -267,6 +267,7 @@ app.use("/api/admin/messages", adminMessageRoutes);
 app.use("/api/shop/messages", shopMessageRoutes);
 app.use("/api/admin/logs", adminLogRoutes);
 app.use("/api/contact", contactRoutes);
+
 app.use(errorHandler);
 if (process.env.NODE_ENV !== "test") {
   scheduleAbandonedCartEmails();
