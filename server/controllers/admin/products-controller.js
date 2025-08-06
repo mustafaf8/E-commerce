@@ -71,12 +71,30 @@ const addProduct = async (req, res) => {
 
     await newlyCreatedProduct.save();
     
+    // Ürün ekleme işlemini logla
+    logInfo("Yeni ürün eklendi", req, {
+      action: "ADD_PRODUCT",
+      resourceId: newlyCreatedProduct._id,
+      resourceType: "Product",
+      additionalData: {
+        productTitle: title,
+        productCategory: category,
+        productBrand: brand,
+        priceUSD: priceUSD,
+      },
+    });
+    
     res.status(201).json({
       success: true,
       data: newlyCreatedProduct,
     });
   } catch (e) {
-    //console.log(e);
+    // Hata durumunu logla
+    logError("Ürün ekleme hatası", req, {
+      action: "ADD_PRODUCT_ERROR",
+      error: e.message,
+    });
+    
     res.status(500).json({
       success: false,
       message: "Error occured",
