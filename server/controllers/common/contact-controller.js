@@ -1,64 +1,45 @@
-const { sendEmail } = require("../../helpers/emailHelper");
+const Message = require('../../models/Message');
+const { sendEmail } = require('../../helpers/emailHelper');
 
-const sendContactEmail = async (req, res) => {
+// Socket.IO instance'ı server.js'den alınacak (sonra bağlanacak)
+let io;
+function setSocketIo(socketIoInstance) {
+  io = socketIoInstance;
+}
+
+// POST /api/contact/send
+const sendContactMessage = async (req, res) => {
   try {
-    const { name, email, subject, message } = req.body;
-
-    // Email içeriğini HTML formatında oluştur
-    const emailHtml = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px;">
-        <h2 style="color: #333;">Yeni İletişim Formu Mesajı</h2>
-        <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
-          <p><strong>Gönderen:</strong> ${name}</p>
-          <p><strong>E-posta:</strong> ${email}</p>
-          <p><strong>Konu:</strong> ${subject}</p>
-        </div>
-        <div style="background: #f9f9f9; padding: 15px; border-radius: 5px;">
-          <h3 style="color: #444; margin-top: 0;">Mesaj:</h3>
-          <p style="white-space: pre-wrap;">${message}</p>
-        </div>
-      </div>
-    `;
-
-    // Düz metin versiyonu
-    const emailText = `
-      Yeni İletişim Formu Mesajı
-      
-      Gönderen: ${name}
-      E-posta: ${email}
-      Konu: ${subject}
-      
-      Mesaj:
-      ${message}
-    `;
-
-    // Email gönder
-    const emailSent = await sendEmail({
-      to: "admin@deposun.com",
-      subject: `İletişim Formu: ${subject}`,
-      text: emailText,
-      html: emailHtml,
-      replyTo: email // Yanıt verilecek adres olarak gönderenin emailini ayarla
+    const { userId, name, email, subject, message } = req.body;
+    if (!name || !email || !subject || !message) {
+      return res.status(400).json({ success: false, message: 'Tüm alanlar zorunludur.' });
+    }
+    const newMessage = await Message.create({
+      userId: userId || null,
+      name,
+      email,
+      subject,
+      message,
+      status: 'new',
+      replies: []
     });
 
-    if (!emailSent) {
-      throw new Error("E-posta gönderilemedi");
+    // Adminlere Socket.IO ile bildirim gönder
+    if (io) {
+      io.emit('new_message_received', { messageId: newMessage._id, subject, name, email });
     }
 
-    res.status(200).json({
-      success: true,
-      message: "Mesajınız başarıyla gönderildi."
+    // Adminlere e-posta gönder (örnek: destek@site.com)
+    await sendEmail({
+      to: process.env.CONTACT_ADMIN_EMAIL || 'destek@site.com',
+      subject: `[Yeni Mesaj] ${subject}`,
+      htmlContent: `<b>Yeni mesaj:</b><br>Ad: ${name}<br>Email: ${email}<br>Konu: ${subject}<br>Mesaj: ${message}`
     });
 
-  } catch (error) {
-    console.error("Contact form error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Mesajınız gönderilemedi. Lütfen daha sonra tekrar deneyin."
-    });
+    return res.status(201).json({ success: true, message: 'Mesajınız başarıyla iletildi.' });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Mesaj gönderilemedi.', error: err.message });
   }
 };
 
-module.exports = {
-  sendContactEmail
-}; 
+module.exports = { sendContactMessage, setSocketIo }; 

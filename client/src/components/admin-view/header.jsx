@@ -3,18 +3,21 @@ import { io } from "socket.io-client";
 import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "@/store/auth-slice";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
+import { incrementNewCount, resetNewCount } from "@/store/admin/adminMessageSlice";
 
 function AdminHeader({ setOpen }) {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [newOrderCount, setNewOrderCount] = useState(0);
   const [liveVisitorCount, setLiveVisitorCount] = useState(null);
+  const newMessageCount = useSelector((state) => state.adminMessages?.newCount || 0);
 
   // Get order data from store
   const { userList = [], guestOrderList = [] } = useSelector(
@@ -38,42 +41,40 @@ function AdminHeader({ setOpen }) {
     setNewOrderCount(registeredNewOrders + guestNewOrders);
   }, [userList, guestOrderList]);
 
-// ... (diğer importlar ve kodlar)
-useEffect(() => {
-  // Vite ortam değişkenleri VITE_ ile başlamalıdır.
-  const socketURL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin);
- // console.log("Socket.IO sunucusuna bağlanılıyor:", socketURL);
+  useEffect(() => {
+    const socketURL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin);
+    const socket = io(socketURL, {
+      withCredentials: true,
+      transports: ['websocket', 'polling']
+    });
+    socket.on("connect", () => {
+      socket.emit("register_admin");
+    });
+    socket.on("disconnect", (reason) => {
+      setLiveVisitorCount(null);
+    });
+    socket.on("connect_error", (error) => {
+      console.error("Socket.IO bağlantı hatası:", error.message);
+    });
+    socket.on("visitor_count", (count) => {
+      setLiveVisitorCount(count);
+    });
+    // Yeni mesaj bildirimi
+    socket.on("new_message_received", (data) => {
+      dispatch(incrementNewCount());
+      toast({ title: "Yeni müşteri mesajı!", description: data.subject, variant: "default" });
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, [dispatch, toast]);
 
-  const socket = io(socketURL, {
-    withCredentials: true,
-    transports: ['websocket', 'polling'] // WebSocket çalışmazsa polling'e geçer
-  });
-
-  socket.on("connect", () => {
-  //  console.log("Socket.IO başarıyla bağlandı, ID:", socket.id);
-    socket.emit("register_admin");
- //   console.log("'register_admin' olayı gönderildi.");
-  });
-
-  socket.on("disconnect", (reason) => {
-    console.log("Socket.IO bağlantısı kesildi:", reason);
-    setLiveVisitorCount(null); // Bağlantı kopunca sayacı sıfırla
-  });
-
-  socket.on("connect_error", (error) => {
-    console.error("Socket.IO bağlantı hatası:", error.message);
-  });
-
-  socket.on("visitor_count", (count) => {
- //   console.log("Ziyaretçi sayısı alındı:", count);
-    setLiveVisitorCount(count);
-  });
-
-  return () => {
- //   console.log("Socket.IO bağlantısı kesiliyor...");
-    socket.disconnect();
-  };
-}, []); 
+  // Mesajlar sayfasına gidince yeni mesaj sayısını sıfırla
+  useEffect(() => {
+    if (location.pathname === "/admin/messages") {
+      dispatch(resetNewCount());
+    }
+  }, [location, dispatch]);
 
   function handleLogout() {
     dispatch(logoutUser())
@@ -86,13 +87,16 @@ useEffect(() => {
           "[handleLogout] Dispatch sırasında hata oluştu veya çıkış başarısız oldu:",
           error
         );
-
         toast({ variant: "destructive", title: "Çıkış yapılamadı." });
       });
   }
 
   function handleBellClick() {
     navigate("/admin/orders");
+  }
+
+  function handleMessageBellClick() {
+    navigate("/admin/messages");
   }
 
   return (
@@ -120,6 +124,7 @@ useEffect(() => {
       </div>
 
       <div className="flex items-center gap-4">
+        {/* Sipariş bildirimi */}
         <Button
           variant="outline"
           size="icon"
@@ -134,12 +139,25 @@ useEffect(() => {
           )}
           <span className="sr-only">Notifications</span>
         </Button>
-
+        {/* Mesaj bildirimi */}
+        <Button
+          variant="outline"
+          size="icon"
+          className="rounded-full relative"
+          onClick={handleMessageBellClick}
+        >
+          <BellRing size={18} className="text-indigo-600" />
+          {newMessageCount > 0 && (
+            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-medium text-white">
+              {newMessageCount > 9 ? "9+" : newMessageCount}
+            </span>
+          )}
+          <span className="sr-only">Mesaj Bildirimi</span>
+        </Button>
         <div className="hidden md:flex items-center gap-2 rounded-full bg-secondary/80 px-3 py-1.5 text-sm font-medium">
           <User size={16} className="text-primary" />
           <span>{user?.userName || "Admin"}</span>
         </div>
-
         <Button
           onClick={handleLogout}
           variant="ghost"

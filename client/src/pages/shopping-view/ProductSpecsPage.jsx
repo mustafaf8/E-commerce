@@ -230,49 +230,52 @@ function ProductSpecsPage() {
 
         {/* Sağ: Ürün Bilgi ve Sepet Kutusu */}
         <div className="flex-1 min-w-0 flex flex-col gap-6">
-          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 flex flex-col gap-4">
-            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 leading-tight mb-2">
+          <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-8 border border-gray-100 flex flex-col gap-4">
+            <h1 className="text-lg sm:text-2xl md:text-3xl font-extrabold text-gray-900 leading-tight mb-2 break-words">
               {productDetails.title}
             </h1>
-            <div className="flex items-center gap-3 mb-2 pointer-events-none">
-              <StarRatingComponent value={productDetails.rating || 0} readOnly size={22} />
-              <span className="text-sm text-gray-500">({productDetails.numReviews || 0} Yorum)</span>
+            <div className="flex items-center gap-2 sm:gap-3 mb-2">
+              <StarRatingComponent rating={productDetails.averageReview || 0} size={24} />
+              <span className="text-xs sm:text-sm text-gray-600 font-medium">
+                {productDetails.averageReview ? productDetails.averageReview.toFixed(1) : '0.0'}
+              </span>
+              <span className="text-xs sm:text-sm text-gray-500">({productDetails.numReviews || 0} Yorum)</span>
             </div>
-            <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center gap-2 sm:gap-4 mb-4 flex-wrap">
               {productDetails.salePrice ? (
                 <>
-                  <span className="bg-blue-100 text-blue-800 font-bold px-6 py-2 rounded-2xl text-2xl shadow-sm">
+                  <span className="bg-blue-100 text-blue-800 font-bold px-3 py-1 sm:px-6 sm:py-2 rounded-2xl text-lg sm:text-2xl shadow-sm">
                     {formatPrice(productDetails.salePrice)} TL
                   </span>
-                  <span className="line-through text-lg text-gray-400">{formatPrice(productDetails.price)} TL</span>
+                  <span className="line-through text-base sm:text-lg text-gray-400">{formatPrice(productDetails.price)} TL</span>
                 </>
               ) : (
-                <span className="bg-blue-100 text-blue-800 font-bold px-6 py-2 rounded-2xl text-2xl shadow-sm">
+                <span className="bg-blue-100 text-blue-800 font-bold px-3 py-1 sm:px-6 sm:py-2 rounded-2xl text-lg sm:text-2xl shadow-sm">
                   {formatPrice(productDetails.price)} TL
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex items-center border border-gray-200 rounded-full px-2 py-1 bg-gray-50">
-                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" disabled={quantity <= 1} onClick={() => setQuantity(q => Math.max(1, q - 1))}><Minus className="w-4 h-4" /></Button>
-                <span className="font-semibold w-10 text-center text-lg">{quantity}</span>
-                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" disabled={quantity >= productDetails.totalStock} onClick={() => setQuantity(q => Math.min(productDetails.totalStock, q + 1))}><Plus className="w-4 h-4" /></Button>
+            <div className="flex items-center gap-2 sm:gap-3 mb-4 w-full">
+              <div className="flex items-center border border-gray-200 rounded-full px-1 sm:px-2 py-0.5 sm:py-1 bg-gray-50">
+                <Button variant="ghost" size="icon" className="h-6 w-6 sm:h-8 sm:w-8 rounded-full" disabled={quantity <= 1} onClick={() => setQuantity(q => Math.max(1, q - 1))}><Minus className="w-3 h-3 sm:w-4 sm:h-4" /></Button>
+                <span className="font-semibold w-6 sm:w-10 text-center text-sm sm:text-lg">{quantity}</span>
+                <Button variant="ghost" size="icon" className="h-6 w-6 sm:h-8 sm:w-8 rounded-full" disabled={quantity >= productDetails.totalStock} onClick={() => setQuantity(q => Math.min(productDetails.totalStock, q + 1))}><Plus className="w-3 h-3 sm:w-4 sm:h-4" /></Button>
               </div>
-              <Button className="flex-1 min-w-0 max-w-60 text-lg font-semibold shadow-md" onClick={handleAddToCart} disabled={productDetails.totalStock === 0}>
+              <Button className="flex-1 min-w-0 max-w-60 text-sm sm:text-lg font-semibold shadow-md sm:py-0" onClick={handleAddToCart} disabled={productDetails.totalStock === 0}>
                 {productDetails.totalStock === 0 ? 'Stokta Yok' : 'Sepete Ekle'}
               </Button>
               <Button
                 variant={isWishlisted ? "default" : "outline"}
                 size="icon"
-                className={`rounded-full border-gray-300 ${isWishlisted ? 'bg-pink-100 border-pink-200' : ''}`}
+                className={`rounded-full border-gray-300 h-6 w-6 sm:h-10 sm:w-10 ${isWishlisted ? 'bg-pink-100 border-pink-200' : ''}`}
                 aria-label={isWishlisted ? "Favorilerden çıkar" : "Favorilere ekle"}
                 onClick={handleWishlistToggle}
               >
-                <Heart className={`w-6 h-6 transition-colors ${isWishlisted ? 'fill-pink-500 text-pink-500' : 'text-pink-500'}`} />
+                <Heart className={`w-4 h-4 sm:w-6 sm:h-6 transition-colors ${isWishlisted ? 'fill-pink-500 text-pink-500' : 'text-pink-500'}`} />
               </Button>
             </div>
             <div className="flex items-center gap-2 mt-2">
-              <span className={`text-sm font-medium px-3 py-1 rounded-full ${productDetails.totalStock > 0 ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-red-100 text-red-700 border border-red-200'}`}>
+              <span className={`text-xs sm:text-sm font-medium px-2 sm:px-3 py-0.5 sm:py-1 rounded-full ${productDetails.totalStock > 0 ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-red-100 text-red-700 border border-red-200'}`}>
                 {productDetails.totalStock > 0 ? `Stokta: ${productDetails.totalStock} adet` : 'Stokta Yok'}
               </span>
             </div>

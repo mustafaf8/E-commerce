@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./auth-slice";
 import adminProductsSlice from "./admin/products-slice";
 import adminOrderSlice from "./admin/order-slice";
+import adminReviewSlice from "./admin/review-slice";
 import shopProductsSlice from "./shop/products-slice";
 import shopCartSlice from "./shop/cart-slice";
 import shopAddressSlice from "./shop/address-slice";
@@ -20,12 +21,14 @@ import adminCouponReducer from "./admin/coupon-slice";
 import maintenanceReducer from "./common-slice/maintenance-slice";
 import authorizationReducer from "./admin/authorization-slice";
 import campaignCouponsReducer from "./common-slice/coupons-slice";
+import adminMessageReducer from "./admin/adminMessageSlice";
 
 const store = configureStore({
   reducer: {
     auth: authReducer,
     adminProducts: adminProductsSlice,
     adminOrder: adminOrderSlice,
+    adminReviews: adminReviewSlice,
     shopProducts: shopProductsSlice,
     shopCart: shopCartSlice,
     shopAddress: shopAddressSlice,
@@ -44,6 +47,7 @@ const store = configureStore({
     maintenance: maintenanceReducer,
     adminAuthorization: authorizationReducer,
     campaignCoupons: campaignCouponsReducer,
+    adminMessages: adminMessageReducer,
   },
 });
 

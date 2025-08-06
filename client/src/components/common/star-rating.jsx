@@ -1,7 +1,9 @@
 import { StarIcon } from "lucide-react";
 
-function StarRatingComponent({ rating, handleRatingChange }) {
+function StarRatingComponent({ rating, handleRatingChange, size = 18 }) {
   // console.log(rating, "rating star");
+  const starSize = size === 18 ? "w-4 h-4" : size === 24 ? "w-6 h-6" : "w-5 h-5 max-[640px]:w-4 max-[640px]:h-4";
+  
   return [1, 2, 3, 4, 5].map((star) => (
     <button
       key={star}
@@ -15,11 +17,11 @@ function StarRatingComponent({ rating, handleRatingChange }) {
       onClick={handleRatingChange ? () => handleRatingChange(star) : null}
     >
       <StarIcon
-        className={`w-5 h-5 max-[640px]:w-4 max-[640px]:h-4 ${
+        className={`${starSize} ${
           // Boyut
           star <= rating
             ? "fill-yellow-500 stroke-yellow-500"
-            : "fill-transparent"
+            : "fill-gray-200 stroke-gray-300"
         }`}
         strokeWidth={1.2}
       />

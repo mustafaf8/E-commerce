@@ -38,21 +38,31 @@ const addProductReview = async (req, res) => {
       userName,
       reviewMessage,
       reviewValue,
+      status: "pending" // Açıkça pending olarak belirt
     });
 
     await newReview.save();
 
-    const reviews = await ProductReview.find({ productId });
-    const totalReviewsLength = reviews.length;
-    const averageReview =
-      reviews.reduce((sum, reviewItem) => sum + reviewItem.reviewValue, 0) /
-      totalReviewsLength;
-
-    await Product.findByIdAndUpdate(productId, { averageReview });
+    // Ürün puanını ve yorum sayısını güncelle (sadece approved yorumlar için)
+    const approvedReviews = await ProductReview.find({ 
+      productId, 
+      status: "approved" 
+    });
+    
+    const numReviews = approvedReviews.length;
+    const averageReview = numReviews > 0 
+      ? approvedReviews.reduce((sum, reviewItem) => sum + reviewItem.reviewValue, 0) / numReviews 
+      : 0;
+    
+    await Product.findByIdAndUpdate(productId, { 
+      averageReview,
+      numReviews 
+    });
 
     res.status(201).json({
       success: true,
       data: newReview,
+      message: "Yorumunuz başarıyla eklendi ve onay için bekliyor."
     });
   } catch (e) {
    // console.log(e);
@@ -67,7 +77,12 @@ const getProductReviews = async (req, res) => {
   try {
     const { productId } = req.params;
 
-    const reviews = await ProductReview.find({ productId });
+    // Sadece approved yorumları getir
+    const reviews = await ProductReview.find({ 
+      productId, 
+      status: "approved" 
+    });
+    
     res.status(200).json({
       success: true,
       data: reviews,
