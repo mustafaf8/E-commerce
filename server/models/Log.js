@@ -16,19 +16,18 @@ const logSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    meta: {
-      userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-      username: String,
-      ipAddress: String,
-      userAgent: String,
-      action: String,
-      resourceId: String,
-      resourceType: String,
-      additionalData: mongoose.Schema.Types.Mixed,
+    // Meta alanları kök dizine taşındı
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
+    username: String,
+    ipAddress: String,
+    userAgent: String,
+    action: String,
+    resourceId: String,
+    resourceType: String,
+    additionalData: mongoose.Schema.Types.Mixed,
     source: {
       type: String,
       default: "server",
@@ -39,10 +38,10 @@ const logSchema = new mongoose.Schema(
   }
 );
 
-// İndeksler ekle
+// İndeksler güncellendi
 logSchema.index({ timestamp: -1 });
 logSchema.index({ level: 1 });
-logSchema.index({ "meta.userId": 1 });
-logSchema.index({ "meta.action": 1 });
+logSchema.index({ "userId": 1 });
+logSchema.index({ "action": 1 });
 
-module.exports = mongoose.model("Log", logSchema); 
+module.exports = mongoose.model("Log", logSchema);

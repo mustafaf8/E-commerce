@@ -2,6 +2,7 @@ const Log = require("../../models/Log");
 const { logInfo, logError } = require("../../helpers/logger");
 
 // Logları getir
+// GET /api/admin/logs - Tüm logları getir
 const getLogs = async (req, res) => {
   try {
     const {
@@ -15,88 +16,82 @@ const getLogs = async (req, res) => {
       search,
     } = req.query;
 
-    // Filtreleme kriterleri
     const filter = {};
 
-    // Level filtresi
     if (level && ["info", "warn", "error", "debug"].includes(level)) {
       filter.level = level;
     }
-
-    // Action filtresi
     if (action) {
-      filter["meta.action"] = { $regex: action, $options: "i" };
+      filter["action"] = { $regex: action, $options: "i" };
     }
-
-    // User ID filtresi
     if (userId) {
-      filter["meta.userId"] = userId;
+      filter["userId"] = userId;
     }
-
-    // Tarih filtresi
     if (startDate || endDate) {
       filter.timestamp = {};
-      if (startDate) {
-        filter.timestamp.$gte = new Date(startDate);
-      }
-      if (endDate) {
-        filter.timestamp.$lte = new Date(endDate);
-      }
+      if (startDate) filter.timestamp.$gte = new Date(startDate);
+      if (endDate) filter.timestamp.$lte = new Date(endDate);
     }
-
-    // Arama filtresi
     if (search) {
       filter.$or = [
         { message: { $regex: search, $options: "i" } },
-        { "meta.username": { $regex: search, $options: "i" } },
-        { "meta.action": { $regex: search, $options: "i" } },
+        { "username": { $regex: search, $options: "i" } },
+        { "action": { $regex: search, $options: "i" } },
       ];
     }
 
-    // Sayfalama
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const limitNum = parseInt(limit);
 
-    // Logları getir
+    // Logları getir (populate güncellendi)
     const logs = await Log.find(filter)
-      .populate("meta.userId", "username email")
+      .populate("userId", "username email") // Doğrudan 'userId' populate ediliyor
       .sort({ timestamp: -1 })
       .skip(skip)
       .limit(limitNum)
       .lean();
 
-    // Toplam log sayısını getir
     const totalLogs = await Log.countDocuments(filter);
-
-    // Toplam sayfa sayısını hesapla
     const totalPages = Math.ceil(totalLogs / limitNum);
 
-    // Logları formatla
+    // Logları formatla (meta referansları kaldırıldı)
     const formattedLogs = logs.map((log) => ({
       id: log._id,
       timestamp: log.timestamp,
       level: log.level,
       message: log.message,
-      user: log.meta?.userId ? {
-        id: log.meta.userId._id,
-        username: log.meta.userId.username || log.meta.userId.email,
-      } : null,
-      ipAddress: log.meta?.ipAddress,
-      action: log.meta?.action,
-      resourceId: log.meta?.resourceId,
-      resourceType: log.meta?.resourceType,
-      additionalData: log.meta?.additionalData,
+      user: log.userId ? {
+        id: log.userId._id,
+        username: log.userId.username || log.userId.email,
+      } : (log.username ? { username: log.username } : null),
+      ipAddress: log.ipAddress,
+      action: log.action,
+      resourceId: log.resourceId,
+      resourceType: log.resourceType,
+      additionalData: log.additionalData,
       createdAt: log.createdAt,
       updatedAt: log.updatedAt,
     }));
 
     // Log görüntüleme işlemini logla
+    console.log("LogController: req.user bilgisi:", {
+      hasUser: !!req.user,
+      userId: req.user?._id,
+      username: req.user?.username || req.user?.email
+    });
+    
     logInfo("Loglar görüntülendi", req, {
       action: "VIEW_LOGS",
       filters: { level, action, userId, startDate, endDate, search },
       page,
       limit,
       totalResults: totalLogs,
+      debug: {
+        hasUser: !!req.user,
+        userId: req.user?._id,
+        username: req.user?.username || req.user?.email,
+        ip: req.ip,
+      }
     });
 
     res.status(200).json({
@@ -117,7 +112,6 @@ const getLogs = async (req, res) => {
       action: "VIEW_LOGS_ERROR",
       error: error.message,
     });
-
     res.status(500).json({
       success: false,
       message: "Loglar alınırken bir hata oluştu.",

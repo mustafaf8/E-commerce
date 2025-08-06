@@ -89,9 +89,18 @@ const logWithUser = (level, message, req = null, additionalMeta = {}) => {
     if (req.user) {
       meta.userId = req.user._id;
       meta.username = req.user.username || req.user.email;
+      console.log("Logger: Kullanıcı bilgileri eklendi:", {
+        userId: req.user._id,
+        username: req.user.username || req.user.email
+      });
+    } else {
+      console.log("Logger: req.user bulunamadı");
     }
+  } else {
+    console.log("Logger: req objesi null");
   }
 
+  console.log("Logger: Meta bilgileri:", meta);
   logger.log(level, message, meta);
 };
 

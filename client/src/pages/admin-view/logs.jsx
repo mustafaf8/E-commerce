@@ -30,6 +30,29 @@ const LogsPage = () => {
     dispatch(fetchLogs({ page: pagination.currentPage, limit: 20 }));
   }, [dispatch, pagination.currentPage]);
 
+  // Debug: Log verilerini kontrol et
+  useEffect(() => {
+    if (logs && logs.length > 0) {
+      console.log("=== LOG DEBUG ===");
+      console.log("Toplam log sayısı:", logs.length);
+      console.log("İlk log:", logs[0]);
+      console.log("İlk log kullanıcı bilgisi:", logs[0]?.user);
+      console.log("İlk log meta bilgisi:", logs[0]?.meta);
+
+      // Tüm logları kontrol et
+      logs.forEach((log, index) => {
+        if (log.user) {
+          console.log(`Log ${index} - Kullanıcı:`, log.user);
+        }
+        if (log.meta?.username) {
+          console.log(`Log ${index} - Meta Username:`, log.meta.username);
+        }
+      });
+
+      console.log("==================");
+    }
+  }, [logs]);
+
   // Logları en yeni tarihten en eskiye doğru sırala
   const sortedLogs = logs ? [...logs].sort((a, b) => {
     const dateA = new Date(a.timestamp);
@@ -84,7 +107,7 @@ const LogsPage = () => {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {log.user?.username || "-"}
+                        {log.user?.username || log.username || log.user?.email || log.meta?.username || "-"}
                       </TableCell>
                       <TableCell className="max-w-xs truncate" title={log.message}>
                         {log.message}
@@ -94,10 +117,11 @@ const LogsPage = () => {
                           {JSON.stringify(
                             {
                               action: log.action,
-                              ip: log.ipAddress,
+                              ipAddress: log.ipAddress,
                               resourceId: log.resourceId,
                               resourceType: log.resourceType,
-                              ...log.additionalData,
+                              // additionalData'yı da ekleyelim (varsa)
+                              ...(log.additionalData || {}),
                             },
                             null,
                             2

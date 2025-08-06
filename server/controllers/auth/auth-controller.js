@@ -255,6 +255,7 @@ const logoutUser = (req, res, next) => {
 const authMiddleware = async (req, res, next) => {
   if (req.isAuthenticated()) {
    // console.log("authMiddleware -> User is authenticated via session.");
+    console.log("AuthMiddleware: Session auth - User:", req.user?.username || req.user?.email);
     return next();
   }
 
@@ -277,6 +278,7 @@ const authMiddleware = async (req, res, next) => {
     }
     req.user = userFromToken;
    // console.log("authMiddleware -> User authenticated via token.");
+    console.log("AuthMiddleware: Token auth - User:", req.user.username || req.user.email);
     next();
   } catch (error) {
    // console.error(
