@@ -21,6 +21,7 @@ import adminCouponReducer from "./admin/coupon-slice";
 import maintenanceReducer from "./common-slice/maintenance-slice";
 import authorizationReducer from "./admin/authorization-slice";
 import campaignCouponsReducer from "./common-slice/coupons-slice";
+import adminMessageReducer from "./admin/adminMessageSlice";
 
 const store = configureStore({
   reducer: {
@@ -46,6 +47,7 @@ const store = configureStore({
     maintenance: maintenanceReducer,
     adminAuthorization: authorizationReducer,
     campaignCoupons: campaignCouponsReducer,
+    adminMessages: adminMessageReducer,
   },
 });
 

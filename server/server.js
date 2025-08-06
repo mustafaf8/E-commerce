@@ -12,6 +12,7 @@ const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 const http = require("http");
 const { Server } = require("socket.io");
+const { setSocketIo } = require("./controllers/common/contact-controller");
 
 const apiLimiter = rateLimit({
   windowMs: 3 * 60 * 1000, // 3 dakika
@@ -84,11 +85,15 @@ const adminReviewRouter = require("./routes/admin/review-routes");
 const maintenanceRouter = require("./routes/common/maintenance-routes");
 const currencyRouter = require("./routes/common/currency-routes");
 const shopCouponRouter = require("./routes/shop/coupon-routes");
+const priceUpdateJob = require("./jobs/priceUpdateJob");
+const contactRoutes = require("./routes/common/contact-routes");
+const adminMessageRoutes = require("./routes/admin/message-routes.js");
+const shopMessageRoutes = require("./routes/shop/message-routes.js");
 const errorHandler = require("./middleware/errorHandler");
 const { scheduleAbandonedCartEmails } = require("./jobs/abandonedCartJob");
 const { startScheduledRateUpdates } = require("./utils/currencyConverter");
-const priceUpdateJob = require("./jobs/priceUpdateJob");
 require("./controllers/auth/auth-controller");
+
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -118,7 +123,8 @@ const io = new Server(serverInstance, {
   transports: ['websocket', 'polling'] // Hem WebSocket hem de gerekirse polling'e izin ver
 });
 
-
+setSocketIo(io);
+ 
 let activeVisitorCount = 0;
 
 io.on("connection", (socket) => {
@@ -239,14 +245,21 @@ app.use("/api/admin/users", adminUserRouter);
 app.use("/api/admin/reviews", adminReviewRouter);
 app.use("/api/maintenance", maintenanceRouter);
 app.use("/api/common/currency", currencyRouter);
+app.use("/api/shop/coupons", shopCouponRouter);
+app.use("/api/admin/messages", adminMessageRoutes);
+app.use("/api/shop/messages", shopMessageRoutes);
+app.use("/api/contact", contactRoutes);
 app.use(errorHandler);
 if (process.env.NODE_ENV !== "test") {
   scheduleAbandonedCartEmails();
   startScheduledRateUpdates();
   priceUpdateJob.start();
 }
-app.use("/api/shop/coupons", shopCouponRouter);
 
 serverInstance.listen(PORT, () =>
   console.log(`Server (with Socket.io) is now running on port ${PORT}`)
 );
+
+
+
+
