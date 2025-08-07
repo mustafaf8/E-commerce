@@ -104,7 +104,6 @@ const getLogs = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Log getirme hatası:", error);
     logError("Log görüntüleme hatası", req, {
       action: "VIEW_LOGS_ERROR",
       error: error.message,
