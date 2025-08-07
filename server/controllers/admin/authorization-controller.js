@@ -1,4 +1,5 @@
 const User = require("../../models/User");
+const { logInfo, logError } = require("../../helpers/logger");
 
 // GET /admin/authorization/admins -> list all admin users with roles & permissions
 exports.listAdmins = async (req, res) => {
@@ -8,10 +9,12 @@ exports.listAdmins = async (req, res) => {
     );
     res.status(200).json({ success: true, data: admins });
   } catch (e) {
-   // console.error("listAdmins error:", e);
-    res
-      .status(500)
-      .json({ success: false, message: "Admin listesi alınamadı.", error: e.message });
+    // console.error("listAdmins error:", e);
+    res.status(500).json({
+      success: false,
+      message: "Admin listesi alınamadı.",
+      error: e.message,
+    });
   }
 };
 
@@ -22,8 +25,10 @@ exports.updateAdminAuthorization = async (req, res) => {
     const { adminAccessLevel, adminModulePermissions } = req.body;
 
     const update = {};
-    if (adminAccessLevel !== undefined) update.adminAccessLevel = adminAccessLevel;
-    if (adminModulePermissions !== undefined) update.adminModulePermissions = adminModulePermissions;
+    if (adminAccessLevel !== undefined)
+      update.adminAccessLevel = adminAccessLevel;
+    if (adminModulePermissions !== undefined)
+      update.adminModulePermissions = adminModulePermissions;
 
     const updatedAdmin = await User.findByIdAndUpdate(adminId, update, {
       new: true,
@@ -33,14 +38,36 @@ exports.updateAdminAuthorization = async (req, res) => {
     );
 
     if (!updatedAdmin) {
-      return res.status(404).json({ success: false, message: "Admin bulunamadı" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Admin bulunamadı" });
     }
+
+    logInfo(`Admin yetkileri güncellendi: ${updatedAdmin.userName}`, req, {
+      action: "UPDATE_AUTHORIZATION",
+      resourceId: adminId,
+      resourceType: "User",
+      additionalData: {
+        targetUser: updatedAdmin.userName,
+        newLevel: adminAccessLevel,
+        permissions: adminModulePermissions,
+      },
+    });
 
     res.status(200).json({ success: true, data: updatedAdmin });
   } catch (e) {
-   // console.error("updateAdminAuthorization error:", e);
-    res
-      .status(500)
-      .json({ success: false, message: "Güncelleme başarısız.", error: e.message });
+    logError("Admin yetkileri güncellenirken hata oluştu", req, {
+      action: "UPDATE_AUTHORIZATION_ERROR",
+      resourceId: adminId,
+      resourceType: "User",
+      error: e.message,
+    });
+
+    // console.error("updateAdminAuthorization error:", e);
+    res.status(500).json({
+      success: false,
+      message: "Güncelleme başarısız.",
+      error: e.message,
+    });
   }
-}; 
+};

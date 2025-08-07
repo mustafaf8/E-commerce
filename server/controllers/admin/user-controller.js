@@ -9,9 +9,9 @@ exports.getAdminUsers = async (req, res) => {
     res.status(200).json({ success: true, data: adminUsers });
   } catch (error) {
     res.status(500).json({
-      success: false, 
+      success: false,
       message: "Admin kullanıcılar getirilemedi.",
-      error: error.message 
+      error: error.message,
     });
   }
 };
@@ -25,9 +25,9 @@ exports.getRegularUsers = async (req, res) => {
     res.status(200).json({ success: true, data: regularUsers });
   } catch (error) {
     res.status(500).json({
-      success: false, 
+      success: false,
       message: "Normal kullanıcılar getirilemedi.",
-      error: error.message 
+      error: error.message,
     });
   }
 };
@@ -36,25 +36,37 @@ exports.getRegularUsers = async (req, res) => {
 exports.makeAdmin = async (req, res) => {
   try {
     const { userId } = req.params;
-    
+
     const user = await User.findById(userId);
-    
+
     if (!user) {
-      return res.status(404).json({ success: false, message: "Kullanıcı bulunamadı" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Kullanıcı bulunamadı" });
     }
-    
+
     if (user.role === "admin") {
-      return res.status(400).json({ success: false, message: "Kullanıcı zaten admin rolüne sahip" });
+      return res.status(400).json({
+        success: false,
+        message: "Kullanıcı zaten admin rolüne sahip",
+      });
     }
-    
+
     user.role = "admin";
     // Varsayılan admin yetki seviyesi ve izinler
     user.adminAccessLevel = 3; // Sınırlı yetki
-    
+
     await user.save();
-    
-    res.status(200).json({ 
-      success: true, 
+
+    logInfo(`${user.userName} admin yapıldı`, req, {
+      action: "MAKE_ADMIN",
+      resourceId: user._id,
+      resourceType: "User",
+      additionalData: { targetUser: user.userName },
+    });
+
+    res.status(200).json({
+      success: true,
       message: "Kullanıcı başarıyla admin yapıldı",
       data: {
         _id: user._id,
@@ -62,14 +74,20 @@ exports.makeAdmin = async (req, res) => {
         email: user.email,
         role: user.role,
         authProvider: user.authProvider,
-        createdAt: user.createdAt
-      }
+        createdAt: user.createdAt,
+      },
     });
   } catch (error) {
+    logError("Kullanıcı admin yapılırken hata oluştu", req, {
+      action: "MAKE_ADMIN_ERROR",
+      resourceId: userId,
+      resourceType: "User",
+      error: error.message,
+    });
     res.status(500).json({
-      success: false, 
+      success: false,
       message: "Kullanıcı admin yapılırken hata oluştu.",
-      error: error.message 
+      error: error.message,
     });
   }
 };
@@ -78,35 +96,48 @@ exports.makeAdmin = async (req, res) => {
 exports.removeAdmin = async (req, res) => {
   try {
     const { userId } = req.params;
-    
+
     const user = await User.findById(userId);
-    
+
     if (!user) {
-      return res.status(404).json({ success: false, message: "Kullanıcı bulunamadı" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Kullanıcı bulunamadı" });
     }
-    
+
     if (user.role === "user") {
-      return res.status(400).json({ success: false, message: "Kullanıcı zaten normal kullanıcı rolüne sahip" });
+      return res.status(400).json({
+        success: false,
+        message: "Kullanıcı zaten normal kullanıcı rolüne sahip",
+      });
     }
-    
+
     // Eğer son admin kullanıcısıysa, işlemi reddet
     const adminCount = await User.countDocuments({ role: "admin" });
     if (adminCount <= 1) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Son admin kullanıcısının yetkisi alınamaz. En az bir admin kullanıcı olmalıdır." 
+      return res.status(400).json({
+        success: false,
+        message:
+          "Son admin kullanıcısının yetkisi alınamaz. En az bir admin kullanıcı olmalıdır.",
       });
     }
-    
+
     user.role = "user";
     // Admin yetki seviyesi ve izinleri kaldır
     user.adminAccessLevel = undefined;
     user.adminModulePermissions = {};
-    
+
     await user.save();
-    
-    res.status(200).json({ 
-      success: true, 
+
+    logInfo(`${user.userName} admin yetkisi kaldırıldı`, req, {
+      action: "REMOVE_ADMIN",
+      resourceId: user._id,
+      resourceType: "User",
+      additionalData: { targetUser: user.userName },
+    });
+
+    res.status(200).json({
+      success: true,
       message: "Admin yetkisi başarıyla kaldırıldı",
       data: {
         _id: user._id,
@@ -114,14 +145,20 @@ exports.removeAdmin = async (req, res) => {
         email: user.email,
         role: user.role,
         authProvider: user.authProvider,
-        createdAt: user.createdAt
-      }
+        createdAt: user.createdAt,
+      },
     });
   } catch (error) {
+    logError("Admin yetkisi kaldırılırken hata oluştu", req, {
+      action: "REMOVE_ADMIN_ERROR",
+      resourceId: userId,
+      resourceType: "User",
+      error: error.message,
+    });
     res.status(500).json({
-      success: false, 
+      success: false,
       message: "Admin yetkisi kaldırılırken hata oluştu.",
-      error: error.message 
+      error: error.message,
     });
   }
-}; 
+};
