@@ -1,6 +1,7 @@
 const Category = require("../../models/Category");
 const Product = require("../../models/Product");
 const mongoose = require("mongoose");
+const { logInfo, logError } = require("../../helpers/logger");
 
 // Yeni Kategori Ekle (Admin)
 const addCategoryAdmin = async (req, res) => {
@@ -29,10 +30,22 @@ const addCategoryAdmin = async (req, res) => {
       parent: parent || null,
     });
     await newCategory.save();
+    // YENİ: Loglama
+    logInfo("Yeni kategori eklendi", req, {
+      action: "ADD_CATEGORY",
+      resourceId: newCategory._id,
+      resourceType: "Category",
+      additionalData: { categoryName: name, categorySlug: slug },
+    });
     res
       .status(201)
       .json({ success: true, message: "Kategori eklendi.", data: newCategory });
   } catch (error) {
+    logError("Kategori eklenirken hata oluştu", req, {
+      action: "ADD_CATEGORY_ERROR",
+      error: error.message,
+      additionalData: { name, slug },
+    });
     //console.error("Admin kategori ekleme hatası:", error);
     if (error.name === "ValidationError") {
       return res.status(400).json({
@@ -86,12 +99,26 @@ const updateCategoryAdmin = async (req, res) => {
         message: "Güncellenecek kategori bulunamadı.",
       });
     }
+    // YENİ: Loglama
+    logInfo("Kategori güncellendi", req, {
+      action: "UPDATE_CATEGORY",
+      resourceId: id,
+      resourceType: "Category",
+      additionalData: { newName: name, newSlug: slug },
+    });
     res.status(200).json({
       success: true,
       message: "Kategori güncellendi.",
       data: updatedCategory,
     });
   } catch (error) {
+    // YENİ: Hata Loglama
+    logError("Kategori güncellenirken hata oluştu", req, {
+      action: "UPDATE_CATEGORY_ERROR",
+      resourceId: id,
+      resourceType: "Category",
+      error: error.message,
+    });
     //console.error("Admin kategori güncelleme hatası:", error);
     if (error.name === "ValidationError") {
       return res.status(400).json({
@@ -128,10 +155,7 @@ const deleteCategoryAdmin = async (req, res) => {
     }
 
     // Alt kategorilerin parent referansını güncelle
-    await Category.updateMany(
-      { parent: id },
-      { parent: null }
-    );
+    await Category.updateMany({ parent: id }, { parent: null });
 
     const deletedCategory = await Category.findByIdAndDelete(id);
 
@@ -140,10 +164,24 @@ const deleteCategoryAdmin = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Silinecek kategori bulunamadı." });
     }
+    // YENİ: Loglama
+    logInfo("Kategori silindi", req, {
+      action: "DELETE_CATEGORY",
+      resourceId: id,
+      resourceType: "Category",
+      additionalData: { categoryName: deletedCategory.name },
+    });
+
     res
       .status(200)
       .json({ success: true, message: "Kategori silindi.", data: { _id: id } });
   } catch (error) {
+    logError("Kategori silinirken hata oluştu", req, {
+      action: "DELETE_CATEGORY_ERROR",
+      resourceId: id,
+      resourceType: "Category",
+      error: error.message,
+    });
     //console.error("Admin kategori silme hatası:", error);
     if (error.name === "CastError") {
       return res
@@ -157,33 +195,35 @@ const deleteCategoryAdmin = async (req, res) => {
 // Kategorileri hiyerarşik yapıda döndürmek için yardımcı fonksiyon
 const buildCategoryTree = (categories, parentId = null) => {
   const tree = [];
-  
+
   for (const category of categories) {
     // parent null ise ana kategori, değilse alt kategori
-    const categoryParentId = category.parent ? category.parent._id || category.parent : null;
-    
+    const categoryParentId = category.parent
+      ? category.parent._id || category.parent
+      : null;
+
     if (categoryParentId?.toString() === parentId?.toString()) {
       const children = buildCategoryTree(categories, category._id);
       const categoryWithChildren = {
         ...category.toObject(),
-        children: children
+        children: children,
       };
       tree.push(categoryWithChildren);
     }
   }
-  
+
   return tree;
 };
 
 const getAllCategoriesAdmin = async (req, res) => {
   try {
     const categories = await Category.find({})
-      .populate('parent', 'name slug')
+      .populate("parent", "name slug")
       .sort({ name: 1 });
-    
+
     // Hiyerarşik yapıyı oluştur
     const categoryTree = buildCategoryTree(categories);
-    
+
     res.status(200).json({ success: true, data: categoryTree });
   } catch (error) {
     //console.error("Admin tüm kategorileri getirme hatası:", error);
@@ -194,12 +234,11 @@ const getAllCategoriesAdmin = async (req, res) => {
 // Header için ana kategorileri getir (sadece parent null olanlar)
 const getHeaderCategories = async (req, res) => {
   try {
-    const categories = await Category.find({ 
-      parent: null, 
-      isActive: true 
-    })
-    .sort({ headerOrder: 1, name: 1 });
-    
+    const categories = await Category.find({
+      parent: null,
+      isActive: true,
+    }).sort({ headerOrder: 1, name: 1 });
+
     res.status(200).json({ success: true, data: categories });
   } catch (error) {
     //console.error("Header kategorileri getirme hatası:", error);
@@ -211,20 +250,20 @@ const getHeaderCategories = async (req, res) => {
 const updateHeaderOrder = async (req, res) => {
   try {
     const { categoryOrders } = req.body; // [{id: "categoryId", order: 1}, ...]
-    
+
     if (!Array.isArray(categoryOrders)) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Geçersiz sıralama verisi." 
+      return res.status(400).json({
+        success: false,
+        message: "Geçersiz sıralama verisi.",
       });
     }
 
     // Her kategori için sıralamayı güncelle
     for (const item of categoryOrders) {
       if (!mongoose.Types.ObjectId.isValid(item.id)) {
-        return res.status(400).json({ 
-          success: false, 
-          message: "Geçersiz kategori ID formatı." 
+        return res.status(400).json({
+          success: false,
+          message: "Geçersiz kategori ID formatı.",
         });
       }
 
@@ -235,9 +274,9 @@ const updateHeaderOrder = async (req, res) => {
       );
     }
 
-    res.status(200).json({ 
-      success: true, 
-      message: "Header sıralaması güncellendi." 
+    res.status(200).json({
+      success: true,
+      message: "Header sıralaması güncellendi.",
     });
   } catch (error) {
     //console.error("Header sıralaması güncelleme hatası:", error);

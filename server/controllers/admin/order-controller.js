@@ -1,6 +1,7 @@
 const Order = require("../../models/Order");
 const mongoose = require("mongoose");
 const { sendOrderNotificationToAdmin } = require("../../helpers/emailHelper");
+const { logInfo, logError } = require("../../helpers/logger");
 
 const getAllOrdersOfAllUsers = async (req, res) => {
   try {
@@ -44,11 +45,10 @@ const getOrderDetailsForAdmin = async (req, res) => {
     }
 
     if (!order.isGuestOrder && order.userId) {
-      order = await Order.findById(id)
-        .populate({
-          path: "userId",
-          select: "userName email phoneNumber tcKimlikNo",
-        });
+      order = await Order.findById(id).populate({
+        path: "userId",
+        select: "userName email phoneNumber tcKimlikNo",
+      });
 
       order = order.toJSON();
 
@@ -94,6 +94,8 @@ const updateOrderStatus = async (req, res) => {
       });
     }
 
+    const previousStatus = order.orderStatus;
+
     const updatedOrder = await Order.findByIdAndUpdate(
       id,
       { orderStatus, orderUpdateDate: new Date() },
@@ -101,6 +103,16 @@ const updateOrderStatus = async (req, res) => {
     ).populate({
       path: "userId",
       select: "userName email phoneNumber tcKimlikNo",
+    });
+
+    logInfo(`Sipariş durumu güncellendi`, req, {
+      action: "UPDATE_ORDER_STATUS",
+      resourceId: id,
+      resourceType: "Order",
+      additionalData: {
+        fromStatus: previousStatus,
+        toStatus: orderStatus,
+      },
     });
 
     // Sipariş "confirmed" durumuna geçtiğinde admin e-posta bildirimi gönder
@@ -119,6 +131,12 @@ const updateOrderStatus = async (req, res) => {
       message: "Order status is updated successfully!",
     });
   } catch (e) {
+    logError("Sipariş durumu güncellenirken hata oluştu", req, {
+      action: "UPDATE_ORDER_STATUS_ERROR",
+      resourceId: id,
+      resourceType: "Order",
+      error: e.message,
+    });
     //console.log(e);
     res.status(500).json({
       success: false,
@@ -133,7 +151,7 @@ const getUsersWithOrders = async (req, res) => {
       {
         $match: {
           isGuestOrder: false,
-          orderStatus: { $nin: ["pending_payment", "failed"] }
+          orderStatus: { $nin: ["pending_payment", "failed"] },
         },
       },
       {
@@ -186,7 +204,10 @@ const getUsersWithOrders = async (req, res) => {
     res.status(200).json({
       success: true,
       data: usersWithOrders,
-      message: usersWithOrders.length === 0 ? "Siparişi olan kullanıcı bulunamadı!" : null
+      message:
+        usersWithOrders.length === 0
+          ? "Siparişi olan kullanıcı bulunamadı!"
+          : null,
     });
   } catch (e) {
     //console.error("getUsersWithOrders error:", e);
@@ -209,7 +230,7 @@ const getOrdersByUserIdForAdmin = async (req, res) => {
 
     const orders = await Order.find({
       userId: userId,
-      orderStatus: { $nin: ["pending_payment", "failed"] }
+      orderStatus: { $nin: ["pending_payment", "failed"] },
     }).sort({ orderDate: -1 });
 
     if (!orders.length) {
@@ -237,7 +258,7 @@ const getAllGuestOrdersForAdmin = async (req, res) => {
   try {
     const guestOrders = await Order.find({
       isGuestOrder: true,
-      orderStatus: { $nin: ["pending_payment", "failed"] }
+      orderStatus: { $nin: ["pending_payment", "failed"] },
     }).sort({ orderDate: -1 });
 
     if (!guestOrders.length) {
@@ -264,7 +285,7 @@ const getAllGuestOrdersForAdmin = async (req, res) => {
 const getPendingAndFailedOrders = async (req, res) => {
   try {
     const orders = await Order.find({
-      orderStatus: { $in: ["pending_payment", "failed"] }
+      orderStatus: { $in: ["pending_payment", "failed"] },
     }).sort({ orderDate: -1 });
 
     res.status(200).json({

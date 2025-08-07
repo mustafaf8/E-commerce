@@ -1,22 +1,14 @@
 const winston = require("winston");
 const WinstonMongoDB = require("winston-mongodb");
-const Log = require("../models/Log");
 
-// Winston MongoDB transport için özel format
-const mongoFormat = winston.format.combine(
-  winston.format.timestamp(),
-  winston.format.errors({ stack: true }),
-  winston.format.json()
-);
-
-// Console format
+// Console için formatlama (değişiklik yok)
 const consoleFormat = winston.format.combine(
   winston.format.colorize(),
   winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-  winston.format.printf(({ timestamp, level, message, meta }) => {
-    let logMessage = `${timestamp} [${level.toUpperCase()}]: ${message}`;
-    if (meta) {
-      logMessage += ` | Meta: ${JSON.stringify(meta)}`;
+  winston.format.printf(({ timestamp, level, message, ...meta }) => {
+    let logMessage = `${timestamp} [${level}]: ${message}`;
+    if (Object.keys(meta).length > 0) {
+      logMessage += ` | ${JSON.stringify(meta)}`;
     }
     return logMessage;
   })
@@ -25,15 +17,16 @@ const consoleFormat = winston.format.combine(
 // Logger oluştur
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || "info",
-  format: mongoFormat,
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.errors({ stack: true }),
+    winston.format.json() // Tüm logları JSON formatına çeviriyoruz
+  ),
   transports: [
-    // Console transport (geliştirme ortamı için)
     new winston.transports.Console({
       format: consoleFormat,
       level: "debug",
     }),
-    
-    // MongoDB transport
     new WinstonMongoDB.MongoDB({
       level: "info",
       db: process.env.MONGO_URI,
@@ -41,75 +34,38 @@ const logger = winston.createLogger({
       options: {
         useUnifiedTopology: true,
       },
-      format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.errors({ stack: true }),
-        winston.format.json()
-      ),
-    }),
-  ],
-  exceptionHandlers: [
-    new winston.transports.Console({
-      format: consoleFormat,
-    }),
-    new WinstonMongoDB.MongoDB({
-      db: process.env.MONGO_URI,
-      collection: "logs",
-      options: {
-        useUnifiedTopology: true,
-      },
-    }),
-  ],
-  rejectionHandlers: [
-    new winston.transports.Console({
-      format: consoleFormat,
-    }),
-    new WinstonMongoDB.MongoDB({
-      db: process.env.MONGO_URI,
-      collection: "logs",
-      options: {
-        useUnifiedTopology: true,
-      },
+      // YENİ: storeHostMeta seçeneği, meta verilerini düzgünce kaydetmek için
+      storeHostMeta: true,
     }),
   ],
 });
 
-// Özel log fonksiyonu - kullanıcı bilgileri ile
+// Log fonksiyonu - GÜNCELLENDİ
 const logWithUser = (level, message, req = null, additionalMeta = {}) => {
-  const meta = {
-    ...additionalMeta,
-  };
+  const meta = { ...additionalMeta };
 
-  // Request bilgilerini ekle
   if (req) {
-    meta.ipAddress = req.ip || req.connection.remoteAddress;
-    meta.userAgent = req.get("User-Agent");
-    
-    // Kullanıcı bilgilerini ekle
+    meta.ipAddress =
+      req.ip ||
+      req.connection?.remoteAddress ||
+      req.socket?.remoteAddress ||
+      (req.headers ? req.headers["x-forwarded-for"] : null);
+
+    meta.userAgent = req.get
+      ? req.get("User-Agent")
+      : req.headers?.["user-agent"];
+
     if (req.user) {
-      meta.userId = req.user._id;
-      meta.username = req.user.username || req.user.email;
-      console.log("Logger: Kullanıcı bilgileri eklendi:", {
-        userId: req.user._id,
-        username: req.user.username || req.user.email
-      });
-    } else {
-      console.log("Logger: req.user bulunamadı");
+      meta.userId = req.user._id || req.user.id;
+      meta.username = req.user.username || req.user.email || req.user.userName;
     }
-  } else {
-    console.log("Logger: req objesi null");
   }
 
-  console.log("Logger: Meta bilgileri:", meta);
+  // Winston'a logu meta objesiyle birlikte gönderiyoruz
   logger.log(level, message, meta);
 };
 
-// Basit log fonksiyonu
-const log = (level, message, meta = {}) => {
-  logger.log(level, message, meta);
-};
-
-// Kullanım kolaylığı için yardımcı fonksiyonlar
+// Diğer log fonksiyonları (değişiklik yok)
 const logInfo = (message, req = null, additionalMeta = {}) => {
   logWithUser("info", message, req, additionalMeta);
 };
@@ -128,10 +84,9 @@ const logDebug = (message, req = null, additionalMeta = {}) => {
 
 module.exports = {
   logger,
-  log,
   logInfo,
   logError,
   logWarn,
   logDebug,
   logWithUser,
-}; 
+};
