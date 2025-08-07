@@ -1,8 +1,7 @@
 const Log = require("../../models/Log");
 const { logInfo, logError } = require("../../helpers/logger");
 
-// Logları getir
-// GET /api/admin/logs - Tüm logları getir
+// Logları getir - GÜNCELLENDİ
 const getLogs = async (req, res) => {
   try {
     const {
@@ -18,15 +17,11 @@ const getLogs = async (req, res) => {
 
     const filter = {};
 
-    if (level && ["info", "warn", "error", "debug"].includes(level)) {
+    // Filtreleme mantığı (değişiklik yok)
+    if (level && ["info", "warn", "error", "debug"].includes(level))
       filter.level = level;
-    }
-    if (action) {
-      filter["action"] = { $regex: action, $options: "i" };
-    }
-    if (userId) {
-      filter["userId"] = userId;
-    }
+    if (action) filter.action = { $regex: action, $options: "i" };
+    if (userId) filter.userId = userId;
     if (startDate || endDate) {
       filter.timestamp = {};
       if (startDate) filter.timestamp.$gte = new Date(startDate);
@@ -35,17 +30,19 @@ const getLogs = async (req, res) => {
     if (search) {
       filter.$or = [
         { message: { $regex: search, $options: "i" } },
-        { "username": { $regex: search, $options: "i" } },
-        { "action": { $regex: search, $options: "i" } },
+        { username: { $regex: search, $options: "i" } },
+        { action: { $regex: search, $options: "i" } },
+        // Eski loglar için metadata içinde arama
+        { "metadata.username": { $regex: search, $options: "i" } },
+        { "metadata.action": { $regex: search, $options: "i" } },
       ];
     }
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const limitNum = parseInt(limit);
 
-    // Logları getir (populate güncellendi)
     const logs = await Log.find(filter)
-      .populate("userId", "username email") // Doğrudan 'userId' populate ediliyor
+      .populate("userId", "username email userName")
       .sort({ timestamp: -1 })
       .skip(skip)
       .limit(limitNum)
@@ -54,44 +51,43 @@ const getLogs = async (req, res) => {
     const totalLogs = await Log.countDocuments(filter);
     const totalPages = Math.ceil(totalLogs / limitNum);
 
-    // Logları formatla (meta referansları kaldırıldı)
-    const formattedLogs = logs.map((log) => ({
-      id: log._id,
-      timestamp: log.timestamp,
-      level: log.level,
-      message: log.message,
-      user: log.userId ? {
-        id: log.userId._id,
-        username: log.userId.username || log.userId.email,
-      } : (log.username ? { username: log.username } : null),
-      ipAddress: log.ipAddress,
-      action: log.action,
-      resourceId: log.resourceId,
-      resourceType: log.resourceType,
-      additionalData: log.additionalData,
-      createdAt: log.createdAt,
-      updatedAt: log.updatedAt,
-    }));
-
-    // Log görüntüleme işlemini logla
-    console.log("LogController: req.user bilgisi:", {
-      hasUser: !!req.user,
-      userId: req.user?._id,
-      username: req.user?.username || req.user?.email
+    // YENİ: Logları formatlama mantığı
+    const formattedLogs = logs.map((log) => {
+      // Hem kök dizindeki hem de metadata içindeki veriyi kontrol et
+      const meta = log.metadata || {};
+      return {
+        id: log._id,
+        timestamp: log.timestamp,
+        level: log.level,
+        message: log.message,
+        user: log.userId
+          ? {
+              id: log.userId._id,
+              username:
+                log.userId.username || log.userId.email || log.userId.userName,
+            }
+          : null,
+        username:
+          log.username ||
+          meta.username ||
+          (log.userId
+            ? log.userId.username || log.userId.email || log.userId.userName
+            : null),
+        ipAddress: log.ipAddress || meta.ipAddress,
+        userAgent: log.userAgent || meta.userAgent,
+        action: log.action || meta.action,
+        resourceId: log.resourceId || meta.resourceId,
+        resourceType: log.resourceType || meta.resourceType,
+        additionalData: log.additionalData || meta.additionalData,
+      };
     });
-    
+
     logInfo("Loglar görüntülendi", req, {
       action: "VIEW_LOGS",
       filters: { level, action, userId, startDate, endDate, search },
       page,
       limit,
       totalResults: totalLogs,
-      debug: {
-        hasUser: !!req.user,
-        userId: req.user?._id,
-        username: req.user?.username || req.user?.email,
-        ip: req.ip,
-      }
     });
 
     res.status(200).json({
@@ -108,13 +104,16 @@ const getLogs = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Log getirme hatası:", error);
     logError("Log görüntüleme hatası", req, {
       action: "VIEW_LOGS_ERROR",
       error: error.message,
+      stack: error.stack,
     });
     res.status(500).json({
       success: false,
       message: "Loglar alınırken bir hata oluştu.",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
@@ -148,12 +147,12 @@ const getLogStats = async (req, res) => {
       { $sort: { count: -1 } },
     ]);
 
-    // Action bazında istatistikler
+    // Action bazında istatistikler - DÜZELTİLDİ
     const actionStats = await Log.aggregate([
-      { $match: { ...dateFilter, "meta.action": { $exists: true } } },
+      { $match: { ...dateFilter, action: { $exists: true, $ne: null } } },
       {
         $group: {
-          _id: "$meta.action",
+          _id: "$action", // meta.action değil, sadece action
           count: { $sum: 1 },
         },
       },
@@ -213,13 +212,13 @@ const getLogStats = async (req, res) => {
   }
 };
 
-// Belirli bir logu getir
+// Belirli bir logu getir - DÜZELTİLDİ
 const getLogById = async (req, res) => {
   try {
     const { id } = req.params;
 
     const log = await Log.findById(id)
-      .populate("meta.userId", "username email")
+      .populate("userId", "username email userName") // DÜZELTİLDİ
       .lean();
 
     if (!log) {
@@ -241,16 +240,24 @@ const getLogById = async (req, res) => {
         timestamp: log.timestamp,
         level: log.level,
         message: log.message,
-        user: log.meta?.userId ? {
-          id: log.meta.userId._id,
-          username: log.meta.userId.username || log.meta.userId.email,
-        } : null,
-        ipAddress: log.meta?.ipAddress,
-        userAgent: log.meta?.userAgent,
-        action: log.meta?.action,
-        resourceId: log.meta?.resourceId,
-        resourceType: log.meta?.resourceType,
-        additionalData: log.meta?.additionalData,
+        user: log.userId
+          ? {
+              id: log.userId._id || log.userId,
+              username:
+                log.userId.username || log.userId.email || log.userId.userName,
+            }
+          : null,
+        username:
+          log.username ||
+          (log.userId && typeof log.userId === "object"
+            ? log.userId.username || log.userId.email || log.userId.userName
+            : null),
+        ipAddress: log.ipAddress, // DÜZELTİLDİ
+        userAgent: log.userAgent, // DÜZELTİLDİ
+        action: log.action, // DÜZELTİLDİ
+        resourceId: log.resourceId, // DÜZELTİLDİ
+        resourceType: log.resourceType, // DÜZELTİLDİ
+        additionalData: log.additionalData, // DÜZELTİLDİ
         createdAt: log.createdAt,
         updatedAt: log.updatedAt,
       },
@@ -273,4 +280,4 @@ module.exports = {
   getLogs,
   getLogStats,
   getLogById,
-}; 
+};

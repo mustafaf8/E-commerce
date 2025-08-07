@@ -53,6 +53,20 @@ const logSlice = createSlice({
       })
       .addCase(fetchLogs.fulfilled, (state, action) => {
         state.loading = false;
+        
+        // Debug için gelen verileri kontrol et
+        console.log("API'den gelen log verileri:", action.payload.logs);
+        
+        // Kullanıcı bilgilerini kontrol et
+        if (action.payload.logs && action.payload.logs.length > 0) {
+          action.payload.logs.forEach((log, index) => {
+            console.log(`Log ${index} kullanıcı bilgisi:`, {
+              username: log.username,
+              user: log.user
+            });
+          });
+        }
+        
         state.logs = action.payload.logs;
         state.pagination = action.payload.pagination;
       })
