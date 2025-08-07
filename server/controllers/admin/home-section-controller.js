@@ -1,5 +1,6 @@
 const HomeSection = require("../../models/HomeSection");
 const Category = require("../../models/Category");
+const { logInfo, logError } = require("../../helpers/logger");
 
 const addHomeSectionAdmin = async (req, res) => {
   try {
@@ -34,12 +35,27 @@ const addHomeSectionAdmin = async (req, res) => {
     });
 
     await newSection.save();
+
+    logInfo("Yeni ana sayfa bölümü eklendi", req, {
+      action: "ADD_HOME_SECTION",
+      resourceId: newSection._id,
+      resourceType: "HomeSection",
+      additionalData: { sectionTitle: title },
+    });
+
     res.status(201).json({
       success: true,
       message: "Ana sayfa bölümü eklendi.",
       data: newSection,
     });
   } catch (error) {
+    logError("Ana sayfa bölümü eklenirken hata oluştu", req, {
+      action: "ADD_HOME_SECTION_ERROR",
+      resourceId: newSection._id,
+      resourceType: "HomeSection",
+      error: error.message,
+    });
+
     //console.error("Admin bölüm ekleme hatası:", error);
     if (error.name === "ValidationError") {
       return res.status(400).json({
@@ -75,10 +91,13 @@ const updateHomeSectionAdmin = async (req, res) => {
     } = req.body;
 
     // Eğer sadece isActive güncelleniyorsa, diğer alanları kontrol etme
-    if (Object.keys(req.body).length === 1 && req.body.hasOwnProperty('isActive')) {
+    if (
+      Object.keys(req.body).length === 1 &&
+      req.body.hasOwnProperty("isActive")
+    ) {
       const updatedSection = await HomeSection.findByIdAndUpdate(
-        id, 
-        { isActive }, 
+        id,
+        { isActive },
         { new: true }
       );
 
@@ -87,7 +106,7 @@ const updateHomeSectionAdmin = async (req, res) => {
           .status(404)
           .json({ success: false, message: "Güncellenecek bölüm bulunamadı." });
       }
-      
+
       return res.status(200).json({
         success: true,
         message: "Bölüm durumu güncellendi.",
@@ -125,12 +144,27 @@ const updateHomeSectionAdmin = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Güncellenecek bölüm bulunamadı." });
     }
+
+    logInfo("Ana sayfa bölümü güncellendi", req, {
+      action: "UPDATE_HOME_SECTION",
+      resourceId: id,
+      resourceType: "HomeSection",
+      additionalData: { sectionTitle: updatedSection.title },
+    });
+
     res.status(200).json({
       success: true,
       message: "Bölüm güncellendi.",
       data: updatedSection,
     });
   } catch (error) {
+    logError("Ana sayfa bölümü güncellenirken hata oluştu", req, {
+      action: "UPDATE_HOME_SECTION_ERROR",
+      resourceId: id,
+      resourceType: "HomeSection",
+      error: error.message,
+    });
+
     //console.error("Admin bölüm güncelleme hatası:", error);
     if (error.name === "ValidationError") {
       return res.status(400).json({
@@ -158,10 +192,24 @@ const deleteHomeSectionAdmin = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Silinecek bölüm bulunamadı." });
     }
+    logInfo("Ana sayfa bölümü silindi", req, {
+      action: "DELETE_HOME_SECTION",
+      resourceId: id,
+      resourceType: "HomeSection",
+      additionalData: { sectionTitle: deletedSection.title },
+    });
+
     res
       .status(200)
       .json({ success: true, message: "Bölüm silindi.", data: { _id: id } });
   } catch (error) {
+    logError("Ana sayfa bölümü silinirken hata oluştu", req, {
+      action: "DELETE_HOME_SECTION_ERROR",
+      resourceId: id,
+      resourceType: "HomeSection",
+      error: error.message,
+    });
+
     //console.error("Admin bölüm silme hatası:", error);
     if (error.name === "CastError") {
       return res
@@ -193,12 +241,21 @@ const updateHomeSectionsOrderAdmin = async (req, res) => {
       //console.warn("Sıralama güncellemede bazı bölümler bulunamadı.");
     }
 
+    logInfo("Ana sayfa bölüm sıralaması güncellendi", req, {
+      action: "REORDER_HOME_SECTIONS",
+    });
+
     res.status(200).json({
       success: true,
       message: "Bölüm sıralaması güncellendi.",
       data: await HomeSection.find({}).sort({ displayOrder: 1 }),
     });
   } catch (error) {
+    logError("Admin bölüm sıralama hatası", req, {
+      action: "REORDER_HOME_SECTIONS_ERROR",
+      error: error.message,
+    });
+
     //console.error("Admin bölüm sıralama hatası:", error);
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }

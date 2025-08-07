@@ -1,4 +1,5 @@
 const Coupon = require("../../models/Coupon");
+const { logInfo, logError } = require("../../helpers/logger");
 
 // Tüm kuponları getir
 const getAllCoupons = async (req, res) => {
@@ -28,7 +29,7 @@ const createCoupon = async (req, res) => {
       maxUses,
       expiryDate,
       description,
-      imageUrl, 
+      imageUrl,
       showOnCampaignsPage,
     } = req.body;
 
@@ -58,12 +59,30 @@ const createCoupon = async (req, res) => {
 
     await newCoupon.save();
 
+    logInfo("Kupon oluşturuldu", req, {
+      action: "CREATE_COUPON",
+      resourceId: newCoupon._id,
+      resourceType: "Coupon",
+      additionalData: {
+        couponCode: code,
+        discountType: discountType,
+        discountValue: discountValue,
+      },
+    });
+
     res.status(201).json({
       success: true,
       message: "Kupon başarıyla oluşturuldu.",
       data: newCoupon,
     });
   } catch (error) {
+    logError("Kupon oluşturma hatası", req, {
+      action: "CREATE_COUPON_ERROR",
+      resourceId: newCoupon._id,
+      resourceType: "Coupon",
+      error: error.message,
+    });
+
     console.error("Kupon oluşturma hatası:", error);
     res.status(500).json({
       success: false,
@@ -105,12 +124,30 @@ const updateCoupon = async (req, res) => {
       });
     }
 
+    logInfo("Kupon güncellendi", req, {
+      action: "UPDATE_COUPON",
+      resourceId: id,
+      resourceType: "Coupon",
+      additionalData: {
+        couponCode: code,
+        discountType: discountType,
+        discountValue: discountValue,
+      },
+    });
+
     res.status(200).json({
       success: true,
       message: "Kupon başarıyla güncellendi.",
       data: updatedCoupon,
     });
   } catch (error) {
+    logError("Kupon güncelleme hatası", req, {
+      action: "UPDATE_COUPON_ERROR",
+
+      resourceId: id,
+      resourceType: "Coupon",
+      error: error.message,
+    });
     console.error("Kupon güncelleme hatası:", error);
     res.status(500).json({
       success: false,
@@ -132,12 +169,27 @@ const deleteCoupon = async (req, res) => {
         message: "Kupon bulunamadı.",
       });
     }
+    logInfo("Kupon silindi", req, {
+      action: "DELETE_COUPON",
+      resourceId: id,
+      resourceType: "Coupon",
+      additionalData: {
+        couponCode: deletedCoupon.code,
+      },
+    });
 
     res.status(200).json({
       success: true,
       message: "Kupon başarıyla silindi.",
     });
   } catch (error) {
+    logError("Kupon silme hatası", req, {
+      action: "DELETE_COUPON_ERROR",
+      resourceId: id,
+      resourceType: "Coupon",
+      error: error.message,
+    });
+
     console.error("Kupon silme hatası:", error);
     res.status(500).json({
       success: false,
