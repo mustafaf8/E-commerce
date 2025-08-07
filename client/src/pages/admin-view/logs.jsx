@@ -35,26 +35,6 @@ const LogsPage = () => {
     dispatch(fetchLogs({ page: pagination.currentPage, limit: 20 }));
   }, [dispatch, pagination.currentPage]);
 
-  // Debug: Log verilerini kontrol et
-  useEffect(() => {
-    if (logs && logs.length > 0) {
-      console.log("=== FRONTEND LOG DEBUG ===");
-      console.log("Toplam log sayısı:", logs.length);
-      console.log(
-        "İlk 3 log detayları:",
-        logs.slice(0, 3).map((log) => ({
-          id: log.id,
-          message: log.message,
-          username: log.username,
-          user: log.user,
-          action: log.action,
-          level: log.level,
-        }))
-      );
-      console.log("==========================");
-    }
-  }, [logs]);
-
   // Logları en yeni tarihten en eskiye doğru sırala
   const sortedLogs = logs
     ? [...logs].sort((a, b) => {
@@ -172,19 +152,17 @@ const LogsPage = () => {
                           {log.message || "-"}
                         </TableCell>
                         <TableCell>
-                          <details className="text-xs">
+                          <details className="text-xs relative">
                             <summary className="cursor-pointer text-blue-600 hover:text-blue-800">
                               Detayları Göster
                             </summary>
-                            <pre className="whitespace-pre-wrap break-all text-xs bg-gray-50 rounded p-2 mt-2 max-h-32 overflow-y-auto">
+                            <pre className="whitespace-pre-wrap break-all text-xs bg-gray-50 rounded p-3 mt-2 overflow-y-auto absolute right-0 z-10 w-[450px] max-h-[400px] shadow-lg border border-gray-200">
                               {JSON.stringify(
                                 {
                                   ipAddress: log.ipAddress,
                                   resourceId: log.resourceId,
                                   resourceType: log.resourceType,
-                                  userAgent: log.userAgent
-                                    ? log.userAgent.substring(0, 50) + "..."
-                                    : undefined,
+                                  userAgent: log.userAgent,
                                   additionalData: log.additionalData,
                                 },
                                 null,
