@@ -7,7 +7,7 @@ const getPromoCards = async (req, res) => {
     const promoCards = await PromoCard.find({}).sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: promoCards });
   } catch (error) {
-   // console.error("Promosyon kartları getirilirken hata:", error);
+    // console.error("Promosyon kartları getirilirken hata:", error);
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
 };
@@ -26,13 +26,26 @@ const addPromoCard = async (req, res) => {
       link,
     });
     await newPromoCard.save();
+
+    logInfo("Yeni fırsat kartı eklendi", req, {
+      action: "ADD_PROMO_CARD",
+      resourceId: newPromoCard._id,
+      resourceType: "PromoCard",
+    });
+
     res.status(201).json({
       success: true,
       message: "Promosyon kartı eklendi.",
       data: newPromoCard,
     });
   } catch (error) {
-   // console.error("Promosyon kartı eklenirken hata:", error);
+    logError("Promosyon kartı eklenirken hata oluştu", req, {
+      action: "ADD_PROMO_CARD_ERROR",
+      resourceId: newPromoCard._id,
+      resourceType: "PromoCard",
+      error: error.message,
+    });
+    // console.error("Promosyon kartı eklenirken hata:", error);
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -74,12 +87,25 @@ const updatePromoCard = async (req, res) => {
       });
     }
 
+    logInfo("Fırsat kartı güncellendi", req, {
+      action: "UPDATE_PROMO_CARD",
+      resourceId: cardId,
+      resourceType: "PromoCard",
+    });
+
     res.status(200).json({
       success: true,
       message: "Promosyon kartı güncellendi.",
       data: updatedCard,
     });
   } catch (error) {
+    logError("Promosyon kartı güncellenirken hata oluştu", req, {
+      action: "UPDATE_PROMO_CARD_ERROR",
+      resourceId: cardId,
+      resourceType: "PromoCard",
+      error: error.message,
+    });
+
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -114,13 +140,26 @@ const deletePromoCard = async (req, res) => {
         .json({ success: false, message: "Silinecek kart bulunamadı." });
     }
 
+    logInfo("Fırsat kartı silindi", req, {
+      action: "DELETE_PROMO_CARD",
+      resourceId: cardId,
+      resourceType: "PromoCard",
+    });
+
     res.status(200).json({
       success: true,
       message: "Promosyon kartı silindi.",
       data: { _id: cardId },
     });
   } catch (error) {
-   // console.error("Promosyon kartı silinirken hata:", error);
+    logError("Promosyon kartı silinirken hata oluştu", req, {
+      action: "DELETE_PROMO_CARD_ERROR",
+      resourceId: cardId,
+      resourceType: "PromoCard",
+      error: error.message,
+    });
+
+    // console.error("Promosyon kartı silinirken hata:", error);
     if (error.name === "CastError") {
       return res
         .status(400)

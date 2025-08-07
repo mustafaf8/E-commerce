@@ -1,11 +1,12 @@
 const SideBanner = require("../../models/SideBanner");
+const { logInfo, logError } = require("../../helpers/logger");
 
 const getSideBanners = async (req, res) => {
   try {
     const sideBanners = await SideBanner.find({}).sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: sideBanners });
   } catch (error) {
-   // console.error("Yan banner'lar getirilirken hata:", error);
+    // console.error("Yan banner'lar getirilirken hata:", error);
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
 };
@@ -20,13 +21,26 @@ const addSideBanner = async (req, res) => {
     }
     const newSideBanner = new SideBanner({ image, title, link });
     await newSideBanner.save();
+
+    logInfo("Yeni küçük banner eklendi", req, {
+      action: "ADD_SIDE_BANNER",
+      resourceId: newSideBanner._id,
+      resourceType: "SideBanner",
+    });
+
     res.status(201).json({
       success: true,
       message: "Yan banner eklendi.",
       data: newSideBanner,
     });
   } catch (error) {
-   // console.error("Yan banner eklenirken hata:", error);
+    logError("Yan banner eklenirken hata oluştu", req, {
+      action: "ADD_SIDE_BANNER_ERROR",
+      resourceId: newSideBanner._id,
+      resourceType: "SideBanner",
+      error: error.message,
+    });
+    // console.error("Yan banner eklenirken hata:", error);
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -44,9 +58,10 @@ const updateSideBanner = async (req, res) => {
     const { image, title, link } = req.body;
 
     if (!bannerId) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Güncellenecek banner ID'si gerekli." });
+      return res.status(400).json({
+        success: false,
+        message: "Güncellenecek banner ID'si gerekli.",
+      });
     }
 
     if (!image) {
@@ -68,12 +83,24 @@ const updateSideBanner = async (req, res) => {
       });
     }
 
+    logInfo("Küçük banner güncellendi", req, {
+      action: "UPDATE_SIDE_BANNER",
+      resourceId: bannerId,
+      resourceType: "SideBanner",
+    });
+
     res.status(200).json({
       success: true,
       message: "Yan banner güncellendi.",
       data: updatedBanner,
     });
   } catch (error) {
+    logError("Yan banner güncellenirken hata oluştu", req, {
+      action: "UPDATE_SIDE_BANNER_ERROR",
+      resourceId: bannerId,
+      resourceType: "SideBanner",
+      error: error.message,
+    });
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -104,13 +131,27 @@ const deleteSideBanner = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Silinecek yan banner bulunamadı." });
     }
+
+    logInfo("Küçük banner silindi", req, {
+      action: "DELETE_SIDE_BANNER",
+      resourceId: bannerId,
+      resourceType: "SideBanner",
+    });
+
     res.status(200).json({
       success: true,
       message: "Yan banner silindi.",
       data: { _id: bannerId },
     });
   } catch (error) {
-   // console.error("Yan banner silinirken hata:", error);
+    logError("Yan banner silinirken hata oluştu", req, {
+      action: "DELETE_SIDE_BANNER_ERROR",
+      resourceId: bannerId,
+      resourceType: "SideBanner",
+      error: error.message,
+    });
+
+    // console.error("Yan banner silinirken hata:", error);
     if (error.name === "CastError") {
       return res
         .status(400)

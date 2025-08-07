@@ -1,4 +1,5 @@
 const Maintenance = require("../../models/Maintenance");
+const { logInfo, logError } = require("../../helpers/logger");
 
 const findOrCreateStatus = async () => {
   let status = await Maintenance.findOne({ singleton: "maintenance_status" });
@@ -12,8 +13,19 @@ const findOrCreateStatus = async () => {
 const getMaintenanceStatus = async (req, res) => {
   try {
     const status = await findOrCreateStatus();
+    logInfo("Bakım modu durumu getirildi", req, {
+      action: "GET_MAINTENANCE_STATUS",
+      resourceId: status._id,
+      resourceType: "MaintenanceStatus",
+    });
     res.status(200).json({ success: true, data: status });
   } catch (error) {
+    logError("Bakım modu durumu alınamadı", req, {
+      action: "GET_MAINTENANCE_STATUS_ERROR",
+      resourceId: status._id,
+      resourceType: "MaintenanceStatus",
+      error: error.message,
+    });
     res.status(500).json({
       success: false,
       message: "Durum alınamadı.",
@@ -37,11 +49,22 @@ const updateMaintenanceStatus = async (req, res) => {
       { $set: updateData },
       { new: true, upsert: true, runValidators: true }
     );
+    logInfo("Bakım modu durumu güncellendi", req, {
+      action: "UPDATE_MAINTENANCE_STATUS",
+      resourceId: updatedStatus._id,
+      resourceType: "MaintenanceStatus",
+    });
 
     res.status(200).json({
       success: true,
       message: "Bakım modu güncellendi.",
       data: updatedStatus,
+    });
+    logError("Bakım modu durumu güncelleme hatası", req, {
+      action: "UPDATE_MAINTENANCE_STATUS_ERROR",
+      resourceId: updatedStatus._id,
+      resourceType: "MaintenanceStatus",
+      error: error.message,
     });
   } catch (error) {
     res.status(500).json({

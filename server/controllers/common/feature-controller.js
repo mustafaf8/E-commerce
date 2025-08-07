@@ -1,4 +1,5 @@
 const Feature = require("../../models/Feature");
+const { logInfo, logError } = require("../../helpers/logger");
 
 const addFeatureImage = async (req, res) => {
   try {
@@ -9,7 +10,7 @@ const addFeatureImage = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Resim URL'si gerekli." });
     }
-   // console.log("Gelen Feature Data:", { image, title, link });
+    // console.log("Gelen Feature Data:", { image, title, link });
     const newFeatureImage = new Feature({
       image,
       title,
@@ -18,13 +19,26 @@ const addFeatureImage = async (req, res) => {
 
     await newFeatureImage.save();
 
+    logInfo("Yeni ana banner eklendi", req, {
+      action: "ADD_FEATURE_BANNER",
+      resourceId: newFeatureImage._id,
+      resourceType: "FeatureBanner",
+    });
+
     res.status(201).json({
       success: true,
       message: "Banner başarıyla eklendi.",
       data: newFeatureImage,
     });
   } catch (e) {
-   // console.error("Banner eklenirken hata:", e);
+    logError("Banner eklenirken hata oluştu", req, {
+      action: "ADD_FEATURE_BANNER_ERROR",
+      resourceId: newFeatureImage._id,
+      resourceType: "FeatureBanner",
+      error: e.message,
+    });
+
+    // console.error("Banner eklenirken hata:", e);
     if (e.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -41,7 +55,7 @@ const getFeatureImages = async (req, res) => {
     const images = await Feature.find({}).sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: images });
   } catch (e) {
-   // console.log(e);
+    // console.log(e);
     res.status(500).json({ success: false, message: "Some error occured!" });
   }
 };
@@ -52,9 +66,10 @@ const updateFeatureImage = async (req, res) => {
     const { image, title, link } = req.body;
 
     if (!imageId) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Güncellenecek resim ID'si gerekli." });
+      return res.status(400).json({
+        success: false,
+        message: "Güncellenecek resim ID'si gerekli.",
+      });
     }
 
     if (!image) {
@@ -76,12 +91,25 @@ const updateFeatureImage = async (req, res) => {
       });
     }
 
+    logInfo("Ana banner güncellendi", req, {
+      action: "UPDATE_FEATURE_BANNER",
+      resourceId: imageId,
+      resourceType: "FeatureBanner",
+    });
+
     res.status(200).json({
       success: true,
       message: "Banner resmi güncellendi.",
       data: updatedImage,
     });
   } catch (error) {
+    logError("Banner resmi güncelleme hatası", req, {
+      action: "UPDATE_FEATURE_BANNER_ERROR",
+      resourceId: imageId,
+      resourceType: "FeatureBanner",
+      error: error.message,
+    });
+
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -113,13 +141,27 @@ const deleteFeatureImage = async (req, res) => {
         message: "Silinecek banner resmi bulunamadı.",
       });
     }
+
+    logInfo("Ana banner silindi", req, {
+      action: "DELETE_FEATURE_BANNER",
+      resourceId: imageId,
+      resourceType: "FeatureBanner",
+    });
+
     res.status(200).json({
       success: true,
       message: "Banner resmi silindi.",
       data: { _id: imageId },
     });
   } catch (error) {
-   // console.error("Banner resmi silinirken hata:", error);
+    logError("Banner resmi silinirken hata oluştu", req, {
+      action: "DELETE_FEATURE_BANNER_ERROR",
+      resourceId: imageId,
+      resourceType: "FeatureBanner",
+      error: error.message,
+    });
+
+    // console.error("Banner resmi silinirken hata:", error);
     if (error.name === "CastError") {
       return res
         .status(400)
