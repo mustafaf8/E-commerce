@@ -1,4 +1,4 @@
-const Message = require('../../models/Message');
+const Message = require("../../models/Message");
 
 // GET /api/shop/messages
 const getUserMessages = async (req, res) => {
@@ -7,7 +7,13 @@ const getUserMessages = async (req, res) => {
     const messages = await Message.find({ userId }).sort({ createdAt: -1 });
     return res.json({ success: true, messages });
   } catch (err) {
-    return res.status(500).json({ success: false, message: 'Mesajlar alınamadı.', error: err.message });
+    return res
+      .status(500)
+      .json({
+        success: false,
+        message: "Mesajlar alınamadı.",
+        error: err.message,
+      });
   }
 };
 
