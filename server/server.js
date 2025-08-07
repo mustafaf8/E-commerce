@@ -96,18 +96,10 @@ const { startScheduledRateUpdates } = require("./utils/currencyConverter");
 const { logInfo } = require("./helpers/logger");
 require("./controllers/auth/auth-controller");
 
-
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB connected");
-    logInfo("Sunucu başlatıldı ve MongoDB'ye bağlandı", null, {
-      action: "SERVER_START",
-      additionalData: {
-        port: process.env.PORT || 5000,
-        environment: process.env.NODE_ENV || "development",
-      },
-    });
   })
   .catch((error) => {
     console.log("MongoDB connection error:", error);
@@ -137,44 +129,43 @@ const io = new Server(serverInstance, {
     methods: ["GET", "POST"], // Bağlantı kurmak için gereken HTTP metodları
     credentials: true,
   },
-  transports: ['websocket', 'polling'] // Hem WebSocket hem de gerekirse polling'e izin ver
+  transports: ["websocket", "polling"], // Hem WebSocket hem de gerekirse polling'e izin ver
 });
 
 setSocketIo(io);
- 
+
 let activeVisitorCount = 0;
 
 io.on("connection", (socket) => {
-//  console.log(`[Socket.IO] Yeni bağlantı: ${socket.id}`);
+  //  console.log(`[Socket.IO] Yeni bağlantı: ${socket.id}`);
 
   // Ziyaretçi olarak kayıt
   socket.on("register_visitor", () => {
-  //  console.log(`[Socket.IO] ${socket.id} ziyaretçi olarak kayıt oldu.`);
+    //  console.log(`[Socket.IO] ${socket.id} ziyaretçi olarak kayıt oldu.`);
     socket.data.isVisitor = true;
     activeVisitorCount += 1;
-   // console.log(`[Socket.IO] Aktif ziyaretçi: ${activeVisitorCount}. Adminlere yayınlanıyor.`);
+    // console.log(`[Socket.IO] Aktif ziyaretçi: ${activeVisitorCount}. Adminlere yayınlanıyor.`);
     io.to("admins").emit("visitor_count", activeVisitorCount);
   });
 
   // Admin olarak kayıt ve mevcut sayıyı gönder
   socket.on("register_admin", () => {
-  //  console.log(`[Socket.IO] ${socket.id} admin olarak kayıt oldu.`);
+    //  console.log(`[Socket.IO] ${socket.id} admin olarak kayıt oldu.`);
     socket.join("admins");
- //   console.log(`[Socket.IO] Yeni admine mevcut sayı (${activeVisitorCount}) gönderiliyor: ${socket.id}.`);
+    //   console.log(`[Socket.IO] Yeni admine mevcut sayı (${activeVisitorCount}) gönderiliyor: ${socket.id}.`);
     socket.emit("visitor_count", activeVisitorCount);
   });
 
   // Bağlantı koptuğunda ziyaretçi sayaç güncellemesi
   socket.on("disconnect", (reason) => {
-   // console.log(`[Socket.IO] Bağlantı kesildi: ${socket.id}. Sebep: ${reason}`);
+    // console.log(`[Socket.IO] Bağlantı kesildi: ${socket.id}. Sebep: ${reason}`);
     if (socket.data.isVisitor) {
       activeVisitorCount = Math.max(activeVisitorCount - 1, 0);
-   //   console.log(`[Socket.IO] Ziyaretçi ayrıldı. Aktif ziyaretçi: ${activeVisitorCount}. Adminlere yayınlanıyor.`);
+      //   console.log(`[Socket.IO] Ziyaretçi ayrıldı. Aktif ziyaretçi: ${activeVisitorCount}. Adminlere yayınlanıyor.`);
       io.to("admins").emit("visitor_count", activeVisitorCount);
     }
   });
 });
-
 
 const IYZICO_CALLBACK_PATH = "/api/shop/order/iyzico-callback";
 
@@ -278,7 +269,3 @@ if (process.env.NODE_ENV !== "test") {
 serverInstance.listen(PORT, () =>
   console.log(`Server (with Socket.io) is now running on port ${PORT}`)
 );
-
-
-
-

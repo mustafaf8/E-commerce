@@ -16,24 +16,21 @@ const consoleFormat = winston.format.combine(
 
 // Logger oluştur
 const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || "info",
+  level: process.env.LOG_LEVEL || "warn",
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.errors({ stack: true }),
     winston.format.json() // Tüm logları JSON formatına çeviriyoruz
   ),
   transports: [
-    new winston.transports.Console({
-      format: consoleFormat,
-      level: "debug",
-    }),
+    // new winston.transports.Console({
+    //   format: consoleFormat,
+    //   level: "debug",
+    // }),
     new WinstonMongoDB.MongoDB({
-      level: "info",
+      level: "warn",
       db: process.env.MONGO_URI,
       collection: "logs",
-      options: {
-        useUnifiedTopology: true,
-      },
       // YENİ: storeHostMeta seçeneği, meta verilerini düzgünce kaydetmek için
       storeHostMeta: true,
     }),

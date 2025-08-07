@@ -13,11 +13,6 @@ const findOrCreateStatus = async () => {
 const getMaintenanceStatus = async (req, res) => {
   try {
     const status = await findOrCreateStatus();
-    logInfo("Bakım modu durumu getirildi", req, {
-      action: "GET_MAINTENANCE_STATUS",
-      resourceId: status._id,
-      resourceType: "MaintenanceStatus",
-    });
     res.status(200).json({ success: true, data: status });
   } catch (error) {
     logError("Bakım modu durumu alınamadı", req, {
