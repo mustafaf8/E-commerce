@@ -1,24 +1,26 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from '@/api/axiosInstance';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "@/api/axiosInstance";
 
 // Async thunk: logları çek
 export const fetchLogs = createAsyncThunk(
-  'logs/fetchLogs',
+  "logs/fetchLogs",
   async (params = {}, { rejectWithValue }) => {
     try {
       const { page = 1, limit = 20, level, action, userId, search } = params;
-      const response = await axios.get('/admin/logs', {
+      const response = await axios.get("/admin/logs", {
         params: { page, limit, level, action, userId, search },
       });
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Loglar alınamadı');
+      return rejectWithValue(
+        error.response?.data?.message || "Loglar alınamadı"
+      );
     }
   }
 );
 
 const logSlice = createSlice({
-  name: 'logs',
+  name: "logs",
   initialState: {
     logs: [],
     pagination: {
@@ -31,10 +33,10 @@ const logSlice = createSlice({
     loading: false,
     error: null,
     filters: {
-      level: '',
-      action: '',
-      userId: '',
-      search: '',
+      level: "",
+      action: "",
+      userId: "",
+      search: "",
     },
   },
   reducers: {
@@ -53,26 +55,12 @@ const logSlice = createSlice({
       })
       .addCase(fetchLogs.fulfilled, (state, action) => {
         state.loading = false;
-        
-        // Debug için gelen verileri kontrol et
-        console.log("API'den gelen log verileri:", action.payload.logs);
-        
-        // Kullanıcı bilgilerini kontrol et
-        if (action.payload.logs && action.payload.logs.length > 0) {
-          action.payload.logs.forEach((log, index) => {
-            console.log(`Log ${index} kullanıcı bilgisi:`, {
-              username: log.username,
-              user: log.user
-            });
-          });
-        }
-        
         state.logs = action.payload.logs;
         state.pagination = action.payload.pagination;
       })
       .addCase(fetchLogs.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Loglar alınamadı';
+        state.error = action.payload || "Loglar alınamadı";
       });
   },
 });
