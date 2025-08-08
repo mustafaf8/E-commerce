@@ -69,6 +69,36 @@ const updateCategoryAdmin = async (req, res) => {
     }
     const { name, slug, isActive, parent } = req.body;
 
+    // Eğer sadece isActive güncelleniyorsa, diğer alanları kontrol etme
+    if (Object.keys(req.body).length === 1 && req.body.hasOwnProperty("isActive")) {
+      const updatedCategory = await Category.findByIdAndUpdate(
+        id,
+        { isActive },
+        { new: true }
+      );
+
+      if (!updatedCategory) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Güncellenecek kategori bulunamadı." });
+      }
+
+      // YENİ: Loglama
+      logInfo("Kategori durumu güncellendi", req, {
+        action: "UPDATE_CATEGORY_STATUS",
+        resourceId: id,
+        resourceType: "Category",
+        additionalData: { isActive }
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Kategori durumu güncellendi.",
+        data: updatedCategory,
+      });
+    }
+    
+    // Normal güncelleme için isim ve slug kontrolü
     if (!name || !slug) {
       return res
         .status(400)
