@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const adminCheckMiddleware = require("../../middleware/adminCheckMiddleware");
+const permissionCheckMiddleware = require("../../middleware/permissionCheckMiddleware");
 const {
   getAllReviewsAdmin,
   updateReviewStatusAdmin,
@@ -11,12 +12,12 @@ const {
 router.use(adminCheckMiddleware);
 
 // GET /api/admin/reviews - Tüm yorumları getir
-router.get("/", getAllReviewsAdmin);
+router.get("/", permissionCheckMiddleware('reviews', 'view'), getAllReviewsAdmin);
 
 // PUT /api/admin/reviews/:id/status - Yorum durumunu güncelle
-router.put("/:id/status", updateReviewStatusAdmin);
+router.put("/:id/status", permissionCheckMiddleware('reviews', 'manage'), updateReviewStatusAdmin);
 
 // DELETE /api/admin/reviews/:id - Yorumu sil
-router.delete("/:id", deleteReviewAdmin);
+router.delete("/:id", permissionCheckMiddleware('reviews', 'manage'), deleteReviewAdmin);
 
 module.exports = router; 

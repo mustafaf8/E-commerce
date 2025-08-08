@@ -273,6 +273,7 @@ function MenuItems({ setOpen }) {
               visibleItems.push(item);
             }
           } else {
+            // Tüm diğer modüller için doğrudan ID üzerinden kontrol
             const perms = user?.adminModulePermissions?.[item.id];
             if (perms?.view) {
               visibleItems.push(item);

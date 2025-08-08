@@ -11,6 +11,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
+import useAdminPermission from "@/hooks/useAdminPermission";
 
 const statusLabels = {
   new: "Yeni",
@@ -30,10 +31,14 @@ const MessagesPage = () => {
   const [reply, setReply] = useState("");
   const [replyLoading, setReplyLoading] = useState(false);
   const { toast } = useToast();
+  const canView = useAdminPermission('messages');
+  const canManage = useAdminPermission('messages', 'manage');
 
   useEffect(() => {
-    dispatch(fetchAdminMessages(filter));
-  }, [dispatch, filter]);
+    if (canView) {
+      dispatch(fetchAdminMessages(filter));
+    }
+  }, [dispatch, filter, canView]);
 
   const openDetail = (msg) => {
     dispatch(setSelectedMessage(msg));
@@ -71,6 +76,14 @@ const MessagesPage = () => {
       toast({ title: "Durum güncellenemedi!", variant: "destructive" });
     }
   };
+
+  if (!canView) {
+    return (
+      <div className="p-4 text-center bg-red-50 text-red-700 rounded-md">
+        Bu sayfayı görüntüleme yetkiniz yok.
+      </div>
+    );
+  }
 
   return (
     <div className="p-4">

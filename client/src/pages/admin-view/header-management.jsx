@@ -14,15 +14,20 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import api from "@/api/axiosInstance";
+import useAdminPermission from "@/hooks/useAdminPermission";
 
 const HeaderManagement = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const canView = useAdminPermission('header-management');
+  const canManage = useAdminPermission('header-management', 'manage');
 
   useEffect(() => {
-    fetchHeaderCategories();
-  }, []);
+    if (canView) {
+      fetchHeaderCategories();
+    }
+  }, [canView]);
 
   const fetchHeaderCategories = async () => {
     try {
@@ -98,6 +103,14 @@ const HeaderManagement = () => {
     });
   };
 
+  if (!canView) {
+    return (
+      <div className="p-4 text-center bg-red-50 text-red-700 rounded-md">
+        Bu sayfayı görüntüleme yetkiniz yok.
+      </div>
+    );
+  }
+  
   if (loading) {
     return (
       <div className="container mx-auto p-6">
@@ -145,27 +158,31 @@ const HeaderManagement = () => {
                 {categories.map((category, index) => (
                   <TableRow key={category._id}>
                     <TableCell className="flex items-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={() => moveCategory(index, -1)}
-                        disabled={index === 0}
-                      >
-                        <ArrowUp className="h-4 w-4" />
-                      </Button>
+                      {canManage && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => moveCategory(index, -1)}
+                          disabled={index === 0}
+                        >
+                          <ArrowUp className="h-4 w-4" />
+                        </Button>
+                      )}
                       <span className="font-mono min-w-[2rem] text-center">
                         {index + 1}
                       </span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={() => moveCategory(index, 1)}
-                        disabled={index === categories.length - 1}
-                      >
+                      {canManage && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => moveCategory(index, 1)}
+                          disabled={index === categories.length - 1}
+                        >
                         <ArrowDown className="h-4 w-4" />
                       </Button>
+                      )}
                     </TableCell>
                     <TableCell className="font-medium">{category.name}</TableCell>
                     <TableCell className="text-muted-foreground">
@@ -190,12 +207,16 @@ const HeaderManagement = () => {
           )}
 
           <div className="flex gap-3 mt-6">
-            <Button onClick={saveOrder} disabled={saving}>
-              {saving ? "Kaydediliyor..." : "Sıralamayı Kaydet"}
-            </Button>
-            <Button variant="outline" onClick={resetOrder}>
-              Sıfırla
-            </Button>
+            {canManage && (
+              <>
+                <Button onClick={saveOrder} disabled={saving}>
+                  {saving ? "Kaydediliyor..." : "Sıralamayı Kaydet"}
+                </Button>
+                <Button variant="outline" onClick={resetOrder}>
+                  Sıfırla
+                </Button>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>

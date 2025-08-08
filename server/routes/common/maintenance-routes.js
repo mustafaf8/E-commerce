@@ -1,6 +1,7 @@
 const express = require("express");
 const { authMiddleware } = require("../../controllers/auth/auth-controller");
 const adminCheckMiddleware = require("../../middleware/adminCheckMiddleware");
+const permissionCheckMiddleware = require("../../middleware/permissionCheckMiddleware");
 
 const {
   getMaintenanceStatus,
@@ -12,7 +13,7 @@ router.get("/status", getMaintenanceStatus);
 
 router.put(
   "/status",
-  [authMiddleware, adminCheckMiddleware],
+  [authMiddleware, adminCheckMiddleware, permissionCheckMiddleware('maintenance', 'manage')],
   updateMaintenanceStatus
 );
 
