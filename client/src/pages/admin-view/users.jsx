@@ -287,20 +287,26 @@ const UsersPage = () => {
                           </Badge>
                         </TableCell>
                         <TableCell className="py-1">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            className="border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800 flex items-center gap-1 py-1"
-                            onClick={() => onRemoveAdminClick(user)}
-                            disabled={actionLoading}
-                          >
-                            {actionLoading && selectedUser?._id === user._id ? (
-                              <Loader2 size={14} className="animate-spin" />
-                            ) : (
-                              <XCircle size={14} />
-                            )}
-                            Yetkiyi Al
-                          </Button>
+                          {user.adminAccessLevel === 1 ? (
+                            <div className="h-8 max-w-[106px] px-3 py-1 border border-green-400 rounded-md bg-gray-50 text-green-600 text-sm font-medium flex items-center justify-center">
+                              Tam Yetki
+                            </div>
+                          ) : (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800 flex items-center gap-1 py-1"
+                              onClick={() => onRemoveAdminClick(user)}
+                              disabled={actionLoading}
+                            >
+                              {actionLoading && selectedUser?._id === user._id ? (
+                                <Loader2 size={14} className="animate-spin" />
+                              ) : (
+                                <XCircle size={14} />
+                              )}
+                              Yetkiyi Al
+                            </Button>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))
@@ -394,22 +400,21 @@ const UsersPage = () => {
         </CardContent>
       </Card>
       
-      {/* Onay Modali */}
-      <ConfirmationModal
-        isOpen={isConfirmModalOpen}
-        onClose={() => {
-          setIsConfirmModalOpen(false);
-          setSelectedUser(null);
-          setAction(null);
-        }}
-        onConfirm={handleConfirm}
-        title={action === 'makeAdmin' ? "Admin Yap" : "Yetkiyi Al"}
-        description={
-          action === 'makeAdmin'
-            ? `${selectedUser?.userName} kullanıcısını admin yapmak istediğinizden emin misiniz?`
-            : `${selectedUser?.userName} kullanıcısının admin yetkisini kaldırmak istediğinizden emin misiniz?`
-        }
-      />
+             {/* Onay Modali */}
+       <ConfirmationModal
+         isOpen={isConfirmModalOpen}
+         message={
+           action === 'makeAdmin'
+             ? `${selectedUser?.userName} kullanıcısını admin yapmak istediğinizden emin misiniz?`
+             : `${selectedUser?.userName} kullanıcısının admin yetkisini kaldırmak istediğinizden emin misiniz?`
+         }
+         onConfirm={handleConfirm}
+         onCancel={() => {
+           setIsConfirmModalOpen(false);
+           setSelectedUser(null);
+           setAction(null);
+         }}
+       />
     </div>
   );
 };
