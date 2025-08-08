@@ -5,7 +5,7 @@ const { logInfo, logError } = require("../../helpers/logger");
 exports.getAdminUsers = async (req, res) => {
   try {
     const adminUsers = await User.find({ role: "admin" })
-      .select("_id userName email role authProvider createdAt")
+      .select("_id userName email role authProvider createdAt adminAccessLevel")
       .sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: adminUsers });
   } catch (error) {

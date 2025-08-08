@@ -23,15 +23,16 @@ const logger = winston.createLogger({
     winston.format.json() // Tüm logları JSON formatına çeviriyoruz
   ),
   transports: [
-    // new winston.transports.Console({
-    //   format: consoleFormat,
-    //   level: "debug",
-    // }),
+    // Console transport - tüm seviyeleri göster
+    new winston.transports.Console({
+      format: consoleFormat,
+      level: "debug",
+    }),
+    // MongoDB transport - sadece error seviyesi
     new WinstonMongoDB.MongoDB({
-      level: "warn",
+      level: "error", // Sadece error seviyesindeki logları kaydet
       db: process.env.MONGO_URI,
       collection: "logs",
-      // YENİ: storeHostMeta seçeneği, meta verilerini düzgünce kaydetmek için
       storeHostMeta: true,
     }),
   ],
