@@ -1,4 +1,4 @@
-import { AlignJustify, BellRing, LogOut, User } from "lucide-react";
+import { AlignJustify, BellRing, LogOut, User, ShoppingBag, MessageSquare } from "lucide-react";
 import { io } from "socket.io-client";
 import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
@@ -130,14 +130,15 @@ function AdminHeader({ setOpen }) {
           size="icon"
           className="rounded-full relative"
           onClick={handleBellClick}
+          title="Yeni Siparişler"
         >
-          <BellRing size={18} />
+          <ShoppingBag size={18} className="text-orange-600" />
           {newOrderCount > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white">
+            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-[10px] font-medium text-white">
               {newOrderCount > 9 ? "9+" : newOrderCount}
             </span>
           )}
-          <span className="sr-only">Notifications</span>
+          <span className="sr-only">Yeni Siparişler</span>
         </Button>
         {/* Mesaj bildirimi */}
         <Button
@@ -145,14 +146,15 @@ function AdminHeader({ setOpen }) {
           size="icon"
           className="rounded-full relative"
           onClick={handleMessageBellClick}
+          title="Yeni Mesajlar"
         >
-          <BellRing size={18} className="text-indigo-600" />
+          <MessageSquare size={18} className="text-blue-600" />
           {newMessageCount > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-medium text-white">
+            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-blue-500 text-[10px] font-medium text-white">
               {newMessageCount > 9 ? "9+" : newMessageCount}
             </span>
           )}
-          <span className="sr-only">Mesaj Bildirimi</span>
+          <span className="sr-only">Yeni Mesajlar</span>
         </Button>
         <div className="hidden md:flex items-center gap-2 rounded-full bg-secondary/80 px-3 py-1.5 text-sm font-medium">
           <User size={16} className="text-primary" />
