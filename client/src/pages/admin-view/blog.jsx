@@ -1,6 +1,17 @@
 import React from "react";
+import useAdminPermission from "@/hooks/useAdminPermission";
 
 const BlogPage = () => {
+  const canView = useAdminPermission('blog');
+  const canManage = useAdminPermission('blog', 'manage');
+  if (!canView) {
+    return (
+      <div className="p-4 text-center bg-red-50 text-red-700 rounded-md">
+        Bu sayfayı görüntüleme yetkiniz yok.
+      </div>
+    );
+  }
+
   return (
     <div className="p-4">
       <div className="flex flex-col">

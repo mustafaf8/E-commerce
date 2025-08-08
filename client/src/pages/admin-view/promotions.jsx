@@ -29,8 +29,8 @@ import api from "@/api/axiosInstance";
 import useAdminPermission from "@/hooks/useAdminPermission";
 
 function PromotionsPage() {
-  const canView = useAdminPermission('dashboard');
-  const canManage = useAdminPermission('dashboard', 'manage');
+  const canView = useAdminPermission('promotions');
+  const canManage = useAdminPermission('promotions', 'manage');
   const [featureImageFile, setFeatureImageFile] = useState(null);
   const [featureImageLoadingState, setFeatureImageLoadingState] =
     useState(false);

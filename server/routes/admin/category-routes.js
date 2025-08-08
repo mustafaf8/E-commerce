@@ -1,6 +1,7 @@
 const express = require("express");
 const { authMiddleware } = require("../../controllers/auth/auth-controller");
 const adminCheckMiddleware = require("../../middleware/adminCheckMiddleware");
+const permissionCheckMiddleware = require("../../middleware/permissionCheckMiddleware");
 const {
   addCategoryAdmin,
   updateCategoryAdmin,
@@ -30,12 +31,12 @@ router.get(
 );
 router.get(
   "/header",
-  [authMiddleware, adminCheckMiddleware],
+  [authMiddleware, adminCheckMiddleware, permissionCheckMiddleware('header-management', 'view')],
   getHeaderCategories
 );
 router.put(
   "/header/order",
-  [authMiddleware, adminCheckMiddleware],
+  [authMiddleware, adminCheckMiddleware, permissionCheckMiddleware('header-management', 'manage')],
   updateHeaderOrder
 );
 

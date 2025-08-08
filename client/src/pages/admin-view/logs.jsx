@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchLogs } from "@/store/admin/logSlice";
+import useAdminPermission from "@/hooks/useAdminPermission";
 import {
   Table,
   TableHeader,
@@ -30,10 +31,14 @@ const LogsPage = () => {
   const { logs, loading, error, pagination } = useSelector(
     (state) => state.logs
   );
+  const canView = useAdminPermission('logs');
+  const canManage = useAdminPermission('logs', 'manage');
 
   useEffect(() => {
-    dispatch(fetchLogs({ page: pagination.currentPage, limit: 20 }));
-  }, [dispatch, pagination.currentPage]);
+    if (canView) {
+      dispatch(fetchLogs({ page: pagination.currentPage, limit: 20 }));
+    }
+  }, [dispatch, pagination.currentPage, canView]);
 
   // Logları en yeni tarihten en eskiye doğru sırala
   const sortedLogs = logs
@@ -82,6 +87,14 @@ const LogsPage = () => {
     }
     return "-";
   };
+
+  if (!canView) {
+    return (
+      <div className="p-4 text-center bg-red-50 text-red-700 rounded-md">
+        Bu sayfayı görüntüleme yetkiniz yok.
+      </div>
+    );
+  }
 
   return (
     <div className="p-4">

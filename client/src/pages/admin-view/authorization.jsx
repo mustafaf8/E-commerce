@@ -27,6 +27,14 @@ const MODULES = [
   { id: "stats", label: "İstatistikler", icon: "📈", color: "bg-teal-500" },
   { id: "users", label: "Kullanıcılar", icon: "👥", color: "bg-sky-500" },
   { id: "coupons", label: "Kuponlar", icon: "🏷️", color: "bg-amber-600" },
+  { id: "reviews", label: "Yorumlar", icon: "⭐", color: "bg-yellow-500" },
+  { id: "promotions", label: "Promosyonlar", icon: "🔊", color: "bg-purple-600" },
+  { id: "blog", label: "Blog & Duyurular", icon: "📰", color: "bg-blue-600" },
+  { id: "messages", label: "Müşteri Mesajları", icon: "✉️", color: "bg-green-600" },
+  { id: "settings", label: "Genel Ayarlar", icon: "⚙️", color: "bg-gray-600" },
+  { id: "maintenance", label: "Bakım Modu", icon: "🔧", color: "bg-red-600" },
+  { id: "logs", label: "Log Kayıtları", icon: "📋", color: "bg-indigo-600" },
+  { id: "header-management", label: "Header Menüsü", icon: "🔝", color: "bg-teal-600" },
 ];
 
 const ACCESS_LEVELS = {
