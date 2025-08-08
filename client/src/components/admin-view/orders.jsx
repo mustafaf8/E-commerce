@@ -38,10 +38,21 @@ import {
   UserMinus,
   ShoppingBag,
   AlertTriangle,
+  Package,
+  Calendar,
+  DollarSign,
+  Eye,
+  Users,
+  User,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
 } from "lucide-react";
 import PropTypes from "prop-types";
 import { orderStatusMappingAdmin } from "@/config";
 import useAdminPermission from "@/hooks/useAdminPermission";
+import { Skeleton } from "../ui/skeleton";
 
 function UserListTable({ users, onViewOrdersClick, isLoading }) {
   UserListTable.propTypes = {
@@ -59,7 +70,7 @@ function UserListTable({ users, onViewOrdersClick, isLoading }) {
     onViewOrdersClick: PropTypes.func.isRequired,
     isLoading: PropTypes.bool.isRequired,
   };
-  // Filter out any entries that might be guest/misafir related
+  
   const filteredUsers = users.filter(
     (user) =>
       !(
@@ -69,92 +80,86 @@ function UserListTable({ users, onViewOrdersClick, isLoading }) {
   );
 
   const [showAll, setShowAll] = useState(false);
-  const displayUsers = showAll ? filteredUsers : filteredUsers.slice(0, 12);
+  const displayUsers = showAll ? filteredUsers : filteredUsers.slice(0, 8);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        {[...Array(5)].map((_, index) => (
+          <div key={index} className="flex items-center gap-4 p-3 border rounded-lg">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <div className="space-y-2 flex-1">
+              <Skeleton className="h-4 w-[200px]" />
+              <Skeleton className="h-3 w-[150px]" />
+            </div>
+            <Skeleton className="h-8 w-16" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (filteredUsers.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <Users className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+        <p className="text-gray-500 font-medium">Siparişi olan kullanıcı bulunamadı</p>
+        <p className="text-gray-400 text-sm mt-1">Henüz kayıtlı kullanıcı siparişi yok</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="overflow-visible">
-      <Table className="border-collapse">
-        <TableHeader>
-          <TableRow className="border-b border-border h-7">
-            <TableHead className="py-1 text-xs">Kullanıcı</TableHead>
-            <TableHead className="py-1 text-xs">E-posta</TableHead>
-            <TableHead className="text-center py-1 text-xs">Sip.</TableHead>
-            <TableHead className="text-right py-1 text-xs">Tarih</TableHead>
-            <TableHead className="text-right py-1 text-xs w-20">
-              İşlem
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {isLoading ? (
-            <TableRow>
-              <TableCell colSpan={5} className="text-center py-2">
-                <Loader2 className="mx-auto h-4 w-4 animate-spin text-muted-foreground" />
-              </TableCell>
-            </TableRow>
-          ) : filteredUsers && filteredUsers.length > 0 ? (
-            displayUsers.map((user) => (
-              <TableRow key={user.userId} className="border-b border-muted h-7">
-                <TableCell className="font-medium py-1 text-xs">
-                  <div className="flex items-center gap-1">
-                    {user.hasNewOrder && (
-                      <Bell
-                        className="h-3 w-3 text-blue-500 flex-shrink-0"
-                        title="Yeni / İşlenmemiş Sipariş Var"
-                      />
-                    )}
-                    <span className="truncate max-w-[100px]">
-                      {user.userName || "N/A"}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell className="py-1 text-xs truncate max-w-[120px]">
-                  {user.email || user.phoneNumber || "N/A"}
-                </TableCell>
-                <TableCell className="text-center py-1 text-xs">
-                  {user.orderCount}
-                </TableCell>
-                <TableCell className="text-right py-1 text-xs">
-                  {user.lastOrderDate && isValid(parseISO(user.lastOrderDate))
-                    ? format(parseISO(user.lastOrderDate), "dd.MM.yy")
-                    : "N/A"}
-                </TableCell>
-                <TableCell className="text-right py-1">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-5 px-2 text-xs"
-                    onClick={() => onViewOrdersClick(user.userId)}
-                  >
-                    Görüntüle
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={5} className="text-center text-xs py-2">
-                Siparişi olan kullanıcı bulunamadı.
-              </TableCell>
-            </TableRow>
-          )}
-          {filteredUsers.length > 12 && (
-            <TableRow>
-              <TableCell colSpan={5} className="text-center py-1">
-                <Button
-                  variant="link"
-                  className="text-xs text-muted-foreground h-5 p-0"
-                  onClick={() => setShowAll(!showAll)}
-                >
-                  {showAll
-                    ? "Daha Az Göster"
-                    : `Tümünü Görüntüle (${filteredUsers.length})`}
-                </Button>
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+    <div className="space-y-2">
+      {displayUsers.map((user) => (
+        <div
+          key={user.userId}
+          className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+          onClick={() => onViewOrdersClick(user.userId)}
+        >
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <div className="h-10 w-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-medium">
+                {user.userName?.charAt(0)?.toUpperCase() || 'U'}
+              </div>
+              {user.hasNewOrder && (
+                <div className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full flex items-center justify-center">
+                  <Bell className="h-2 w-2 text-white" />
+                </div>
+              )}
+            </div>
+            <div>
+              <p className="font-medium text-sm">{user.userName || "N/A"}</p>
+              <p className="text-xs text-gray-500">{user.email || user.phoneNumber || "N/A"}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="text-right">
+              <p className="text-sm font-medium">{user.orderCount} sipariş</p>
+              <p className="text-xs text-gray-500">
+                {user.lastOrderDate && isValid(parseISO(user.lastOrderDate))
+                  ? format(parseISO(user.lastOrderDate), "dd.MM.yy")
+                  : "N/A"}
+              </p>
+            </div>
+            <Button variant="outline" size="sm" className="h-8">
+              <Eye className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      ))}
+      
+      {filteredUsers.length > 8 && (
+        <div className="text-center pt-2">
+          <Button
+            variant="link"
+            className="text-sm"
+            onClick={() => setShowAll(!showAll)}
+          >
+            {showAll ? "Daha Az Göster" : `Tümünü Görüntüle (${filteredUsers.length})`}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
@@ -172,107 +177,96 @@ function UserOrdersTable({ orders, onViewDetailsClick, isLoading }) {
     onViewDetailsClick: PropTypes.func.isRequired,
     isLoading: PropTypes.bool.isRequired,
   };
+  
   const [showAll, setShowAll] = useState(false);
-  const displayOrders = showAll ? orders : orders.slice(0, 14);
+  const displayOrders = showAll ? orders : orders.slice(0, 8);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        {[...Array(5)].map((_, index) => (
+          <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-8 w-16" />
+              <div className="space-y-1">
+                <Skeleton className="h-4 w-[120px]" />
+                <Skeleton className="h-3 w-[80px]" />
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-6 w-16" />
+              <Skeleton className="h-8 w-16" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (orders.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <Package className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+        <p className="text-gray-500 font-medium">Sipariş bulunamadı</p>
+        <p className="text-gray-400 text-sm mt-1">Bu kullanıcının henüz siparişi yok</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="overflow-visible">
-      <Table className="border-collapse">
-        <TableHeader>
-          <TableRow className="border-b border-border h-7">
-            <TableHead className="py-1 text-xs">No</TableHead>
-            <TableHead className="py-1 text-xs">Tarih</TableHead>
-            <TableHead className="py-1 text-xs">Durum</TableHead>
-            <TableHead className="py-1 text-xs">Tutar</TableHead>
-            <TableHead className="text-right py-1 text-xs w-16">
-              Detay
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {isLoading ? (
-            <TableRow>
-              <TableCell colSpan={5} className="text-center py-2">
-                <Loader2 className="mx-auto h-4 w-4 animate-spin text-muted-foreground" />
-              </TableCell>
-            </TableRow>
-          ) : orders && orders.length > 0 ? (
-            displayOrders.map((orderItem) => {
-              let formattedDate = "N/A";
-              if (
-                orderItem?.orderDate &&
-                isValid(parseISO(orderItem.orderDate))
-              ) {
-                formattedDate = format(
-                  parseISO(orderItem.orderDate),
-                  "dd.MM.yy"
-                );
-              }
+    <div className="space-y-2">
+      {displayOrders.map((orderItem) => {
+        let formattedDate = "N/A";
+        if (orderItem?.orderDate && isValid(parseISO(orderItem.orderDate))) {
+          formattedDate = format(parseISO(orderItem.orderDate), "dd.MM.yy");
+        }
 
-              // Get status info
-              const status = orderItem?.orderStatus || "default";
-              const statusInfo =
-                orderStatusMappingAdmin[status] ||
-                orderStatusMappingAdmin.default;
+        const status = orderItem?.orderStatus || "default";
+        const statusInfo = orderStatusMappingAdmin[status] || orderStatusMappingAdmin.default;
 
-              return (
-                <TableRow
-                  key={orderItem._id}
-                  className="border-b border-muted h-7"
-                >
-                  <TableCell className="font-mono text-xs py-1 truncate max-w-[70px]">
-                    {orderItem._id.substring(orderItem._id.length - 8)}
-                  </TableCell>
-                  <TableCell className="py-1 text-xs">
-                    {formattedDate}
-                  </TableCell>
-                  <TableCell className="py-1">
-                    <Badge
-                      className={`p-0.5 px-1 text-[10px] justify-center min-w-[60px] ${statusInfo.color} ${statusInfo.textColor}`}
-                    >
-                      {statusInfo.label}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="font-medium py-1 text-xs">
-                    {orderItem.totalAmount?.toFixed(2) || 0}₺
-                  </TableCell>
-                  <TableCell className="text-right py-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-5 px-1 text-xs"
-                      onClick={() => onViewDetailsClick(orderItem._id)}
-                    >
-                      Detay
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              );
-            })
-          ) : (
-            <TableRow>
-              <TableCell colSpan={5} className="text-center text-xs py-2">
-                Sipariş bulunamadı.
-              </TableCell>
-            </TableRow>
-          )}
-          {orders.length > 14 && (
-            <TableRow>
-              <TableCell colSpan={5} className="text-center py-1">
-                <Button
-                  variant="link"
-                  className="text-xs text-muted-foreground h-5 p-0"
-                  onClick={() => setShowAll(!showAll)}
-                >
-                  {showAll
-                    ? "Daha Az Göster"
-                    : `Tümünü Görüntüle (${orders.length})`}
-                </Button>
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+        return (
+          <div
+            key={orderItem._id}
+            className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+            onClick={() => onViewDetailsClick(orderItem._id)}
+          >
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-16 bg-gray-100 rounded flex items-center justify-center">
+                <span className="text-xs font-mono">
+                  {orderItem._id.substring(orderItem._id.length - 8)}
+                </span>
+              </div>
+              <div>
+                <p className="text-sm font-medium">{formattedDate}</p>
+                <p className="text-xs text-gray-500">Sipariş Tarihi</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Badge className={`${statusInfo.color} ${statusInfo.textColor}`}>
+                {statusInfo.label}
+              </Badge>
+              <div className="text-right">
+                <p className="text-sm font-medium">{orderItem.totalAmount?.toFixed(2) || 0}₺</p>
+              </div>
+              <Button variant="outline" size="sm" className="h-8">
+                <Eye className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        );
+      })}
+      
+      {orders.length > 8 && (
+        <div className="text-center pt-2">
+          <Button
+            variant="link"
+            className="text-sm"
+            onClick={() => setShowAll(!showAll)}
+          >
+            {showAll ? "Daha Az Göster" : `Tümünü Görüntüle (${orders.length})`}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
@@ -313,146 +307,111 @@ function GuestOrdersTable({ orders, onViewDetailsClick, isLoading }) {
     onViewDetailsClick: PropTypes.func.isRequired,
     isLoading: PropTypes.bool.isRequired,
   };
+  
   const [showAll, setShowAll] = useState(false);
-  const displayOrders = showAll ? orders : orders.slice(0, 14);
+  const displayOrders = showAll ? orders : orders.slice(0, 8);
 
-  // Define which statuses are considered "new" and need notification
-  const newOrderStatuses = [
-    "pending",
-    "pending_payment",
-    "confirmed",
-    "failed",
-  ];
+  const newOrderStatuses = ["pending", "pending_payment", "confirmed", "failed"];
+
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        {[...Array(5)].map((_, index) => (
+          <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-8 w-16" />
+              <div className="space-y-1">
+                <Skeleton className="h-4 w-[120px]" />
+                <Skeleton className="h-3 w-[80px]" />
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-6 w-16" />
+              <Skeleton className="h-8 w-16" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (orders.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <UserMinus className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+        <p className="text-gray-500 font-medium">Misafir siparişi bulunamadı</p>
+        <p className="text-gray-400 text-sm mt-1">Henüz misafir siparişi yok</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="overflow-visible">
-      <Table className="border-collapse">
-        <TableHeader>
-          <TableRow className="border-b border-border h-7">
-            <TableHead className="py-1 text-xs">No</TableHead>
-            <TableHead className="py-1 text-xs">Alıcı</TableHead>
-            <TableHead className="py-1 text-xs">Tarih</TableHead>
-            <TableHead className="py-1 text-xs">Durum</TableHead>
-            <TableHead className="py-1 text-xs">Tutar</TableHead>
-            <TableHead className="text-right py-1 text-xs w-16">
-              Detay
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {isLoading ? (
-            <TableRow>
-              <TableCell colSpan={6} className="text-center py-2">
-                <Loader2 className="mx-auto h-4 w-4 animate-spin text-muted-foreground" />
-              </TableCell>
-            </TableRow>
-          ) : orders && orders.length > 0 ? (
-            displayOrders.map((orderItem) => {
-              let formattedDate = "N/A";
-              if (
-                orderItem?.orderDate &&
-                isValid(parseISO(orderItem.orderDate))
-              ) {
-                formattedDate = format(
-                  parseISO(orderItem.orderDate),
-                  "dd.MM.yy"
-                );
-              }
+    <div className="space-y-2">
+      {displayOrders.map((orderItem) => {
+        let formattedDate = "N/A";
+        if (orderItem?.orderDate && isValid(parseISO(orderItem.orderDate))) {
+          formattedDate = format(parseISO(orderItem.orderDate), "dd.MM.yy");
+        }
 
-              // Get status info
-              const status = orderItem?.orderStatus || "default";
-              const statusInfo =
-                orderStatusMappingAdmin[status] ||
-                orderStatusMappingAdmin.default;
+        const status = orderItem?.orderStatus || "default";
+        const statusInfo = orderStatusMappingAdmin[status] || orderStatusMappingAdmin.default;
+        const isNewOrder = newOrderStatuses.includes(status) || orderItem.isNew;
 
-              // Check if this is a new order that needs attention
-              const isNewOrder =
-                newOrderStatuses.includes(status) || orderItem.isNew;
+        const guestName = orderItem.guestInfo?.fullName || orderItem.addressInfo?.fullName || "Misafir";
+        const guestEmail = orderItem.guestInfo?.email;
+        const shortOrderId = orderItem._id.substring(orderItem._id.length - 8);
 
-              const guestName =
-                orderItem.guestInfo?.fullName ||
-                orderItem.addressInfo?.fullName ||
-                "Misafir";
-              const guestEmail = orderItem.guestInfo?.email;
-
-              // Get the last 8 characters of the order ID
-              const shortOrderId = orderItem._id.substring(
-                orderItem._id.length - 8
-              );
-
-              return (
-                <TableRow
-                  key={orderItem._id}
-                  className="border-b border-muted h-7"
-                >
-                  <TableCell className="font-mono text-xs py-1">
-                    <div className="flex items-center gap-1">
-                      {isNewOrder && (
-                        <Bell
-                          className="h-3 w-3 text-blue-500 flex-shrink-0"
-                          title="Yeni / İşlenmemiş Sipariş"
-                        />
-                      )}
-                      {shortOrderId}
-                    </div>
-                  </TableCell>
-                  <TableCell className="py-1 text-xs">
-                    <div className="truncate max-w-[90px]">{guestName}</div>
-                    {guestEmail && (
-                      <div className="text-[10px] text-muted-foreground truncate max-w-[90px]">
-                        {guestEmail}
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell className="py-1 text-xs">
-                    {formattedDate}
-                  </TableCell>
-                  <TableCell className="py-1">
-                    <Badge
-                      className={`p-0.5 px-1 text-[10px] justify-center min-w-[60px] ${statusInfo.color} ${statusInfo.textColor}`}
-                    >
-                      {statusInfo.label}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="font-medium py-1 text-xs">
-                    {orderItem.totalAmount?.toFixed(2) || 0}₺
-                  </TableCell>
-                  <TableCell className="text-right py-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-5 px-1 text-xs"
-                      onClick={() => onViewDetailsClick(orderItem._id)}
-                    >
-                      Detay
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              );
-            })
-          ) : (
-            <TableRow>
-              <TableCell colSpan={6} className="text-center text-xs py-2">
-                {/* Misafir siparişi bulunamadı mesajı kaldırıldı */}
-              </TableCell>
-            </TableRow>
-          )}
-          {orders.length > 14 && (
-            <TableRow>
-              <TableCell colSpan={6} className="text-center py-1">
-                <Button
-                  variant="link"
-                  className="text-xs text-muted-foreground h-5 p-0"
-                  onClick={() => setShowAll(!showAll)}
-                >
-                  {showAll
-                    ? "Daha Az Göster"
-                    : `Tümünü Görüntüle (${orders.length})`}
-                </Button>
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+        return (
+          <div
+            key={orderItem._id}
+            className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+            onClick={() => onViewDetailsClick(orderItem._id)}
+          >
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <div className="h-8 w-16 bg-gray-100 rounded flex items-center justify-center">
+                  <span className="text-xs font-mono">{shortOrderId}</span>
+                </div>
+                {isNewOrder && (
+                  <div className="absolute -top-1 -right-1 h-4 w-4 bg-blue-500 rounded-full flex items-center justify-center">
+                    <Bell className="h-2 w-2 text-white" />
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="text-sm font-medium">{guestName}</p>
+                {guestEmail && (
+                  <p className="text-xs text-gray-500">{guestEmail}</p>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <p className="text-xs text-gray-500">{formattedDate}</p>
+                <p className="text-sm font-medium">{orderItem.totalAmount?.toFixed(2) || 0}₺</p>
+              </div>
+              <Badge className={`${statusInfo.color} ${statusInfo.textColor}`}>
+                {statusInfo.label}
+              </Badge>
+              <Button variant="outline" size="sm" className="h-8">
+                <Eye className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        );
+      })}
+      
+      {orders.length > 8 && (
+        <div className="text-center pt-2">
+          <Button
+            variant="link"
+            className="text-sm"
+            onClick={() => setShowAll(!showAll)}
+          >
+            {showAll ? "Daha Az Göster" : `Tümünü Görüntüle (${orders.length})`}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
@@ -461,8 +420,7 @@ function AdminOrdersView() {
   const canView = useAdminPermission("orders");
   const canManage = useAdminPermission("orders", "manage");
   const [selectedUserId, setSelectedUserId] = useState(null);
-  const [selectedOrderIdForDetails, setSelectedOrderIdForDetails] =
-    useState(null);
+  const [selectedOrderIdForDetails, setSelectedOrderIdForDetails] = useState(null);
   const [isPendingModalOpen, setIsPendingModalOpen] = useState(false);
 
   const dispatch = useDispatch();
@@ -495,7 +453,6 @@ function AdminOrdersView() {
       }
   );
 
-  // Filter out guest users from registered users
   const filteredUserList = userList.filter(
     (user) =>
       !(
@@ -504,7 +461,6 @@ function AdminOrdersView() {
       )
   );
 
-  // Calculate total orders with filtered user list
   const registeredUserOrdersCount = filteredUserList.reduce(
     (acc, user) => acc + (user.orderCount || 0),
     0
@@ -549,6 +505,7 @@ function AdminOrdersView() {
     setSelectedOrderIdForDetails(null);
     dispatch(resetOrderDetails());
   };
+
   if (!canView) {
     return (
       <div className="p-4 text-center bg-red-50 text-red-700 rounded-md">
@@ -558,19 +515,24 @@ function AdminOrdersView() {
   }
 
   return (
-    <div className="space-y-3">
-      {error && (
-        <p className="text-red-600 text-xs p-2 bg-red-50 rounded-md">
-          {error}
-        </p>
-      )}
-
-      <div className="flex justify-between items-center">
+    <div className="p-6 space-y-6">
+      {/* Header Section */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+              <ShoppingBag className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Sipariş Yönetimi</h1>
+              <p className="text-gray-500">Tüm siparişleri görüntüleyin ve yönetin</p>
+            </div>
+          </div>
+        </div>
+        
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-semibold">Sipariş Yönetimi</h2>
           <Button
             variant="outline"
-            size="sm"
             onClick={() => setIsPendingModalOpen(true)}
             className="flex items-center gap-2"
           >
@@ -583,61 +545,78 @@ function AdminOrdersView() {
             )}
           </Button>
         </div>
-        <Card className="p-2 shadow-sm">
-          <div className="flex items-center gap-3 text-sm">
-            <div className="flex items-center gap-1.5">
-              <ShoppingBag className="h-3.5 w-3.5 text-blue-600" />
+      </div>
+
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                <ShoppingBag className="h-5 w-5 text-white" />
+              </div>
               <div>
-                <div className="text-[10px] text-muted-foreground">Toplam</div>
-                <div className="text-sm font-bold">{totalOrdersCount}</div>
+                <p className="text-sm text-blue-600 font-medium">Toplam Sipariş</p>
+                <p className="text-2xl font-bold text-blue-900">{totalOrdersCount}</p>
               </div>
             </div>
-            <div className="h-6 w-px bg-gray-200 dark:bg-gray-700"></div>
-            <div className="flex items-center gap-1.5">
-              <UserCog className="h-3.5 w-3.5 text-indigo-600" />
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 bg-indigo-500 rounded-lg flex items-center justify-center">
+                <Users className="h-5 w-5 text-white" />
+              </div>
               <div>
-                <div className="text-[10px] text-muted-foreground">Kayıtlı</div>
-                <div className="text-sm font-bold">
-                  {registeredUserOrdersCount}
-                </div>
+                <p className="text-sm text-indigo-600 font-medium">Kayıtlı Kullanıcı</p>
+                <p className="text-2xl font-bold text-indigo-900">{registeredUserOrdersCount}</p>
               </div>
             </div>
-            <div className="h-6 w-px bg-gray-200 dark:bg-gray-700"></div>
-            <div className="flex items-center gap-1.5">
-              <UserMinus className="h-3.5 w-3.5 text-amber-600" />
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 bg-amber-500 rounded-lg flex items-center justify-center">
+                <UserMinus className="h-5 w-5 text-white" />
+              </div>
               <div>
-                <div className="text-[10px] text-muted-foreground">Misafir</div>
-                <div className="text-sm font-bold">{guestOrdersCount}</div>
+                <p className="text-sm text-amber-600 font-medium">Misafir Siparişi</p>
+                <p className="text-2xl font-bold text-amber-900">{guestOrdersCount}</p>
               </div>
             </div>
-          </div>
+          </CardContent>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {/* Registered Users Side */}
-        <Card className="shadow-sm md:col-span-3">
-          <CardHeader className="py-2 px-3">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <UserCog className="h-3.5 w-3.5" />
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Registered Users Section */}
+        <Card className="shadow-sm">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Users className="h-5 w-5 text-indigo-600" />
               Kayıtlı Kullanıcı Siparişleri
             </CardTitle>
           </CardHeader>
-          <CardContent className="py-1 px-2">
+          <CardContent>
             {selectedUserId ? (
-              <div>
-                <div className="flex items-center gap-1.5 mb-1">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
-                    size="icon"
-                    className="h-5 w-5"
+                    size="sm"
                     onClick={handleBackToUserList}
+                    className="flex items-center gap-2"
                   >
-                    <ArrowLeft className="h-3 w-3" />
+                    <ArrowLeft className="h-4 w-4" />
+                    Geri Dön
                   </Button>
-                  <h3 className="text-xs font-medium">
-                    {userList.find((u) => u.userId === selectedUserId)
-                      ?.userName || selectedUserId}
+                  <h3 className="text-sm font-medium text-gray-600">
+                    {userList.find((u) => u.userId === selectedUserId)?.userName || selectedUserId}
                   </h3>
                 </div>
                 <RegisteredUserOrdersTable
@@ -656,15 +635,15 @@ function AdminOrdersView() {
           </CardContent>
         </Card>
 
-        {/* Guest Orders Side */}
-        <Card className="shadow-sm md:col-span-3">
-          <CardHeader className="py-2 px-3">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <UserMinus className="h-3.5 w-3.5" />
+        {/* Guest Orders Section */}
+        <Card className="shadow-sm">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <UserMinus className="h-5 w-5 text-amber-600" />
               Misafir Siparişleri
             </CardTitle>
           </CardHeader>
-          <CardContent className="py-1 px-2">
+          <CardContent>
             <GuestOrdersTable
               orders={guestOrderList}
               onViewDetailsClick={handleViewOrderDetails}
@@ -674,6 +653,7 @@ function AdminOrdersView() {
         </Card>
       </div>
 
+      {/* Order Details Dialog */}
       <Dialog
         open={!!selectedOrderIdForDetails}
         onOpenChange={(isOpen) => !isOpen && handleDetailsDialogClose()}
@@ -838,3 +818,4 @@ function AdminOrdersView() {
 }
 
 export default AdminOrdersView;
+
