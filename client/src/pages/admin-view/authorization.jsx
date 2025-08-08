@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
 import { Loader2, User, Shield, Eye, Settings, Save, CheckCircle2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 const MODULES = [
   { id: "dashboard", label: "Banner", icon: "📊", color: "bg-blue-500" },
@@ -45,7 +46,8 @@ const ACCESS_LEVELS = {
 
 function AuthorizationPage() {
   const dispatch = useDispatch();
-  const { adminList: rawAdminList, isLoading, isUpdating } = useSelector(
+  const { toast } = useToast();
+  const { adminList: rawAdminList, isLoading, isUpdating, error } = useSelector(
     (state) => state.adminAuthorization
   );
 
@@ -67,6 +69,16 @@ function AuthorizationPage() {
       setSelectedAdmin(filtered[0]);
     }
   }, [rawAdminList]);
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Hata",
+        description: error,
+      });
+    }
+  }, [error, toast]);
 
   const handleLevelChange = (adminId, newLevel) => {
     setLocalData((prev) =>
@@ -105,7 +117,16 @@ function AuthorizationPage() {
     dispatch(updateAdminAuthorization({
       adminId: _id,
       updateData: { adminAccessLevel, adminModulePermissions },
-    }));
+    }))
+    .then((result) => {
+      if (!result.error) {
+        toast({
+          title: "Başarılı",
+          description: `${admin.userName} kullanıcısının yetkileri başarıyla güncellendi.`,
+          variant: "success",
+        });
+      }
+    });
   };
 
   const getModulePermissions = (admin, moduleId) => {
