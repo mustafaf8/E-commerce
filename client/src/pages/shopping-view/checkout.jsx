@@ -123,7 +123,8 @@ function ShoppingCheckout() {
       return;
     }
 
-    if (!user?.tcKimlikNo) {
+    const effectiveTcKimlikNo = user?.tcKimlikNo || currentSelectedAddress?.tcKimlikNo;
+    if (!effectiveTcKimlikNo) {
       toast({
         variant: "warning",
         title: "TC Kimlik No Eksik",
@@ -140,7 +141,7 @@ function ShoppingCheckout() {
         quantity: singleCartItem?.quantity,
       })),
       addressInfo: currentSelectedAddress,
-      tcKimlikNo: user?.tcKimlikNo,
+      tcKimlikNo: effectiveTcKimlikNo,
       appliedCoupon: appliedCoupon,
     };
 

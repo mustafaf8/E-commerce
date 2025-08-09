@@ -103,7 +103,7 @@ function Address({ setCurrentSelectedAddress, seciliAdresProp }) {
       phone: getCuurentAddress?.phone,
       pincode: getCuurentAddress?.pincode,
       notes: getCuurentAddress?.notes,
-      tcKimlikNo: user?.tcKimlikNo || "",
+      tcKimlikNo: getCuurentAddress?.tcKimlikNo || user?.tcKimlikNo || "",
     });
   }
 

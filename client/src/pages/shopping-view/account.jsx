@@ -18,8 +18,9 @@ function ShoppingAccount() {
               <TabsTrigger value="orders" className="max-sm:text-xs">Siparişler</TabsTrigger>
               <TabsTrigger value="address" className="max-sm:text-xs">Adresler</TabsTrigger>
               <TabsTrigger value="info" className="max-sm:text-xs">Bilgilerim</TabsTrigger>
-              <TabsTrigger value="settings" className="max-sm:text-xs">Ayarlar</TabsTrigger>
               <TabsTrigger value="messages" className="max-sm:text-xs">Mesajlarım</TabsTrigger>
+              <TabsTrigger value="settings" className="max-sm:text-xs">Ayarlar</TabsTrigger>
+              
             </TabsList>
             <TabsContent value="orders" className="mt-4 max-sm:mt-2">
               <ShoppingOrders />
@@ -33,12 +34,13 @@ function ShoppingAccount() {
             <TabsContent value="info" className="mt-4 max-sm:mt-2">
               <UserInfo />
             </TabsContent>
-            <TabsContent value="settings" className="mt-4 max-sm:mt-2">
-              <UserSettings />
-            </TabsContent>
             <TabsContent value="messages" className="mt-4 max-sm:mt-2">
               <UserMessages />
             </TabsContent>
+            <TabsContent value="settings" className="mt-4 max-sm:mt-2">
+              <UserSettings />
+            </TabsContent>
+          
           </Tabs>
         </div>
       </div>
