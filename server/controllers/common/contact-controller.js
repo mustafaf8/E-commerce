@@ -29,9 +29,9 @@ const sendContactMessage = async (req, res) => {
       io.emit('new_message_received', { messageId: newMessage._id, subject, name, email });
     }
 
-    // Adminlere e-posta gönder (örnek: destek@site.com)
+    // Adminlere e-posta gönder (örnek: destek@deposun.com)
     await sendEmail({
-      to: process.env.CONTACT_ADMIN_EMAIL || 'destek@site.com',
+      to: process.env.CONTACT_ADMIN_EMAIL || 'destek@deposun.com',
       subject: `[Yeni Mesaj] ${subject}`,
       htmlContent: `<b>Yeni mesaj:</b><br>Ad: ${name}<br>Email: ${email}<br>Konu: ${subject}<br>Mesaj: ${message}`
     });
