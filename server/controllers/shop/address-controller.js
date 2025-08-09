@@ -3,12 +3,19 @@ const Address = require("../../models/Address");
 const addAddress = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { address, city, pincode, phone, notes } = req.body;
+  const { address, city, pincode, phone, notes, tcKimlikNo } = req.body;
 
     if (!userId || !address || !city || !pincode || !phone) {
       return res.status(400).json({
         success: false,
         message: "Invalid data provided!",
+      });
+    }
+
+    if (tcKimlikNo && !/^\d{11}$/.test(tcKimlikNo)) {
+      return res.status(400).json({
+        success: false,
+        message: "TC Kimlik No 11 haneli sayı olmalıdır.",
       });
     }
 
@@ -19,6 +26,7 @@ const addAddress = async (req, res) => {
       pincode,
       phone,
       notes: notes || "Not Kısmı Boş",
+      tcKimlikNo,
     });
 
     await newlyCreatedAddress.save();
@@ -66,6 +74,12 @@ const editAddress = async (req, res) => {
     const userId = req.user.id;
     const { addressId } = req.params;
     const formData = req.body;
+    if (formData.tcKimlikNo && !/^\d{11}$/.test(formData.tcKimlikNo)) {
+      return res.status(400).json({
+        success: false,
+        message: "TC Kimlik No 11 haneli sayı olmalıdır.",
+      });
+    }
 
     if (!userId || !addressId) {
       return res.status(400).json({

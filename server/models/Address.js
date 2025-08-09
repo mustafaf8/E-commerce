@@ -8,6 +8,17 @@ const AddressSchema = new mongoose.Schema(
     pincode: String,
     phone: String,
     notes: String,
+    tcKimlikNo: {
+      type: String,
+      required: false,
+      validate: {
+        validator: function (v) {
+          if (!v) return true;
+          return /^\d{11}$/.test(v);
+        },
+        message: 'TC Kimlik No 11 haneli sayı olmalıdır',
+      },
+    },
   },
   { timestamps: true }
 );
