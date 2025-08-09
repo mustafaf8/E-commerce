@@ -237,6 +237,7 @@ const loginUser = async (req, res) => {
       action: "LOGIN_SUCCESS",
       resourceId: checkUser._id,
       resourceType: "User",
+      additionalData: { email: email },
     });
     res.cookie("token", token, cookieOptions).json({
       success: true,

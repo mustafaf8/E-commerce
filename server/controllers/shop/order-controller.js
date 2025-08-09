@@ -203,7 +203,7 @@ const createOrder = async (req, res) => {
       basketId: pendingOrder._id.toString(),
       paymentGroup: Iyzipay.PAYMENT_GROUP.PRODUCT,
       callbackUrl: backendCallbackUrl,
-      enabledInstallments: [2, 3, 6, 9],
+      enabledInstallments: [1, 2, 3, 6, 9, 12],
       buyer: {
         id: userId,
         name: user.userName.split(" ")[0] || "Ad",
@@ -480,7 +480,7 @@ const createGuestOrder = async (req, res) => {
       basketId: pendingOrder._id.toString(),
       paymentGroup: Iyzipay.PAYMENT_GROUP.PRODUCT,
       callbackUrl: backendCallbackUrl,
-      enabledInstallments: [2, 3, 6, 9],
+      enabledInstallments: [1, 2, 3, 6, 9, 12],
       buyer: {
         id: guestInfo.email.replace(/[^a-zA-Z0-9]/g, "") + Date.now(),
         name: guestInfo.fullName.split(" ")[0] || "Ad",
