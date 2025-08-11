@@ -15,16 +15,16 @@ const { Server } = require("socket.io");
 const { setSocketIo } = require("./controllers/common/contact-controller");
 
 const apiLimiter = rateLimit({
-  windowMs: 3 * 60 * 1000, // 3 dakika
-  max: 1500, // her IP'den 3 dakikada en fazla xxx istek
+  windowMs: 1 * 60 * 1000, 
+  max: 800, 
   standardHeaders: true,
   legacyHeaders: false,
   message: "Çok fazla istek yaptınız, lütfen 15 dakika sonra tekrar deneyin.",
 });
 
 const authLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 dakika
-  max: 15, // 5 dakikada 10 giriş denemesi
+  windowMs: 5 * 60 * 1000,
+  max: 15, 
   message:
     "Çok fazla giriş denemesi yapıldı, lütfen daha sonra tekrar deneyin.",
 });
@@ -53,7 +53,6 @@ try {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   });
-  //console.log("Firebase Admin SDK başarıyla başlatıldı.");
 } catch (error) {
   console.error("Firebase Admin SDK başlatılamadı:", error.message);
 }
@@ -90,6 +89,7 @@ const contactRoutes = require("./routes/common/contact-routes");
 const adminMessageRoutes = require("./routes/admin/message-routes.js");
 const shopMessageRoutes = require("./routes/shop/message-routes.js");
 const adminLogRoutes = require("./routes/admin/log-routes.js");
+const adminDirectPaymentRouter = require("./routes/admin/direct-payment-routes.js");
 const errorHandler = require("./middleware/errorHandler");
 const { scheduleAbandonedCartEmails } = require("./jobs/abandonedCartJob");
 const { startScheduledRateUpdates } = require("./utils/currencyConverter");
@@ -121,15 +121,14 @@ const allowedOrigins = [
   "http://localhost:5173",
 ];
 
-// YUKARIDAKİ KODU BUNUNLA DEĞİŞTİRİN:
 const io = new Server(serverInstance, {
-  path: "/socket.io/", // Socket.IO'nun çalışacağı yolu açıkça belirtiyoruz.
+  path: "/socket.io/", 
   cors: {
     origin: allowedOrigins,
-    methods: ["GET", "POST"], // Bağlantı kurmak için gereken HTTP metodları
+    methods: ["GET", "POST"], 
     credentials: true,
   },
-  transports: ["websocket", "polling"], // Hem WebSocket hem de gerekirse polling'e izin ver
+  transports: ["websocket", "polling"], 
 });
 
 setSocketIo(io);
@@ -137,40 +136,30 @@ setSocketIo(io);
 let activeVisitorCount = 0;
 
 io.on("connection", (socket) => {
-  //  console.log(`[Socket.IO] Yeni bağlantı: ${socket.id}`);
-
-  // Ziyaretçi olarak kayıt
   socket.on("register_visitor", () => {
-    //  console.log(`[Socket.IO] ${socket.id} ziyaretçi olarak kayıt oldu.`);
     socket.data.isVisitor = true;
     activeVisitorCount += 1;
-    // console.log(`[Socket.IO] Aktif ziyaretçi: ${activeVisitorCount}. Adminlere yayınlanıyor.`);
     io.to("admins").emit("visitor_count", activeVisitorCount);
   });
 
-  // Admin olarak kayıt ve mevcut sayıyı gönder
   socket.on("register_admin", () => {
-    //  console.log(`[Socket.IO] ${socket.id} admin olarak kayıt oldu.`);
     socket.join("admins");
-    //   console.log(`[Socket.IO] Yeni admine mevcut sayı (${activeVisitorCount}) gönderiliyor: ${socket.id}.`);
     socket.emit("visitor_count", activeVisitorCount);
   });
 
-  // Bağlantı koptuğunda ziyaretçi sayaç güncellemesi
   socket.on("disconnect", (reason) => {
-    // console.log(`[Socket.IO] Bağlantı kesildi: ${socket.id}. Sebep: ${reason}`);
     if (socket.data.isVisitor) {
-      activeVisitorCount = Math.max(activeVisitorCount - 1, 0);
-      //   console.log(`[Socket.IO] Ziyaretçi ayrıldı. Aktif ziyaretçi: ${activeVisitorCount}. Adminlere yayınlanıyor.`);
+      activeVisitorCount = Math.max(activeVisitorCount - 1, 0); 
       io.to("admins").emit("visitor_count", activeVisitorCount);
     }
   });
 });
 
 const IYZICO_CALLBACK_PATH = "/api/shop/order/iyzico-callback";
+const IYZICO_ADMIN_CALLBACK_PATH = "/api/admin/direct-payment/callback";
 
 app.use((req, res, next) => {
-  if (req.path === IYZICO_CALLBACK_PATH) {
+  if (req.path === IYZICO_CALLBACK_PATH || req.path === IYZICO_ADMIN_CALLBACK_PATH) {
     return next();
   }
 
@@ -211,7 +200,7 @@ app.use(
     store: MongoStore.create({
       mongoUrl: process.env.MONGO_URI,
       collectionName: "sessions",
-      ttl: 24 * 60 * 60, // 24 saat
+      ttl: 24 * 60 * 60, 
     }),
     cookie: {
       secure: process.env.NODE_ENV === "production",
@@ -258,6 +247,7 @@ app.use("/api/admin/messages", adminMessageRoutes);
 app.use("/api/shop/messages", shopMessageRoutes);
 app.use("/api/admin/logs", adminLogRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/admin/direct-payment", adminDirectPaymentRouter);
 
 app.use(errorHandler);
 if (process.env.NODE_ENV !== "test") {

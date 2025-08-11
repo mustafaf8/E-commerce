@@ -23,6 +23,7 @@ import authorizationReducer from "./admin/authorization-slice";
 import campaignCouponsReducer from "./common-slice/coupons-slice";
 import adminMessageReducer from "./admin/adminMessageSlice";
 import logReducer from "./admin/logSlice";
+import directPaymentReducer from "./admin/directPaymentSlice";
 
 const store = configureStore({
   reducer: {
@@ -50,6 +51,7 @@ const store = configureStore({
     campaignCoupons: campaignCouponsReducer,
     adminMessages: adminMessageReducer,
     logs: logReducer,
+    directPayments: directPaymentReducer,
   },
 });
 

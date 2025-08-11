@@ -36,6 +36,7 @@ const MODULES = [
   { id: "maintenance", label: "Bakım Modu", icon: "🔧", color: "bg-red-600" },
   { id: "logs", label: "Log Kayıtları", icon: "📋", color: "bg-indigo-600" },
   { id: "header-management", label: "Header Menüsü", icon: "🔝", color: "bg-teal-600" },
+  { id: "direct-payment", label: "Alışverişsiz Ödeme", icon: "💳", color: "bg-cyan-500" },
 ];
 
 const ACCESS_LEVELS = {
