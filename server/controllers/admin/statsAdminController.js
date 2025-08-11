@@ -57,11 +57,16 @@ const getSalesOverview = async (req, res) => {
     
     // Önce siparişlerden toplam geliri hesapla
     const orderResults = await Order.aggregate([
-      { $match: match },
+      { 
+        $match: { 
+          ...match,
+          orderStatus: { $in: ["confirmed", "inProcess", "inShipping", "delivered"] } 
+        } 
+      },
       {
         $group: {
           _id: null,
-          totalRevenue: { $sum: "$totalAmountTRY" }, // ← DÜZELTME
+          totalRevenue: { $sum: "$totalAmountTRY" },
           totalOrders: { $sum: 1 },
           totalDiscount: { $sum: { $ifNull: ["$appliedCoupon.discountAmount", 0] } },
         },
@@ -71,7 +76,12 @@ const getSalesOverview = async (req, res) => {
     
     // Sonra ürün detaylarından brüt satışı hesapla
     const grossRevenueResults = await Order.aggregate([
-      { $match: match },
+      { 
+        $match: { 
+          ...match,
+          orderStatus: { $in: ["confirmed", "inProcess", "inShipping", "delivered"] } 
+        } 
+      },
       { $unwind: "$cartItems" },
       {
         $group: {
@@ -79,7 +89,7 @@ const getSalesOverview = async (req, res) => {
           totalGrossRevenue: { 
             $sum: { 
               $multiply: [
-                { $ifNull: ["$cartItems.priceTRY", 0] }, // ← DÜZELTME
+                { $ifNull: ["$cartItems.priceTRY", 0] }, 
                 "$cartItems.quantity"
               ] 
             } 
@@ -122,7 +132,6 @@ const getOrderStatusDistribution = async (_req, res) => {
     }, {});
     res.status(200).json({ success: true, data: distribution });
   } catch (error) {
-    //console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -138,7 +147,7 @@ const getTopSellingProducts = async (req, res) => {
           $group: {
             _id: "$cartItems.productId",
             totalRevenue: {
-              $sum: { $multiply: ["$cartItems.priceTRY", "$cartItems.quantity"] }, // ← DÜZELTME
+              $sum: { $multiply: ["$cartItems.priceTRY", "$cartItems.quantity"] }, 
             },
             totalUnits: { $sum: "$cartItems.quantity" },
           },
@@ -183,6 +192,11 @@ const getTopSellingProducts = async (req, res) => {
 const getSalesByCategory = async (_req, res) => {
   try {
     const pipeline = [
+      { 
+        $match: { 
+          orderStatus: { $in: ["confirmed", "inProcess", "inShipping", "delivered"] } 
+        } 
+      }, 
       { $unwind: "$cartItems" },
       {
         $lookup: {
@@ -228,6 +242,11 @@ const getSalesByCategory = async (_req, res) => {
 const getSalesByBrand = async (_req, res) => {
   try {
     const pipeline = [
+      { 
+        $match: { 
+          orderStatus: { $in: ["confirmed", "inProcess", "inShipping", "delivered"] } 
+        } 
+      },
       { $unwind: "$cartItems" },
       {
         $lookup: {
@@ -302,7 +321,6 @@ const getUserSummary = async (req, res) => {
 
     res.status(200).json({ success: true, data: { totalUsers, newUsers } });
   } catch (error) {
-    //console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -364,7 +382,6 @@ const getTopCustomers = async (req, res) => {
     const customers = await Order.aggregate(pipeline);
     res.status(200).json({ success: true, data: customers });
   } catch (error) {
-    //console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -390,7 +407,6 @@ const getProductSummary = async (_req, res) => {
       },
     });
   } catch (error) {
-    //console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -412,7 +428,12 @@ const getSalesTrend = async (req, res) => {
     }
 
     const data = await Order.aggregate([
-      { $match: match },
+      { 
+        $match: { 
+          ...match,
+          orderStatus: { $in: ["confirmed", "inProcess", "inShipping", "delivered"] } 
+        } 
+      },
       {
         $group: {
           _id: {
@@ -431,7 +452,6 @@ const getSalesTrend = async (req, res) => {
 
     res.status(200).json({ success: true, data });
   } catch (e) {
-    //console.error(e);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -468,8 +488,8 @@ const getUserRegistrationsTrend = async (req, res) => {
       { 
         $match: { 
           ...match,
-          isGuestOrder: false, // Sadece kayıtlı kullanıcılar
-          orderStatus: { $nin: ["pending_payment", "failed"] } // Sorunlu siparişleri hariç tut
+          isGuestOrder: false, 
+          orderStatus: { $nin: ["pending_payment", "failed"] }
         } 
       },
       {
@@ -491,7 +511,6 @@ const getUserRegistrationsTrend = async (req, res) => {
 
     res.status(200).json({ success: true, data });
   } catch (e) {
-    //  console.error("getUserRegistrationsTrend error:", e);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -532,15 +551,19 @@ const getTopLikedProducts = async (req, res) => {
     const liked = await Wishlist.aggregate(pipeline);
     res.status(200).json({ success: true, data: liked });
   } catch (e) {
-    //console.error(e);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
 // === PROFIT ANALYSIS HELPERS ===
 function getCostAndRevenueAggregation(match = {}) {
+  const finalMatch = { 
+    ...match, 
+    orderStatus: { $in: ["confirmed", "inProcess", "inShipping", "delivered"] } 
+  };
+
   return [
-    { $match: match },
+    { $match: finalMatch },
     { $unwind: "$cartItems" },
     {
       $addFields: {
@@ -569,7 +592,7 @@ function getCostAndRevenueAggregation(match = {}) {
         costPriceUSD: { 
           $ifNull: [
             { $toDouble: "$productInfo.costPrice" }, 
-            0 // Eğer costPrice yoksa 0 al
+            0 
           ] 
         },
       },
@@ -596,13 +619,13 @@ const getProfitOverview = async (req, res) => {
       {
         $addFields: {
           costPriceTRY: { 
-            $multiply: ["$costPriceUSD", exchangeRate] // Gerçek döviz kuru ile hesapla
+            $multiply: ["$costPriceUSD", exchangeRate] 
           },
         },
       },
       {
         $group: {
-          _id: "$_id", // group per order first
+          _id: "$_id", 
           orderRevenue: { $first: "$totalAmountTRY" },
           orderCost: {
             $sum: { $multiply: ["$costPriceTRY", "$cartQuantity"] },
@@ -641,7 +664,6 @@ const getProfitByProduct = async (req, res) => {
   try {
     const { limit = 20 } = req.query;
     
-    // Güncel döviz kurunu al
     const exchangeRate = await getExchangeRate();
     
     const pipeline = [
@@ -649,7 +671,7 @@ const getProfitByProduct = async (req, res) => {
       {
         $addFields: {
           costPriceTRY: { 
-            $multiply: ["$costPriceUSD", exchangeRate] // Gerçek döviz kuru ile hesapla
+            $multiply: ["$costPriceUSD", exchangeRate] 
           },
         },
       },
@@ -678,7 +700,6 @@ const getProfitByProduct = async (req, res) => {
     const data = await Order.aggregate(pipeline);
     res.status(200).json({ success: true, data });
   } catch (e) {
-    //console.error(e);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -686,7 +707,6 @@ const getProfitByProduct = async (req, res) => {
 // 14. Profit by Category
 const getProfitByCategory = async (_req, res) => {
   try {
-    // Güncel döviz kurunu al
     const exchangeRate = await getExchangeRate();
     
     const pipeline = [
@@ -694,7 +714,7 @@ const getProfitByCategory = async (_req, res) => {
       {
         $addFields: {
           costPriceTRY: { 
-            $multiply: ["$costPriceUSD", exchangeRate] // Gerçek döviz kuru ile hesapla
+            $multiply: ["$costPriceUSD", exchangeRate] 
           },
         },
       },
@@ -739,7 +759,6 @@ const getProfitByCategory = async (_req, res) => {
     const data = await Order.aggregate(pipeline);
     res.status(200).json({ success: true, data });
   } catch (error) {
-    //console.error(error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -747,7 +766,6 @@ const getProfitByCategory = async (_req, res) => {
 // 15. Profit by Brand
 const getProfitByBrand = async (_req, res) => {
   try {
-    // Güncel döviz kurunu al
     const exchangeRate = await getExchangeRate();
     
     const pipeline = [
@@ -755,7 +773,7 @@ const getProfitByBrand = async (_req, res) => {
       {
         $addFields: {
           costPriceTRY: { 
-            $multiply: ["$costPriceUSD", exchangeRate] // Gerçek döviz kuru ile hesapla
+            $multiply: ["$costPriceUSD", exchangeRate] 
           },
         },
       },
@@ -800,7 +818,6 @@ const getProfitByBrand = async (_req, res) => {
     const data = await Order.aggregate(pipeline);
     res.status(200).json({ success: true, data });
   } catch (e) {
-    //console.error(e);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

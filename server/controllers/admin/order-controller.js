@@ -19,7 +19,6 @@ const getAllOrdersOfAllUsers = async (req, res) => {
       data: orders,
     });
   } catch (e) {
-    //console.log(e);
     res.status(500).json({
       success: false,
       message: "Some error occured!",
@@ -66,7 +65,6 @@ const getOrderDetailsForAdmin = async (req, res) => {
       data: order,
     });
   } catch (e) {
-    //console.error("getOrderDetailsForAdmin error:", e);
     res.status(500).json({
       success: false,
       message: "Admin için sipariş detayı alınırken hata oluştu.",
@@ -121,7 +119,6 @@ const updateOrderStatus = async (req, res) => {
         await sendOrderNotificationToAdmin(updatedOrder);
       } catch (mailErr) {
         console.error("Admin bildirim e-postası hatası:", mailErr.message);
-        // E-posta hatası sipariş güncelleme işlemini etkilemesin
       }
     }
 
@@ -137,7 +134,7 @@ const updateOrderStatus = async (req, res) => {
       resourceType: "Order",
       error: e.message,
     });
-    //console.log(e);
+    
     res.status(500).json({
       success: false,
       message: "Some error occured!",
@@ -210,7 +207,6 @@ const getUsersWithOrders = async (req, res) => {
           : null,
     });
   } catch (e) {
-    //console.error("getUsersWithOrders error:", e);
     res.status(500).json({
       success: false,
       message: "Kullanıcı listesi alınırken hata oluştu.",
@@ -245,7 +241,6 @@ const getOrdersByUserIdForAdmin = async (req, res) => {
       data: orders,
     });
   } catch (e) {
-    //console.error("getOrdersByUserIdForAdmin error:", e);
     res.status(500).json({
       success: false,
       message: "Kullanıcı siparişleri alınırken hata oluştu.",
@@ -273,7 +268,6 @@ const getAllGuestOrdersForAdmin = async (req, res) => {
       data: guestOrders,
     });
   } catch (e) {
-    //console.error("getAllGuestOrdersForAdmin error:", e);
     res.status(500).json({
       success: false,
       message: "Misafir siparişleri alınırken hata oluştu.",
@@ -286,14 +280,18 @@ const getPendingAndFailedOrders = async (req, res) => {
   try {
     const orders = await Order.find({
       orderStatus: { $in: ["pending_payment", "failed"] },
-    }).sort({ orderDate: -1 });
+    })
+    .populate({ 
+      path: "userId",
+      select: "userName email phoneNumber",
+    }) 
+    .sort({ orderDate: -1 });
 
     res.status(200).json({
       success: true,
       data: orders,
     });
   } catch (e) {
-    //console.error("getPendingAndFailedOrders error:", e);
     res.status(500).json({
       success: false,
       message: "Bekleyen ve başarısız siparişler alınırken hata oluştu.",
