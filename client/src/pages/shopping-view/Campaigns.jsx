@@ -59,7 +59,6 @@ export default function Campaigns() {
         className: "bg-green-50 border-green-200 text-green-800",
       });
     } catch (err) {
-      // Fallback for older browsers
       const textArea = document.createElement("textarea");
       textArea.value = code;
       document.body.appendChild(textArea);

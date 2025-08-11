@@ -11,7 +11,6 @@ const getWishlist = async (req, res) => {
     }
 
     const wishlist = await Wishlist.findOne({ userId });
-    // .populate('items.productId'); // <<< İstersen ürün detaylarını getirmek için bunu açabilirsin
 
     if (!wishlist) {
       return res.status(200).json({ success: true, data: [] });
@@ -19,7 +18,6 @@ const getWishlist = async (req, res) => {
 
     res.status(200).json({ success: true, data: wishlist.items });
   } catch (error) {
-    //console.error("Favori listesi getirilirken hata:", error);
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
 };
@@ -68,7 +66,6 @@ const addToWishlist = async (req, res) => {
       });
     }
   } catch (error) {
-   // console.error("Favorilere eklenirken hata:", error);
     if (error.code === 11000) {
       return res.status(409).json({
         success: false,
@@ -116,7 +113,7 @@ const removeFromWishlist = async (req, res) => {
       });
     }
   } catch (error) {
-  //  console.error("Favorilerden çıkarılırken hata:", error);
+
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
 };

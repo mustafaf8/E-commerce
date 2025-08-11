@@ -45,7 +45,7 @@ const LogsPage = () => {
     ? [...logs].sort((a, b) => {
         const dateA = new Date(a.timestamp);
         const dateB = new Date(b.timestamp);
-        return dateB - dateA; // En yeni tarih önce
+        return dateB - dateA; 
       })
     : [];
 

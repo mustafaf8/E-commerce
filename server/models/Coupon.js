@@ -8,7 +8,7 @@ const CouponSchema = new mongoose.Schema(
       unique: true,
       trim: true,
       uppercase: true,
-      index: { unique: true, collation: { locale: "en", strength: 2 } }, // case-insensitive unique index
+      index: { unique: true, collation: { locale: "en", strength: 2 } }, 
     },
     discountType: {
       type: String,
@@ -114,7 +114,7 @@ CouponSchema.methods.calculateDiscount = function (cartTotal) {
   if (this.discountType === "percentage") {
     return (cartTotal * this.discountValue) / 100;
   } else {
-    return Math.min(this.discountValue, cartTotal); // İndirim sepet toplamından fazla olamaz
+    return Math.min(this.discountValue, cartTotal); 
   }
 };
 

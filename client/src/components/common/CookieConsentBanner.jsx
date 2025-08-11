@@ -13,7 +13,7 @@ function CookieConsentBanner() {
     if (!consentStatus) {
       const timer = setTimeout(() => {
         setIsVisible(true);
-      }, 1500); // 1.5 saniye sonra
+      }, 1500); 
       return () => clearTimeout(timer);
     }
   }, []);

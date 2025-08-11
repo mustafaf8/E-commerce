@@ -23,7 +23,7 @@ export const fetchActiveHomeSections = createAsyncThunk(
 
 export const fetchAllHomeSections = createAsyncThunk(
   "homeSections/fetchAllAdmin",
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => { 
     try {
       const response = await api.get(`/admin/home-sections/list`);
       return response.data;
@@ -135,7 +135,6 @@ const homeSectionsSlice = createSlice({
           action.payload?.message || "Admin için bölümler alınamadı.";
         state.homeSections = [];
       })
-      // addHomeSection (Admin)
       .addCase(addHomeSection.fulfilled, (state, action) => {
         if (action.payload?.success && action.payload?.data) {
           state.homeSections.push(action.payload.data);

@@ -30,7 +30,7 @@ const addCategoryAdmin = async (req, res) => {
       parent: parent || null,
     });
     await newCategory.save();
-    // YENİ: Loglama
+    
     logInfo("Yeni kategori eklendi", req, {
       action: "ADD_CATEGORY",
       resourceId: newCategory._id,
@@ -46,7 +46,7 @@ const addCategoryAdmin = async (req, res) => {
       error: error.message,
       additionalData: { name, slug },
     });
-    //console.error("Admin kategori ekleme hatası:", error);
+    
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -83,7 +83,6 @@ const updateCategoryAdmin = async (req, res) => {
           .json({ success: false, message: "Güncellenecek kategori bulunamadı." });
       }
 
-      // YENİ: Loglama
       logInfo("Kategori durumu güncellendi", req, {
         action: "UPDATE_CATEGORY_STATUS",
         resourceId: id,
@@ -109,7 +108,7 @@ const updateCategoryAdmin = async (req, res) => {
     const existingCategory = await Category.findOne({
       $or: [{ name }, { slug }],
       _id: { $ne: id },
-    }); // Kendisi hariç kontrol et
+    }); 
     if (existingCategory) {
       return res.status(400).json({
         success: false,
@@ -120,7 +119,7 @@ const updateCategoryAdmin = async (req, res) => {
     const updatedCategory = await Category.findByIdAndUpdate(
       id,
       { name, slug, isActive, parent: parent || null },
-      { new: true, runValidators: true } // Güncellenmiş veriyi döndür ve validasyonları çalıştır
+      { new: true, runValidators: true } 
     );
 
     if (!updatedCategory) {
@@ -129,7 +128,7 @@ const updateCategoryAdmin = async (req, res) => {
         message: "Güncellenecek kategori bulunamadı.",
       });
     }
-    // YENİ: Loglama
+    
     logInfo("Kategori güncellendi", req, {
       action: "UPDATE_CATEGORY",
       resourceId: id,
@@ -142,14 +141,13 @@ const updateCategoryAdmin = async (req, res) => {
       data: updatedCategory,
     });
   } catch (error) {
-    // YENİ: Hata Loglama
     logError("Kategori güncellenirken hata oluştu", req, {
       action: "UPDATE_CATEGORY_ERROR",
       resourceId: id,
       resourceType: "Category",
       error: error.message,
     });
-    //console.error("Admin kategori güncelleme hatası:", error);
+    
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -194,7 +192,7 @@ const deleteCategoryAdmin = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Silinecek kategori bulunamadı." });
     }
-    // YENİ: Loglama
+    
     logInfo("Kategori silindi", req, {
       action: "DELETE_CATEGORY",
       resourceId: id,
@@ -212,7 +210,7 @@ const deleteCategoryAdmin = async (req, res) => {
       resourceType: "Category",
       error: error.message,
     });
-    //console.error("Admin kategori silme hatası:", error);
+    
     if (error.name === "CastError") {
       return res
         .status(400)
@@ -256,7 +254,6 @@ const getAllCategoriesAdmin = async (req, res) => {
 
     res.status(200).json({ success: true, data: categoryTree });
   } catch (error) {
-    //console.error("Admin tüm kategorileri getirme hatası:", error);
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
 };
@@ -271,7 +268,6 @@ const getHeaderCategories = async (req, res) => {
 
     res.status(200).json({ success: true, data: categories });
   } catch (error) {
-    //console.error("Header kategorileri getirme hatası:", error);
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
 };
@@ -279,7 +275,7 @@ const getHeaderCategories = async (req, res) => {
 // Header sıralamasını güncelle
 const updateHeaderOrder = async (req, res) => {
   try {
-    const { categoryOrders } = req.body; // [{id: "categoryId", order: 1}, ...]
+    const { categoryOrders } = req.body;
 
     if (!Array.isArray(categoryOrders)) {
       return res.status(400).json({
@@ -309,7 +305,6 @@ const updateHeaderOrder = async (req, res) => {
       message: "Header sıralaması güncellendi.",
     });
   } catch (error) {
-    //console.error("Header sıralaması güncelleme hatası:", error);
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
 };

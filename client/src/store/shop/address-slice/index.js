@@ -102,7 +102,6 @@ const addressSlice = createSlice({
         state.error = action.error.message || "Adres güncellenemedi.";
       })
 
-      // YENİ: deleteAddress
       .addCase(deleteAddress.pending, (state) => {
         state.isLoading = true;
         state.error = null;

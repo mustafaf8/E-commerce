@@ -55,7 +55,7 @@ exports.makeAdmin = async (req, res) => {
 
     user.role = "admin";
     // Varsayılan admin yetki seviyesi ve izinler
-    user.adminAccessLevel = 3; // Sınırlı yetki
+    user.adminAccessLevel = 3;
 
     await user.save();
 

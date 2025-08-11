@@ -17,7 +17,7 @@ const CategorySchema = new mongoose.Schema(
     parent: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
-      default: null, // Eğer null ise, bu bir ana kategoridir.
+      default: null,
     },
     isActive: {
       type: Boolean,
@@ -25,7 +25,7 @@ const CategorySchema = new mongoose.Schema(
     },
     headerOrder: {
       type: Number,
-      default: 999, // Varsayılan olarak en sona koy
+      default: 999, 
     },
   },
   { timestamps: true }

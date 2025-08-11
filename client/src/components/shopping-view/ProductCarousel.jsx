@@ -76,16 +76,11 @@ function ProductCarousel({
               payload.data?.slice(0, fetchConfig.limit || 10) || []
             );
           } else {
-         //   console.error(
-         //     `Carousel fetch failed for ${title}:`,
-        //      payload.message
-          //  );
             setInternalError(payload.message || "Veri alınamadı.");
             setInternalProducts([]);
           }
         })
         .catch((error) => {
-         // console.error(`Carousel error for ${title}:`, error);
           setInternalError(error.message || "Bir hata oluştu.");
           setInternalProducts([]);
         })
@@ -165,7 +160,6 @@ function ProductCarousel({
             className="flex gap-3 overflow-x-auto py-1 pb-3 px-1 no-scrollbar"
           >
             {internalLoading ? (
-              // Skeleton loading state
               Array.from({ length: skeletonCount }).map((_, index) => (
                 <div
                   key={`skel-${fetchConfig?.key || title}-${index}`}
@@ -175,12 +169,10 @@ function ProductCarousel({
                 </div>
               ))
             ) : internalError ? (
-              // Error state
               <div className="w-full text-center py-10 text-red-500">
                 Hata: {internalError}
               </div>
             ) : internalProducts && internalProducts.length > 0 ? (
-              // Products
               internalProducts.map((productItem) => (
                 <div
                   key={productItem._id}
@@ -196,7 +188,6 @@ function ProductCarousel({
                 </div>
               ))
             ) : (
-              // Empty state
               <div className="w-full text-center py-10 text-gray-500">
                 Bu bölümde gösterilecek ürün bulunamadı.
               </div>

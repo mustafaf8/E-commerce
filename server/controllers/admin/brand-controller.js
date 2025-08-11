@@ -47,7 +47,6 @@ const addBrandAdmin = async (req, res) => {
       error: error.message,
     });
 
-    // console.error("Admin marka ekleme hatası:", error);
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -141,7 +140,6 @@ const updateBrandAdmin = async (req, res) => {
       error: error.message,
     });
 
-    // console.error("Admin marka güncelleme hatası:", error);
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -199,7 +197,6 @@ const deleteBrandAdmin = async (req, res) => {
       error: error.message,
     });
 
-    // console.error("Admin marka silme hatası:", error);
     if (error.name === "CastError") {
       return res
         .status(400)
@@ -215,7 +212,6 @@ const getAllBrandsAdmin = async (req, res) => {
     const brands = await Brand.find({}).sort({ name: 1 });
     res.status(200).json({ success: true, data: brands });
   } catch (error) {
-    // console.error("Admin tüm markaları getirme hatası:", error);
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
 };

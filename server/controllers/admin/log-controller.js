@@ -32,7 +32,6 @@ const getLogs = async (req, res) => {
         { message: { $regex: search, $options: "i" } },
         { username: { $regex: search, $options: "i" } },
         { action: { $regex: search, $options: "i" } },
-        // Eski loglar için metadata içinde arama
         { "metadata.username": { $regex: search, $options: "i" } },
         { "metadata.action": { $regex: search, $options: "i" } },
       ];
@@ -151,7 +150,7 @@ const getLogStats = async (req, res) => {
       { $match: { ...dateFilter, action: { $exists: true, $ne: null } } },
       {
         $group: {
-          _id: "$action", // meta.action değil, sadece action
+          _id: "$action", 
           count: { $sum: 1 },
         },
       },
@@ -211,13 +210,13 @@ const getLogStats = async (req, res) => {
   }
 };
 
-// Belirli bir logu getir - DÜZELTİLDİ
+// Belirli bir logu getir 
 const getLogById = async (req, res) => {
   try {
     const { id } = req.params;
 
     const log = await Log.findById(id)
-      .populate("userId", "username email userName") // DÜZELTİLDİ
+      .populate("userId", "username email userName") 
       .lean();
 
     if (!log) {
@@ -251,12 +250,12 @@ const getLogById = async (req, res) => {
           (log.userId && typeof log.userId === "object"
             ? log.userId.username || log.userId.email || log.userId.userName
             : null),
-        ipAddress: log.ipAddress, // DÜZELTİLDİ
-        userAgent: log.userAgent, // DÜZELTİLDİ
-        action: log.action, // DÜZELTİLDİ
-        resourceId: log.resourceId, // DÜZELTİLDİ
-        resourceType: log.resourceType, // DÜZELTİLDİ
-        additionalData: log.additionalData, // DÜZELTİLDİ
+        ipAddress: log.ipAddress,
+        userAgent: log.userAgent,
+        action: log.action,
+        resourceId: log.resourceId,
+        resourceType: log.resourceType,
+        additionalData: log.additionalData,
         createdAt: log.createdAt,
         updatedAt: log.updatedAt,
       },

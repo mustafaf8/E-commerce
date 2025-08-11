@@ -1,7 +1,6 @@
 const winston = require("winston");
 const WinstonMongoDB = require("winston-mongodb");
 
-// Console için formatlama (değişiklik yok)
 const consoleFormat = winston.format.combine(
   winston.format.colorize(),
   winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
@@ -14,23 +13,23 @@ const consoleFormat = winston.format.combine(
   })
 );
 
-// Logger oluştur
+
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || "warn",
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.errors({ stack: true }),
-    winston.format.json() // Tüm logları JSON formatına çeviriyoruz
+    winston.format.json() 
   ),
   transports: [
-    // Console transport - tüm seviyeleri göster
+
     // new winston.transports.Console({
     //   format: consoleFormat,
     //    level: "debug",
     //  }),
-    // MongoDB transport - sadece error seviyesi
+
     new WinstonMongoDB.MongoDB({
-      level: "error", // Sadece error seviyesindeki logları kaydet
+      level: "error", 
       db: process.env.MONGO_URI,
       collection: "logs",
       storeHostMeta: true,

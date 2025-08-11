@@ -269,7 +269,7 @@ function MainHeaderActions() {
         toast({ title: "Çıkış yapıldı", variant: "success" });
       })
       .catch((error) => {
-        // console.error("Shop logout failed:", error);
+
         toast({ variant: "destructive", title: "Çıkış yapılamadı." });
       });
   }
@@ -380,7 +380,6 @@ function TopStrip() {
   const [exchangeRate, setExchangeRate] = useState(null);
 
   useEffect(() => {
-    // Kur bilgisini çek
     api
       .get("/common/currency/rate")
       .then((response) => {
@@ -391,7 +390,7 @@ function TopStrip() {
       .catch((error) => {
         console.error("Döviz kuru alınırken hata oluştu:", error);
       });
-  }, []); // Sadece bileşen ilk yüklendiğinde çalışır
+  }, []); 
 
   const handleOrdersClick = (e) => {
     if (isAuthenticated) {

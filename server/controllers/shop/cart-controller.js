@@ -71,7 +71,6 @@ const addToCart = async (req, res) => {
       data: { ...populatedCart._doc, items: finalPopulatedItems },
     });
   } catch (error) {
-   // console.log(error);
     res.status(500).json({
       success: false,
       message: "Error",
@@ -98,7 +97,6 @@ const fetchCartItems = async (req, res) => {
     if (!cart) {
       const newCart = new Cart({ userId, items: [] });
       await newCart.save();
-     // console.log(`Yeni kullanıcı için boş sepet oluşturuldu: ${userId}`);
       return res.status(200).json({
         success: true,
         data: { ...newCart._doc, items: [] },
@@ -133,7 +131,6 @@ const fetchCartItems = async (req, res) => {
       },
     });
   } catch (error) {
-   // console.log(error);
     res.status(500).json({
       success: false,
       message: "Error",
@@ -185,9 +182,6 @@ const updateCartItemQty = async (req, res) => {
       });
     }
     if (product.totalStock === undefined || product.totalStock < 0) {
-     // console.error(
-     //   `Ürün (${productId}) için geçersiz stok değeri: ${product.totalStock}`
-     // );
       return res.status(500).json({
         success: false,
         message: "Ürün stok bilgisi alınırken hata oluştu.",
@@ -235,7 +229,6 @@ const updateCartItemQty = async (req, res) => {
       data: { ...populatedCart._doc, items: finalPopulatedItems },
     });
   } catch (error) {
-   // console.error("Error updating cart item quantity:", error);
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
@@ -262,9 +255,6 @@ const deleteCartItem = async (req, res) => {
     }
 
     if (authenticatedUserId !== userId) {
-     // console.warn(
-     //   `Yetkisiz silme denemesi: req.user.id (<span class="math-inline">\{authenticatedUserId\}\) \!\=\= params\.userId \(</span>{userId})`
-     // );
       return res
         .status(403)
         .json({ success: false, message: "Yetkisiz işlem." });
@@ -314,7 +304,6 @@ const deleteCartItem = async (req, res) => {
       data: { ...populatedCart._doc, items: finalPopulatedItems },
     });
   } catch (error) {
-   // console.error("Error deleting cart item:", error);
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
@@ -345,10 +334,7 @@ const syncLocalCart = async (req, res) => {
     for (const localItem of localCartItems) {
       const product = await Product.findById(localItem.productId);
       if (!product) {
-       // console.warn(
-       //   `Senkronizasyon: Ürün bulunamadı ID: ${localItem.productId}`
-       // );
-        continue; // Ürün yoksa bu adımı atla
+        continue; 
       }
 
       const existingItemIndex = userCart.items.findIndex(
@@ -396,7 +382,6 @@ const syncLocalCart = async (req, res) => {
       data: { ...populatedCart._doc, items: finalPopulatedItems },
     });
   } catch (error) {
-   // console.error("Sepet senkronizasyon hatası:", error);
     res
       .status(500)
       .json({ success: false, message: "Sunucu hatası (senkronizasyon)." });

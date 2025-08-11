@@ -88,22 +88,16 @@ function PromotionsPage() {
 
   const uploadImage = async (file) => {
     if (!file) return null;
-   // console.log("--- [uploadImage] Yüklenecek dosya:", file.name);
     const data = new FormData();
     data.append("my_file", file);
     try {
       const response = await api.post("/admin/products/upload-image", data);
       if (response?.data?.success) {
-      //  console.log(
-     //     "--- [uploadImage] Başarılı. Dönen URL:",
-      //    response.data.result.url
-      //  ); // Ekle
         return response.data.result.url;
       } else {
         throw new Error(response?.data?.message || "Resim yüklenemedi.");
       }
     } catch (error) {
-     // console.error("Resim yükleme hatası:", error);
       toast({
         variant: "destructive",
         title: "Resim Yükleme Hatası",
@@ -133,10 +127,6 @@ function PromotionsPage() {
         title: featureImageTitle,
         link: featureImageLink,
       };
-     // console.log(
-     //   "addFeatureImage dispatch ediliyor, gönderilen veri:",
-     //   bannerData
-     // );
       dispatch(addFeatureImage(bannerData))
         .then((data) => {
           if (data?.payload?.success) {
@@ -155,7 +145,6 @@ function PromotionsPage() {
           }
         })
         .catch((err) => {
-         // console.error("addFeatureImage dispatch hatası:", err);
           toast({
             variant: "destructive",
             title: "Banner eklenirken bir hata oluştu.",
@@ -389,10 +378,6 @@ function PromotionsPage() {
         title: sideBannerTitle,
         link: sideBannerLink,
       };
-     // console.log(
-     //   ">>> addSideBanner dispatch ediliyor, gönderilen veri:",
-     //   bannerData
-     // );
       dispatch(addSideBanner(bannerData))
         .then((data) => {
           if (data?.payload?.success) {
@@ -411,7 +396,6 @@ function PromotionsPage() {
           }
         })
         .catch((err) => {
-         // console.error("addSideBanner dispatch hatası:", err);
           toast({
             variant: "destructive",
             title: "Yan banner eklenirken bir hata oluştu.",
@@ -775,7 +759,7 @@ function PromotionsPage() {
             )}
           </div>
         </div>
-        {/* !!! YENİ BÖLÜM: Yan Banner Yönetimi !!! */}
+        {/* Yan Banner Yönetimi */}
         <div className="border p-6 rounded-lg shadow-sm bg-white">
           <h2 className="text-xl font-semibold mb-4 border-b pb-2">
             Küçük Banner Yönetimi (Manuel Slider)

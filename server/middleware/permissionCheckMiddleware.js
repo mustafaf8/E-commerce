@@ -36,18 +36,6 @@ const permissionCheckMiddleware = (moduleId, permissionType = "view") => {
         return next();
       }
       
-      // Debug bilgilerini konsola yazdır
-      console.log('---------- YETKİ KONTROL DEBUG ----------');
-      console.log('Modül ID:', moduleId);
-      console.log('Yetki Türü:', permissionType);
-      console.log('Kullanıcı Bilgileri:', {
-        id: user._id,
-        name: user.userName,
-        role: user.role,
-        adminAccessLevel: user.adminAccessLevel
-      });
-      console.log('Modül İzinleri:', user.adminModulePermissions || {});
-      
       // Modül izinlerini kontrol et
       const modulePermissions = user.adminModulePermissions || {};
       let modulePermObj;
@@ -63,9 +51,6 @@ const permissionCheckMiddleware = (moduleId, permissionType = "view") => {
         (permissionType === "view" 
           ? modulePermObj.view 
           : modulePermObj.manage);
-      
-      console.log('Yetki Durumu:', hasPermission);
-      console.log('----------------------------------------');
       
       if (!hasPermission) {
         return res.status(403).json({

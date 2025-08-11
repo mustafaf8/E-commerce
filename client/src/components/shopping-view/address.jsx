@@ -85,7 +85,6 @@ function Address({ setCurrentSelectedAddress, seciliAdresProp }) {
       setAddressIdToDelete(getCurrentAddress._id);
       setShowConfirmModal(true);
     } else {
-     // console.error("Silinecek adres ID'si bulunamadı.");
       toast({
         variant: "destructive",
         title: "Hata",
@@ -134,7 +133,7 @@ function Address({ setCurrentSelectedAddress, seciliAdresProp }) {
             description: data.payload?.message || "Bir hata oluştu.",
           });
         }
-        closeConfirmationModal(); // İşlem sonrası modalı kapat
+        closeConfirmationModal();
       });
     }
   }
@@ -149,18 +148,11 @@ function Address({ setCurrentSelectedAddress, seciliAdresProp }) {
   }, [dispatch, user?.id]);
 
   useEffect(() => {
-    // Kullanıcı TC bilgisi geldiğinde formData'ya set et (yeni adres eklerken hazır olsun)
     if (user?.tcKimlikNo) {
       setFormData((prev) => ({ ...prev, tcKimlikNo: user.tcKimlikNo }));
     }
   }, [user?.tcKimlikNo]);
 
-  //console.log(
-  //  "Address Component Render - Received selectedId:",
-  //  seciliAdresProp
-  //);
-
-  //console.log(addressList, "addressList prop in Address component");
 
   return (
     <Card>

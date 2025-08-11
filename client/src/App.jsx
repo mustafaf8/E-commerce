@@ -137,7 +137,6 @@ function App() {
   }, [dispatch, user?.id, isAuthenticated, authIsLoading]);
 
   // Auth veya bakım durumu kontrol edilirken yüklenme ekranı göster
-  // hesapla/client/src/App.jsx
   if (authIsLoading || maintenanceLoading || !maintenanceStatus) {
     return <Skeleton className="w-full h-screen bg-gray-200" />;
   }
@@ -213,7 +212,6 @@ function App() {
             <Route path="users" element={<AdminUsers />} />
             <Route path="maintenance" element={<AdminMaintenanceMode />} />
             <Route path="header-management" element={<AdminHeaderManagement />} />
-            {/* Yeni rotalar */}
             <Route path="reviews" element={<AdminReviews />} />
             <Route path="promotions" element={<AdminPromotions />} />
             <Route path="blog" element={<AdminBlog />} />
@@ -266,7 +264,6 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            {/* Bu yeni rota, diğerlerini etkilemeden eklendi */}
             <Route path="product/:id/specs" element={<ProductSpecsPage />} />
           </Route>
 

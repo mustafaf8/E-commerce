@@ -54,7 +54,6 @@ const HeaderManagement = () => {
     newCategories[index] = newCategories[index + direction];
     newCategories[index + direction] = temp;
 
-    // Yeni sıralamayı uygula
     const updatedCategories = newCategories.map((category, idx) => ({
       ...category,
       headerOrder: idx + 1,

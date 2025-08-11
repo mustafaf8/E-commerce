@@ -40,7 +40,6 @@ function ShoppingOrders() {
     isLoading: orderDetailsLoading,
   } = useSelector((state) => state.shopOrder || {});
 
-  //console.log(orderList, `orderDetails ${user?.id}`);
   function handleFetchOrderDetails(getId) {
     setSelectedOrderId(getId);
     dispatch(getOrderDetails(getId));
@@ -65,7 +64,6 @@ function ShoppingOrders() {
         return format(parsedDate, "dd.MM.yyyy");
       }
     } catch (e) {
-     // console.error("Tarih formatlama hatası:", e);
     }
     return "N/A";
   };
@@ -94,7 +92,6 @@ function ShoppingOrders() {
                         orderStatusMappingUser[orderItem?.orderStatus]?.color ||
                         orderStatusMappingUser.default.color
                       } ${
-                        // textColor eklendi
                         orderStatusMappingUser[orderItem?.orderStatus] ||
                         orderStatusMappingUser.default
                       }`}

@@ -25,10 +25,9 @@ const handleImageUpload = async (req, res) => {
 
     res.json({
       success: true,
-      result: finalResult, // Güncellenmiş result objesini gönder
+      result: finalResult, 
     });
   } catch (error) {
-    // console.log(error);
     res.status(500).json({
       success: false,
       message: "Resim yüklenirken bir hata oluştu.",
@@ -46,8 +45,8 @@ const addProduct = async (req, res) => {
       description,
       category,
       brand,
-      priceUSD, // Değişti: price -> priceUSD
-      salePriceUSD, // Değişti: salePrice -> salePriceUSD
+      priceUSD, 
+      salePriceUSD, 
       totalStock,
       averageReview,
       costPrice,
@@ -61,8 +60,8 @@ const addProduct = async (req, res) => {
       description,
       category,
       brand,
-      priceUSD, // Değişti
-      salePriceUSD, // Değişti
+      priceUSD, 
+      salePriceUSD, 
       totalStock,
       averageReview,
       costPrice,
@@ -114,7 +113,6 @@ const fetchAllProducts = async (req, res) => {
       data: listOfProducts,
     });
   } catch (e) {
-    //console.log(e);
     res.status(500).json({
       success: false,
       message: "Error occured",
@@ -138,8 +136,8 @@ const editProduct = async (req, res) => {
       description,
       category,
       brand,
-      priceUSD, // Değişti
-      salePriceUSD, // Değişti
+      priceUSD,
+      salePriceUSD,
       totalStock,
       averageReview,
       costPrice,
@@ -157,8 +155,8 @@ const editProduct = async (req, res) => {
     if (description !== undefined) findProduct.description = description;
     if (category !== undefined) findProduct.category = category;
     if (brand !== undefined) findProduct.brand = brand;
-    if (priceUSD !== undefined) findProduct.priceUSD = priceUSD; // Değişti
-    if (salePriceUSD !== undefined) findProduct.salePriceUSD = salePriceUSD; // Değişti
+    if (priceUSD !== undefined) findProduct.priceUSD = priceUSD; 
+    if (salePriceUSD !== undefined) findProduct.salePriceUSD = salePriceUSD; 
     if (totalStock !== undefined) findProduct.totalStock = totalStock;
     if (image !== undefined) findProduct.image = image;
     if (images !== undefined) findProduct.images = images;
@@ -170,10 +168,8 @@ const editProduct = async (req, res) => {
     
     if (priceUSD !== undefined || salePriceUSD !== undefined) {
       console.log("Fiyat değişikliği algılandı, tüm TL fiyatları güncelleniyor...");
-      // Await kullanmıyoruz ki admin yanıt için beklemesin.
       Product.updateAllTLPrices().catch(err => {
         console.error("Arka planda TL fiyat güncelleme hatası:", err);
-        // Bu hata admin'e gönderilmez, sadece loglanır.
       });
     }
     
@@ -182,7 +178,6 @@ const editProduct = async (req, res) => {
       data: findProduct,
     });
   } catch (e) {
-    //console.log(e);
     res.status(500).json({
       success: false,
       message: "Error occured",
@@ -210,10 +205,8 @@ const deleteProduct = async (req, res) => {
       });
     }
 
-    // Ürünü sil
     await Product.findByIdAndDelete(id);
 
-    // Başarılı silme işlemini logla
     logInfo("Ürün başarıyla silindi", req, {
       action: "DELETE_PRODUCT",
       resourceId: id,
@@ -230,7 +223,6 @@ const deleteProduct = async (req, res) => {
       message: "Product delete successfully",
     });
   } catch (e) {
-    // Hata durumunu logla
     logError("Ürün silme hatası", req, {
       action: "DELETE_PRODUCT_ERROR",
       resourceId: req.params.id,

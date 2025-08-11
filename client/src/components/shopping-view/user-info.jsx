@@ -32,7 +32,6 @@ function UserInfo() {
   function handleUpdateUserInfo(event) {
     event.preventDefault();
 
-    // TC Kimlik No validasyonu
     if (formData.tcKimlikNo && !/^[0-9]{11}$/.test(formData.tcKimlikNo)) {
       toast({
         title: "TC Kimlik Numarası 11 haneli ve sadece rakam olmalıdır",
@@ -67,7 +66,6 @@ function UserInfo() {
         }
       })
       .catch((error) => {
-       // console.error("Update user details error:", error);
         toast({
           title: error?.message || "Bilgiler güncellenemedi",
           variant: "destructive",

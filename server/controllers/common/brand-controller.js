@@ -5,7 +5,6 @@ const getActiveBrands = async (req, res) => {
     const brands = await Brand.find({ isActive: true }).sort({ name: 1 });
     res.status(200).json({ success: true, data: brands });
   } catch (error) {
-   // console.error("Aktif markaları getirme hatası:", error);
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
 };

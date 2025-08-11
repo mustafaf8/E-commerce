@@ -20,7 +20,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
   const [reviewMsg, setReviewMsg] = useState("");
   const [rating, setRating] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [isAddingToCart, setIsAddingToCart] = useState(false); // Yükleme durumu
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const dispatch = useDispatch();
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const navigate = useNavigate();
@@ -159,7 +159,6 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
         description: "Yorumunuz onay için bekliyor. Onaylandıktan sonra görünür olacaktır.",
       });
     } catch (error) {
-     // console.error("Yorum ekleme hatası yakalandı:", error);
       toast({
         variant: "destructive",
         title: "Yorum Eklenemedi",
@@ -174,7 +173,6 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
     }
   }, [productDetails?._id, dispatch]);
 
-  // Reset quantity when dialog opens or product changes
   useEffect(() => {
     if (open && productDetails) {
       setQuantity(1);

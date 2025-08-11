@@ -5,7 +5,6 @@ const DashboardPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Dashboard sayfasına gelen kullanıcıyı stats sayfasına yönlendir
     navigate("/admin/stats");
   }, [navigate]);
 

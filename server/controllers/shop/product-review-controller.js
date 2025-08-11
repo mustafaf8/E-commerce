@@ -38,7 +38,7 @@ const addProductReview = async (req, res) => {
       userName,
       reviewMessage,
       reviewValue,
-      status: "pending" // Açıkça pending olarak belirt
+      status: "pending" 
     });
 
     await newReview.save();
@@ -65,7 +65,7 @@ const addProductReview = async (req, res) => {
       message: "Yorumunuz başarıyla eklendi ve onay için bekliyor."
     });
   } catch (e) {
-   // console.log(e);
+   
     res.status(500).json({
       success: false,
       message: "Error",
@@ -88,7 +88,7 @@ const getProductReviews = async (req, res) => {
       data: reviews,
     });
   } catch (e) {
-   // console.log(e);
+   
     res.status(500).json({
       success: false,
       message: "Error",

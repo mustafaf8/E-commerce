@@ -5,17 +5,14 @@ const Product = require("../models/Product"); // Ürün detayları için
 const AbandonedCartReminder = require("../models/AbandonedCartReminder");
 const { sendAbandonedCartEmail } = require("../helpers/emailHelper");
 
-const CHECK_INTERVAL_HOURS = 2; // Kaç saatte bir kontrol edilecek
-const ABANDONED_THRESHOLD_MIN_HOURS = 1; // En az kaç saat aktif olmayan sepetler
-const ABANDONED_THRESHOLD_MAX_HOURS = 24; // En fazla kaç saat aktif olmayan sepetler (çok eski sepetlere göndermemek için)
-const REMINDER_COOLDOWN_DAYS = 3; // Aynı kullanıcıya en az kaç gün sonra tekrar hatırlatma yapılabilir
+const CHECK_INTERVAL_HOURS = 2;
+const ABANDONED_THRESHOLD_MIN_HOURS = 1; 
+const ABANDONED_THRESHOLD_MAX_HOURS = 24; 
+const REMINDER_COOLDOWN_DAYS = 3; 
 
 const scheduleAbandonedCartEmails = () => {
   // Örneğin her CHECK_INTERVAL_HOURS saatte bir çalışır:
   cron.schedule(`0 */${CHECK_INTERVAL_HOURS} * * *`, async () => {
-  //  console.log(
-  //    `(${new Date().toISOString()}) Terk edilmiş sepet e-posta görevi başlatılıyor...`
-  //  );
 
     const now = new Date();
     const minAbandonedTime = new Date(
@@ -30,16 +27,12 @@ const scheduleAbandonedCartEmails = () => {
 
     try {
       const potentialCarts = await Cart.find({
-        "items.0": { $exists: true }, // Sepette en az bir ürün olmalı
+        "items.0": { $exists: true },
         updatedAt: {
           $gte: minAbandonedTime,
           $lt: maxAbandonedTime,
         },
-      }).populate("userId", "email userName"); // Kullanıcı bilgilerini al (sadece email ve userName yeterli)
-
-     // console.log(
-     //   `Kontrol edilecek ${potentialCarts.length} potansiyel terk edilmiş sepet bulundu.`
-     // );
+      }).populate("userId", "email userName"); 
 
       for (const cart of potentialCarts) {
         if (!cart.userId || !cart.userId.email) {
@@ -52,31 +45,26 @@ const scheduleAbandonedCartEmails = () => {
         // Bu kullanıcıya son REMINDER_COOLDOWN_DAYS içinde hatırlatma gönderilmiş mi?
         const recentReminder = await AbandonedCartReminder.findOne({
           userId: cart.userId._id,
-          createdAt: { $gte: reminderCooldownDate }, // Son gönderim zamanına bak
+          createdAt: { $gte: reminderCooldownDate },
         });
 
         if (recentReminder) {
-          // console.log(`Kullanıcı ${cart.userId.email} için son ${REMINDER_COOLDOWN_DAYS} günde zaten hatırlatma gönderilmiş (Sepet ID: ${cart._id}), atlanıyor.`);
           continue;
         }
 
-        // Bu spesifik sepet için daha önce 'sent' durumunda bir hatırlatma var mı?
-        // Bu, aynı sepet tekrar tekrar tetiklenirse diye ek bir kontrol.
         const existingReminderForCart = await AbandonedCartReminder.findOne({
           userId: cart.userId._id,
           cartId: cart._id,
           status: "sent",
         });
         if (existingReminderForCart) {
-          // console.log(`Sepet ID ${cart._id} için zaten 'sent' durumunda bir hatırlatma mevcut, atlanıyor.`);
           continue;
         }
 
-        // Ürün detaylarını almak için sepeti tekrar populate et
         const populatedCart = await Cart.findById(cart._id).populate({
           path: "items.productId",
           model: "Product",
-          select: "title image price salePrice", // E-posta için gerekli alanlar
+          select: "title image price salePrice", 
         });
 
         if (
@@ -84,9 +72,6 @@ const scheduleAbandonedCartEmails = () => {
           !populatedCart.items ||
           populatedCart.items.length === 0
         ) {
-         // console.warn(
-         //   `Sepet ID ${cart._id}: Populate sonrası ürün bulunamadı veya sepet boş, atlanıyor.`
-         // );
           continue;
         }
 
@@ -100,12 +85,8 @@ const scheduleAbandonedCartEmails = () => {
 
         const clientUrl =
           process.env.CLIENT_BASE_URL || "http://localhost:5173";
-        // Kullanıcıyı direkt sepetine veya bir "sepetinizi tamamlayın" sayfasına yönlendirebilirsiniz.
-        const completePurchaseLink = `${clientUrl}/shop/cart`; // Veya /shop/checkout
+        const completePurchaseLink = `${clientUrl}/shop/cart`; 
 
-       // console.log(
-      //    `Kullanıcı ${cart.userId.email} için e-posta gönderiliyor (Sepet ID: ${cart._id})...`
-       // );
         const emailSentSuccessfully = await sendAbandonedCartEmail(
           cart.userId.email,
           cart.userId.userName,
@@ -119,9 +100,7 @@ const scheduleAbandonedCartEmails = () => {
             cartId: cart._id,
             status: "sent",
           });
-         // console.log(
-         //   `Kullanıcı ${cart.userId.email} için hatırlatma kaydedildi (Sepet ID: ${cart._id}).`
-         // );
+
         } else {
           await AbandonedCartReminder.create({
             userId: cart.userId._id,
@@ -133,9 +112,7 @@ const scheduleAbandonedCartEmails = () => {
           );
         }
       }
-     // console.log(
-     //   `(${new Date().toISOString()}) Terk edilmiş sepet e-posta görevi tamamlandı.`
-    //  );
+
     } catch (error) {
       console.error(
         `(${new Date().toISOString()}) Terk edilmiş sepet e-posta görevi sırasında hata:`,

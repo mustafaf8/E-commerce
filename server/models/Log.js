@@ -16,7 +16,6 @@ const logSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // Meta alanları kök dizine taşındı
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -38,7 +37,6 @@ const logSchema = new mongoose.Schema(
   }
 );
 
-// İndeksler güncellendi
 logSchema.index({ timestamp: -1 });
 logSchema.index({ level: 1 });
 logSchema.index({ userId: 1 });

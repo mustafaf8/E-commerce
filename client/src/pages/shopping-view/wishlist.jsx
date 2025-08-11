@@ -59,7 +59,6 @@ function ShoppingWishlist() {
           ))}
         </div>
       ) : wishlistError ? (
-        // Hata durumu
         <div className="text-center py-10 text-red-600">
           <p>Favoriler yüklenirken bir hata oluştu: {wishlistError}</p>
         </div>

@@ -6,7 +6,6 @@ const getSideBanners = async (req, res) => {
     const sideBanners = await SideBanner.find({}).sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: sideBanners });
   } catch (error) {
-    // console.error("Yan banner'lar getirilirken hata:", error);
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
 };
@@ -40,7 +39,6 @@ const addSideBanner = async (req, res) => {
       resourceType: "SideBanner",
       error: error.message,
     });
-    // console.error("Yan banner eklenirken hata:", error);
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -151,7 +149,6 @@ const deleteSideBanner = async (req, res) => {
       error: error.message,
     });
 
-    // console.error("Yan banner silinirken hata:", error);
     if (error.name === "CastError") {
       return res
         .status(400)

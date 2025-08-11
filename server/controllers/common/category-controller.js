@@ -25,14 +25,12 @@ const getActiveCategories = async (req, res) => {
   try {
     const categories = await Category.find({ isActive: true })
       .populate('parent', 'name slug')
-      .sort({ headerOrder: 1, name: 1 }); // Header sıralamasını dikkate al
+      .sort({ headerOrder: 1, name: 1 }); 
     
-    // Hiyerarşik yapıyı oluştur
     const categoryTree = buildCategoryTree(categories);
     
     res.status(200).json({ success: true, data: categoryTree });
   } catch (error) {
-   // console.error("Aktif kategorileri getirme hatası:", error);
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
 };
