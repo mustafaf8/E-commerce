@@ -82,13 +82,12 @@ function EntityManager({
   const handleSelectChange = (name, value) => {
     setCurrentEntity((prev) => ({
       ...prev,
-      [name]: value === "none" ? null : value, // "Ana Kategori Yok" seçilirse null yap
+      [name]: value === "none" ? null : value,
     }));
   };
 
   const openModalForEdit = (entity) => {
     setIsEditing(true);
-    // Parent alanını doğru şekilde handle et
     const parentId = entity.parent ? (entity.parent._id || entity.parent) : null;
     setCurrentEntity({ 
       ...entity, 
@@ -255,7 +254,7 @@ function EntityManager({
       <div key={entity._id}>
         <div
           className="flex items-center justify-between p-3 border rounded-md bg-muted/30 hover:bg-muted/60 transition-colors"
-          style={{ marginLeft: `${level * 32}px` }} // Girinti
+          style={{ marginLeft: `${level * 32}px` }}
         >
           <div className="flex flex-col sm:flex-row sm:items-center gap-x-4 gap-y-1 flex-grow min-w-0">
             <div className="min-w-0">

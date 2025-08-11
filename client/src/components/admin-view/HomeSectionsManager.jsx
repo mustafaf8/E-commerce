@@ -61,7 +61,7 @@ const contentTypeOptions = [
   { value: "CATEGORY", label: "Kategori" },
   { value: "BRAND", label: "Marka" },
   // { value: 'TAG', label: 'Etiket' }, // İleride eklenebilir
-  // { value: 'CUSTOM_FILTER', label: 'Özel Filtre' }, // İleride eklenebilir
+  // { value: 'CUSTOM_FILTER', label: 'Özel Filtre' },
 ];
 
 function HomeSectionsManager({ canManage }) {
