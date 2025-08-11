@@ -142,7 +142,7 @@ function ShoppingHome() {
                       src={promoCard.image}
                       alt={promoCard.title || "Promosyon"}
                       className="w-full h-full object-contain max-[850px]:p-0"
-                      loading="lazy"
+                      loading="eager"
                     />
                   </div>
                 </Card>
@@ -175,11 +175,11 @@ function ShoppingHome() {
                     className={`${
                       index === currentSlide
                         ? "opacity-100 z-10"
-                        : "opacity-0 z-0" 
+                        : "opacity-0 z-0"
                     } absolute inset-0 w-full h-full object-center transition-opacity duration-1000 ease-in-out ${
                       slide.link ? "cursor-pointer" : ""
                     }`}
-                    loading="lazy"
+                    loading="eager"
                   />
                 ))
               ) : (
@@ -237,7 +237,7 @@ function ShoppingHome() {
                     } absolute inset-0 w-full h-full object-center transition-opacity duration-300 ease-in-out ${
                       slide.link ? "cursor-pointer" : ""
                     }`}
-                    loading="lazy"
+                    loading="eager"
                   />
                 ))
               ) : (
