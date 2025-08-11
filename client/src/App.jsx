@@ -96,6 +96,8 @@ const ProductSpecsPage = lazy(() =>
   import("./pages/shopping-view/ProductSpecsPage")
 );
 const Campaigns = lazy(() => import("./pages/shopping-view/Campaigns"));
+const AdminDirectPayment = lazy(() => import("./pages/admin-view/DirectPaymentPage"));
+const PaymentStatusPage = lazy(() => import("./pages/admin-view/PaymentStatusPage"));
 
 function App() {
   const {
@@ -218,6 +220,8 @@ function App() {
             <Route path="messages" element={<AdminMessages />} />
             <Route path="settings" element={<AdminSettings />} />
             <Route path="logs" element={<AdminLogs />} />
+            <Route path="direct-payment" element={<AdminDirectPayment />} />
+            <Route path="payment-status" element={<PaymentStatusPage />} />
           </Route>
 
           <Route path="/shop" element={<ShoppingLayout />}>

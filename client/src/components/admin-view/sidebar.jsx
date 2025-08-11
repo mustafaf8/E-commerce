@@ -17,6 +17,7 @@ import {
   Shield,
   Cog,
   ChevronDown,
+  CreditCard,
   FileText as LogIcon,
 } from "lucide-react";
 import { Fragment, useState } from "react";
@@ -25,7 +26,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 import PropTypes from "prop-types";
 
-// Menü grupları tanımı
 const menuGroups = [
   {
     id: "panel",
@@ -75,6 +75,12 @@ const menuGroups = [
         label: "Siparişler",
         path: "/admin/orders",
         icon: <BadgeCheck size={16} />,
+      },
+      {
+        id: "direct-payment",
+        label: "Alışverişsiz Ödeme",
+        path: "/admin/direct-payment",
+        icon: <CreditCard size={16} />,
       },
     ],
   },
