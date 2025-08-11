@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const express = require("express");
+const nosqlInjectionSanitize = require("./middleware/nosqlInjectionSanitize");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
@@ -188,9 +189,10 @@ app.use((req, res, next) => {
 });
 
 app.use(cookieParser());
+app.use(nosqlInjectionSanitize());
+app.use(express.json({ limit: "10kb" }));
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 app.use(
   session({

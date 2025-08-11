@@ -1,6 +1,13 @@
 const Order = require("../../models/Order");
 const Product = require("../../models/Product");
 const ProductReview = require("../../models/Review");
+const { JSDOM } = require('jsdom');
+const DOMPurify = require('dompurify');
+
+
+
+const window = new JSDOM('').window;
+const purify = DOMPurify(window);
 
 const addProductReview = async (req, res) => {
   try {
@@ -32,12 +39,22 @@ const addProductReview = async (req, res) => {
       });
     }
 
+    const rating = Number(reviewValue);
+    if (isNaN(rating) || rating < 1 || rating > 5) {
+      return res.status(400).json({
+        success: false,
+        message: "Lütfen 1 ile 5 arasında geçerli bir puan verin.",
+      });
+    }
+
+    const cleanReviewMessage = purify.sanitize(reviewMessage);
+
     const newReview = new ProductReview({
       productId,
       userId,
       userName,
-      reviewMessage,
-      reviewValue,
+      reviewMessage: cleanReviewMessage,
+      reviewValue: rating,
       status: "pending" 
     });
 

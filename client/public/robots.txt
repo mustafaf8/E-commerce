@@ -1,6 +1,6 @@
 # ===================================================================
 # Deposun.com - Konya Güneş Enerjisi Sistemleri için robots.txt
-# Güneş Enerjisi SEO Optimizasyonu - 2024
+# Güneş Enerjisi SEO Optimizasyonu - 2025
 # ===================================================================
 
 # Tüm arama motoru botları için geçerli kurallar

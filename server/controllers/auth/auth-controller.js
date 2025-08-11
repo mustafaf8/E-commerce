@@ -179,13 +179,6 @@ const loginUser = async (req, res) => {
 
     // 1. Durum: Kullanıcının kayıtlı bir şifresi var (Normal e-posta/şifre kullanıcısı)
     if (checkUser.password) {
-      logWarn("Başarısız giriş denemesi: Yanlış şifre", req, {
-        action: "LOGIN_FAIL_WRONG_PASSWORD",
-        resourceId: checkUser._id,
-        resourceType: "User",
-        additionalData: { email: email },
-      });
-      // Şifre gönderilmemişse hata ver
       if (!password) {
         return res.status(400).json({
           success: false,
@@ -271,7 +264,6 @@ const logoutUser = (req, res, next) => {
     }
     req.session.destroy((err) => {
       if (err) {
-         console.error("Session yok etme hatası:", err);
       }
       res
         .clearCookie("token", cookieOptions)
@@ -393,7 +385,7 @@ const updateUserDetails = async (req, res) => {
           tcKimlikNo: updatedUser.tcKimlikNo,
         },
         process.env.CLIENT_SECRET_KEY || "DEFAULT_SECRET_KEY",
-        { expiresIn: "1h" }
+        { expiresIn: "30m" }
       );
 
       res.cookie("token", newToken, {
@@ -461,7 +453,7 @@ const verifyPhoneNumberLogin = async (req, res) => {
           tcKimlikNo: user.tcKimlikNo,
         },
         process.env.CLIENT_SECRET_KEY || "DEFAULT_SECRET_KEY",
-        { expiresIn: "1h" }
+        { expiresIn: "15m" }
       );
 
       res.cookie("token", jwtToken, cookieOptions);
@@ -530,7 +522,7 @@ const registerPhoneNumberUser = async (req, res) => {
           tcKimlikNo: existingUser.tcKimlikNo,
         },
         process.env.CLIENT_SECRET_KEY || "DEFAULT_SECRET_KEY",
-        { expiresIn: "1h" }
+        { expiresIn: "15m" }
       );
       res.cookie("token", jwtToken, cookieOptions);
       return res.status(200).json({
@@ -616,7 +608,7 @@ const forgotPassword = async (req, res) => {
       .digest("hex");
 
     user.resetPasswordToken = hashedToken;
-    user.resetPasswordExpires = Date.now() + 3600000;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 saat geçerli
 
     await user.save();
 
