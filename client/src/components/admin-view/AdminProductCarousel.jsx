@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react"; // useCallback ekledim
+import { useState, useRef, useEffect, useCallback } from "react"; 
 import AdminProductTile from "./product-tile";
 import ProductTileSkeleton from "../shopping-view/product-tile-skeleton.jsx";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";

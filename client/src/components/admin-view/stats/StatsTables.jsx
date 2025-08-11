@@ -73,7 +73,7 @@ const StatsTables = ({ topCustomers, topSellingProducts, lowStockProducts }) => 
 
                       return filteredTopProducts.slice(0, 10).map((p, idx) => {
                         const sales = p.salesCount || p.totalUnits;
-                        const ratio = (sales / maxSales) * 100; // % genişlik
+                        const ratio = (sales / maxSales) * 100;
                         return (
                           <div
                             key={p._id || idx}

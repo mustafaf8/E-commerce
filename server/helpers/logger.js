@@ -24,10 +24,10 @@ const logger = winston.createLogger({
   ),
   transports: [
     // Console transport - tüm seviyeleri göster
-    new winston.transports.Console({
-      format: consoleFormat,
-      level: "debug",
-    }),
+    // new winston.transports.Console({
+    //   format: consoleFormat,
+    //    level: "debug",
+    //  }),
     // MongoDB transport - sadece error seviyesi
     new WinstonMongoDB.MongoDB({
       level: "error", // Sadece error seviyesindeki logları kaydet
