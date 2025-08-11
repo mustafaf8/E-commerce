@@ -42,7 +42,7 @@ exports.initiatePayment = async (req, res) => {
         name: "Alışverişsiz",
         surname: "Ödeme",
         gsmNumber: "+905555555555",
-        email: "odeme@deposun.com",
+        email: "siparis@deposun.com",
         identityNumber: "11111111111",
         registrationAddress: "Fevziçakmak, 10777 Sk. No:1AC, 42250 Karatay/Konya",
         ip: req.ip || "127.0.0.1",
