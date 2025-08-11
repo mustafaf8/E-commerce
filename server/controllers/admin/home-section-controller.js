@@ -56,7 +56,6 @@ const addHomeSectionAdmin = async (req, res) => {
       error: error.message,
     });
 
-    //console.error("Admin bölüm ekleme hatası:", error);
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -73,7 +72,6 @@ const getAllHomeSectionsAdmin = async (req, res) => {
     const sections = await HomeSection.find({}).sort({ displayOrder: 1 });
     res.status(200).json({ success: true, data: sections });
   } catch (error) {
-    //console.error("Admin tüm bölümleri getirme hatası:", error);
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
 };
@@ -165,7 +163,6 @@ const updateHomeSectionAdmin = async (req, res) => {
       error: error.message,
     });
 
-    //console.error("Admin bölüm güncelleme hatası:", error);
     if (error.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -210,7 +207,6 @@ const deleteHomeSectionAdmin = async (req, res) => {
       error: error.message,
     });
 
-    //console.error("Admin bölüm silme hatası:", error);
     if (error.name === "CastError") {
       return res
         .status(400)
@@ -237,9 +233,9 @@ const updateHomeSectionsOrderAdmin = async (req, res) => {
 
     const updatedSections = await Promise.all(updatePromises);
 
-    if (updatedSections.some((section) => section === null)) {
-      //console.warn("Sıralama güncellemede bazı bölümler bulunamadı.");
-    }
+    // if (updatedSections.some((section) => section === null)) {
+    //console.warn("Sıralama güncellemede bazı bölümler bulunamadı.");
+    // }
 
     logInfo("Ana sayfa bölüm sıralaması güncellendi", req, {
       action: "REORDER_HOME_SECTIONS",
@@ -255,8 +251,6 @@ const updateHomeSectionsOrderAdmin = async (req, res) => {
       action: "REORDER_HOME_SECTIONS_ERROR",
       error: error.message,
     });
-
-    //console.error("Admin bölüm sıralama hatası:", error);
     res.status(500).json({ success: false, message: "Sunucu hatası oluştu." });
   }
 };

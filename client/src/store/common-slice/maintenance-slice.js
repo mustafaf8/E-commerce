@@ -43,7 +43,6 @@ const maintenanceSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch Status
       .addCase(fetchMaintenanceStatus.pending, (state) => {
         state.isLoading = true;
       })
@@ -59,9 +58,8 @@ const maintenanceSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload?.message || "Durum alınamadı.";
       })
-      // Update Status
       .addCase(updateMaintenanceStatus.pending, (state) => {
-        state.isLoading = true; // veya isUpdating: true
+        state.isLoading = true; 
       })
       .addCase(updateMaintenanceStatus.fulfilled, (state, action) => {
         state.isLoading = false;

@@ -9,7 +9,6 @@ exports.listAdmins = async (req, res) => {
     );
     res.status(200).json({ success: true, data: admins });
   } catch (e) {
-    // console.error("listAdmins error:", e);
     res.status(500).json({
       success: false,
       message: "Admin listesi alınamadı.",
@@ -63,7 +62,6 @@ exports.updateAdminAuthorization = async (req, res) => {
       error: e.message,
     });
 
-    // console.error("updateAdminAuthorization error:", e);
     res.status(500).json({
       success: false,
       message: "Güncelleme başarısız.",

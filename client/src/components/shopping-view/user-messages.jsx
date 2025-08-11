@@ -25,7 +25,6 @@ export default function UserMessages() {
 
   useEffect(() => {
     fetchMessages();
-    // eslint-disable-next-line
   }, []);
 
   const handleChange = (e) => {

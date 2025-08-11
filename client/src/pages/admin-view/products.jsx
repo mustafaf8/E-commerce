@@ -174,7 +174,6 @@ function AdminProducts() {
             .map((cat) => ({ 
               id: cat._id, 
               label: cat.name,
-              // Alt kategoriler için prefix ekle
               displayLabel: cat.parent ? `  └─ ${cat.name}` : cat.name
             })),
         };
@@ -289,9 +288,8 @@ function AdminProducts() {
           category: formData.category,
           brand: formData.brand || null,
           image: finalImageUrl,
-          images: formData.images || [], // Ek resimler
+          images: formData.images || [], 
         };
-       // console.log("Gönderilen Veri (Brand Kontrol):", dataToSend);
 
       // technicalSpecs'i boş ve geçersiz satırlardan temizle
       const filteredSpecs = dataToSend.technicalSpecs.filter(
@@ -318,7 +316,6 @@ function AdminProducts() {
         });
         setOpenCreateProductsDialog(false);
       } catch (error) {
-       // console.error("onSubmit sırasında hata:", error);
         toast({
           variant: "destructive",
           title: "İşlem Başarısız",
@@ -346,7 +343,7 @@ function AdminProducts() {
 
   const confirmDeleteHandler = useCallback(() => {
     if (productIdToDelete) {
-      closeConfirmationModal(); // Önce modal'ı kapat
+      closeConfirmationModal(); 
       dispatch(deleteProduct(productIdToDelete)).then((data) => {
         if (data?.payload?.success) {
           dispatch(fetchAllProducts());
@@ -391,7 +388,7 @@ function AdminProducts() {
           priceUSD: productToEdit.priceUSD?.toString() ?? "",
           salePriceUSD: productToEdit.salePriceUSD?.toString() ?? "",
           totalStock: productToEdit.totalStock?.toString() ?? "",
-          technicalSpecs: productToEdit.technicalSpecs || [], // Düzenleme için yükle
+          technicalSpecs: productToEdit.technicalSpecs || [], 
         });
         setProductImageFile(null);
         setAdditionalImageFiles([]);
@@ -457,9 +454,9 @@ function AdminProducts() {
           salePriceUSD: product.salePriceUSD,
           totalStock: product.totalStock,
           image: product.image,
-          images: product.images || [], // Ek resimler
+          images: product.images || [], 
           costPrice: product.costPrice,
-          technicalSpecs: product.technicalSpecs || [], // Düzenleme için yükle
+          technicalSpecs: product.technicalSpecs || [], 
         });
         setOpenCreateProductsDialog(true);
       } else {

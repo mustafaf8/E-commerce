@@ -28,10 +28,6 @@ function ShoppingCheckout() {
   );
   const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
   const [couponCode, setCouponCode] = useState("");
-  //console.log(
-  //  "Checkout Render - currentSelectedAddress:",
-  //  currentSelectedAddress
-  //);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -148,9 +144,7 @@ function ShoppingCheckout() {
     dispatch(createNewOrder(orderData))
       .unwrap()
       .then((result) => {
-       // console.log("createNewOrder result:", result);
         if (result?.success && result?.paymentPageUrl) {
-          // Sipariş başarılı olduğunda kupon state'ini temizle
           dispatch(clearCouponState());
           toast({
             title: "Ödeme sayfasına yönlendiriliyorsunuz...",
@@ -158,9 +152,6 @@ function ShoppingCheckout() {
           });
           window.location.href = result.paymentPageUrl;
         } else if (result?.success && result?.checkoutFormContent) {
-         // console.warn(
-         //   "PaymentPageUrl alınamadı, checkoutFormContent ile devam edilmeli."
-         // );
           toast({
             variant: "destructive",
             title: "Yönlendirme Hatası",

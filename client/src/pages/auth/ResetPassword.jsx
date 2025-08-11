@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import AuthLayout from "@/components/auth/AuthLayout";
 import { Loader2, KeyRound } from "lucide-react";
-import { resetPassword } from "@/store/auth-slice"; // Birazdan ekleyeceğiz
+import { resetPassword } from "@/store/auth-slice"; 
 
 function ResetPassword() {
   const [password, setPassword] = useState("");

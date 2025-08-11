@@ -43,7 +43,7 @@ export const updateCategory = createAsyncThunk(
         `/admin/categories/update/${id}`,
         categoryData
       );
-      return response.data; // { success: true, data: updatedCategory }
+      return response.data; 
     } catch (error) {
       return rejectWithValue(
         error.response?.data || { message: "Kategori güncellenemedi." }
@@ -105,24 +105,17 @@ const categoriesSlice = createSlice({
         state.error = action.payload?.message || "Kategoriler alınamadı.";
         state.categoryList = [];
       })
-      // addCategory - Hiyerarşik yapıyı korumak için yeniden fetch et
       .addCase(addCategory.fulfilled, (state, action) => {
-        // Kategori eklendiğinde hiyerarşik yapıyı korumak için
-        // state'i değiştirmiyoruz, component'te yeniden fetch edilecek
       })
       .addCase(addCategory.rejected, (state, action) => {
         state.error = action.payload?.message || "Kategori eklenemedi.";
       })
       .addCase(updateCategory.fulfilled, (state, action) => {
-        // Kategori güncellendiğinde hiyerarşik yapıyı korumak için
-        // state'i değiştirmiyoruz, component'te yeniden fetch edilecek
       })
       .addCase(updateCategory.rejected, (state, action) => {
         state.error = action.payload?.message || "Kategori güncellenemedi.";
       })
       .addCase(deleteCategory.fulfilled, (state, action) => {
-        // Kategori silindiğinde hiyerarşik yapıyı korumak için
-        // state'i değiştirmiyoruz, component'te yeniden fetch edilecek
       })
       .addCase(deleteCategory.rejected, (state, action) => {
         state.error = action.payload?.message || "Kategori silinemedi.";

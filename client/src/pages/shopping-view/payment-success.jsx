@@ -19,10 +19,8 @@ const PaymentSuccessPage = () => {
     if (isSuccess) {
       if (!isAuthenticated) {
         clearGuestCart();
-       // console.log("Misafir sepeti ödeme sonrası temizlendi.");
       }
       dispatch(clearCartState());
-     // console.log("Redux sepet state'i ödeme sonrası temizlendi.");
     }
   }, [isSuccess, isAuthenticated, dispatch]);
 

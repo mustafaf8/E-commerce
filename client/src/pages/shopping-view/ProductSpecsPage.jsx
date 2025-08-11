@@ -177,9 +177,6 @@ function ProductSpecsPage() {
   return (
     <div className="container mx-auto px-2 py-6 max-w-7xl">
       <div className="flex flex-col lg:flex-row gap-8">
-
-
-        
         {/* Sol: Galeri */}
         <div className="flex-1 min-w-0">
           <div className="bg-white rounded-2xl shadow-lg flex flex-col items-center">
@@ -225,9 +222,6 @@ function ProductSpecsPage() {
             )}
           </div>
         </div>
-
-
-
         {/* Sağ: Ürün Bilgi ve Sepet Kutusu */}
         <div className="flex-1 min-w-0 flex flex-col gap-6">
           <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-8 border border-gray-100 flex flex-col gap-4">

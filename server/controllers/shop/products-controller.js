@@ -142,7 +142,7 @@ const getFilteredProducts = async (req, res) => {
         },
       ];
     } else {
-      // Diğer sıralama türleri için normal sort kullan
+      
       switch (sortBy) {
         case "title-atoz":
           sort.title = 1;
@@ -182,7 +182,7 @@ const getFilteredProducts = async (req, res) => {
         .populate("brand", "name slug")
         .select("-description -costPrice");
 
-      // Her ürün için TL fiyatlarını hesapla
+      
       for (const product of products) {
         await product.calculateTLPrices();
       }
@@ -228,7 +228,7 @@ const getProductDetails = async (req, res) => {
       data: product,
     });
   } catch (error) {
-    // console.error("getProductDetails error:", error);
+    
     res.status(500).json({
       success: false,
       message: "Ürün detayı alınırken bir hata oluştu.",
@@ -263,7 +263,7 @@ const getProductStock = async (req, res) => {
       },
     });
   } catch (error) {
-    // console.error("getProductStock error:", error);
+    
     res.status(500).json({
       success: false,
       message: "Ürün stok bilgisi alınırken bir hata oluştu.",

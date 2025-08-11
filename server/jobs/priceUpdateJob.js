@@ -4,7 +4,6 @@ const { getExchangeRate } = require("../utils/currencyConverter");
 
 /**
  * TL Fiyat Güncelleme Cron Job
- *
  * Bu job, belirli aralıklarla tüm ürünlerin TL fiyatlarını günceller.
  * Performans optimizasyonu için kullanılır.
  */
@@ -20,7 +19,6 @@ class PriceUpdateJob {
    * Cron job'ı başlatır
    */
   start() {
-    // console.log('TL Fiyat Güncelleme Cron Job başlatılıyor...');
 
     // Her saat başı çalışacak cron job (0 * * * *)
     cron.schedule(
@@ -38,7 +36,7 @@ class PriceUpdateJob {
     cron.schedule(
       "0 0 * * *",
       async () => {
-        await this.updateAllPrices(true); // Force update
+        await this.updateAllPrices(true); 
       },
       {
         scheduled: true,
@@ -46,7 +44,6 @@ class PriceUpdateJob {
       }
     );
 
-    // console.log('TL Fiyat Güncelleme Cron Job başlatıldı.');
   }
 
   /**
@@ -55,15 +52,12 @@ class PriceUpdateJob {
    */
   async updateAllPrices(forceUpdate = false) {
     if (this.isRunning) {
-      // console.log('TL fiyat güncelleme işlemi zaten çalışıyor, atlanıyor...');
       return;
     }
 
     try {
       this.isRunning = true;
       this.lastRun = new Date();
-
-      // console.log(`TL fiyat güncelleme işlemi başlatılıyor... (${new Date().toLocaleString('tr-TR')})`);
 
       // Güncel döviz kurunu al
       const rate = await getExchangeRate();
@@ -72,10 +66,8 @@ class PriceUpdateJob {
       // Tüm ürünleri güncelle
       const result = await Product.updateAllTLPrices();
 
-      this.nextRun = new Date(Date.now() + 60 * 60 * 1000); // 1 saat sonra
+      this.nextRun = new Date(Date.now() + 60 * 60 * 1000); 
 
-      // console.log(`TL fiyat güncelleme işlemi tamamlandı. ${result.modifiedCount} ürün güncellendi.`);
-      // console.log(`Sonraki güncelleme: ${this.nextRun.toLocaleString('tr-TR')}`);
     } catch (error) {
       console.error("TL fiyat güncelleme hatası:", error);
     } finally {
@@ -87,7 +79,6 @@ class PriceUpdateJob {
    * Manuel olarak fiyat güncellemesi yapar
    */
   async manualUpdate() {
-    // console.log('Manuel TL fiyat güncellemesi başlatılıyor...');
     await this.updateAllPrices(true);
   }
 
@@ -107,13 +98,11 @@ class PriceUpdateJob {
    * Job'ı durdurur
    */
   stop() {
-    // console.log('TL Fiyat Güncelleme Cron Job durduruluyor...');
     cron.getTasks().forEach((task) => {
       if (task.name.includes("price-update")) {
         task.stop();
       }
     });
-    // console.log('TL Fiyat Güncelleme Cron Job durduruldu.');
   }
 }
 

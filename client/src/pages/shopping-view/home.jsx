@@ -175,7 +175,7 @@ function ShoppingHome() {
                     className={`${
                       index === currentSlide
                         ? "opacity-100 z-10"
-                        : "opacity-0 z-0" // z-index eklendi
+                        : "opacity-0 z-0" 
                     } absolute inset-0 w-full h-full object-center transition-opacity duration-1000 ease-in-out ${
                       slide.link ? "cursor-pointer" : ""
                     }`}

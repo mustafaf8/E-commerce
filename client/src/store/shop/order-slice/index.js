@@ -36,10 +36,6 @@ export const getAllOrdersByUserId = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-    //  console.error(
-      //  "getAllOrdersByUserId API Hatası:",
-      //  error.response?.data || error.message
-     // );
       return rejectWithValue(
         error.response?.data || { message: "Siparişler alınamadı." }
       );
@@ -56,10 +52,6 @@ export const getOrderDetails = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-    //  console.error(
-    //    "getOrderDetails API Hatası:",
-    //    error.response?.data || error.message
-    //  );
       return rejectWithValue(
         error.response?.data || { message: "Sipariş detayı alınamadı." }
       );
@@ -216,7 +208,6 @@ const shoppingOrderSlice = createSlice({
         state.orderId = null;
       })
 
-      // ---- İPTAL SİPARİŞ ----
       .addCase(cancelOrder.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -225,11 +216,9 @@ const shoppingOrderSlice = createSlice({
         state.isLoading = false;
         const updatedOrder = action.payload?.data;
         if (updatedOrder) {
-          // orderList güncelle
           state.orderList = state.orderList.map((o) =>
             o._id === updatedOrder._id ? updatedOrder : o
           );
-          // orderDetails güncelle
           if (state.orderDetails && state.orderDetails._id === updatedOrder._id) {
             state.orderDetails = updatedOrder;
           }

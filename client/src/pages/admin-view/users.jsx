@@ -89,7 +89,7 @@ const UsersPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [action, setAction] = useState(null); // 'makeAdmin' veya 'removeAdmin'
+  const [action, setAction] = useState(null); 
 
   // Kullanıcıları getir
   const fetchUsers = async () => {

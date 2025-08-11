@@ -17,7 +17,7 @@ const adminCheckMiddleware = async (req, res, next) => {
 
         if (user) {
           req.user = user;
-          // console.log("JWT token'dan user çıkarıldı:", user.userName);
+
         }
       } catch (error) {
         console.log("JWT token geçersiz:", error.message);
@@ -42,7 +42,6 @@ const adminCheckMiddleware = async (req, res, next) => {
     req.user.isAdmin === true;
 
   if (isAdmin) {
-    //  console.log("Admin erişimi onaylandı");
     return next();
   }
 

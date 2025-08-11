@@ -27,7 +27,7 @@ function UserCartItemsContent({ cartItem, readOnly = false }) {
       .unwrap()
       .then((payload) => {
         if (payload?.success) {
-          // toast({ title: "Sepet güncellendi", variant: "success" });
+           toast({ title: "Sepet güncellendi", variant: "success" });
         }
       })
       .catch((errorPayload) => {

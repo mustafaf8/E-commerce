@@ -63,15 +63,12 @@ function AuthLogin() {
   useEffect(() => {
     if (step === "phone" && !window.recaptchaVerifier) {
       try {
-       // console.log("Setting up reCAPTCHA verifier...");
 
         const verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
           size: "invisible",
           callback: () => {
-           // console.log("reCAPTCHA challenge passed.");
           },
           "expired-callback": () => {
-           // console.warn("reCAPTCHA expired. Please try again.");
             toast({
               variant: "warning",
               title: "Doğrulama süresi doldu, lütfen tekrar deneyin.",
@@ -86,16 +83,13 @@ function AuthLogin() {
         verifier
           .render()
           .then((widgetId) => {
-           // console.log("reCAPTCHA rendered. Widget ID:", widgetId);
             window.recaptchaWidgetId = widgetId;
           })
           .catch((err) => {
-           // console.error("reCAPTCHA render error:", err);
             toast({ variant: "destructive", title: "reCAPTCHA yüklenemedi." });
           });
         window.recaptchaVerifier = verifier;
       } catch (error) {
-       // console.error("Error setting up RecaptchaVerifier:", error);
         toast({
           variant: "destructive",
           title: "Giriş sistemi başlatılamadı.",
@@ -142,7 +136,6 @@ function AuthLogin() {
       setStep("otp");
       toast({ variant: "success", title: "OTP Gönderildi" });
     } catch (error) {
-     // console.error("Error sending OTP:", error);
       toast({
         variant: "destructive",
         title: "SMS Gönderilemedi",
@@ -189,7 +182,6 @@ function AuthLogin() {
         );
       }
     } catch (error) {
-     // console.error("Error verifying OTP or backend check:", error);
       toast({
         variant: "destructive",
         title: "SMS Doğrulama Hatası",
@@ -234,7 +226,6 @@ function AuthLogin() {
         throw new Error(backendResponse.message || "Backend kaydı başarısız.");
       }
     } catch (error) {
-     // console.error("Error registering new user:", error);
       toast({
         variant: "destructive",
         title: "Kayıt Başarısız",
@@ -271,7 +262,6 @@ function AuthLogin() {
         }
       })
       .catch((error) => {
-       // console.error("Email login error:", error);
         toast({
           title: error.message || "Giriş sırasında hata oluştu",
           variant: "destructive",

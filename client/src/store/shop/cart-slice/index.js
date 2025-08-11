@@ -84,7 +84,7 @@ export const addToCart = createAsyncThunk(
             salePrice: productDetails.salePrice,
             title: productDetails.title,
             image: productDetails.image,
-            totalStock: currentStock, // Anlık stok bilgisini kullan
+            totalStock: currentStock, 
           });
         }
         const newGuestCart = { ...localCart, items: updatedCartItems };
@@ -184,7 +184,6 @@ export const deleteCartItem = createAsyncThunk(
         saveGuestCart(newGuestCart);
         return { success: true, data: newGuestCart, fromLocalStorage: true };
       } catch (error) {
-       // console.error("Yerel sepetten silme hatası:", error);
         return rejectWithValue({
           success: false,
           message: error.message || "Yerel sepetten silinemedi.",
@@ -230,9 +229,7 @@ export const updateCartQuantity = createAsyncThunk(
         const cartItemToUpdate = localCart.items[itemIndex];
 
         if (cartItemToUpdate.totalStock === undefined) {
-         // console.warn(
-         //   `Misafir sepetindeki ${productId} için stok bilgisi eksik.`
-         // );
+
         } else if (quantity > cartItemToUpdate.totalStock) {
           return rejectWithValue({
             success: false,
@@ -258,7 +255,6 @@ export const updateCartQuantity = createAsyncThunk(
         saveGuestCart(newGuestCart);
         return { success: true, data: newGuestCart, fromLocalStorage: true };
       } catch (error) {
-       // console.error("Yerel sepet güncelleme hatası:", error);
         return rejectWithValue({
           success: false,
           message: error.message || "Yerel sepet güncellenemedi.",
@@ -468,7 +464,6 @@ const shoppingCartSlice = createSlice({
       .addCase(syncLocalCartToBackend.fulfilled, handleFulfilled)
       .addCase(syncLocalCartToBackend.rejected, handleRejected)
 
-      // Kupon işlemleri
       .addCase(applyCoupon.pending, (state) => {
         state.couponLoading = true;
         state.couponError = null;

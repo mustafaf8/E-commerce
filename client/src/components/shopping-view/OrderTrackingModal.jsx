@@ -81,7 +81,6 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
           "Sipariş sorgulanırken bir hata oluştu."
       );
       setSearchResult(null);
-      // console.error("Sipariş sorgulama hatası:", error);
     } finally {
       setIsLoading(false);
     }

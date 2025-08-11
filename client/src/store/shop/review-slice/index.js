@@ -56,7 +56,6 @@ const reviewSlice = createSlice({
       .addCase(getReviews.rejected, (state, action) => {
         state.isLoading = false;
         state.reviews = [];
-       // console.error("Get reviews failed:", action.payload || action.error);
       })
 
       .addCase(addReview.pending, (state) => {
@@ -75,7 +74,7 @@ const reviewSlice = createSlice({
           action.payload?.message ||
           action.error.message ||
           "Unknown error adding review";
-       // console.error("Add review failed:", action.payload || action.error);
+
       });
   },
 });

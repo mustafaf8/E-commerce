@@ -253,7 +253,7 @@ function MenuItems({ setOpen }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useSelector((state) => state.auth);
-  const [expandedGroups, setExpandedGroups] = useState(['panel']); // Panel varsayılan olarak açık
+  const [expandedGroups, setExpandedGroups] = useState(['panel']);
 
   // Görünür menü öğelerini belirle
   const getVisibleItems = () => {

@@ -13,8 +13,8 @@ import commonFeatureSlice from "./common-slice";
 import promoCardReducer from "./common-slice/promo-card-slice";
 import wishlistReducer from "./shop/wishlist-slice";
 import sideBannerReducer from "./common-slice/side-banner-slice";
-import categoriesReducer from "./common-slice/categories-slice"; // Yeni
-import homeSectionsReducer from "./common-slice/home-sections-slice"; // Yeni
+import categoriesReducer from "./common-slice/categories-slice"; 
+import homeSectionsReducer from "./common-slice/home-sections-slice"; 
 import brandsReducer from "./common-slice/brands-slice";
 import adminStatsReducer from "./admin/statsSlice";
 import adminCouponReducer from "./admin/coupon-slice";

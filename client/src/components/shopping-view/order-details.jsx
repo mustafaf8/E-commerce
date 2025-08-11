@@ -29,7 +29,6 @@ function ShoppingOrderDetailsView({ orderDetails }) {
         formattedDate = format(parsedDate, "dd.MM.yyyy HH:mm");
       }
     } catch (e) {
-     // console.error("Detayda tarih formatlama hatası:", e);
     }
   }
 
@@ -52,7 +51,6 @@ function ShoppingOrderDetailsView({ orderDetails }) {
     ? user.email
     : "E-posta Yok";
 
-  // İptal edilebilir mi?
   const cancellableStatuses = ["pending", "pending_payment", "confirmed"];
   const canCancel = cancellableStatuses.includes(orderDetails.orderStatus);
 

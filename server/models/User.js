@@ -42,7 +42,7 @@ const UserSchema = new mongoose.Schema(
     // Admin yetkilendirme alanları
     adminAccessLevel: {
       type: Number,
-      enum: [1, 2, 3], // 1: Tam, 2: Orta, 3: Sınırlı
+      enum: [1, 2, 3], 
       default: 3,
     },
     // Her modül için görüntüleme ve yönetme izinleri

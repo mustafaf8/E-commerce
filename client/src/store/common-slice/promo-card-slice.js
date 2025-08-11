@@ -90,9 +90,7 @@ const promoCardSlice = createSlice({
       })
       .addCase(addPromoCard.rejected, (state, action) => {
         state.error = action.payload?.message || action.error.message;
-       // console.error("Promo kart ekleme hatası:", state.error);
       })
-      // deletePromoCard
       .addCase(updatePromoCard.fulfilled, (state, action) => {
         if (action.payload?.success && action.payload?.data) {
           const index = state.promoCardList.findIndex(
@@ -117,7 +115,6 @@ const promoCardSlice = createSlice({
       })
       .addCase(deletePromoCard.rejected, (state, action) => {
         state.error = action.payload?.message || action.error.message;
-       // console.error("Promo kart silme hatası:", state.error);
       });
   },
 });

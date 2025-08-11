@@ -33,7 +33,6 @@ const ProductSchema = new mongoose.Schema(
       default: null,
       min: [0, "İndirimli fiyat negatif olamaz."],
     },
-    // TL fiyatları için yeni alanlar
     priceTL: {
       type: Number,
       default: 0,
@@ -42,7 +41,6 @@ const ProductSchema = new mongoose.Schema(
       type: Number,
       default: null,
     },
-    // TL fiyatlarının son güncellenme zamanı
     priceLastUpdated: {
       type: Date,
       default: Date.now,
@@ -102,26 +100,22 @@ const ProductSchema = new mongoose.Schema(
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-// Optimize edilmiş TL fiyat hesaplama metodu
 ProductSchema.methods.calculateTLPrices = async function(forceUpdate = false) {
   try {
     const now = new Date();
-    const cacheExpiry = 60 * 60 * 1000; // 1 saat cache süresi
+    const cacheExpiry = 60 * 60 * 1000; 
     
-    // Cache kontrolü - eğer TL fiyatlar güncel ise ve force update istenmiyorsa
     if (!forceUpdate && 
         this.priceTL && 
         this.salePriceTL !== undefined && 
         this.priceLastUpdated && 
         (now - this.priceLastUpdated) < cacheExpiry) {
       
-      // Cache'den TL fiyatları kullan
       this.price = this.priceTL;
       this.salePrice = this.salePriceTL;
       return this;
     }
 
-    // Yeni kur ile hesaplama yap
     const rate = await getExchangeRate();
     const toNumber = (val) => (val !== undefined && val !== null ? Number(val) : null);
 
@@ -134,12 +128,10 @@ ProductSchema.methods.calculateTLPrices = async function(forceUpdate = false) {
     const usdPrice = toNumber(this.priceUSD);
     const usdSale = toNumber(this.salePriceUSD);
 
-    // TL fiyatları hesapla ve sakla
     this.priceTL = usdPrice !== null ? calcTL(usdPrice) : 0;
     this.salePriceTL = usdSale !== null ? calcTL(usdSale) : null;
     this.priceLastUpdated = now;
 
-    // Virtual alanları güncelle
     this.price = this.priceTL;
     this.salePrice = this.salePriceTL;
 
@@ -160,7 +152,6 @@ ProductSchema.methods.calculateTLPrices = async function(forceUpdate = false) {
   }
 };
 
-// Toplu TL fiyat güncelleme metodu
 ProductSchema.statics.updateAllTLPrices = async function() {
   try {
     console.log("Tüm ürünlerin TL fiyatları güncelleniyor...");
