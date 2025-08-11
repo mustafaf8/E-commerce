@@ -8,6 +8,8 @@ import { useToast } from "@/components/ui/use-toast";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { incrementNewCount, resetNewCount } from "@/store/admin/adminMessageSlice";
+import { fetchPendingFailedOrders } from "@/store/admin/order-slice";
+import { fetchAdminMessages, setNewCount } from "@/store/admin/adminMessageSlice";
 
 function AdminHeader({ setOpen }) {
   const { user } = useSelector((state) => state.auth);
@@ -18,26 +20,29 @@ function AdminHeader({ setOpen }) {
   const [newOrderCount, setNewOrderCount] = useState(0);
   const [liveVisitorCount, setLiveVisitorCount] = useState(null);
   const newMessageCount = useSelector((state) => state.adminMessages?.newCount || 0);
-
-  // Get order data from store
-  const { userList = [], guestOrderList = [] } = useSelector(
-    (state) => state.adminOrder || {}
-  );
+  const { 
+    userList = [], 
+    guestOrderList = [],
+    pendingFailedOrders = []
+  } = useSelector((state) => state.adminOrder || {})
+  useEffect(() => {
+    dispatch(fetchPendingFailedOrders());
+    dispatch(fetchAdminMessages('new')).unwrap().then((newMessages) => {
+      if (newMessages) {
+        dispatch(setNewCount(newMessages.length));
+      }
+    });
+  }, [dispatch]);
 
   // Calculate new order count
   useEffect(() => {
-    // Check for new orders from registered users
     const registeredNewOrders = userList.filter(
       (user) => user.hasNewOrder
     ).length;
-
-    // Check for new orders from guests
     const newOrderStatuses = ["pending", "pending_payment"];
     const guestNewOrders = guestOrderList.filter(
       (order) => newOrderStatuses.includes(order.orderStatus) || order.isNew
     ).length;
-
-    // Set total count
     setNewOrderCount(registeredNewOrders + guestNewOrders);
   }, [userList, guestOrderList]);
 

@@ -180,7 +180,7 @@ const createOrder = async (req, res) => {
       cartId: cartId,
       cartItems: orderCartItems,
       addressInfo,
-      orderStatus: "pending",
+      orderStatus: "pending_payment",
       paymentMethod: "iyzico",
       paymentStatus: "pending",
       totalAmountTRY: finalTotalTRY,
@@ -274,8 +274,6 @@ const createOrder = async (req, res) => {
 };
 
 const createGuestOrder = async (req, res) => {
-  // ... (createGuestOrder fonksiyonunun tamamı, createOrder'daki aynı düzeltmelerle buraya gelecek) ...
-  // ... Şimdilik bu kısmı kısa tutuyorum, ana mantık createOrder ile aynı.
   try {
     const { guestInfo, cartItems, appliedCoupon } = req.body;
     const rate = await getExchangeRate();

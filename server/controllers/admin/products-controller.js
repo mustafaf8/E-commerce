@@ -168,6 +168,15 @@ const editProduct = async (req, res) => {
 
     await findProduct.save();
     
+    if (priceUSD !== undefined || salePriceUSD !== undefined) {
+      console.log("Fiyat değişikliği algılandı, tüm TL fiyatları güncelleniyor...");
+      // Await kullanmıyoruz ki admin yanıt için beklemesin.
+      Product.updateAllTLPrices().catch(err => {
+        console.error("Arka planda TL fiyat güncelleme hatası:", err);
+        // Bu hata admin'e gönderilmez, sadece loglanır.
+      });
+    }
+    
     res.status(200).json({
       success: true,
       data: findProduct,
