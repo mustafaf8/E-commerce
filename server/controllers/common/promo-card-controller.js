@@ -1,4 +1,5 @@
 const PromoCard = require("../../models/PromoCard");
+const { logInfo, logError } = require("../../helpers/logger");
 
 const getPromoCards = async (req, res) => {
   try {
