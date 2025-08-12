@@ -577,12 +577,13 @@ function ShoppingHeader() {
     <header className="sticky top-0 z-[99999999] w-full border-b bg-background shadow-sm">
       <TopStrip />
       <div className="container mx-auto px-4 md:px-20">
-        <div className="flex h-20 items-center justify-between gap-4 md:gap-6">
+        <div className="flex h-20 items-center justify-between gap-4 md:gap-6 max-[767px]:h-16">
           <Link to="/shop/home" className="flex-shrink-0">
             <img
-              className="h-36 w-36 max-[690px]:h-24 max-[690px]:w-24 "
-              src="/dlogo2.png"
+              className="h-12 w-36 max-[690px]:h-8 max-[690px]:w-24 "
+              src="/logo.png"
               alt="logo"
+              aria-label="Ana Sayfa"
             />
           </Link>
           <form
