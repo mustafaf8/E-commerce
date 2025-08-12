@@ -393,7 +393,7 @@
   scrollbar-width: none;
   position: relative;
   z-index: 99999999 !important;
-  overflow: hidden ;
+  overflow: visible !important;
 }
 
 .category-menu-container::-webkit-scrollbar {
@@ -466,25 +466,25 @@ section[class*="z-"] {
 .category-menu-container *,
 header .absolute,
 header .relative {
-  overflow: hidden !important;
+  overflow: visible !important;
 }
 
 /* Dropdown'ların kesilmemesi için */
 .absolute[class*="z-"] {
-  overflow: hidden !important;
+  overflow: visible !important;
   z-index: 99999999 !important;
 }
 
 /* Arama suggestions dropdown'larının kesinlikle en üstte kalması */
 .absolute[class*="z-"]:has(div[class*="px-3"][class*="py-2"]) {
   z-index: 9999999999 !important;
-  overflow: hidden !important;
+  overflow: visible !important;
 }
 
 /* Arama suggestions için en güçlü kural */
 .absolute[class*="z-"]:has(.px-3) {
   z-index: 9999999999 !important;
-  overflow: hidden !important;
+  overflow: visible !important;
 }
 
 /* Arama suggestions için spesifik kural */
