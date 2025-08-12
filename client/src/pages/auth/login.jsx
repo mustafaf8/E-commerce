@@ -303,6 +303,7 @@ function AuthLogin() {
             variant="default"
             className="w-full"
             onClick={() => setStep("email")}
+            aria-label="E-posta ile Giriş Yap"
           >
             <Mail className="mr-2 h-4 w-4" />
             E-posta ile Giriş Yap
@@ -312,6 +313,7 @@ function AuthLogin() {
             variant="outline"
             className="w-full"
             onClick={handleGoogleLogin}
+            aria-label="Google ile Devam Et"
           >
             <Chrome className="mr-2 h-4 w-4" />
             Google ile Devam Et
@@ -392,6 +394,7 @@ function AuthLogin() {
             size="sm"
             className="w-full"
             onClick={() => setStep("select")}
+            aria-label="Geri Dön"
           >
             <ArrowLeft className="mr-2 h-3 w-3" />
             Geri Dön
@@ -426,6 +429,7 @@ function AuthLogin() {
           type="submit"
           className="w-full"
           disabled={otpLoading || loading || otp.length !== 6}
+          aria-label="Kodu Doğrula"
         >
           {otpLoading ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -443,6 +447,7 @@ function AuthLogin() {
             onClick={handleResendOtp}
             disabled={resendDisabled || loading}
             className="px-0 h-auto"
+            aria-label="Kodu Tekrar Gönder"
           >
             {resendDisabled
               ? `Tekrar gönder (${resendTimer}s)`
@@ -458,6 +463,7 @@ function AuthLogin() {
               setConfirmationResult(null);
             }}
             className="px-0 h-auto"
+            aria-label="Numarayı Değiştir"
           >
             Numarayı Değiştir
           </Button>
@@ -489,6 +495,7 @@ function AuthLogin() {
           type="submit"
           className="w-full"
           disabled={nameLoading || loading || !userName.trim()}
+          aria-label="Kaydı Tamamla ve Giriş Yap"
         >
           {nameLoading ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -556,6 +563,7 @@ function AuthLogin() {
             size="sm"
             className="w-full"
             onClick={() => setStep("select")}
+            aria-label="Diğer Giriş Yöntemleri"
           >
             <ArrowLeft className="mr-2 h-3 w-3" />
             Diğer Giriş Yöntemleri

@@ -120,6 +120,7 @@ function AdminProductTile({
                   handleEdit();
                 }}
                 className="flex-1"
+                aria-label="Ürünü Düzenle"
               >
                 <Edit className="h-4 w-4 mr-1" />
                 Düzenle
@@ -133,6 +134,7 @@ function AdminProductTile({
                   handleDelete();
                 }}
                 className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                aria-label="Ürünü Sil"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>

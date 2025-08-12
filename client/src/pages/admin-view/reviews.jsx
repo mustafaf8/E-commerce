@@ -172,6 +172,7 @@ const ReviewsPage = () => {
           variant={currentFilter === "all" ? "default" : "outline"}
           onClick={() => handleFilterChange("all")}
           className="flex items-center gap-1"
+          aria-label="Tümü"
         >
           <Filter className="h-4 w-4" />
           Tümü
@@ -180,6 +181,7 @@ const ReviewsPage = () => {
           variant={currentFilter === "pending" ? "default" : "outline"}
           onClick={() => handleFilterChange("pending")}
           className="flex items-center gap-1"
+          aria-label="Onay Bekliyor"
         >
           {statusConfig.pending.icon}
           Onay Bekleyenler
@@ -188,6 +190,7 @@ const ReviewsPage = () => {
           variant={currentFilter === "approved" ? "default" : "outline"}
           onClick={() => handleFilterChange("approved")}
           className="flex items-center gap-1"
+          aria-label="Onaylandı"
         >
           {statusConfig.approved.icon}
           Onaylananlar
@@ -196,6 +199,7 @@ const ReviewsPage = () => {
           variant={currentFilter === "rejected" ? "default" : "outline"}
           onClick={() => handleFilterChange("rejected")}
           className="flex items-center gap-1"
+          aria-label="Reddedildi"
         >
           {statusConfig.rejected.icon}
           Reddedilenler
@@ -281,6 +285,7 @@ const ReviewsPage = () => {
                               className="h-8 w-8 p-0 text-green-600 hover:bg-green-50 hover:border-green-300 transition-colors"
                               title="Onayla"
                               onClick={() => handleStatusUpdate(review._id, "approved")}
+                              aria-label="Onayla"
                             >
                               <Check size={14} />
                             </Button>
@@ -290,6 +295,7 @@ const ReviewsPage = () => {
                               className="h-8 w-8 p-0 text-red-600 hover:bg-red-50 hover:border-red-300 transition-colors"
                               title="Reddet"
                               onClick={() => handleStatusUpdate(review._id, "rejected")}
+                              aria-label="Reddet"
                             >
                               <X size={14} />
                             </Button>
@@ -301,6 +307,7 @@ const ReviewsPage = () => {
                           className="h-8 w-8 p-0 text-red-600 hover:bg-red-50 hover:border-red-300 transition-colors"
                           title="Sil"
                           onClick={() => handleDeleteReview(review._id)}
+                          aria-label="Sil"
                         >
                           <Trash2 size={14} />
                         </Button>

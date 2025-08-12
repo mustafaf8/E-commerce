@@ -24,7 +24,7 @@ function UserSettings() {
 
   return (
     <div className="p-10 max-[1024px]:p-1">
-      <Button onClick={handleLogout}>Çıkış Yap</Button>
+      <Button onClick={handleLogout} aria-label="Çıkış Yap">Çıkış Yap</Button>
     </div>
   );
 }

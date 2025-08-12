@@ -434,6 +434,7 @@ function ShoppingListing() {
                     variant="outline"
                     size="sm"
                     className="flex items-center gap-1"
+                    aria-label="Sırala"
                   >
                     <ArrowUpDownIcon className="h-4 w-4" />
                     <span>Sırala</span>
@@ -448,6 +449,7 @@ function ShoppingListing() {
                       <DropdownMenuRadioItem
                         value={sortItem.id}
                         key={sortItem.id}
+                        aria-label={sortItem.label}
                       >
                         {sortItem.label}
                       </DropdownMenuRadioItem>

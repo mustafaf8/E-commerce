@@ -55,6 +55,7 @@ function NotFound() {
               asChild 
               size="lg" 
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+              aria-label="Ana Sayfaya Dön"
             >
               <Link to="/shop/home">
                 <Home className="mr-2 h-5 w-5" /> 
@@ -67,6 +68,7 @@ function NotFound() {
               size="lg" 
               onClick={() => navigate(-1)}
               className="border-gray-300 hover:border-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-800 transform hover:scale-105 transition-all duration-200"
+              aria-label="Geri Dön"
             >
               <ArrowLeft className="mr-2 h-5 w-5" /> 
               Geri Dön
@@ -77,7 +79,8 @@ function NotFound() {
               variant="ghost" 
               size="lg"
               className="hover:bg-blue-50 dark:hover:bg-gray-800 transform hover:scale-105 transition-all duration-200"
-            >
+              aria-label="Arama Yap"
+              >
               <Link to="/shop/search">
                 <Search className="mr-2 h-5 w-5" /> 
                 Arama Yap

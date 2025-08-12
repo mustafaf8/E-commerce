@@ -21,10 +21,10 @@ function NoSearchResults() {
       </p>
       <div className="flex flex-wrap justify-center gap-4">
         <Button variant="outline" asChild>
-          <Link to="/shop/listing">Tüm Ürünlere Göz At</Link>
+          <Link to="/shop/listing" aria-label="Tüm Ürünlere Göz At">Tüm Ürünlere Göz At</Link>
         </Button>
-        <Button asChild>
-          <Link to="/shop/home">
+        <Button asChild aria-label="Ana Sayfa">
+          <Link to="/shop/home" aria-label="Ana Sayfa">
             <Home className="mr-2 h-4 w-4" /> Ana Sayfa
           </Link>
         </Button>

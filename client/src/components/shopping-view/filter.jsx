@@ -201,6 +201,7 @@ function ProductFilter({
                   filters.inStock === "true" ? "" : "true"
                 )
               }
+              aria-label="Stokta Var/Yok"
             />
             <span className="text-sm">Stokta Var/Yok</span>
             {filters.inStock === "true" && (
@@ -254,6 +255,7 @@ function ProductFilter({
                                   onCheckedChange={() =>
                                     handleFilter(section.id, option.id)
                                   }
+                                  aria-label={`${section.id}-${option.id}`}
                                 />
                                 <span className={`text-sm flex-1 ${isChecked ? 'text-primary' : ''}`}>
                                   {option.displayLabel || option.label}

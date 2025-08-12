@@ -225,6 +225,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                 className="h-8 w-8 flex-shrink-0 text-gray-500 hover:bg-red-100 hover:text-red-500 transition-colors"
                 onClick={handleWishlistToggle}
                 disabled={wishlistLoading}
+                aria-label="Favorilere Ekle"
               >
                 <Heart
                   className={`w-5 h-5 ${
@@ -317,6 +318,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                         size="icon"
                         disabled={quantity <= 1 || isAddingToCart}
                         onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                        aria-label="Azalt"
                       >
                         <Minus className="w-3.5 h-3.5" />
                         <span className="sr-only">Azalt</span>
@@ -334,7 +336,8 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                             Math.min(productDetails.totalStock, prev + 1)
                           )
                         }
-                      >
+                        aria-label="Arttır"
+                        >
                         <Plus className="w-3.5 h-3.5" />
                         <span className="sr-only">Arttır</span>
                       </Button>
@@ -345,6 +348,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                       className="flex-1 h-8 text-sm"
                       onClick={handleAddToCart}
                       disabled={isAddingToCart}
+                      aria-label="Sepete Ekle"
                     >
                       {isAddingToCart ? "Ekleniyor..." : `Sepete Ekle (${quantity})`}
                     </Button>
@@ -355,6 +359,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                     className="h-8 text-sm w-full sm:w-auto"
                     onClick={() => navigate(`/shop/product/${productDetails._id}/specs`)}
                     disabled={isAddingToCart}
+                    aria-label="Özellikler"
                   >
                     Özellikler
                   </Button>
@@ -421,7 +426,8 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                 onClick={handleAddReview}
                 disabled={reviewMsg.trim() === "" || rating === 0}
                 size="sm"
-              >
+                aria-label="Yorumu Gönder"
+                >
                 Yorumu Gönder
               </Button>
             </div>

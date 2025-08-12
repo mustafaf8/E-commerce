@@ -99,6 +99,7 @@ const StatsHeader = ({
           <button
             onClick={() => setShowPicker((p) => !p)}
             className="border rounded-md px-3 py-1.5 text-sm bg-white"
+            aria-label="Tarih Aralığı Seç"
           >
             {dateRange.from && dateRange.to
               ? `${dateRange.from.toLocaleDateString()} - ${dateRange.to.toLocaleDateString()}`
@@ -117,6 +118,7 @@ const StatsHeader = ({
                 <button
                   className="text-sm text-primary px-3 py-1"
                   onClick={() => setShowPicker(false)}
+                  aria-label="Tarih Aralığı Kapat"
                 >
                   Kapat
                 </button>
@@ -150,7 +152,7 @@ const StatsHeader = ({
           <option value="orders">Siparişler</option>
           <option value="products">Ürünler</option>
         </select>
-        <Button onClick={handleExport} variant="outline" size="sm">
+        <Button onClick={handleExport} variant="outline" size="sm" aria-label="Raporu İndir">
           <Download className="w-4 h-4 mr-2" />
           Raporu İndir
         </Button>

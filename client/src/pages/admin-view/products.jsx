@@ -486,7 +486,7 @@ function AdminProducts() {
 
   const floatingActionButton = canManage ? (
     <div className="mb-4 w-full flex justify-end">
-      <Button onClick={() => handleEditClick(null)}>Yeni Ürün Ekle</Button>
+      <Button onClick={() => handleEditClick(null)} aria-label="Yeni Ürün Ekle" >Yeni Ürün Ekle</Button>
     </div>
   ) : null;
 
@@ -618,7 +618,8 @@ function AdminProducts() {
                         type="button"
                         onClick={() => removeAdditionalImage(index)}
                         className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
+                        aria-label="Resmi Kaldır"
+                        >
                         <Trash className="h-3 w-3" />
                       </button>
                     </div>
@@ -652,6 +653,7 @@ function AdminProducts() {
                     multiple
                     accept="image/*"
                     onChange={(e) => handleAdditionalImageUpload(e.target.files)}
+                    aria-label="Ek Resimler Seç"
                   />
                   <p className="text-xs text-gray-500">
                     Birden fazla resim seçebilirsiniz. JPG, PNG, GIF desteklenir.
@@ -672,6 +674,7 @@ function AdminProducts() {
                          placeholder={control.placeholder}
                          value={formData[control.name]}
                          onChange={(e) => setFormData({ ...formData, [control.name]: e.target.value })}
+                         aria-label={control.label}
                        />
                      )}
                      {control.componentType === 'textarea' && (
@@ -682,6 +685,7 @@ function AdminProducts() {
                          value={formData[control.name]}
                          onChange={(e) => setFormData({ ...formData, [control.name]: e.target.value })}
                          rows={4}
+                         aria-label={control.label}
                        />
                      )}
                      {control.componentType === 'select' && (
@@ -691,6 +695,7 @@ function AdminProducts() {
                           value={formData[control.name]}
                           onChange={(e) => setFormData({ ...formData, [control.name]: e.target.value })}
                           className="w-full p-2 border rounded-md"
+                          aria-label={control.label}
                         >
                           <option value="">{control.placeholder}</option>
                           {control.options.map(option => (
@@ -714,19 +719,21 @@ function AdminProducts() {
                       value={spec.key}
                       onChange={(e) => handleTechSpecChange(index, 'key', e.target.value)}
                       className="flex-1"
+                      aria-label="Özellik Adı"
                     />
                     <Input
                       placeholder="Değer (örn. Kırmızı)"
                       value={spec.value}
                       onChange={(e) => handleTechSpecChange(index, 'value', e.target.value)}
                       className="flex-1"
+                      aria-label="Değer"
                     />
-                    <Button variant="ghost" size="icon" onClick={() => removeTechSpec(index)} className="flex-shrink-0">
+                    <Button variant="ghost" size="icon" onClick={() => removeTechSpec(index)} className="flex-shrink-0" aria-label="Özellik Kaldır">
                       <Trash className="w-4 h-4 text-red-500" />
                     </Button>
                   </div>
                 ))}
-                <Button type="button" variant="outline" onClick={addTechSpec} className="w-full">
+                <Button type="button" variant="outline" onClick={addTechSpec} className="w-full" aria-label="Yeni Özellik Ekle" >
                   Yeni Özellik Ekle
                 </Button>
               </div>
@@ -735,6 +742,7 @@ function AdminProducts() {
                 className="mt-4 w-full"
                 type="submit"
                 disabled={!isFormValid() || productImageLoadingState}
+                aria-label={currentEditedId ? "Ürünü Güncelle" : "Yeni Ürün Ekle"}
               >
                 {productImageLoadingState
                   ? "Resim Yükleniyor..."

@@ -298,6 +298,7 @@ const UsersPage = () => {
                               className="border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800 flex items-center gap-1 py-1"
                               onClick={() => onRemoveAdminClick(user)}
                               disabled={actionLoading}
+                              aria-label="Yetkiyi Al"
                             >
                               {actionLoading && selectedUser?._id === user._id ? (
                                 <Loader2 size={14} className="animate-spin" />
@@ -375,6 +376,7 @@ const UsersPage = () => {
                             className="border-amber-200 text-amber-700 hover:bg-amber-50 hover:text-amber-800 flex items-center gap-1 py-1"
                             onClick={() => onMakeAdminClick(user)}
                             disabled={actionLoading}
+                            aria-label="Admin Yap"
                           >
                             {actionLoading && selectedUser?._id === user._id ? (
                               <Loader2 size={14} className="animate-spin" />

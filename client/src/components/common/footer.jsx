@@ -187,6 +187,7 @@ const Footer = () => {
                 variant="outline"
                 onClick={scrollToTop}
                 className="rounded-full flex items-center gap-2 text-sm hover:bg-primary hover:text-white transition-colors"
+                aria-label="Başa Dön"
               >
                 <ArrowUpCircle size={16} />
                 <span>Başa Dön</span>

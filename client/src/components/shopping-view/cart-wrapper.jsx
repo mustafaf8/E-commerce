@@ -162,6 +162,7 @@ function UserCartWrapper({ setOpenCartSheet }) {
                         size="sm"
                         onClick={handleRemoveCoupon}
                         className="h-6 w-6 p-0 hover:bg-green-100"
+                        aria-label="Kuponu Kaldır"
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -184,6 +185,7 @@ function UserCartWrapper({ setOpenCartSheet }) {
                         variant="outline"
                         onClick={handleApplyCoupon}
                         disabled={couponLoading || !couponCode.trim()}
+                        aria-label="Kuponu Uygula"
                       >
                         {couponLoading ? "..." : "Uygula"}
                       </Button>
@@ -204,7 +206,7 @@ function UserCartWrapper({ setOpenCartSheet }) {
               {formatPrice(finalAmount)} TL
             </span>
           </div>
-          <Button onClick={handleCheckout} className="w-full text-base py-3">
+          <Button onClick={handleCheckout} className="w-full text-base py-3" aria-label={checkoutButtonText}>
             {checkoutButtonText}
           </Button>
         </div>

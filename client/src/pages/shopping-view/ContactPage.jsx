@@ -125,7 +125,7 @@ export default function ContactPage() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Mesajınız</label>
                 <textarea name="message" value={form.message} onChange={handleChange} required rows={5} className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:bg-gray-900 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
               </div>
-              <button type="submit" disabled={loading} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-60">
+              <button type="submit" disabled={loading} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-60" aria-label="Gönder">
                 {loading ? "Gönderiliyor..." : "Gönder"}
               </button>
             </form>

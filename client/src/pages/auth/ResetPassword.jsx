@@ -74,6 +74,7 @@ function ResetPassword() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Yeni şifreniz"
             required
+            aria-label="Yeni Şifre"
           />
         </div>
         <div className="space-y-2">
@@ -85,9 +86,10 @@ function ResetPassword() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="Yeni şifrenizi tekrar girin"
             required
-          />
+            aria-label="Yeni Şifre (Tekrar)"
+            />
         </div>
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button type="submit" className="w-full" disabled={loading} aria-label="Şifreyi Güncelle">
           {loading ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (

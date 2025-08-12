@@ -329,7 +329,7 @@ function HomeSectionsManager({ canManage }) {
     <div className="space-y-4">
       <div className="flex justify-between items-center my-4">
         <CardTitle>Ana Sayfa Bölüm Yönetimi</CardTitle>
-        {canManage && (<Button onClick={openModalForAdd} className="flex items-center">
+        {canManage && (<Button onClick={openModalForAdd} className="flex items-center" aria-label="Bölüm Ekle">
           <PlusCircle className="h-4 w-4 mr-2" />
           Bölüm Ekle
         </Button>)}
@@ -370,6 +370,7 @@ function HomeSectionsManager({ canManage }) {
                     className="h-6 w-6"
                     onClick={() => moveSection(index, -1)}
                     disabled={index === 0}
+                    aria-label="Yukarı taşı"
                   >
                     <ArrowUpDown className="h-4 w-4 transform rotate-[-45deg]" />
                   </Button>
@@ -380,6 +381,7 @@ function HomeSectionsManager({ canManage }) {
                     className="h-6 w-6"
                     onClick={() => moveSection(index, 1)}
                     disabled={index === sortedSections.length - 1}
+                    aria-label="Aşağı taşı"
                   >
                     <ArrowUpDown className="h-4 w-4 transform rotate-[135deg]" />
                   </Button>
@@ -427,6 +429,7 @@ function HomeSectionsManager({ canManage }) {
                       size="sm"
                       onClick={() => openModalForEdit(section)}
                       className="px-2 py-1"
+                      aria-label="Düzenle"
                     >
                       <Edit className="h-4 w-4" />
                       <span className="sr-only">Düzenle</span>
@@ -438,6 +441,7 @@ function HomeSectionsManager({ canManage }) {
                       size="sm"
                       onClick={() => handleDeleteClick(section)}
                       className="px-2 py-1 text-red-500 hover:text-red-700"
+                      aria-label="Sil"
                     >
                       <Trash2 className="h-4 w-4" />
                       <span className="sr-only">Sil</span>
@@ -615,11 +619,11 @@ function HomeSectionsManager({ canManage }) {
 
             <DialogFooter>
               <DialogClose asChild>
-                <Button type="button" variant="secondary">
+                <Button type="button" variant="secondary" aria-label="İptal">
                   İptal
                 </Button>
               </DialogClose>
-              <Button type="submit">{isEditing ? "Güncelle" : "Ekle"}</Button>
+              <Button type="submit" aria-label={isEditing ? "Güncelle" : "Ekle"}>{isEditing ? "Güncelle" : "Ekle"}</Button>
             </DialogFooter>
           </form>
         </DialogContent>

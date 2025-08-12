@@ -165,7 +165,7 @@ function ProductSpecsPage() {
     return (
       <div className="container mx-auto px-4 py-10 text-center">
         <h1 className="text-2xl font-bold mb-4">Ürün bulunamadı.</h1>
-        <Button onClick={() => navigate("/shop/home")} className="mt-3 text-base">
+        <Button onClick={() => navigate("/shop/home")} className="mt-3 text-base" aria-label="Ana Sayfaya Dön">
           Ana Sayfaya Dön
         </Button>
       </div>
@@ -198,6 +198,7 @@ function ProductSpecsPage() {
                 <div
                   className={`flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden cursor-pointer border-2 transition-all duration-200 ${selectedImage === productDetails.image ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-200 hover:border-blue-300'}`}
                   onClick={() => setSelectedImage(productDetails.image)}
+                  aria-label="Ana resim"
                 >
                   <img
                     src={productDetails.image}
@@ -210,6 +211,7 @@ function ProductSpecsPage() {
                     key={index}
                     className={`flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden cursor-pointer border-2 transition-all duration-200 ${selectedImage === image ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-200 hover:border-blue-300'}`}
                     onClick={() => setSelectedImage(image)}
+                    aria-label={`Resim ${index + 2}`}
                   >
                     <img
                       src={image}
@@ -255,7 +257,7 @@ function ProductSpecsPage() {
                 <span className="font-semibold w-6 sm:w-10 text-center text-sm sm:text-lg">{quantity}</span>
                 <Button variant="ghost" size="icon" className="h-6 w-6 sm:h-8 sm:w-8 rounded-full" disabled={quantity >= productDetails.totalStock} onClick={() => setQuantity(q => Math.min(productDetails.totalStock, q + 1))}><Plus className="w-3 h-3 sm:w-4 sm:h-4" /></Button>
               </div>
-              <Button className="flex-1 min-w-0 max-w-60 text-sm sm:text-lg font-semibold shadow-md sm:py-0" onClick={handleAddToCart} disabled={productDetails.totalStock === 0}>
+              <Button className="flex-1 min-w-0 max-w-60 text-sm sm:text-lg font-semibold shadow-md sm:py-0" onClick={handleAddToCart} disabled={productDetails.totalStock === 0} aria-label="Sepete Ekle">
                 {productDetails.totalStock === 0 ? 'Stokta Yok' : 'Sepete Ekle'}
               </Button>
               <Button
