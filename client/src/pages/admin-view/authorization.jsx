@@ -223,6 +223,7 @@ function AuthorizationPage() {
                     onClick={() => handleSave(selectedAdmin)}
                     disabled={isUpdating}
                     className="bg-green-600 hover:bg-green-700 w-full lg:w-auto"
+                    aria-label="Değişiklikleri Kaydet"
                   >
                     {isUpdating ? (
                       <>
@@ -249,6 +250,7 @@ function AuthorizationPage() {
                   <Select
                     value={String(selectedAdmin.adminAccessLevel || 3)}
                     onValueChange={(val) => handleLevelChange(selectedAdmin._id, val)}
+                    aria-label="Yetki Seviyesi"
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue />

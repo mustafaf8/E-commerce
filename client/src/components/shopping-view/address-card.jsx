@@ -77,6 +77,7 @@ function AddressCard({
             size="sm"
             className="text-xs text-blue-600 hover:bg-blue-100"
             onClick={handleEditClick}
+            aria-label="Adresi Düzenle"
           >
             <Edit size={14} className="mr-1" /> Düzenle
           </Button>
@@ -85,6 +86,7 @@ function AddressCard({
             size="sm"
             className="text-xs text-red-600 hover:bg-red-100"
             onClick={handleDeleteClick}
+            aria-label="Adresi Sil"
           >
             <Trash2 size={14} className="mr-1" /> Sil
           </Button>

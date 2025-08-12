@@ -142,7 +142,7 @@ function MaintenanceManager({ canManage }) {
           />
         </div>
 
-        <Button onClick={handleSave} disabled={isLoading || !canManage}>
+        <Button onClick={handleSave} disabled={isLoading || !canManage} aria-label="Değişiklikleri Kaydet">
           {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
           Değişiklikleri Kaydet
         </Button>

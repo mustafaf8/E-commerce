@@ -287,6 +287,7 @@ function MainHeaderActions() {
               variant="mustafa"
               size="mustafa"
               className="flex items-center gap-2 px-2 md:px-3 py-1.5 h-auto"
+              aria-label="Hesabım"
             >
               <Avatar className="h-8 w-8 border">
                 <AvatarFallback className="bg-secondary text-xs md:text-sm font-semibold text-primary">
@@ -338,6 +339,7 @@ function MainHeaderActions() {
           onClick={() => navigate("/auth/login")}
           variant="secondary"
           className="flex items-center gap-2 px-3 md:px-4 py-2 h-auto "
+          aria-label="Giriş Yap"
         >
           <LogIn className="h-5 w-5 md:h- md:w-4 text-primary" />
           <span className="md:inline text-sm font-medium">Giriş Yap</span>
@@ -348,6 +350,7 @@ function MainHeaderActions() {
           <Button
             variant="secondary"
             className="flex items-center gap-2 px-3 md:px-4 py-2 h-auto max-lg:hidden"
+            aria-label="Sepetim"
           >
             <ShoppingCart className="w-5 h-5" />
             <span className="hidden md:inline text-sm font-medium">
@@ -435,6 +438,7 @@ function TopStrip() {
                 to={link.path}
                 onClick={link.action}
                 className="hover:text-primary transition-colors"
+                aria-label={link.label}
               >
                 {link.label}
               </Link>

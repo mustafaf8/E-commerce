@@ -66,7 +66,7 @@ export default function UserMessages() {
             <label className="block text-sm font-medium mb-1">Mesaj</label>
             <textarea name="message" value={form.message} onChange={handleChange} required rows={4} className="w-full px-3 py-2 rounded border border-gray-300 dark:bg-gray-900 dark:border-gray-700" />
           </div>
-          <button type="submit" disabled={sending} className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded disabled:opacity-60">
+          <button type="submit" disabled={sending} className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded disabled:opacity-60" aria-label="Gönder">
             {sending ? "Gönderiliyor..." : "Gönder"}
           </button>
         </form>

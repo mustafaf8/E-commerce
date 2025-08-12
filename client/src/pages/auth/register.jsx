@@ -50,6 +50,7 @@ function AuthRegister() {
       <Link
         className="font-medium text-primary hover:underline transition-colors"
         to="/auth/login"
+        aria-label="Giriş Yap"
       >
         Giriş Yap
       </Link>

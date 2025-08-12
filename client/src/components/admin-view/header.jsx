@@ -112,6 +112,7 @@ function AdminHeader({ setOpen }) {
           variant="ghost"
           size="icon"
           className="lg:hidden"
+          aria-label="Menüyü aç"
         >
           <AlignJustify size={20} />
           <span className="sr-only">Toggle menu</span>
@@ -136,6 +137,7 @@ function AdminHeader({ setOpen }) {
           className="rounded-full relative"
           onClick={handleBellClick}
           title="Yeni Siparişler"
+          aria-label="Yeni Siparişler"
         >
           <ShoppingBag size={18} className="text-orange-600" />
           {newOrderCount > 0 && (
@@ -152,6 +154,7 @@ function AdminHeader({ setOpen }) {
           className="rounded-full relative"
           onClick={handleMessageBellClick}
           title="Yeni Mesajlar"
+          aria-label="Yeni Mesajlar"
         >
           <MessageSquare size={18} className="text-blue-600" />
           {newMessageCount > 0 && (
@@ -170,6 +173,7 @@ function AdminHeader({ setOpen }) {
           variant="ghost"
           size="sm"
           className="gap-1 items-center text-gray-700 dark:text-gray-300"
+          aria-label="Çıkış"
         >
           <LogOut size={16} />
           <span className="hidden md:inline">Çıkış</span>

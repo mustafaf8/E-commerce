@@ -201,6 +201,7 @@ function ShoppingHome() {
                       );
                     }}
                     className="absolute top-1/2 left-3 z-20 transform -translate-y-1/2 bg-white/60 hover:bg-white rounded-full h-8 w-8 max-sm:h-6 max-md:h-6 max-sm:w-6 max-md:w-6"
+                    aria-label="Sol kaydır"
                   >
                     <ChevronLeftIcon className="w-5 h-5 text-gray-700" />
                   </Button>
@@ -214,6 +215,7 @@ function ShoppingHome() {
                       );
                     }}
                     className="absolute top-1/2 right-3 z-20 transform -translate-y-1/2 bg-white/60 hover:bg-white rounded-full h-8 w-8 shadow-md max-sm:h-6 max-md:h-6 max-sm:w-6 max-md:w-6"
+                    aria-label="Sağ kaydır"
                   >
                     <ChevronRightIcon className="w-5 h-5 text-gray-700" />
                   </Button>
@@ -255,6 +257,7 @@ function ShoppingHome() {
                       handleSideBannerNav(-1);
                     }}
                     className="absolute top-1/2 left-3 z-20 transform -translate-y-1/2 bg-white/60 hover:bg-white rounded-full h-8 w-8 shadow-md max-sm:h-6 max-md:h-6 max-sm:w-6 max-md:w-6"
+                    aria-label="Sol kaydır"
                   >
                     <ChevronLeftIcon className="w-5 h-5 text-gray-700" />
                   </Button>

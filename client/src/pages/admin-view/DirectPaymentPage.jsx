@@ -129,6 +129,7 @@ const DirectPaymentPage = () => {
                 type="submit"
                 disabled={loading || !canManage || !amount || parseFloat(amount) <= 0}
                 className="w-full text-lg py-6"
+                aria-label="Güvenli Ödeme Sayfası Oluştur"
               >
                 {loading ? <Loader2 className="animate-spin mr-2" /> : <CreditCard className="mr-2 h-5 w-5" />}
                 {loading ? "Yönlendiriliyor..." : "Güvenli Ödeme Sayfası Oluştur"}

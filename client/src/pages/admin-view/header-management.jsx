@@ -164,6 +164,7 @@ const HeaderManagement = () => {
                           className="h-6 w-6"
                           onClick={() => moveCategory(index, -1)}
                           disabled={index === 0}
+                          aria-label="Yukarı taşı"
                         >
                           <ArrowUp className="h-4 w-4" />
                         </Button>
@@ -178,6 +179,7 @@ const HeaderManagement = () => {
                           className="h-6 w-6"
                           onClick={() => moveCategory(index, 1)}
                           disabled={index === categories.length - 1}
+                          aria-label="Aşağı taşı"
                         >
                         <ArrowDown className="h-4 w-4" />
                       </Button>
@@ -208,10 +210,10 @@ const HeaderManagement = () => {
           <div className="flex gap-3 mt-6">
             {canManage && (
               <>
-                <Button onClick={saveOrder} disabled={saving}>
+                <Button onClick={saveOrder} disabled={saving} aria-label="Sıralamayı Kaydet">
                   {saving ? "Kaydediliyor..." : "Sıralamayı Kaydet"}
                 </Button>
-                <Button variant="outline" onClick={resetOrder}>
+                <Button variant="outline" onClick={resetOrder} aria-label="Sıfırla">
                   Sıfırla
                 </Button>
               </>

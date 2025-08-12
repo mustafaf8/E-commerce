@@ -98,6 +98,7 @@ function UserInfo() {
         labelClassName="text-base font-medium"
         buttonSize="lg"
         buttonClassName="w-full mt-6"
+        aria-label="Bilgileri Güncelle"
       />
     </div>
   );

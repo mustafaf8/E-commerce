@@ -206,6 +206,7 @@ const CouponCard = React.memo(({ coupon, canManage, onEdit, onDelete, onToggleSt
               variant="outline"
               onClick={() => onToggleStatus(coupon._id)}
               className="flex-1"
+              aria-label="Durumu Değiştir"
             >
               {coupon.isActive ? (
                 <>
@@ -223,6 +224,7 @@ const CouponCard = React.memo(({ coupon, canManage, onEdit, onDelete, onToggleSt
               size="sm"
               variant="outline"
               onClick={() => onEdit(coupon)}
+              aria-label="Düzenle"
             >
               <Edit className="w-4 h-4" />
             </Button>
@@ -230,6 +232,7 @@ const CouponCard = React.memo(({ coupon, canManage, onEdit, onDelete, onToggleSt
               size="sm"
               variant="outline"
               onClick={() => onDelete(coupon._id)}
+              aria-label="Sil"
             >
               <Trash2 className="w-4 h-4" />
             </Button>
@@ -454,6 +457,7 @@ function AdminCouponsPage() {
               <Button
                 onClick={() => setEditingCoupon(null)}
                 size="lg"
+                aria-label="Yeni Kupon Oluştur"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Yeni Kupon Oluştur

@@ -105,6 +105,7 @@ const ShoppingProductTile = React.memo(function ShoppingProductTile({
           className="absolute top-2 right-2 z-10 h-7 w-7 rounded-full bg-white/70 hover:bg-white shadow-sm"
           onClick={handleWishlistToggle}
           disabled={wishlistLoading}
+          aria-label="Favorilere Ekle"
         >
           <Heart
             className={cn(
@@ -235,6 +236,7 @@ const ShoppingProductTile = React.memo(function ShoppingProductTile({
           onClick={handleActualAddToCart}
           disabled={!product?.totalStock || product.totalStock <= 0}
           className="w-full bg-primary/90 hover:bg-primary text-white transition-colors flex items-center gap-1.5 h-9"
+          aria-label="Sepete Ekle"
         >
           <span className="text-sm">Sepete Ekle</span>
         </Button>

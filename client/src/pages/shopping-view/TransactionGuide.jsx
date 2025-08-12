@@ -303,6 +303,7 @@ const TransactionGuide = () => {
               key={section.id}
               href={`#${section.id}`}
               className="flex items-center px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors"
+              aria-label={section.title}
             >
               <span className="mr-2 text-primary dark:text-primary-light">
                 {section.icon}

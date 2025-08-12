@@ -255,7 +255,7 @@ function AdminProductDetailsDialog({ open, setOpen, productDetails }) {
         {/* Footer */}
         <DialogFooter className="px-6 py-4 border-t bg-secondary/30 dark:bg-gray-700/30">
           <DialogClose asChild>
-            <Button type="button" variant="outline" className="gap-2">
+            <Button type="button" variant="outline" className="gap-2" aria-label="Kapat">
               Kapat
             </Button>
           </DialogClose>

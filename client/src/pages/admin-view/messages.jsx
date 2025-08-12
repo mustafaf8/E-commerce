@@ -100,6 +100,7 @@ const MessagesPage = () => {
           variant={!filter ? "default" : "outline"}
           onClick={() => dispatch(setFilter(""))}
           className="flex items-center gap-1"
+          aria-label="Tümü"
         >
           <Inbox className="h-4 w-4" />
           Tümü
@@ -109,6 +110,7 @@ const MessagesPage = () => {
           variant={filter === "new" ? "default" : "outline"}
           onClick={() => dispatch(setFilter("new"))}
           className="flex items-center gap-1"
+          aria-label="Yeni"
         >
           <Clock className="h-4 w-4" />
           {statusLabels.new}
@@ -118,6 +120,7 @@ const MessagesPage = () => {
           variant={filter === "read" ? "default" : "outline"}
           onClick={() => dispatch(setFilter("read"))}
           className="flex items-center gap-1"
+          aria-label="Okundu"
         >
           <Check className="h-4 w-4" />
           {statusLabels.read}
@@ -127,6 +130,7 @@ const MessagesPage = () => {
           variant={filter === "replied" ? "default" : "outline"}
           onClick={() => dispatch(setFilter("replied"))}
           className="flex items-center gap-1"
+          aria-label="Yanıtlandı"
         >
           <MessageCircle className="h-4 w-4" />
           {statusLabels.replied}
@@ -236,6 +240,7 @@ const MessagesPage = () => {
                       onClick={handleReply} 
                       disabled={replyLoading || !reply.trim()}
                       className="flex items-center gap-1"
+                      aria-label="Yanıtla"
                     >
                       <MessageCircle className="h-4 w-4" />
                       {replyLoading ? "Gönderiliyor..." : "Yanıtla"}

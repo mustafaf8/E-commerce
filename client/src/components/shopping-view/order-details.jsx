@@ -255,6 +255,7 @@ function ShoppingOrderDetailsView({ orderDetails }) {
         <button
           className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg text-sm font-medium"
           onClick={() => setShowCancelConfirm(true)}
+          aria-label="Siparişi İptal Et"
         >
           Siparişi İptal Et
         </button>

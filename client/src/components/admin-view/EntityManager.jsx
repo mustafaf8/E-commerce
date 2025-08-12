@@ -299,6 +299,7 @@ function EntityManager({
                 size="icon"
                 className="h-8 w-8"
                 onClick={() => openModalForEdit(entity)}
+                aria-label="Düzenle"
               >
                 <Edit className="h-4 w-4" />
                 <span className="sr-only">Düzenle</span>
@@ -308,6 +309,7 @@ function EntityManager({
                 size="icon"
                 className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                 onClick={() => handleDeleteClick(entity)}
+                aria-label="Sil"
               >
                 <Trash2 className="h-4 w-4" />
                 <span className="sr-only">Sil</span>
@@ -346,7 +348,7 @@ function EntityManager({
     <div>
       <div className="flex justify-between items-center mb-4">
         {canManage && (
-          <Button onClick={openModalForAdd} className="ml-auto">
+          <Button onClick={openModalForAdd} className="ml-auto" aria-label="Yeni Ekle">
             <PlusCircle className="mr-2 h-4 w-4" /> Yeni {entityName} Ekle
           </Button>
         )}
@@ -434,11 +436,11 @@ function EntityManager({
 
             <DialogFooter>
               <DialogClose asChild>
-                <Button type="button" variant="secondary">
+                <Button type="button" variant="secondary" aria-label="İptal">
                   İptal
                 </Button>
               </DialogClose>
-              <Button type="submit">{isEditing ? "Güncelle" : "Ekle"}</Button>
+              <Button type="submit" aria-label={isEditing ? "Güncelle" : "Ekle"}>{isEditing ? "Güncelle" : "Ekle"}</Button>
             </DialogFooter>
           </form>
         </DialogContent>

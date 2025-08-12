@@ -77,6 +77,7 @@ function CookieConsentBanner() {
             size="sm"
             onClick={handleDecline}
             className="flex-1 sm:flex-none py-2 px-2 sm:px-4 h-8 sm:h-9 text-xs sm:text-sm"
+            aria-label="Çerezleri Reddet"
           >
             Reddet
           </Button>
@@ -84,6 +85,7 @@ function CookieConsentBanner() {
             size="sm"
             onClick={handleAccept}
             className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 text-primary-foreground py-2 px-2 sm:px-4 h-8 sm:h-9 text-xs sm:text-sm"
+            aria-label="Çerezleri Kabul Et"
           >
             Kabul Et
           </Button>

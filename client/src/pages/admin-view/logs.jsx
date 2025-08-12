@@ -217,6 +217,7 @@ const LogsPage = () => {
                       dispatch(setLogPage(pagination.currentPage - 1))
                     }
                     disabled={!pagination.hasPrevPage || loading}
+                    aria-label="Önceki Sayfa"
                   >
                     <ChevronLeft className="h-4 w-4" />
                     Önceki
@@ -231,6 +232,7 @@ const LogsPage = () => {
                       dispatch(setLogPage(pagination.currentPage + 1))
                     }
                     disabled={!pagination.hasNextPage || loading}
+                    aria-label="Sonraki Sayfa"
                   >
                     Sonraki
                     <ChevronRight className="h-4 w-4" />

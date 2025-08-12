@@ -142,7 +142,7 @@ function UserListTable({ users, onViewOrdersClick, isLoading }) {
                   : "N/A"}
               </p>
             </div>
-            <Button variant="outline" size="sm" className="h-8">
+            <Button variant="outline" size="sm" className="h-8" aria-label="Siparişleri Görüntüle">
               <Eye className="h-4 w-4" />
             </Button>
           </div>
@@ -155,6 +155,7 @@ function UserListTable({ users, onViewOrdersClick, isLoading }) {
             variant="link"
             className="text-sm"
             onClick={() => setShowAll(!showAll)}
+            aria-label="Tümünü Görüntüle"
           >
             {showAll ? "Daha Az Göster" : `Tümünü Görüntüle (${filteredUsers.length})`}
           </Button>
@@ -248,7 +249,7 @@ function UserOrdersTable({ orders, onViewDetailsClick, isLoading }) {
               <div className="text-right">
                 <p className="text-sm font-medium">{orderItem.totalAmount?.toFixed(2) || 0}₺</p>
               </div>
-              <Button variant="outline" size="sm" className="h-8">
+              <Button variant="outline" size="sm" className="h-8" aria-label="Sipariş Detaylarını Görüntüle">
                 <Eye className="h-4 w-4" />
               </Button>
             </div>
@@ -393,7 +394,7 @@ function GuestOrdersTable({ orders, onViewDetailsClick, isLoading }) {
               <Badge className={`${statusInfo.color} ${statusInfo.textColor}`}>
                 {statusInfo.label}
               </Badge>
-              <Button variant="outline" size="sm" className="h-8">
+              <Button variant="outline" size="sm" className="h-8" aria-label="Sipariş Detaylarını Görüntüle" >
                 <Eye className="h-4 w-4" />
               </Button>
             </div>
@@ -407,6 +408,7 @@ function GuestOrdersTable({ orders, onViewDetailsClick, isLoading }) {
             variant="link"
             className="text-sm"
             onClick={() => setShowAll(!showAll)}
+            aria-label="Tümünü Görüntüle"
           >
             {showAll ? "Daha Az Göster" : `Tümünü Görüntüle (${orders.length})`}
           </Button>
@@ -535,6 +537,7 @@ function AdminOrdersView() {
             variant="outline"
             onClick={() => setIsPendingModalOpen(true)}
             className="flex items-center gap-2"
+            aria-label="Sorunlu Ödemeler"
           >
             <AlertTriangle className="h-4 w-4 text-amber-600" />
             Sorunlu Ödemeler
@@ -611,6 +614,7 @@ function AdminOrdersView() {
                     size="sm"
                     onClick={handleBackToUserList}
                     className="flex items-center gap-2"
+                    aria-label="Geri Dön"
                   >
                     <ArrowLeft className="h-4 w-4" />
                     Geri Dön
@@ -692,7 +696,7 @@ function AdminOrdersView() {
 
           <DialogFooter className="px-6 py-3 border-t bg-gray-50 dark:bg-gray-900">
             <DialogClose asChild>
-              <Button type="button" variant="secondary">
+              <Button type="button" variant="secondary" aria-label="Kapat">
                 Kapat
               </Button>
             </DialogClose>
@@ -784,6 +788,7 @@ function AdminOrdersView() {
                               setIsPendingModalOpen(false);
                             }}
                             className="h-6 px-2 text-xs"
+                            aria-label="Sipariş Detaylarını Görüntüle"
                           >
                             Detay
                           </Button>
@@ -806,7 +811,7 @@ function AdminOrdersView() {
 
           <DialogFooter className="px-6 py-3 border-t bg-gray-50 dark:bg-gray-900">
             <DialogClose asChild>
-              <Button type="button" variant="secondary">
+              <Button type="button" variant="secondary" aria-label="Kapat">
                 Kapat
               </Button>
             </DialogClose>

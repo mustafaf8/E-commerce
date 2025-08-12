@@ -211,6 +211,7 @@ function ShoppingCheckout() {
                     size="sm"
                     className="border-amber-300 text-amber-700 hover:bg-amber-100"
                     onClick={() => navigate("/shop/account")}
+                    aria-label="Profili Güncelle"
                   >
                     Profili Güncelle
                   </Button>
@@ -270,6 +271,7 @@ function ShoppingCheckout() {
                         size="sm"
                         onClick={handleRemoveCoupon}
                         className="h-8 w-8 p-0 text-green-600 hover:text-green-800 hover:bg-green-100"
+                        aria-label="Kuponu Kaldır"
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -292,6 +294,7 @@ function ShoppingCheckout() {
                         onClick={handleApplyCoupon}
                         disabled={couponLoading || !couponCode.trim()}
                         className="px-4"
+                        aria-label="Kuponu Uygula"
                       >
                         {couponLoading ? "..." : "Uygula"}
                       </Button>
@@ -335,6 +338,7 @@ function ShoppingCheckout() {
                 onClick={handleInitiateIyzicoPayment}
                 className="w-full text-base py-3"
                 disabled={orderLoading || !currentSelectedAddress}
+                aria-label="Iyzico ile Güvenli Öde"
               >
                 {orderLoading ? "İşleniyor..." : "Iyzico ile Güvenli Öde"}
               </Button>

@@ -135,7 +135,7 @@ function CommonForm({
           </div>
         ))}
       </div>
-      <Button disabled={isBtnDisabled} type="submit" className="mt-6 w-full">
+      <Button disabled={isBtnDisabled} type="submit" className="mt-6 w-full" aria-label={buttonText || "Submit"}>
         {buttonText || "Submit"}
       </Button>
     </form>

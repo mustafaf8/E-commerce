@@ -50,7 +50,7 @@ const PaymentStatusPage = () => {
         <CardContent>
           <p className="text-gray-600">{statusConfig.description}</p>
           {id && <p className="text-sm text-gray-500 mt-2">İşlem ID: {id}</p>}
-          <Button asChild className="mt-6">
+          <Button asChild className="mt-6" aria-label="Yeni Ödeme Sayfasına Dön">
             <Link to="/admin/direct-payment">Yeni Ödeme Sayfasına Dön</Link>
           </Button>
         </CardContent>

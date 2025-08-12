@@ -55,9 +55,10 @@ function ForgotPassword() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="ornek@mail.com"
             required
+            aria-label="E-posta Adresi"
           />
         </div>
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button type="submit" className="w-full" disabled={loading} aria-label="Sıfırlama Bağlantısı Gönder">
           {loading ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (
@@ -66,7 +67,7 @@ function ForgotPassword() {
           Sıfırlama Bağlantısı Gönder
         </Button>
         <div className="text-center">
-            <Button asChild variant="link" className="text-muted-foreground">
+            <Button asChild variant="link" className="text-muted-foreground" aria-label="Giriş'e Geri Dön">
                 <Link to="/auth/login">
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Giriş'e Geri Dön

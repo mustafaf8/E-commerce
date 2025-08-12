@@ -265,6 +265,7 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
                 variant="destructive"
                 className="w-full text-xs sm:text-sm h-9"
                 onClick={() => setShowCancelConfirm(true)}
+                aria-label="Siparişi İptal Et"
               >
                 Siparişi İptal Et
               </Button>
@@ -284,6 +285,7 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
             variant="outline"
             onClick={handleLoginRedirect}
             className="w-full text-xs sm:text-sm h-9"
+            aria-label="Giriş Yaparak Tüm Siparişlerinizi Görün"
           >
             <LogIn className="h-3 w-3 mr-2" />
             <span className="break-words">
@@ -297,6 +299,7 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
               type="button"
               variant="secondary"
               className="w-full text-xs sm:text-sm h-9"
+              aria-label="Kapat"
             >
               Kapat
             </Button>

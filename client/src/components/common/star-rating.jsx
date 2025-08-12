@@ -22,6 +22,7 @@ function StarRatingComponent({ rating, handleRatingChange, size = 18 }) {
             : "fill-gray-200 stroke-gray-300"
         }`}
         strokeWidth={1.2}
+        aria-label={`${star} yıldız`}
       />
     </button>
   ));

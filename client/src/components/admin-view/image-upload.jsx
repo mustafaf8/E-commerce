@@ -110,6 +110,7 @@ function ProductImageUpload({ imageFile, setImageFile, isEditMode, id }) {
               className="h-8 w-8 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 flex-shrink-0"
               onClick={handleRemoveImage}
               disabled={isEditMode}
+              aria-label="Dosyayı Kaldır"
             >
               <X className="w-4 h-4" />
               <span className="sr-only">Dosyayı Kaldır</span>

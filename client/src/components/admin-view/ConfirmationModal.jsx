@@ -23,6 +23,7 @@ const ConfirmationModal = ({ isOpen, message, onConfirm, onCancel }) => {
               variant="outline"
               className="flex-1"
               onClick={onCancel}
+              aria-label="İptal"
             >
               İptal
             </Button>
@@ -30,6 +31,7 @@ const ConfirmationModal = ({ isOpen, message, onConfirm, onCancel }) => {
               variant="default"
               className="flex-1 bg-primary hover:bg-primary/90"
               onClick={onConfirm}
+              aria-label="Onayla"
             >
               Onayla
             </Button>

@@ -553,6 +553,7 @@ function PromotionsPage() {
                   onClick={handleUpdatePromoCard}
                   className="flex-1"
                   disabled={promoCardImageLoadingState}
+                  aria-label="Güncelle"
                 >
                   {promoCardImageLoadingState ? "Güncelleniyor..." : "Güncelle"}
                 </Button>
@@ -561,6 +562,7 @@ function PromotionsPage() {
                   variant="outline"
                   className="flex-1"
                   disabled={promoCardImageLoadingState}
+                  aria-label="İptal"
                 >
                   İptal
                 </Button>
@@ -570,7 +572,8 @@ function PromotionsPage() {
                 onClick={handleUploadPromoCard}
                 className="w-full"
                 disabled={promoCardImageLoadingState || !promoCardImageFile}
-              >
+                aria-label="Yeni Fırsat Kartı Ekle"
+                >
                 {promoCardImageLoadingState
                   ? "Yükleniyor..."
                   : "Yeni Fırsat Kartı Ekle"}
@@ -617,6 +620,7 @@ function PromotionsPage() {
                         size="icon"
                         className="text-blue-500 hover:bg-blue-100 h-7 w-7 flex-shrink-0"
                         onClick={() => handleEditPromoCard(card)}
+                        aria-label="Düzenle"
                       >
                         <Edit size={16} />
                       </Button>
@@ -625,6 +629,7 @@ function PromotionsPage() {
                         size="icon"
                         className="text-red-500 hover:bg-red-100 h-7 w-7 flex-shrink-0"
                         onClick={() => handleDeletePromoCard(card._id)}
+                        aria-label="Sil"
                       >
                         <Trash size={16} />
                       </Button>
@@ -678,6 +683,7 @@ function PromotionsPage() {
                   onClick={handleUpdateFeatureImage}
                   className="flex-1"
                   disabled={featureImageLoadingState}
+                  aria-label="Güncelle"
                 >
                   {featureImageLoadingState ? "Güncelleniyor..." : "Güncelle"}
                 </Button>
@@ -695,6 +701,7 @@ function PromotionsPage() {
                 onClick={handleUploadFeatureImage}
                 className="w-full"
                 disabled={featureImageLoadingState || !featureImageFile}
+                aria-label="Yeni Banner Ekle"
               >
                 {featureImageLoadingState ? "Yükleniyor..." : "Yeni Banner Ekle"}
               </Button>
@@ -738,6 +745,7 @@ function PromotionsPage() {
                           size="icon"
                           className="text-blue-500 hover:bg-blue-100 h-7 w-7 flex-shrink-0"
                           onClick={() => handleEditFeatureImage(featureImgItem)}
+                          aria-label="Düzenle"
                         >
                           <Edit size={16} />
                         </Button>
@@ -746,6 +754,7 @@ function PromotionsPage() {
                           size="icon"
                           className="text-red-500 hover:bg-red-100 h-7 w-7 flex-shrink-0"
                           onClick={() => handleDeleteFeatureImage(featureImgItem._id)}
+                          aria-label="Sil"
                         >
                           <Trash size={16} />
                         </Button>
@@ -802,6 +811,7 @@ function PromotionsPage() {
                   onClick={handleUpdateSideBanner}
                   className="flex-1"
                   disabled={sideBannerImageLoadingState}
+                  aria-label="Güncelle"
                 >
                   {sideBannerImageLoadingState ? "Güncelleniyor..." : "Güncelle"}
                 </Button>
@@ -819,6 +829,7 @@ function PromotionsPage() {
                 onClick={handleUploadSideBanner}
                 className="w-full"
                 disabled={sideBannerImageLoadingState || !sideBannerImageFile}
+                aria-label="Yeni Yan Banner Ekle"
               >
                 {sideBannerImageLoadingState
                   ? "Yükleniyor..."
@@ -868,6 +879,7 @@ function PromotionsPage() {
                         size="icon"
                         className="text-blue-500 hover:bg-blue-100 h-7 w-7 flex-shrink-0"
                         onClick={() => handleEditSideBanner(banner)}
+                        aria-label="Düzenle"
                       >
                         <Edit size={16} />
                       </Button>
@@ -876,6 +888,7 @@ function PromotionsPage() {
                         size="icon"
                         className="text-red-500 hover:bg-red-100 h-7 w-7 flex-shrink-0"
                         onClick={() => handleDeleteSideBanner(banner._id)}
+                        aria-label="Sil"
                       >
                         <Trash size={16} />
                       </Button>

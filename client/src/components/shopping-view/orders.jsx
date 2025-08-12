@@ -123,6 +123,7 @@ function ShoppingOrders() {
                     size="sm"
                     className="w-full mt-1"
                     onClick={() => handleFetchOrderDetails(orderItem?._id)}
+                    aria-label="Detaylar"
                   >
                     Detaylar
                   </Button>
@@ -182,6 +183,7 @@ function ShoppingOrders() {
                           onClick={() =>
                             handleFetchOrderDetails(orderItem?._id)
                           }
+                          aria-label="Detaylar"
                         >
                           Detaylar
                         </Button>
@@ -233,7 +235,7 @@ function ShoppingOrders() {
 
             <DialogFooter className="p-6 pt-4 border-t bg-gray-50 dark:bg-gray-800">
               <DialogClose asChild>
-                <Button type="button" variant="secondary">
+                <Button type="button" variant="secondary" aria-label="Kapat">
                   Kapat
                 </Button>
               </DialogClose>

@@ -90,6 +90,7 @@ function UserCartItemsContent({ cartItem, readOnly = false }) {
               size="icon"
               disabled={cartItem?.quantity === 1}
               onClick={() => handleUpdateQuantity(cartItem, "minus")}
+              aria-label="Azalt"
             >
               <Minus className="w-3 h-3 md:w-4 md:h-4" />
               <span className="sr-only">Azalt</span>
@@ -102,6 +103,7 @@ function UserCartItemsContent({ cartItem, readOnly = false }) {
               className="h-7 w-7 md:h-8 md:w-8 rounded-full p-0"
               size="icon"
               onClick={() => handleUpdateQuantity(cartItem, "plus")}
+              aria-label="Arttır"
             >
               <Plus className="w-3 h-3 md:w-4 md:h-4" />
               <span className="sr-only">Arttır</span>
@@ -128,6 +130,7 @@ function UserCartItemsContent({ cartItem, readOnly = false }) {
             size="icon"
             className="text-red-500 hover:bg-red-100 h-7 w-7 mt-1"
             onClick={() => handleCartItemDelete(cartItem)}
+            aria-label="Sil"
           >
             <Trash className="w-4 h-4" />
             <span className="sr-only">Sil</span>

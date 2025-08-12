@@ -149,6 +149,7 @@ function ProductCarousel({
             )}
             onClick={() => scroll("left")}
             disabled={!canScrollLeft || internalLoading}
+            aria-label="Sol kaydır"
           >
             <ChevronLeftIcon className="h-4 w-4 text-gray-700" />
           </Button>
@@ -206,6 +207,7 @@ function ProductCarousel({
             )}
             onClick={() => scroll("right")}
             disabled={!canScrollRight || internalLoading}
+            aria-label="Sağ kaydır"
           >
             <ChevronRightIcon className="h-4 w-4 text-gray-700" />
           </Button>
