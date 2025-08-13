@@ -90,13 +90,10 @@ export default function Campaigns() {
               </div>
             </div>
           </div>
-          <h1 className="text-5xl font-bold mb-4 tracking-tight">
+          <h1 className="text-5xl font-bold mb-0 tracking-tight">
             Özel Kampanyalar
           </h1>
-          <p className="text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
-            Size özel hazırladığımız harika indirim fırsatlarını kaçırmayın!
-            Kupon kodlarını kopyalayıp alışverişinizde kullanın.
-          </p>
+         
         </div>
 
         {/* Decorative Elements */}

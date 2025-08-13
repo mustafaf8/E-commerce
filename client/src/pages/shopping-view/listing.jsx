@@ -17,7 +17,7 @@ import {
   fetchProductDetails,
   setProductDetails,
 } from "@/store/shop/products-slice";
-import { ArrowUpDownIcon, ChevronRight } from "lucide-react";
+import { ArrowUpDownIcon, ChevronRight, ChevronDown } from "lucide-react"; // ChevronDown eklendi
 import {
   useEffect,
   useState,
@@ -155,6 +155,7 @@ function ShoppingListing() {
   const isInitialMount = useRef(true);
   const lastFiltersPushedToUrl = useRef(createSearchParamsHelper(filters));
   const categorySlugFromUrl = searchParams.get("category");
+  const [isFilterOpen, setIsFilterOpen] = useState(false); // State for filter drawer
 
   const handleFilter = useCallback((getSectionId, getCurrentOptionSlug) => {
     setFilters((prevFilters) => {
@@ -303,7 +304,6 @@ function ShoppingListing() {
       setSort(urlSortBy);
       lastFiltersPushedToUrl.current = urlFiltersString;
       
-      // URL değiştiğinde sayfanın en üste scroll yap
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -336,7 +336,6 @@ function ShoppingListing() {
       })
     );
     
-    // Sayfa yüklendiğinde en üste scroll yap
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [dispatch]);
 
@@ -351,7 +350,6 @@ function ShoppingListing() {
     dispatch(setProductDetails(null));
   }, [dispatch]);
 
-  // Hiyerarşik kategori listesini düz listeye çevir
   const flattenCategories = (categories, result = []) => {
     categories.forEach(category => {
       result.push(category);
@@ -364,7 +362,6 @@ function ShoppingListing() {
 
   const dynamicFilterOptions = useMemo(
     () => {
-      // Tüm kategorileri (ana ve alt kategoriler) düz listeye çevir
       const allCategories = flattenCategories(categoryList);
       
       return {
@@ -389,13 +386,43 @@ function ShoppingListing() {
     <div className="container mx-auto px-4 md:px-6 py-4">
       <Breadcrumbs categorySlug={categorySlugFromUrl} />
       <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6 p-4 md:p-6 max-[600px]:p-0 container mx-auto px-20 max-[1024px]:px-1">
-        <ProductFilter
-          filters={filters}
-          handleFilter={handleFilter}
-          handleScalarFilter={handleScalarFilter}
-          dynamicFilterOptions={dynamicFilterOptions}
-          isLoading={categoriesLoading || brandsLoading}
-        />
+        <aside>
+          {/* Mobile Filter Trigger */}
+          <div className="md:hidden mb-4">
+            <Button
+              variant="outline"
+              className="w-full flex items-center justify-between"
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              aria-expanded={isFilterOpen}
+              aria-controls="filter-panel"
+            >
+              Filtrele
+              <ChevronDown
+                className={`h-4 w-4 transition-transform duration-300 ${
+                  isFilterOpen ? "rotate-180" : ""
+                }`}
+              />
+            </Button>
+          </div>
+
+          {/* Collapsible Filter Panel */}
+          <div
+            id="filter-panel"
+            className={`
+              transition-all duration-500 ease-in-out overflow-hidden
+              md:block md:max-h-none md:overflow-visible
+              ${isFilterOpen ? "max-h-[3000px]" : "max-h-0"}
+            `}
+          >
+            <ProductFilter
+              filters={filters}
+              handleFilter={handleFilter}
+              handleScalarFilter={handleScalarFilter}
+              dynamicFilterOptions={dynamicFilterOptions}
+              isLoading={categoriesLoading || brandsLoading}
+            />
+          </div>
+        </aside>
         <div className="bg-background w-full rounded-lg shadow-sm border">
           <div className="p-4 border-b flex items-center justify-between">
             <h2 className="text-lg font-semibold">
@@ -403,7 +430,6 @@ function ShoppingListing() {
                 ? `${filters.category
                     .map(
                       (slug) => {
-                        // Tüm kategorilerde ara (ana ve alt kategoriler)
                         const allCategories = flattenCategories(categoryList);
                         const category = allCategories.find((c) => c.slug === slug);
                         return category ? (category.parent ? `    └─ ${category.name}` : category.name) : slug;
@@ -427,7 +453,6 @@ function ShoppingListing() {
                   {productList?.length || 0} Ürün
                 </span>
               )}
-              {/* Sıralama Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
