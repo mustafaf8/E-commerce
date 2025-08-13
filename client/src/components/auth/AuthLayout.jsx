@@ -52,7 +52,7 @@ function AuthLayout({
           </CardContent>
           
           {footerContent && (
-            <CardFooter className="pt-6 pb-8">
+            <CardFooter className="pt-0 pb-12">
               <div className="w-full text-center text-sm text-muted-foreground">
                 {footerContent}
               </div>

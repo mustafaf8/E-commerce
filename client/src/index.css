@@ -259,7 +259,7 @@
   background-color: hsl(var(--shop-discount));
   color: white;
   border-radius: 50%;
-  padding: 0.15rem 0.35rem;
+  padding: 0.15rem 0.40rem;
   font-size: 0.65rem;
   font-weight: bold;
   z-index: 10;
