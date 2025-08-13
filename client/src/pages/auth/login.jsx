@@ -512,7 +512,7 @@ function AuthLogin() {
   const renderEmailPasswordLogin = () => {
     const footerContent = (
       <span>
-        Hesabınız yok mu?{" "}
+        Hesabınız yok mu?
         <Link
           to="/auth/register"
           className="font-medium text-primary hover:underline transition-colors"
@@ -549,14 +549,14 @@ function AuthLogin() {
             onSubmit={handleEmailPasswordLogin}
             isBtnDisabled={emailLoading || loading}
           />
-              <div className="text-right mt-4">
+          <div className="text-right mb-4">
             <Link
-                to="/auth/forgot-password"
-                        className="text-sm font-medium text-primary hover:underline"
-                   >
-                  Şifremi Unuttum?
-             </Link>
-               </div>
+              to="/auth/forgot-password"
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              Şifremi Unuttum?
+            </Link>
+          </div>
           <Button
             type="button"
             variant="ghost"
@@ -576,7 +576,7 @@ function AuthLogin() {
   return (
     <>
       <div className="hidden" id="recaptcha-container"></div>
-      
+
       {step === "select" && renderSelectMethod()}
       {step === "phone" && renderPhoneInput()}
       {step === "otp" && renderOtpInput()}
