@@ -1,9 +1,8 @@
-import { Fragment, useState, useEffect, useCallback, useRef } from "react";
+import { Fragment, useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import { Label } from "../ui/label";
 import { Checkbox } from "../ui/checkbox";
 import { Skeleton } from "../ui/skeleton";
-import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Slider } from "../ui/slider";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -17,12 +16,11 @@ function ProductFilter({
   dynamicFilterOptions = {},
   isLoading = false,
 }) {
-  const [priceRange, setPriceRange] = useState([
+  // Slider'ın görsel olarak akıcı çalışması için anlık değeri tutan state
+  const [displayPriceRange, setDisplayPriceRange] = useState([
     parseInt(filters.minPrice) || 0,
     parseInt(filters.maxPrice) || 1000000
   ]);
-  
-  const debounceTimerRef = useRef(null);
 
   const filterSections = [
     {
@@ -32,45 +30,24 @@ function ProductFilter({
     },
     {
       id: "brand",
-      title: "Markalar", 
+      title: "Markalar",
       options: dynamicFilterOptions.brand || [],
     },
   ];
 
-  // Debounced function for price filter
-  const debouncedPriceFilter = useCallback((minPrice, maxPrice) => {
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
-    
-    debounceTimerRef.current = setTimeout(() => {
-      handleScalarFilter("minPrice", minPrice === 0 ? "" : minPrice.toString());
-      handleScalarFilter("maxPrice", maxPrice === 1000000 ? "" : maxPrice.toString());
-    }, 300); 
+  // Sadece sürükleme bittiğinde filtreyi uygula
+  const handlePriceCommit = useCallback((newRange) => {
+    handleScalarFilter("minPrice", newRange[0] === 0 ? "" : newRange[0].toString());
+    handleScalarFilter("maxPrice", newRange[1] === 1000000 ? "" : newRange[1].toString());
   }, [handleScalarFilter]);
 
-  // Fiyat aralığı değiştiğinde filtrele (debounced)
-  const handlePriceRangeChange = (newRange) => {
-    setPriceRange(newRange);
-    debouncedPriceFilter(newRange[0], newRange[1]);
-  };
-
-  // Filtreler değiştiğinde fiyat aralığını güncelle
+  // Sadece component ilk yüklendiğinde görsel state'i başlat
   useEffect(() => {
-    setPriceRange([
+    setDisplayPriceRange([
       parseInt(filters.minPrice) || 0,
       parseInt(filters.maxPrice) || 1000000
     ]);
-  }, [filters.minPrice, filters.maxPrice]);
-
-  // Cleanup timer on unmount
-  useEffect(() => {
-    return () => {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
-    };
-  }, []);
+  }, []); // Sadece ilk yüklemede çalışsın, hiçbir dependency yok
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('tr-TR', {
@@ -99,21 +76,22 @@ function ProductFilter({
               <Slider
                 min={0}
                 max={1000000}
-                step={100}
-                value={priceRange}
-                onValueChange={handlePriceRangeChange}
+                step={10}
+                value={displayPriceRange}
+                onValueChange={setDisplayPriceRange} 
+                onValueCommit={handlePriceCommit}   
                 className="w-full"
               />
             </div>
             
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>{formatPrice(priceRange[0])}</span>
-              <span>{formatPrice(priceRange[1])}</span>
+              <span>{formatPrice(displayPriceRange[0])}</span>
+              <span>{formatPrice(displayPriceRange[1])}</span>
             </div>
           </div>
         </div>
 
-        {/* Minimum Puan - Kompakt */}
+        {/* Minimum Puan - Kompakt 
         <div className="space-y-1">
           <h3 className="text-sm font-medium">Minimum Puan</h3>
           
@@ -186,7 +164,7 @@ function ProductFilter({
             </SelectContent>
           </Select>
         </div>
-
+        */}
         {/* Stok Durumu - Kompakt */}
         <div className="space-y-1">
           <h3 className="text-sm font-medium">Stok Durumu</h3>

@@ -167,10 +167,8 @@ export const shoppingViewHeaderMenuItems = [
 
 export const sortOptions = [
   { id: "salesCount-desc", label: "En Çok Satanlar" },
-  { id: "price-lowtohigh", label: "Fiyat: Ucuzdan Pahalıya" },
-  { id: "price-hightolow", label: "Fiyat: Pahalıdan Ucuza" },
-  { id: "title-atoz", label: "İsim: A'dan Z'ye" },
-  { id: "title-ztoa", label: "İsim: Z'den A'ya" },
+  { id: "price-lowtohigh", label: "Ucuzdan Pahalıya" },
+  { id: "price-hightolow", label: "Pahalıdan Ucuza" },
 ];
 
 export const addressFormControls = [
