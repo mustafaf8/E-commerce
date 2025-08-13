@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import UserCartItemsContent from "@/components/shopping-view/cart-items-content";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { createNewOrder } from "@/store/shop/order-slice";
+import { createNewOrder, resetPaymentState } from "@/store/shop/order-slice";
 import { applyCoupon, removeCoupon, clearCouponState } from "@/store/shop/cart-slice";
 import { useToast } from "@/components/ui/use-toast";
 import { formatPrice } from "@/lib/utils";
@@ -23,9 +23,10 @@ import { AlertTriangle, Ticket, X } from "lucide-react";
 function ShoppingCheckout() {
   const { cartItems, appliedCoupon, discountAmount, couponLoading, couponError } = useSelector((state) => state.shopCart);
   const { user } = useSelector((state) => state.auth);
-  const { loading: orderLoading, error: orderError } = useSelector(
+  const { isLoading: orderLoading, error: orderError } = useSelector(
     (state) => state.shopOrder
   );
+  const { checkoutFormContent } = useSelector((state) => state.shopOrder);
   const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
   const [couponCode, setCouponCode] = useState("");
   const dispatch = useDispatch();
@@ -41,6 +42,56 @@ function ShoppingCheckout() {
       });
     }
   }, [orderError, toast]);
+
+  // Iyzico Checkout Form content render
+  useEffect(() => {
+    const containerId = "iyzipay-checkout-form";
+    const formContainer = document.getElementById(containerId);
+    if (checkoutFormContent && formContainer) {
+      try {
+        formContainer.innerHTML = "";
+        const temp = document.createElement("div");
+        temp.innerHTML = checkoutFormContent;
+        const scripts = Array.from(temp.querySelectorAll("script"));
+        scripts.forEach((oldScript) => {
+          const newScript = document.createElement("script");
+          Array.from(oldScript.attributes).forEach((attr) =>
+            newScript.setAttribute(attr.name, attr.value)
+          );
+          if (oldScript.src) {
+            newScript.src = oldScript.src;
+          } else {
+            newScript.text = oldScript.text || oldScript.innerHTML;
+          }
+          oldScript.parentNode.replaceChild(newScript, oldScript);
+        });
+        while (temp.firstChild) {
+          formContainer.appendChild(temp.firstChild);
+        }
+        formContainer.style.display = "block";
+      } catch (e) {
+        // no-op
+      }
+    }
+
+    return () => {
+      const cn = document.getElementById(containerId);
+      if (cn) cn.innerHTML = "";
+    };
+  }, [checkoutFormContent]);
+
+  // Sayfadan ayrılırken state ve DOM temizliği
+  useEffect(() => {
+    return () => {
+      const containerId = "iyzipay-checkout-form";
+      const iframeTempWrapperId = "iyzipay-checkout-form-wrapper";
+      const formContainer = document.getElementById(containerId);
+      const wrapper = document.getElementById(iframeTempWrapperId);
+      if (formContainer) formContainer.innerHTML = "";
+      if (wrapper) wrapper.remove();
+      dispatch(resetPaymentState());
+    };
+  }, [dispatch]);
 
   const totalCartAmount =
     cartItems && cartItems.items && cartItems.items.length > 0
@@ -144,20 +195,10 @@ function ShoppingCheckout() {
     dispatch(createNewOrder(orderData))
       .unwrap()
       .then((result) => {
-        if (result?.success && result?.paymentPageUrl) {
+        if (result?.success && result?.checkoutFormContent) {
           dispatch(clearCouponState());
-          toast({
-            title: "Ödeme sayfasına yönlendiriliyorsunuz...",
-            variant: "success",
-          });
-          window.location.href = result.paymentPageUrl;
-        } else if (result?.success && result?.checkoutFormContent) {
-          toast({
-            variant: "destructive",
-            title: "Yönlendirme Hatası",
-            description:
-              "Ödeme sayfasına yönlendirilemedi (Form içeriği alındı). Lütfen tekrar deneyin.",
-          });
+          // checkoutFormContent state'e zaten yazıldı; useEffect gösterir.
+          toast({ title: "Güvenli ödeme formu yüklendi", variant: "success" });
         } else {
           toast({
             variant: "destructive",
@@ -342,6 +383,10 @@ function ShoppingCheckout() {
               >
                 {orderLoading ? "İşleniyor..." : "Iyzico ile Güvenli Öde"}
               </Button>
+              <div id="iyzipay-checkout-form" className="mt-2 hidden" />
+              {checkoutFormContent && (
+                <style>{`#iyzipay-checkout-form{display:block}`}</style>
+              )}
               {!currentSelectedAddress && (
                 <p className="text-xs text-red-600 text-center">
                   Lütfen bir teslimat adresi seçin.

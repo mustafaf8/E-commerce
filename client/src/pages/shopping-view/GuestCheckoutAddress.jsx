@@ -15,6 +15,7 @@ import { addressFormControls } from "@/config";
 import {
   createGuestOrderThunk,
   resetPaymentPageUrl,
+  resetPaymentState,
 } from "@/store/shop/order-slice";
 
 const initialAddressFormData = {
@@ -31,7 +32,7 @@ const initialAddressFormData = {
 function GuestCheckoutAddress() {
   const [formData, setFormData] = useState(initialAddressFormData);
   const { isAuthenticated } = useSelector((state) => state.auth);
-  const { isLoading: orderIsLoading, paymentPageUrl } = useSelector(
+  const { isLoading: orderIsLoading, paymentPageUrl, checkoutFormContent } = useSelector(
     (state) => state.shopOrder
   );
   const { cartItems: cartForCheckout, appliedCoupon } = useSelector(
@@ -73,12 +74,47 @@ function GuestCheckoutAddress() {
       /^[0-9]{11}$/.test(formData.tcKimlikNo)
     );
   };
+  // Eski yönlendirme davranışını kaldırıyoruz; gömülü form render edilecek
   useEffect(() => {
-    if (paymentPageUrl) {
-      dispatch(resetPaymentPageUrl());
-      window.location.href = paymentPageUrl;
+    const containerId = "iyzipay-checkout-form";
+    const formContainer = document.getElementById(containerId);
+    if (checkoutFormContent && formContainer) {
+      try {
+        // Konteynırı temizle
+        formContainer.innerHTML = "";
+        // Geçici div ile içeriği parse et
+        const temp = document.createElement("div");
+        temp.innerHTML = checkoutFormContent;
+        // Script etiketlerini yeniden yarat (innerHTML ile eklenen script'ler çalışmaz)
+        const scripts = Array.from(temp.querySelectorAll("script"));
+        scripts.forEach((oldScript) => {
+          const newScript = document.createElement("script");
+          Array.from(oldScript.attributes).forEach((attr) =>
+            newScript.setAttribute(attr.name, attr.value)
+          );
+          if (oldScript.src) {
+            newScript.src = oldScript.src;
+          } else {
+            newScript.text = oldScript.text || oldScript.innerHTML;
+          }
+          oldScript.parentNode.replaceChild(newScript, oldScript);
+        });
+        // Tüm childları konteynıra taşı
+        while (temp.firstChild) {
+          formContainer.appendChild(temp.firstChild);
+        }
+        formContainer.style.display = "block";
+      } catch (e) {
+        // no-op
+      }
     }
-  }, [paymentPageUrl, dispatch]);
+
+    return () => {
+      const cn = document.getElementById(containerId);
+      if (cn) cn.innerHTML = "";
+      dispatch(resetPaymentState());
+    };
+  }, [checkoutFormContent, dispatch]);
 
   const handleSubmitAddress = async (event) => {
     event.preventDefault();
@@ -117,9 +153,9 @@ function GuestCheckoutAddress() {
     dispatch(createGuestOrderThunk(orderData))
       .unwrap()
       .then((result) => {
-        if (result.success && result.paymentPageUrl) {
+        if (result.success && result.checkoutFormContent) {
           toast({
-            title: "Ödeme sayfasına yönlendiriliyorsunuz...",
+            title: "Güvenli ödeme formu yüklendi",
             variant: "success",
           });
         } else {
@@ -159,35 +195,45 @@ function GuestCheckoutAddress() {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">
-            Teslimat Bilgileri
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground mb-6 text-center">
-            Siparişinizi teslim edebilmemiz için lütfen bilgilerinizi girin.
-          </p>
-          <CommonForm
-            formControls={guestAddressFormControls}
-            formData={formData}
-            setFormData={setFormData}
-            onSubmit={handleSubmitAddress}
-            buttonText={orderIsLoading ? "İşleniyor..." : "Ödemeye Devam Et"}
-            isBtnDisabled={orderIsLoading || !isFormValid()}
-          />
-        </CardContent>
-        <CardFooter>
-          <Button
-            variant="link"
-            onClick={() => navigate("/shop/home")}
-            className="mx-auto"
-          >
-            Sepete Geri Dön
-          </Button>
-        </CardFooter>
-      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold">Teslimat Bilgileri</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CommonForm
+                formControls={guestAddressFormControls}
+                formData={formData}
+                setFormData={setFormData}
+                onSubmit={handleSubmitAddress}
+                buttonText={orderIsLoading ? "İşleniyor..." : "Ödemeye Geç"}
+                isBtnDisabled={orderIsLoading || !isFormValid()}
+              />
+            </CardContent>
+          </Card>
+        </div>
+        <div className="lg:col-span-1">
+          <Card className="sticky top-4">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold">Sipariş Özeti ve Ödeme</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Button
+                onClick={handleSubmitAddress}
+                disabled={orderIsLoading || !isFormValid()}
+                className="w-full mb-4"
+              >
+                {orderIsLoading ? "İşleniyor..." : "Ödemeye Geç"}
+              </Button>
+              <div id="iyzipay-checkout-form" className="hidden" />
+              {checkoutFormContent && (
+                <style>{`#iyzipay-checkout-form{display:block}`}</style>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
