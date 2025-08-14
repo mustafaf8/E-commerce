@@ -8,16 +8,15 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { addressFormControls } from "@/config";
-import { Skeleton } from "@/components/ui/skeleton";
+import { TextShimmer } from "@/components/ui/TextShimmer";
 import {
   createGuestOrderThunk,
-  resetPaymentPageUrl,
   resetPaymentState,
 } from "@/store/shop/order-slice";
+import IyzicoForm from "@/components/shopping-view/IyzicoForm";
 
 const initialAddressFormData = {
   fullName: "",
@@ -33,7 +32,7 @@ const initialAddressFormData = {
 function GuestCheckoutAddress() {
   const [formData, setFormData] = useState(initialAddressFormData);
   const { isAuthenticated } = useSelector((state) => state.auth);
-  const { isLoading: orderIsLoading, paymentPageUrl, checkoutFormContent } = useSelector(
+  const { isLoading: orderIsLoading, checkoutFormContent } = useSelector(
     (state) => state.shopOrder
   );
   const { cartItems: cartForCheckout, appliedCoupon } = useSelector(
@@ -75,65 +74,8 @@ function GuestCheckoutAddress() {
       /^[0-9]{11}$/.test(formData.tcKimlikNo)
     );
   };
-  // Eski yönlendirme davranışını kaldırıyoruz; gömülü form render edilecek
-  useEffect(() => {
-    const containerId = "iyzipay-checkout-form";
-    const formContainer = document.getElementById(containerId);
-    if (checkoutFormContent && formContainer) {
-      try {
-        // 0) Önceki enjekte scriptleri temizle
-        document
-          .querySelectorAll('script[data-iyzi-injected="true"]')
-          .forEach((s) => s.remove());
 
-        // 1) Konteynırı temizle ve içeriği parse et
-        formContainer.innerHTML = "";
-        const temp = document.createElement("div");
-        temp.innerHTML = checkoutFormContent;
 
-        // 2) Iframe dönerse doğrudan yerleştir
-        const iframe = temp.querySelector("iframe");
-        if (iframe) {
-          formContainer.appendChild(iframe);
-          formContainer.style.display = "block";
-          return;
-        }
-
-        // 3) Script dönerse, scriptleri BODY'e enjekte et ve kalan node'ları konteynıra ekle
-        const childNodes = Array.from(temp.childNodes);
-        childNodes.forEach((node) => {
-          if (node.tagName === "SCRIPT") {
-            const newScript = document.createElement("script");
-            Array.from(node.attributes).forEach((attr) =>
-              newScript.setAttribute(attr.name, attr.value)
-            );
-            if (node.src) {
-              newScript.src = node.src;
-            } else {
-              newScript.text = node.text || node.innerHTML;
-            }
-            newScript.setAttribute("data-iyzi-injected", "true");
-            document.body.appendChild(newScript);
-          } else {
-            formContainer.appendChild(node);
-          }
-        });
-
-        formContainer.style.display = "block";
-      } catch (e) {
-        // no-op
-      }
-    }
-
-    return () => {
-      const cn = document.getElementById(containerId);
-      if (cn) cn.innerHTML = "";
-      document
-        .querySelectorAll('script[data-iyzi-injected="true"]')
-        .forEach((s) => s.remove());
-      dispatch(resetPaymentState());
-    };
-  }, [checkoutFormContent, dispatch]);
 
   const [isPaymentLoading, setIsPaymentLoading] = useState(false);
 
@@ -153,6 +95,8 @@ function GuestCheckoutAddress() {
       return;
     }
 
+    dispatch(resetPaymentState());
+
     const orderData = {
       guestInfo: {
         fullName: formData.fullName,
@@ -171,7 +115,6 @@ function GuestCheckoutAddress() {
       appliedCoupon: appliedCoupon || null,
     };
 
-    // Yeni denemeden önce DOM ve state temizliği
     try {
       const containerId = "iyzipay-checkout-form";
       const cn = document.getElementById(containerId);
@@ -226,11 +169,13 @@ function GuestCheckoutAddress() {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="lg:col-span-2/3 col-span-1">
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl font-bold">Teslimat Bilgileri</CardTitle>
+              <CardTitle className="text-2xl font-bold">
+                Teslimat Bilgileri
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <CommonForm
@@ -238,42 +183,30 @@ function GuestCheckoutAddress() {
                 formData={formData}
                 setFormData={setFormData}
                 onSubmit={handleSubmitAddress}
-                buttonText={orderIsLoading ? "İşleniyor..." : "Ödemeye Geç"}
-                isBtnDisabled={orderIsLoading || !isFormValid()}
+                buttonText={"Ödemeye Geç"}
+                isBtnDisabled={!isFormValid()}
               />
             </CardContent>
           </Card>
         </div>
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-2/3">
           <Card className="sticky top-4">
             <CardHeader>
-              <CardTitle className="text-lg font-semibold">Sipariş Özeti ve Ödeme</CardTitle>
+              <CardTitle className="text-lg font-semibold text-center">
+                Sipariş Özeti ve Ödeme
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <Button
-                onClick={handleSubmitAddress}
-                disabled={orderIsLoading || !isFormValid()}
-                className="w-full mb-4"
-              >
-                {orderIsLoading ? "İşleniyor..." : "Ödemeye Geç"}
-              </Button>
-              {/* Statik skeleton (ilk girişte) */}
-              {!checkoutFormContent && !isPaymentLoading && (
-                <div className="mt-1">
-                  <Skeleton animated={false} className="h-10 w-full mb-2" />
-                  <Skeleton animated={false} className="h-32 w-full" />
-                </div>
-              )}
-              {/* Yükleniyor skeleton (butona basınca) */}
+            
               {isPaymentLoading && (
-                <div className="mt-1">
-                  <Skeleton className="h-10 w-full mb-2" />
-                  <Skeleton className="h-32 w-full" />
+                <div className="flex items-center justify-center p-4">
+                  <TextShimmer className="font-medium text-lg" duration={1.5}>
+                    Ödeme formu yükleniyor...
+                  </TextShimmer>
                 </div>
               )}
-              <div id="iyzipay-checkout-form" className="hidden" />
-              {checkoutFormContent && (
-                <style>{`#iyzipay-checkout-form{display:block}`}</style>
+               {checkoutFormContent && !isPaymentLoading && (
+                <IyzicoForm checkoutFormContent={checkoutFormContent} />
               )}
             </CardContent>
           </Card>
