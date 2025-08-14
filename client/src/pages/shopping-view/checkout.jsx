@@ -183,7 +183,7 @@ function ShoppingCheckout() {
             title: "Ödeme Başlatılamadı",
             description:
               result?.message ||
-              "Iyzico ödeme başlatılamadı. Beklenmeyen yanıt.",
+              "ödeme başlatılamadı. Beklenmeyen yanıt.",
           });
         }
       })
@@ -383,9 +383,9 @@ function ShoppingCheckout() {
                     onClick={handleInitiateIyzicoPayment}
                     className="w-full text-base py-3"
                     disabled={!currentSelectedAddress}
-                    aria-label="Iyzico ile Güvenli Öde"
+                    aria-label="Güvenli Ödeme"
                   >
-                    Iyzico ile Güvenli Öde
+                    Güvenli Öde
                   </Button>
                   {!currentSelectedAddress && (
                     <p className="text-xs text-red-600 text-center">

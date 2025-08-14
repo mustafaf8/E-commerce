@@ -60,11 +60,11 @@ export default function UserMessages() {
         <form className="space-y-3" onSubmit={handleSubmit}>
           <div>
             <label className="block text-sm font-medium mb-1">Konu</label>
-            <input name="subject" value={form.subject} onChange={handleChange} required className="w-full px-3 py-2 rounded border border-gray-300 dark:bg-gray-900 dark:border-gray-700" />
+            <input name="subject" value={form.subject} maxLength="100" onChange={handleChange} required className="w-full px-3 py-2 rounded border border-gray-300 dark:bg-gray-900 dark:border-gray-700" />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Mesaj</label>
-            <textarea name="message" value={form.message} onChange={handleChange} required rows={4} className="w-full px-3 py-2 rounded border border-gray-300 dark:bg-gray-900 dark:border-gray-700" />
+            <textarea name="message" value={form.message} maxLength="200" onChange={handleChange} required rows={4} className="w-full px-3 py-2 rounded border border-gray-300 dark:bg-gray-900 dark:border-gray-700" />
           </div>
           <button type="submit" disabled={sending} className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded disabled:opacity-60" aria-label="Gönder">
             {sending ? "Gönderiliyor..." : "Gönder"}

@@ -115,15 +115,15 @@ export default function ContactPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">E-posta</label>
                 {/* GÜNCELLEME: Kullanıcı giriş yapmışsa bu alan doldurulur ve değiştirilemez. */}
-                <input name="email" type="email" value={form.email} onChange={handleChange} required disabled={isAuthenticated} className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:bg-gray-900 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-70 disabled:bg-gray-100 dark:disabled:bg-gray-700" />
+                <input name="email" type="email" value={form.email} onChange={handleChange} maxLength="50" required disabled={isAuthenticated} className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:bg-gray-900 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-70 disabled:bg-gray-100 dark:disabled:bg-gray-700" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Konu</label>
-                <input name="subject" value={form.subject} onChange={handleChange} required className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:bg-gray-900 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                <input name="subject" value={form.subject} onChange={handleChange} required maxLength="100" className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:bg-gray-900 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Mesajınız</label>
-                <textarea name="message" value={form.message} onChange={handleChange} required rows={5} className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:bg-gray-900 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                <textarea name="message" value={form.message} onChange={handleChange} required rows={5} maxLength="200" className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:bg-gray-900 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
               </div>
               <button type="submit" disabled={loading} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-60" aria-label="Gönder">
                 {loading ? "Gönderiliyor..." : "Gönder"}
