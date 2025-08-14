@@ -1,9 +1,7 @@
-'use client'; // Next.js kullanıyorsanız bu satırı koruyun, Create React App için gereksizdir.
-
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import PropTypes from 'prop-types'; // JSX projelerinde tip kontrolü için
-import { cn } from '@/lib/utils'; // Yukarıda oluşturduğumuz yardımcı fonksiyon
+import PropTypes from 'prop-types'; 
+import { cn } from '@/lib/utils';
 
 export function TextShimmer({
   children,
@@ -44,7 +42,7 @@ export function TextShimmer({
   );
 }
 
-// JSX projelerinde prop tiplerini tanımlamak iyi bir pratiktir.
+
 TextShimmer.propTypes = {
   children: PropTypes.string.isRequired,
   as: PropTypes.elementType,

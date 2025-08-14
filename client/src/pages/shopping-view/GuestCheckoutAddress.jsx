@@ -267,7 +267,7 @@ function GuestCheckoutAddress() {
               {/* Ödeme Formu veya Loading */}
               {isPaymentLoading && (
                 <div className="flex items-center justify-center p-4">
-                  <TextShimmer className="font-medium text-lg" duration={1.5}>
+                  <TextShimmer  className='text-xl font-medium [--base-color:theme(colors.blue.600)] [--base-gradient-color:theme(colors.blue.200)] dark:[--base-color:theme(colors.blue.700)] dark:[--base-gradient-color:theme(colors.blue.400)]' duration={1.5}>
                     Ödeme formu yükleniyor...
                   </TextShimmer>
                 </div>
