@@ -17,6 +17,8 @@ import {
   resetPaymentState,
 } from "@/store/shop/order-slice";
 import IyzicoForm from "@/components/shopping-view/IyzicoForm";
+import { Separator } from "@/components/ui/separator"; // Arayüzde ayraç için
+import { formatPrice } from "@/lib/utils";
 
 const initialAddressFormData = {
   fullName: "",
@@ -35,9 +37,10 @@ function GuestCheckoutAddress() {
   const { isLoading: orderIsLoading, checkoutFormContent } = useSelector(
     (state) => state.shopOrder
   );
-  const { cartItems: cartForCheckout, appliedCoupon } = useSelector(
+  const { cartItems: cartForCheckout, appliedCoupon, discountAmount } = useSelector(
     (state) => state.shopCart
   );
+  
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -167,6 +170,15 @@ function GuestCheckoutAddress() {
     ...addressFormControls,
   ];
 
+  // Sepet toplam tutarını hesapla
+  const totalCartAmount = cartForCheckout?.items?.reduce(
+    (sum, item) => sum + ((item?.salePrice > 0 ? item?.salePrice : item?.price || 0) * (item?.quantity || 0)),
+    0
+  ) || 0;
+
+  // İndirim sonrası final tutar
+  const finalAmount = totalCartAmount - (discountAmount || 0);
+
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -193,11 +205,66 @@ function GuestCheckoutAddress() {
           <Card className="sticky top-4">
             <CardHeader>
               <CardTitle className="text-lg font-semibold text-center">
-                Sipariş Özeti ve Ödeme
+                Sipariş Özeti
               </CardTitle>
             </CardHeader>
-            <CardContent>
-            
+            <CardContent className="space-y-4">
+              {/* Sepet Ürünleri */}
+              <div className="space-y-3">
+                <h3 className="font-medium text-gray-900">Sepetinizdeki Ürünler</h3>
+                {cartForCheckout?.items?.map((item, index) => (
+                  <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+                    <div className="flex items-center space-x-3 flex-1">
+                      {item.image && (
+                        <img 
+                          src={item.image} 
+                          alt={item.title} 
+                          className="w-12 h-12 object-cover rounded-md"
+                        />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {item.title}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Adet: {item.quantity}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-gray-900">
+                        {formatPrice((item?.salePrice > 0 ? item?.salePrice : item?.price || 0) * (item?.quantity || 0))} TL
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <Separator />
+
+              {/* Toplam Tutarlar */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Ara Toplam:</span>
+                  <span className="font-medium">{formatPrice(totalCartAmount)} TL</span>
+                </div>
+                
+                {appliedCoupon && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Kupon İndirimi:</span>
+                    <span className="font-medium text-green-600">-{formatPrice(discountAmount)} TL</span>
+                  </div>
+                )}
+
+                <Separator />
+                
+                <div className="flex justify-between text-base font-semibold">
+                  <span className="text-gray-900">Toplam Tutar:</span>
+                  <span className="text-lg text-blue-600">{formatPrice(finalAmount)} TL</span>
+                </div>
+              </div>
+
+              {/* Ödeme Formu veya Loading */}
               {isPaymentLoading && (
                 <div className="flex items-center justify-center p-4">
                   <TextShimmer className="font-medium text-lg" duration={1.5}>
@@ -205,7 +272,8 @@ function GuestCheckoutAddress() {
                   </TextShimmer>
                 </div>
               )}
-               {checkoutFormContent && !isPaymentLoading && (
+              
+              {checkoutFormContent && !isPaymentLoading && (
                 <IyzicoForm checkoutFormContent={checkoutFormContent} />
               )}
             </CardContent>
