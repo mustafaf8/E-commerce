@@ -5,7 +5,11 @@ import UserCartItemsContent from "@/components/shopping-view/cart-items-content"
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { createNewOrder, resetPaymentState } from "@/store/shop/order-slice";
-import { applyCoupon, removeCoupon, clearCouponState } from "@/store/shop/cart-slice";
+import {
+  applyCoupon,
+  removeCoupon,
+  clearCouponState,
+} from "@/store/shop/cart-slice";
 import { useToast } from "@/components/ui/use-toast";
 import { formatPrice } from "@/lib/utils";
 import {
@@ -19,23 +23,27 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
 import { AlertTriangle, Ticket, X } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { TextShimmer } from "@/components/ui/TextShimmer";
+import IyzicoForm from "@/components/shopping-view/IyzicoForm";
 
 function ShoppingCheckout() {
-  const { cartItems, appliedCoupon, discountAmount, couponLoading, couponError } = useSelector((state) => state.shopCart);
+  const {
+    cartItems,
+    appliedCoupon,
+    discountAmount,
+    couponLoading,
+    couponError,
+  } = useSelector((state) => state.shopCart);
   const { user } = useSelector((state) => state.auth);
-  const { isLoading: orderLoading, error: orderError } = useSelector(
-    (state) => state.shopOrder
-  );
-  const { checkoutFormContent } = useSelector((state) => state.shopOrder);
-  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
+  const { isLoading: orderLoading, error: orderError, checkoutFormContent } =
+  useSelector((state) => state.shopOrder);
   const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
   const [couponCode, setCouponCode] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { toast } = useToast();
   useEffect(() => {
+    
     if (orderError) {
       toast({
         variant: "destructive",
@@ -46,74 +54,10 @@ function ShoppingCheckout() {
     }
   }, [orderError, toast]);
 
-  // Iyzico Checkout Form content render
-  useEffect(() => {
-    const containerId = "iyzipay-checkout-form";
-    const formContainer = document.getElementById(containerId);
-    if (checkoutFormContent && formContainer) {
-      try {
-        // 0) Önceki enjekte scriptleri temizle
-        document
-          .querySelectorAll('script[data-iyzi-injected="true"]')
-          .forEach((s) => s.remove());
-
-        // 1) Konteynırı temizle ve içeriği parse et
-        formContainer.innerHTML = "";
-        const temp = document.createElement("div");
-        temp.innerHTML = checkoutFormContent;
-
-        // 2) Iframe varsa direkt ekle
-        const iframe = temp.querySelector("iframe");
-        if (iframe) {
-          formContainer.appendChild(iframe);
-          formContainer.style.display = "block";
-          return;
-        }
-
-        // 3) Script varsa BODY'e enjekte et ve diğer node'ları konteynıra ekle
-        const childNodes = Array.from(temp.childNodes);
-        childNodes.forEach((node) => {
-          if (node.tagName === "SCRIPT") {
-            const newScript = document.createElement("script");
-            Array.from(node.attributes).forEach((attr) =>
-              newScript.setAttribute(attr.name, attr.value)
-            );
-            if (node.src) {
-              newScript.src = node.src;
-            } else {
-              newScript.text = node.text || node.innerHTML;
-            }
-            newScript.setAttribute("data-iyzi-injected", "true");
-            document.body.appendChild(newScript);
-          } else {
-            formContainer.appendChild(node);
-          }
-        });
-
-        formContainer.style.display = "block";
-      } catch (e) {
-        // no-op
-      }
-    }
-
-    return () => {
-      const cn = document.getElementById(containerId);
-      if (cn) cn.innerHTML = "";
-      document
-        .querySelectorAll('script[data-iyzi-injected="true"]')
-        .forEach((s) => s.remove());
-    };
-  }, [checkoutFormContent]);
 
   // Sayfadan ayrılırken state ve DOM temizliği
   useEffect(() => {
     return () => {
-      const containerId = "iyzipay-checkout-form";
-      const iframeTempWrapperId = "iyzipay-checkout-form-wrapper";
-      const formContainer = document.getElementById(containerId);
-      const wrapper = document.getElementById(iframeTempWrapperId);
-      if (formContainer) formContainer.innerHTML = "";
-      if (wrapper) wrapper.remove();
       dispatch(resetPaymentState());
     };
   }, [dispatch]);
@@ -143,13 +87,17 @@ function ShoppingCheckout() {
       return;
     }
 
-    dispatch(applyCoupon({ couponCode: couponCode.trim(), cartTotal: totalCartAmount }))
+    dispatch(
+      applyCoupon({ couponCode: couponCode.trim(), cartTotal: totalCartAmount })
+    )
       .unwrap()
       .then((result) => {
         if (result?.success) {
           toast({
             title: "Kupon Uygulandı",
-            description: `${formatPrice(result.discountAmount)} TL indirim uygulandı!`,
+            description: `${formatPrice(
+              result.discountAmount
+            )} TL indirim uygulandı!`,
             variant: "success",
           });
           setCouponCode("");
@@ -159,7 +107,8 @@ function ShoppingCheckout() {
         toast({
           variant: "destructive",
           title: "Kupon Uygulanamadı",
-          description: error.message || "Kupon uygulanamadı. Lütfen tekrar deneyin.",
+          description:
+            error.message || "Kupon uygulanamadı. Lütfen tekrar deneyin.",
         });
       });
   };
@@ -185,7 +134,6 @@ function ShoppingCheckout() {
       });
       return;
     }
-
     if (currentSelectedAddress === null) {
       toast({
         variant: "warning",
@@ -194,16 +142,20 @@ function ShoppingCheckout() {
       });
       return;
     }
-
-    const effectiveTcKimlikNo = user?.tcKimlikNo || currentSelectedAddress?.tcKimlikNo;
+    const effectiveTcKimlikNo =
+      user?.tcKimlikNo || currentSelectedAddress?.tcKimlikNo;
     if (!effectiveTcKimlikNo) {
       toast({
         variant: "warning",
         title: "TC Kimlik No Eksik",
-        description: "Fatura için TC Kimlik No gereklidir. Lütfen profilinizi güncelleyin.",
+        description:
+          "Fatura için TC Kimlik No gereklidir. Lütfen profilinizi güncelleyin.",
       });
       return;
     }
+    
+    // Yeni bir deneme yapmadan önce sadece state'i temizliyoruz.
+    dispatch(resetPaymentState());
 
     const orderData = {
       userId: user?.id,
@@ -216,22 +168,14 @@ function ShoppingCheckout() {
       tcKimlikNo: effectiveTcKimlikNo,
       appliedCoupon: appliedCoupon,
     };
-
-    // Yeni denemeden önce DOM ve state temizliği
-    try {
-      const containerId = "iyzipay-checkout-form";
-      const cn = document.getElementById(containerId);
-      if (cn) cn.innerHTML = "";
-    } catch {}
-    dispatch(resetPaymentState());
-
-    setIsPaymentLoading(true);
+    
+    // Manuel DOM temizliği buradan kaldırıldı.
+    
     dispatch(createNewOrder(orderData))
       .unwrap()
       .then((result) => {
         if (result?.success && result?.checkoutFormContent) {
           dispatch(clearCouponState());
-          // checkoutFormContent state'e zaten yazıldı; useEffect gösterir.
           toast({ title: "Güvenli ödeme formu yüklendi", variant: "success" });
         } else {
           toast({
@@ -243,11 +187,12 @@ function ShoppingCheckout() {
           });
         }
       })
-      .catch((error) => {
-       // console.error("createNewOrder error:", error);
-      })
-      .finally(() => setIsPaymentLoading(false));
+      .catch(() => {
+        // Hata zaten useEffect'te yakalanıyor.
+      });
   }
+
+
 
   return (
     <div className="flex flex-col">
@@ -267,7 +212,7 @@ function ShoppingCheckout() {
             seciliAdresProp={currentSelectedAddress}
             setCurrentSelectedAddress={setCurrentSelectedAddress}
           />
-          
+
           {/* TC Kimlik No Uyarısı */}
           {!user?.tcKimlikNo && (
             <Card className="border-amber-200 bg-amber-50">
@@ -296,7 +241,7 @@ function ShoppingCheckout() {
             </Card>
           )}
         </div>
-        
+
         <Card className="shadow-md">
           <CardHeader>
             <CardTitle className="text-xl font-semibold">
@@ -328,7 +273,7 @@ function ShoppingCheckout() {
                     <Ticket className="h-4 w-4" />
                     <span>İndirim Kuponu</span>
                   </div>
-                  
+
                   {appliedCoupon ? (
                     <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-md">
                       <div className="flex items-center gap-2">
@@ -337,9 +282,13 @@ function ShoppingCheckout() {
                           {appliedCoupon.code}
                         </span>
                         <span className="text-xs text-green-600">
-                          ({appliedCoupon.discountType === 'percentage' 
-                            ? `%${appliedCoupon.discountValue}` 
-                            : `${formatPrice(appliedCoupon.discountValue)} TL`} indirim)
+                          (
+                          {appliedCoupon.discountType === "percentage"
+                            ? `%${appliedCoupon.discountValue}`
+                            : `${formatPrice(
+                                appliedCoupon.discountValue
+                              )} TL`}{" "}
+                          indirim)
                         </span>
                       </div>
                       <Button
@@ -357,10 +306,12 @@ function ShoppingCheckout() {
                       <Input
                         placeholder="Kupon kodunu girin"
                         value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                        onChange={(e) =>
+                          setCouponCode(e.target.value.toUpperCase())
+                        }
                         className="flex-1"
                         onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
+                          if (e.key === "Enter") {
                             handleApplyCoupon();
                           }
                         }}
@@ -376,7 +327,7 @@ function ShoppingCheckout() {
                       </Button>
                     </div>
                   )}
-                  
+
                   {couponError && (
                     <p className="text-sm text-red-600">{couponError}</p>
                   )}
@@ -387,12 +338,16 @@ function ShoppingCheckout() {
                   <Separator className="my-3" />
                   <div className="flex justify-between text-sm text-muted-foreground">
                     <span>Ara Toplam</span>
-                    <span className="whitespace-nowrap">{formatPrice(totalCartAmount)} TL</span>
+                    <span className="whitespace-nowrap">
+                      {formatPrice(totalCartAmount)} TL
+                    </span>
                   </div>
                   {appliedCoupon && discountAmount > 0 && (
                     <div className="flex justify-between text-sm text-green-600">
                       <span>İndirim ({appliedCoupon.code})</span>
-                      <span className="whitespace-nowrap">-{formatPrice(discountAmount)} TL</span>
+                      <span className="whitespace-nowrap">
+                        -{formatPrice(discountAmount)} TL
+                      </span>
                     </div>
                   )}
                   <div className="flex justify-between text-sm text-muted-foreground">
@@ -402,44 +357,47 @@ function ShoppingCheckout() {
                   <Separator className="my-3" />
                   <div className="flex justify-between text-lg font-bold">
                     <span>Toplam</span>
-                    <span className="whitespace-nowrap">{formatPrice(finalAmount)} TL</span>
+                    <span className="whitespace-nowrap">
+                      {formatPrice(finalAmount)} TL
+                    </span>
                   </div>
                 </div>
               </div>
             )}
           </CardContent>
           {cartItems?.items?.length > 0 && (
+            // Değişiklik 4: CardFooter'ı tamamen yeniden yapılandırıyoruz.
             <CardFooter className="flex flex-col items-stretch gap-2 pt-5">
-              {isPaymentLoading ? (
+              {orderLoading && (
                 <div className="flex items-center justify-center p-4">
                   <TextShimmer className="font-medium text-lg" duration={1.5}>
                     Ödeme yükleniyor...
                   </TextShimmer>
                 </div>
-              ) : (
-                <Button
-                  onClick={handleInitiateIyzicoPayment}
-                  className="w-full text-base py-3"
-                  disabled={orderLoading || !currentSelectedAddress}
-                  aria-label="Iyzico ile Güvenli Öde"
-                >
-                  {orderLoading ? "İşleniyor..." : "Iyzico ile Güvenli Öde"}
-                </Button>
               )}
 
-              
+              {/* checkoutFormContent yoksa ödeme butonunu göster */}
+              {!checkoutFormContent && !orderLoading && (
+                <>
+                  <Button
+                    onClick={handleInitiateIyzicoPayment}
+                    className="w-full text-base py-3"
+                    disabled={!currentSelectedAddress}
+                    aria-label="Iyzico ile Güvenli Öde"
+                  >
+                    Iyzico ile Güvenli Öde
+                  </Button>
+                  {!currentSelectedAddress && (
+                    <p className="text-xs text-red-600 text-center">
+                      Lütfen bir teslimat adresi seçin.
+                    </p>
+                  )}
+                </>
+              )}
 
-              {/* Gömülü Iyzico form alanı */}
-              <div
-                id="iyzipay-checkout-form"
-                className="mt-2"
-                style={{ display: checkoutFormContent ? "block" : "none" }}
-              />
-
-              {!currentSelectedAddress && !isPaymentLoading && (
-                <p className="text-xs text-red-600 text-center">
-                  Lütfen bir teslimat adresi seçin.
-                </p>
+              {/* checkoutFormContent varsa IyzicoForm component'ini göster */}
+              {checkoutFormContent && !orderLoading && (
+                <IyzicoForm checkoutFormContent={checkoutFormContent} />
               )}
             </CardFooter>
           )}
