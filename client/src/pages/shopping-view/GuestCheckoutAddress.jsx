@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { addressFormControls } from "@/config";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   createGuestOrderThunk,
   resetPaymentPageUrl,
@@ -80,29 +81,44 @@ function GuestCheckoutAddress() {
     const formContainer = document.getElementById(containerId);
     if (checkoutFormContent && formContainer) {
       try {
-        // Konteynırı temizle
+        // 0) Önceki enjekte scriptleri temizle
+        document
+          .querySelectorAll('script[data-iyzi-injected="true"]')
+          .forEach((s) => s.remove());
+
+        // 1) Konteynırı temizle ve içeriği parse et
         formContainer.innerHTML = "";
-        // Geçici div ile içeriği parse et
         const temp = document.createElement("div");
         temp.innerHTML = checkoutFormContent;
-        // Script etiketlerini yeniden yarat (innerHTML ile eklenen script'ler çalışmaz)
-        const scripts = Array.from(temp.querySelectorAll("script"));
-        scripts.forEach((oldScript) => {
-          const newScript = document.createElement("script");
-          Array.from(oldScript.attributes).forEach((attr) =>
-            newScript.setAttribute(attr.name, attr.value)
-          );
-          if (oldScript.src) {
-            newScript.src = oldScript.src;
-          } else {
-            newScript.text = oldScript.text || oldScript.innerHTML;
-          }
-          oldScript.parentNode.replaceChild(newScript, oldScript);
-        });
-        // Tüm childları konteynıra taşı
-        while (temp.firstChild) {
-          formContainer.appendChild(temp.firstChild);
+
+        // 2) Iframe dönerse doğrudan yerleştir
+        const iframe = temp.querySelector("iframe");
+        if (iframe) {
+          formContainer.appendChild(iframe);
+          formContainer.style.display = "block";
+          return;
         }
+
+        // 3) Script dönerse, scriptleri BODY'e enjekte et ve kalan node'ları konteynıra ekle
+        const childNodes = Array.from(temp.childNodes);
+        childNodes.forEach((node) => {
+          if (node.tagName === "SCRIPT") {
+            const newScript = document.createElement("script");
+            Array.from(node.attributes).forEach((attr) =>
+              newScript.setAttribute(attr.name, attr.value)
+            );
+            if (node.src) {
+              newScript.src = node.src;
+            } else {
+              newScript.text = node.text || node.innerHTML;
+            }
+            newScript.setAttribute("data-iyzi-injected", "true");
+            document.body.appendChild(newScript);
+          } else {
+            formContainer.appendChild(node);
+          }
+        });
+
         formContainer.style.display = "block";
       } catch (e) {
         // no-op
@@ -112,9 +128,14 @@ function GuestCheckoutAddress() {
     return () => {
       const cn = document.getElementById(containerId);
       if (cn) cn.innerHTML = "";
+      document
+        .querySelectorAll('script[data-iyzi-injected="true"]')
+        .forEach((s) => s.remove());
       dispatch(resetPaymentState());
     };
   }, [checkoutFormContent, dispatch]);
+
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
 
   const handleSubmitAddress = async (event) => {
     event.preventDefault();
@@ -150,6 +171,15 @@ function GuestCheckoutAddress() {
       appliedCoupon: appliedCoupon || null,
     };
 
+    // Yeni denemeden önce DOM ve state temizliği
+    try {
+      const containerId = "iyzipay-checkout-form";
+      const cn = document.getElementById(containerId);
+      if (cn) cn.innerHTML = "";
+    } catch {}
+    dispatch(resetPaymentState());
+
+    setIsPaymentLoading(true);
     dispatch(createGuestOrderThunk(orderData))
       .unwrap()
       .then((result) => {
@@ -172,7 +202,8 @@ function GuestCheckoutAddress() {
           description: err.message || "Beklenmedik bir hata.",
           variant: "destructive",
         });
-      });
+      })
+      .finally(() => setIsPaymentLoading(false));
   };
 
   const guestAddressFormControls = [
@@ -226,6 +257,20 @@ function GuestCheckoutAddress() {
               >
                 {orderIsLoading ? "İşleniyor..." : "Ödemeye Geç"}
               </Button>
+              {/* Statik skeleton (ilk girişte) */}
+              {!checkoutFormContent && !isPaymentLoading && (
+                <div className="mt-1">
+                  <Skeleton animated={false} className="h-10 w-full mb-2" />
+                  <Skeleton animated={false} className="h-32 w-full" />
+                </div>
+              )}
+              {/* Yükleniyor skeleton (butona basınca) */}
+              {isPaymentLoading && (
+                <div className="mt-1">
+                  <Skeleton className="h-10 w-full mb-2" />
+                  <Skeleton className="h-32 w-full" />
+                </div>
+              )}
               <div id="iyzipay-checkout-form" className="hidden" />
               {checkoutFormContent && (
                 <style>{`#iyzipay-checkout-form{display:block}`}</style>

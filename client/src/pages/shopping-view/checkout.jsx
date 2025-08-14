@@ -19,6 +19,8 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
 import { AlertTriangle, Ticket, X } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TextShimmer } from "@/components/ui/TextShimmer";
 
 function ShoppingCheckout() {
   const { cartItems, appliedCoupon, discountAmount, couponLoading, couponError } = useSelector((state) => state.shopCart);
@@ -27,6 +29,7 @@ function ShoppingCheckout() {
     (state) => state.shopOrder
   );
   const { checkoutFormContent } = useSelector((state) => state.shopOrder);
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
   const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
   const [couponCode, setCouponCode] = useState("");
   const dispatch = useDispatch();
@@ -49,25 +52,44 @@ function ShoppingCheckout() {
     const formContainer = document.getElementById(containerId);
     if (checkoutFormContent && formContainer) {
       try {
+        // 0) Önceki enjekte scriptleri temizle
+        document
+          .querySelectorAll('script[data-iyzi-injected="true"]')
+          .forEach((s) => s.remove());
+
+        // 1) Konteynırı temizle ve içeriği parse et
         formContainer.innerHTML = "";
         const temp = document.createElement("div");
         temp.innerHTML = checkoutFormContent;
-        const scripts = Array.from(temp.querySelectorAll("script"));
-        scripts.forEach((oldScript) => {
-          const newScript = document.createElement("script");
-          Array.from(oldScript.attributes).forEach((attr) =>
-            newScript.setAttribute(attr.name, attr.value)
-          );
-          if (oldScript.src) {
-            newScript.src = oldScript.src;
-          } else {
-            newScript.text = oldScript.text || oldScript.innerHTML;
-          }
-          oldScript.parentNode.replaceChild(newScript, oldScript);
-        });
-        while (temp.firstChild) {
-          formContainer.appendChild(temp.firstChild);
+
+        // 2) Iframe varsa direkt ekle
+        const iframe = temp.querySelector("iframe");
+        if (iframe) {
+          formContainer.appendChild(iframe);
+          formContainer.style.display = "block";
+          return;
         }
+
+        // 3) Script varsa BODY'e enjekte et ve diğer node'ları konteynıra ekle
+        const childNodes = Array.from(temp.childNodes);
+        childNodes.forEach((node) => {
+          if (node.tagName === "SCRIPT") {
+            const newScript = document.createElement("script");
+            Array.from(node.attributes).forEach((attr) =>
+              newScript.setAttribute(attr.name, attr.value)
+            );
+            if (node.src) {
+              newScript.src = node.src;
+            } else {
+              newScript.text = node.text || node.innerHTML;
+            }
+            newScript.setAttribute("data-iyzi-injected", "true");
+            document.body.appendChild(newScript);
+          } else {
+            formContainer.appendChild(node);
+          }
+        });
+
         formContainer.style.display = "block";
       } catch (e) {
         // no-op
@@ -77,6 +99,9 @@ function ShoppingCheckout() {
     return () => {
       const cn = document.getElementById(containerId);
       if (cn) cn.innerHTML = "";
+      document
+        .querySelectorAll('script[data-iyzi-injected="true"]')
+        .forEach((s) => s.remove());
     };
   }, [checkoutFormContent]);
 
@@ -192,6 +217,15 @@ function ShoppingCheckout() {
       appliedCoupon: appliedCoupon,
     };
 
+    // Yeni denemeden önce DOM ve state temizliği
+    try {
+      const containerId = "iyzipay-checkout-form";
+      const cn = document.getElementById(containerId);
+      if (cn) cn.innerHTML = "";
+    } catch {}
+    dispatch(resetPaymentState());
+
+    setIsPaymentLoading(true);
     dispatch(createNewOrder(orderData))
       .unwrap()
       .then((result) => {
@@ -211,7 +245,8 @@ function ShoppingCheckout() {
       })
       .catch((error) => {
        // console.error("createNewOrder error:", error);
-      });
+      })
+      .finally(() => setIsPaymentLoading(false));
   }
 
   return (
@@ -375,19 +410,33 @@ function ShoppingCheckout() {
           </CardContent>
           {cartItems?.items?.length > 0 && (
             <CardFooter className="flex flex-col items-stretch gap-2 pt-5">
-              <Button
-                onClick={handleInitiateIyzicoPayment}
-                className="w-full text-base py-3"
-                disabled={orderLoading || !currentSelectedAddress}
-                aria-label="Iyzico ile Güvenli Öde"
-              >
-                {orderLoading ? "İşleniyor..." : "Iyzico ile Güvenli Öde"}
-              </Button>
-              <div id="iyzipay-checkout-form" className="mt-2 hidden" />
-              {checkoutFormContent && (
-                <style>{`#iyzipay-checkout-form{display:block}`}</style>
+              {isPaymentLoading ? (
+                <div className="flex items-center justify-center p-4">
+                  <TextShimmer className="font-medium text-lg" duration={1.5}>
+                    Ödeme yükleniyor...
+                  </TextShimmer>
+                </div>
+              ) : (
+                <Button
+                  onClick={handleInitiateIyzicoPayment}
+                  className="w-full text-base py-3"
+                  disabled={orderLoading || !currentSelectedAddress}
+                  aria-label="Iyzico ile Güvenli Öde"
+                >
+                  {orderLoading ? "İşleniyor..." : "Iyzico ile Güvenli Öde"}
+                </Button>
               )}
-              {!currentSelectedAddress && (
+
+              
+
+              {/* Gömülü Iyzico form alanı */}
+              <div
+                id="iyzipay-checkout-form"
+                className="mt-2"
+                style={{ display: checkoutFormContent ? "block" : "none" }}
+              />
+
+              {!currentSelectedAddress && !isPaymentLoading && (
                 <p className="text-xs text-red-600 text-center">
                   Lütfen bir teslimat adresi seçin.
                 </p>
