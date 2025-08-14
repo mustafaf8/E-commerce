@@ -421,6 +421,7 @@ function ProductDetailsDialog({ open, setOpen, productDetails }) {
                 placeholder="Yorumunuzu buraya yazın..."
                 rows={3}
                 className="text-sm"
+                maxLength="200"
               />
               <Button
                 onClick={handleAddReview}
