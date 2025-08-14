@@ -19,6 +19,7 @@ import {
 import IyzicoForm from "@/components/shopping-view/IyzicoForm";
 import { Separator } from "@/components/ui/separator"; // Arayüzde ayraç için
 import { formatPrice } from "@/lib/utils";
+import img from "/tutu.png";
 
 const initialAddressFormData = {
   fullName: "",
@@ -180,104 +181,116 @@ function GuestCheckoutAddress() {
   const finalAmount = totalCartAmount - (discountAmount || 0);
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="lg:col-span-2/3 col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl font-bold">
-                Teslimat Bilgileri
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CommonForm
-                formControls={guestAddressFormControls}
-                formData={formData}
-                setFormData={setFormData}
-                onSubmit={handleSubmitAddress}
-                buttonText={"Ödemeye Geç"}
-                isBtnDisabled={!isFormValid()}
-              />
-            </CardContent>
-          </Card>
+    <div className="flex flex-col">
+      <div className="relative h-[120px] w-full overflow-hidden">
+        <img
+          src={img}
+          className="h-full w-full object-cover"
+          alt="Checkout Banner"
+        />
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+          <h1 className="text-3xl md:text-5xl font-bold text-white">Ödeme</h1>
         </div>
-        <div className="lg:col-span-2/3">
-          <Card className="sticky top-4">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold text-center">
-                Sipariş Özeti
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Sepet Ürünleri */}
-              <div className="space-y-3">
-                <h3 className="font-medium text-gray-900">Sepetinizdeki Ürünler</h3>
-                {cartForCheckout?.items?.map((item, index) => (
-                  <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
-                    <div className="flex items-center space-x-3 flex-1">
-                      {item.image && (
-                        <img 
-                          src={item.image} 
-                          alt={item.title} 
-                          className="w-12 h-12 object-cover rounded-md"
-                        />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {item.title}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Adet: {item.quantity}
+      </div>
+      <div className="container mx-auto py-8 px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="lg:col-span-2/3 col-span-1">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold">
+                  Teslimat Bilgileri
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CommonForm
+                  formControls={guestAddressFormControls}
+                  formData={formData}
+                  setFormData={setFormData}
+                  onSubmit={handleSubmitAddress}
+                  buttonText={"Ödemeye Geç"}
+                  isBtnDisabled={!isFormValid()}
+                />
+              </CardContent>
+            </Card>
+          </div>
+          <div className="lg:col-span-2/3">
+            <Card className="sticky top-4">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-center">
+                  Sipariş Özeti
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Sepet Ürünleri */}
+                <div className="space-y-3">
+                  <h3 className="font-medium text-gray-900">Sepetinizdeki Ürünler</h3>
+                  {cartForCheckout?.items?.map((item, index) => (
+                    <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+                      <div className="flex items-center space-x-3 flex-1">
+                        {item.image && (
+                          <img 
+                            src={item.image} 
+                            alt={item.title} 
+                            className="w-12 h-12 object-cover rounded-md"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {item.title}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            Adet: {item.quantity}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium text-gray-900">
+                          {formatPrice((item?.salePrice > 0 ? item?.salePrice : item?.price || 0) * (item?.quantity || 0))} TL
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-gray-900">
-                        {formatPrice((item?.salePrice > 0 ? item?.salePrice : item?.price || 0) * (item?.quantity || 0))} TL
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <Separator />
-
-              {/* Toplam Tutarlar */}
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Ara Toplam:</span>
-                  <span className="font-medium">{formatPrice(totalCartAmount)} TL</span>
+                  ))}
                 </div>
-                
-                {appliedCoupon && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Kupon İndirimi:</span>
-                    <span className="font-medium text-green-600">-{formatPrice(discountAmount)} TL</span>
-                  </div>
-                )}
 
                 <Separator />
-                
-                <div className="flex justify-between text-base font-semibold">
-                  <span className="text-gray-900">Toplam Tutar:</span>
-                  <span className="text-lg text-blue-600">{formatPrice(finalAmount)} TL</span>
-                </div>
-              </div>
 
-              {/* Ödeme Formu veya Loading */}
-              {isPaymentLoading && (
-                <div className="flex items-center justify-center p-4">
-                  <TextShimmer  className='text-xl font-medium [--base-color:theme(colors.blue.600)] [--base-gradient-color:theme(colors.blue.200)] dark:[--base-color:theme(colors.blue.700)] dark:[--base-gradient-color:theme(colors.blue.400)]' duration={1.5}>
-                    Ödeme formu yükleniyor...
-                  </TextShimmer>
+                {/* Toplam Tutarlar */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Ara Toplam:</span>
+                    <span className="font-medium">{formatPrice(totalCartAmount)} TL</span>
+                  </div>
+                  
+                  {appliedCoupon && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Kupon İndirimi:</span>
+                      <span className="font-medium text-green-600">-{formatPrice(discountAmount)} TL</span>
+                    </div>
+                  )}
+
+                  <Separator />
+                  
+                  <div className="flex justify-between text-base font-semibold">
+                    <span className="text-gray-900">Toplam Tutar:</span>
+                    <span className="text-lg text-blue-600">{formatPrice(finalAmount)} TL</span>
+                  </div>
                 </div>
-              )}
-              
-              {checkoutFormContent && !isPaymentLoading && (
-                <IyzicoForm checkoutFormContent={checkoutFormContent} />
-              )}
-            </CardContent>
-          </Card>
+
+                {/* Ödeme Formu veya Loading */}
+                {isPaymentLoading && (
+                  <div className="flex items-center justify-center p-4">
+                    <TextShimmer  className='text-xl font-medium [--base-color:theme(colors.blue.600)] [--base-gradient-color:theme(colors.blue.200)] dark:[--base-color:theme(colors.blue.700)] dark:[--base-gradient-color:theme(colors.blue.400)]' duration={1.5}>
+                      Ödeme formu yükleniyor...
+                    </TextShimmer>
+                  </div>
+                )}
+                
+                {checkoutFormContent && !isPaymentLoading && (
+                  <IyzicoForm checkoutFormContent={checkoutFormContent} />
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
