@@ -3,7 +3,8 @@ import api from "../../../api/axiosInstance";
 import { clearGuestCart } from "@/lib/guestCartUtils";
 
 const initialState = {
-  paymentPageUrl: null,
+  paymentPageUrl: null, // legacy
+  checkoutFormContent: null,
   isLoading: false,
   error: null,
   orderId: null,
@@ -99,6 +100,11 @@ const shoppingOrderSlice = createSlice({
     resetPaymentPageUrl: (state) => {
       state.paymentPageUrl = null;
     },
+    resetPaymentState: (state) => {
+      state.paymentPageUrl = null;
+      state.checkoutFormContent = null;
+      state.orderId = null;
+    },
     clearOrderError: (state) => {
       state.error = null;
     },
@@ -109,11 +115,13 @@ const shoppingOrderSlice = createSlice({
         state.isLoading = true;
         state.error = null;
         state.paymentPageUrl = null;
+        state.checkoutFormContent = null;
         state.orderId = null;
       })
       .addCase(createNewOrder.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.paymentPageUrl = action.payload?.paymentPageUrl;
+        state.paymentPageUrl = action.payload?.paymentPageUrl || null; // legacy
+        state.checkoutFormContent = action.payload?.checkoutFormContent || null;
         state.orderId = action.payload?.orderId;
         state.error = !action.payload?.success
           ? action.payload?.message ||
@@ -136,6 +144,7 @@ const shoppingOrderSlice = createSlice({
           action.error.message ||
           "Sipariş oluşturulurken bir hata oluştu.";
         state.paymentPageUrl = null;
+        state.checkoutFormContent = null;
         state.orderId = null;
         sessionStorage.removeItem("currentOrderId");
       })
@@ -184,11 +193,13 @@ const shoppingOrderSlice = createSlice({
         state.isLoading = true;
         state.error = null;
         state.paymentPageUrl = null;
+        state.checkoutFormContent = null;
         state.orderId = null;
       })
       .addCase(createGuestOrderThunk.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.paymentPageUrl = action.payload?.paymentPageUrl;
+        state.paymentPageUrl = action.payload?.paymentPageUrl || null; // legacy
+        state.checkoutFormContent = action.payload?.checkoutFormContent || null;
         state.orderId = action.payload?.orderId;
         state.error = !action.payload?.success
           ? action.payload?.message ||
@@ -205,6 +216,7 @@ const shoppingOrderSlice = createSlice({
           action.error.message ||
           "Misafir siparişi oluşturulurken bir hata oluştu.";
         state.paymentPageUrl = null;
+        state.checkoutFormContent = null;
         state.orderId = null;
       })
 
@@ -237,7 +249,7 @@ const shoppingOrderSlice = createSlice({
   },
 });
 
-export const { resetOrderDetails, resetPaymentPageUrl, clearOrderError } =
+export const { resetOrderDetails, resetPaymentPageUrl, resetPaymentState, clearOrderError } =
   shoppingOrderSlice.actions;
 
 export default shoppingOrderSlice.reducer;

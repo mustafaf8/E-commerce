@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import UserCartItemsContent from "@/components/shopping-view/cart-items-content";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { createNewOrder } from "@/store/shop/order-slice";
+import { createNewOrder, resetPaymentState } from "@/store/shop/order-slice";
 import { applyCoupon, removeCoupon, clearCouponState } from "@/store/shop/cart-slice";
 import { useToast } from "@/components/ui/use-toast";
 import { formatPrice } from "@/lib/utils";
@@ -19,13 +19,17 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
 import { AlertTriangle, Ticket, X } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TextShimmer } from "@/components/ui/TextShimmer";
 
 function ShoppingCheckout() {
   const { cartItems, appliedCoupon, discountAmount, couponLoading, couponError } = useSelector((state) => state.shopCart);
   const { user } = useSelector((state) => state.auth);
-  const { loading: orderLoading, error: orderError } = useSelector(
+  const { isLoading: orderLoading, error: orderError } = useSelector(
     (state) => state.shopOrder
   );
+  const { checkoutFormContent } = useSelector((state) => state.shopOrder);
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
   const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
   const [couponCode, setCouponCode] = useState("");
   const dispatch = useDispatch();
@@ -41,6 +45,78 @@ function ShoppingCheckout() {
       });
     }
   }, [orderError, toast]);
+
+  // Iyzico Checkout Form content render
+  useEffect(() => {
+    const containerId = "iyzipay-checkout-form";
+    const formContainer = document.getElementById(containerId);
+    if (checkoutFormContent && formContainer) {
+      try {
+        // 0) Önceki enjekte scriptleri temizle
+        document
+          .querySelectorAll('script[data-iyzi-injected="true"]')
+          .forEach((s) => s.remove());
+
+        // 1) Konteynırı temizle ve içeriği parse et
+        formContainer.innerHTML = "";
+        const temp = document.createElement("div");
+        temp.innerHTML = checkoutFormContent;
+
+        // 2) Iframe varsa direkt ekle
+        const iframe = temp.querySelector("iframe");
+        if (iframe) {
+          formContainer.appendChild(iframe);
+          formContainer.style.display = "block";
+          return;
+        }
+
+        // 3) Script varsa BODY'e enjekte et ve diğer node'ları konteynıra ekle
+        const childNodes = Array.from(temp.childNodes);
+        childNodes.forEach((node) => {
+          if (node.tagName === "SCRIPT") {
+            const newScript = document.createElement("script");
+            Array.from(node.attributes).forEach((attr) =>
+              newScript.setAttribute(attr.name, attr.value)
+            );
+            if (node.src) {
+              newScript.src = node.src;
+            } else {
+              newScript.text = node.text || node.innerHTML;
+            }
+            newScript.setAttribute("data-iyzi-injected", "true");
+            document.body.appendChild(newScript);
+          } else {
+            formContainer.appendChild(node);
+          }
+        });
+
+        formContainer.style.display = "block";
+      } catch (e) {
+        // no-op
+      }
+    }
+
+    return () => {
+      const cn = document.getElementById(containerId);
+      if (cn) cn.innerHTML = "";
+      document
+        .querySelectorAll('script[data-iyzi-injected="true"]')
+        .forEach((s) => s.remove());
+    };
+  }, [checkoutFormContent]);
+
+  // Sayfadan ayrılırken state ve DOM temizliği
+  useEffect(() => {
+    return () => {
+      const containerId = "iyzipay-checkout-form";
+      const iframeTempWrapperId = "iyzipay-checkout-form-wrapper";
+      const formContainer = document.getElementById(containerId);
+      const wrapper = document.getElementById(iframeTempWrapperId);
+      if (formContainer) formContainer.innerHTML = "";
+      if (wrapper) wrapper.remove();
+      dispatch(resetPaymentState());
+    };
+  }, [dispatch]);
 
   const totalCartAmount =
     cartItems && cartItems.items && cartItems.items.length > 0
@@ -141,23 +217,22 @@ function ShoppingCheckout() {
       appliedCoupon: appliedCoupon,
     };
 
+    // Yeni denemeden önce DOM ve state temizliği
+    try {
+      const containerId = "iyzipay-checkout-form";
+      const cn = document.getElementById(containerId);
+      if (cn) cn.innerHTML = "";
+    } catch {}
+    dispatch(resetPaymentState());
+
+    setIsPaymentLoading(true);
     dispatch(createNewOrder(orderData))
       .unwrap()
       .then((result) => {
-        if (result?.success && result?.paymentPageUrl) {
+        if (result?.success && result?.checkoutFormContent) {
           dispatch(clearCouponState());
-          toast({
-            title: "Ödeme sayfasına yönlendiriliyorsunuz...",
-            variant: "success",
-          });
-          window.location.href = result.paymentPageUrl;
-        } else if (result?.success && result?.checkoutFormContent) {
-          toast({
-            variant: "destructive",
-            title: "Yönlendirme Hatası",
-            description:
-              "Ödeme sayfasına yönlendirilemedi (Form içeriği alındı). Lütfen tekrar deneyin.",
-          });
+          // checkoutFormContent state'e zaten yazıldı; useEffect gösterir.
+          toast({ title: "Güvenli ödeme formu yüklendi", variant: "success" });
         } else {
           toast({
             variant: "destructive",
@@ -170,7 +245,8 @@ function ShoppingCheckout() {
       })
       .catch((error) => {
        // console.error("createNewOrder error:", error);
-      });
+      })
+      .finally(() => setIsPaymentLoading(false));
   }
 
   return (
@@ -334,15 +410,33 @@ function ShoppingCheckout() {
           </CardContent>
           {cartItems?.items?.length > 0 && (
             <CardFooter className="flex flex-col items-stretch gap-2 pt-5">
-              <Button
-                onClick={handleInitiateIyzicoPayment}
-                className="w-full text-base py-3"
-                disabled={orderLoading || !currentSelectedAddress}
-                aria-label="Iyzico ile Güvenli Öde"
-              >
-                {orderLoading ? "İşleniyor..." : "Iyzico ile Güvenli Öde"}
-              </Button>
-              {!currentSelectedAddress && (
+              {isPaymentLoading ? (
+                <div className="flex items-center justify-center p-4">
+                  <TextShimmer className="font-medium text-lg" duration={1.5}>
+                    Ödeme yükleniyor...
+                  </TextShimmer>
+                </div>
+              ) : (
+                <Button
+                  onClick={handleInitiateIyzicoPayment}
+                  className="w-full text-base py-3"
+                  disabled={orderLoading || !currentSelectedAddress}
+                  aria-label="Iyzico ile Güvenli Öde"
+                >
+                  {orderLoading ? "İşleniyor..." : "Iyzico ile Güvenli Öde"}
+                </Button>
+              )}
+
+              
+
+              {/* Gömülü Iyzico form alanı */}
+              <div
+                id="iyzipay-checkout-form"
+                className="mt-2"
+                style={{ display: checkoutFormContent ? "block" : "none" }}
+              />
+
+              {!currentSelectedAddress && !isPaymentLoading && (
                 <p className="text-xs text-red-600 text-center">
                   Lütfen bir teslimat adresi seçin.
                 </p>

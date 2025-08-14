@@ -244,13 +244,12 @@ const createOrder = async (req, res) => {
       }
       if (
         result.status === "success" &&
-        (result.paymentPageUrl || result.checkoutFormContent)
+        result.checkoutFormContent
       ) {
         pendingOrder.iyzicoToken = result.token;
         pendingOrder.save();
         res.status(200).json({
           success: true,
-          paymentPageUrl: result.paymentPageUrl,
           checkoutFormContent: result.checkoutFormContent,
           orderId: pendingOrder._id,
         });
@@ -519,13 +518,12 @@ const createGuestOrder = async (req, res) => {
       }
       if (
         result.status === "success" &&
-        (result.paymentPageUrl || result.checkoutFormContent)
+        result.checkoutFormContent
       ) {
         pendingOrder.iyzicoToken = result.token;
         await pendingOrder.save();
         res.status(200).json({
           success: true,
-          paymentPageUrl: result.paymentPageUrl,
           checkoutFormContent: result.checkoutFormContent,
           orderId: pendingOrder._id,
         });
