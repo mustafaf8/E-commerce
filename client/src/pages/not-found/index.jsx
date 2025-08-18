@@ -37,7 +37,7 @@ function NotFound() {
             <Compass className="w-20 h-20 text-blue-500 mx-auto" />
           </div>
 
-          {/* Title */}
+    
           <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white mb-4">
             Kaybolmuş Gibisiniz!
           </h2>
