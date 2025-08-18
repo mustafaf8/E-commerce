@@ -23,7 +23,7 @@ function NotFound() {
 
 
         <div className={`relative z-10 max-w-2xl mx-auto transform transition-all duration-1000 ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'}`}>
-          {/* 404 Number with Animation */}
+
           <div className="relative mb-8">
             <h1 className="text-8xl md:text-9xl font-black bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent animate-pulse">
               404
