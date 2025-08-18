@@ -33,7 +33,6 @@ function NotFound() {
             </div>
           </div>
 
-          {/* Icon */}
           <div className="mb-6 animate-bounce">
             <Compass className="w-20 h-20 text-blue-500 mx-auto" />
           </div>
