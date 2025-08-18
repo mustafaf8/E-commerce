@@ -42,7 +42,7 @@ function NotFound() {
             Kaybolmuş Gibisiniz!
           </h2>
 
-          {/* Description */}
+      
           <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
             Aradığınız sayfa bir maceraya çıkmış olabilir. 🚀<br />
             Merak etmeyin, sizi güvenli bir yere götürebiliriz.
