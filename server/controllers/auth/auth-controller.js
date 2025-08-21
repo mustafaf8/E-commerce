@@ -137,7 +137,20 @@ const registerUser = async (req, res) => {
     await newUser.save();
 
     // Doğrulama e-postasını gönder
-    await sendEmailVerificationEmail(newUser.email, emailVerificationCode, newUser.userName);
+    console.log("E-posta doğrulama kodu gönderiliyor:", {
+      email: newUser.email,
+      code: emailVerificationCode,
+      userName: newUser.userName
+    });
+    
+    const emailSent = await sendEmailVerificationEmail(newUser.email, emailVerificationCode, newUser.userName);
+    
+    if (!emailSent) {
+      console.error("E-posta doğrulama kodu gönderilemedi:", newUser.email);
+      // E-posta gönderilemese bile kullanıcı kaydı tamamlanır
+    } else {
+      console.log("E-posta doğrulama kodu başarıyla gönderildi:", newUser.email);
+    }
 
     logInfo("Yeni kullanıcı kaydoldu", req, {
       action: "USER_REGISTER",

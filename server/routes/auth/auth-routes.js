@@ -82,4 +82,25 @@ router.get(
 router.post("/phone/verify", verifyPhoneNumberLogin);
 router.post("/phone/register", registerPhoneNumberUser);
 
+// Test route for email sending
+router.post("/test-email", async (req, res) => {
+  try {
+    const { sendEmailVerificationEmail } = require("../../helpers/emailHelper");
+    const testCode = "123456";
+    const testEmail = req.body.email || "test@example.com";
+    
+    console.log("Test e-postası gönderiliyor:", testEmail);
+    const result = await sendEmailVerificationEmail(testEmail, testCode, "Test User");
+    
+    if (result) {
+      res.json({ success: true, message: "Test e-postası başarıyla gönderildi" });
+    } else {
+      res.json({ success: false, message: "Test e-postası gönderilemedi" });
+    }
+  } catch (error) {
+    console.error("Test e-postası hatası:", error);
+    res.status(500).json({ success: false, message: "Test e-postası hatası", error: error.message });
+  }
+});
+
 module.exports = router;
