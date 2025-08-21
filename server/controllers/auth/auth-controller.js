@@ -87,10 +87,13 @@ const registerUser = async (req, res) => {
     });
   }
 
-  if (password.length < 4) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Şifre en az 4 karakter olmalıdır." });
+  // Backend şifre politikası: min 8, 1 sayı, 1 küçük, 1 büyük harf
+  const passwordPolicy = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+  if (!passwordPolicy.test(password)) {
+    return res.status(400).json({
+      success: false,
+      message: "Şifre en az 8 karakter olmalı ve en az 1 büyük harf, 1 küçük harf ve 1 sayı içermelidir.",
+    });
   }
 
   // TC Kimlik No validasyonu

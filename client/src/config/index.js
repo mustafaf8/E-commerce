@@ -17,7 +17,7 @@ export const registerFormControls = [
     componentType: "input",
     type: "email",
     maxLength: 50,
-    pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+    pattern: "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
     title: "Geçerli bir email adresi giriniz",
     required: true,
   },
