@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from "react";
+import { useId, useMemo, useState, useEffect } from "react";
 import { Input } from "./input";
 import { Label } from "./label";
 import { Check, Eye, EyeOff, X } from "lucide-react";
@@ -6,6 +6,7 @@ import { Check, Eye, EyeOff, X } from "lucide-react";
 export default function PasswordStrengthInput({
   value,
   onChange,
+  onValidityChange,
   label = "Şifre",
   placeholder = "Şifre",
   id: propId,
@@ -27,6 +28,10 @@ export default function PasswordStrengthInput({
   }, [value]);
 
   const strengthScore = useMemo(() => strength.filter((r) => r.met).length, [strength]);
+
+  useEffect(() => {
+    onValidityChange?.(strengthScore === 4);
+  }, [strengthScore, onValidityChange]);
 
   const getStrengthColor = (score) => {
     if (score === 0) return "bg-border";

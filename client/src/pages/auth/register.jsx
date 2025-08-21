@@ -19,6 +19,7 @@ const initialState = {
 function AuthRegister() {
   const [formData, setFormData] = useState(initialState);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
   
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -29,22 +30,22 @@ function AuthRegister() {
     setIsLoading(true);
     
          dispatch(registerUser(formData)).then((data) => {
-       if (data?.payload?.success) {
-         toast({
-           title: data?.payload?.message,
-           variant: "success",
-         });
-         // Doğrulama sayfasına yönlendir
-         navigate(`/auth/verify-email?email=${encodeURIComponent(formData.email)}`);
-       } else {
-         toast({
-           title: data?.payload?.message,
-           variant: "destructive",
-         });
-       }
-     }).finally(() => {
-       setIsLoading(false);
-     });
+      if (data?.payload?.success) {
+        toast({
+          title: data?.payload?.message,
+          variant: "success",
+        });
+        // Doğrulama sayfasına yönlendir
+        navigate(`/auth/verify-email?email=${encodeURIComponent(formData.email)}`);
+      } else {
+        toast({
+          title: data?.payload?.message,
+          variant: "destructive",
+        });
+      }
+    }).finally(() => {
+      setIsLoading(false);
+    });
   }
 
   const footerContent = (
@@ -83,11 +84,12 @@ function AuthRegister() {
         formData={formData}
         setFormData={setFormData}
         onSubmit={onSubmit}
-        isBtnDisabled={isLoading}
+        isBtnDisabled={isLoading || !isPasswordValid}
       >
         <PasswordStrengthInput
           value={formData.password}
           onChange={(val) => setFormData((prev) => ({ ...prev, password: val }))}
+          onValidityChange={setIsPasswordValid}
           label="Şifre"
           placeholder="Şifrenizi belirleyin"
         />
