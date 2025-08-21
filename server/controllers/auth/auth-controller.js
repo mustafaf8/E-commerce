@@ -129,7 +129,8 @@ const registerUser = async (req, res) => {
     // 6 haneli doğrulama kodu oluştur
     const emailVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     newUser.emailVerificationCode = emailVerificationCode;
-    newUser.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 saat
+    // Kod geçerlilik süresi: 30 dakika
+    newUser.emailVerificationExpires = Date.now() + 30 * 60 * 1000; // 30 dk
     newUser.emailVerificationAttempts = 1;
     newUser.emailVerificationLastSent = new Date();
 
@@ -729,11 +730,20 @@ const resendEmailVerification = async (req, res) => {
       });
     }
 
+    // Saatlik limit reset kontrolü (1 saat geçtiyse sayacı sıfırla)
+    if (user.emailVerificationLastSent) {
+      const oneHourAgo = Date.now() - 60 * 60 * 1000;
+      if (new Date(user.emailVerificationLastSent).getTime() < oneHourAgo) {
+        user.emailVerificationAttempts = 0;
+      }
+    }
+
     // Yeni 6 haneli doğrulama kodu oluştur
     const emailVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     
     user.emailVerificationCode = emailVerificationCode;
-    user.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 saat
+    // Kod geçerlilik süresi: 30 dakika
+    user.emailVerificationExpires = Date.now() + 30 * 60 * 1000; // 30 dk
     user.emailVerificationAttempts += 1;
     user.emailVerificationLastSent = new Date();
 

@@ -168,10 +168,10 @@ const sendEmailVerificationEmail = async (toEmail, code, userName = "") => {
           <h1 style="color: #16a34a; font-size: 32px; font-weight: bold; letter-spacing: 8px; margin: 0; font-family: 'Courier New', monospace;">${code}</h1>
         </div>
       </div>
-      <p style="text-align: center; color: #666; font-size: 14px;">Bu kod 24 saat boyunca geçerlidir.</p>
+      <p style="text-align: center; color: #666; font-size: 14px;">Bu kod 30 dakika boyunca geçerlidir.</p>
       <p>Eğer bu talebi siz yapmadıysanız, bu e-postayı görmezden gelebilirsiniz.</p>
       <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-      <p style="font-size: 12px; color: #888;">Teşekkürler,<br/>Deposun Ekibi</p>
+      <p style="font-size: 12px; color: #888;">Teşekkürler,<br/>Deposun Ekibi</p>s
     </div>
   `;
 
