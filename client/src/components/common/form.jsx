@@ -10,6 +10,7 @@ import {
 } from "../ui/select";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
+import { PasswordInput } from "../ui/password-input";
 
 function CommonForm({
   formControls = [],
@@ -25,25 +26,47 @@ function CommonForm({
 
     switch (getControlItem.componentType) {
       case "input":
-        element = (
-          <Input
-            name={getControlItem.name}
-            placeholder={getControlItem.placeholder}
-            id={getControlItem.name}
-            type={getControlItem.type}
-            value={value}
-            onChange={(event) =>
-              setFormData({
-                ...formData,
-                [getControlItem.name]: event.target.value,
-              })
-            }
-            maxLength={getControlItem.maxLength}
-            pattern={getControlItem.pattern}
-            title={getControlItem.title}
-            required={getControlItem.required}
-          />
-        );
+        // Şifre alanları için PasswordInput kullan
+        if (getControlItem.type === "password") {
+          element = (
+            <PasswordInput
+              name={getControlItem.name}
+              placeholder={getControlItem.placeholder}
+              id={getControlItem.name}
+              value={value}
+              onChange={(event) =>
+                setFormData({
+                  ...formData,
+                  [getControlItem.name]: event.target.value,
+                })
+              }
+              maxLength={getControlItem.maxLength}
+              pattern={getControlItem.pattern}
+              title={getControlItem.title}
+              required={getControlItem.required}
+            />
+          );
+        } else {
+          element = (
+            <Input
+              name={getControlItem.name}
+              placeholder={getControlItem.placeholder}
+              id={getControlItem.name}
+              type={getControlItem.type}
+              value={value}
+              onChange={(event) =>
+                setFormData({
+                  ...formData,
+                  [getControlItem.name]: event.target.value,
+                })
+              }
+              maxLength={getControlItem.maxLength}
+              pattern={getControlItem.pattern}
+              title={getControlItem.title}
+              required={getControlItem.required}
+            />
+          );
+        }
 
         break;
       case "select":
@@ -135,6 +158,7 @@ function CommonForm({
           </div>
         ))}
       </div>
+      
       <Button disabled={isBtnDisabled} type="submit" className="mt-6 w-full" aria-label={buttonText || "Submit"}>
         {buttonText || "Submit"}
       </Button>

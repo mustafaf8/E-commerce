@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -21,10 +21,10 @@ import "react-phone-number-input/style.css";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { auth } from "@/firebase-config";
 import {
-  verifyPhoneLogin,
-  registerPhoneUser,
-  loginUser,
-} from "@/store/auth-slice";
+   verifyPhoneLogin,
+   registerPhoneUser,
+   loginUser,
+ } from "@/store/auth-slice";
 import CommonForm from "@/components/common/form";
 import { loginFormControls } from "@/config";
 
@@ -48,9 +48,11 @@ function AuthLogin() {
   const [nameLoading, setNameLoading] = useState(false);
   const [resendDisabled, setResendDisabled] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
+  
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const { isAuthenticated } = useSelector((state) => state.auth);
 
@@ -59,6 +61,17 @@ function AuthLogin() {
       navigate("/shop/home");
     }
   }, [isAuthenticated, navigate]);
+
+  // E-posta doğrulama sonucu gösterimi
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const verified = params.get("verified");
+    if (verified === "1") {
+      toast({ variant: "success", title: "E-posta doğrulandı! Artık giriş yapabilirsiniz." });
+    } else if (verified === "0") {
+      toast({ variant: "destructive", title: "Doğrulama başarısız veya süresi doldu." });
+    }
+  }, [location.search, toast]);
 
   useEffect(() => {
     if (step === "phone" && !window.recaptchaVerifier) {
@@ -273,6 +286,8 @@ function AuthLogin() {
         setEmailPasswordFormData(initialEmailPasswordState);
       });
   };
+
+  
 
   const handleGoogleLogin = () => {
     window.location.href = import.meta.env.VITE_GOOGLE_AUTH_URL;
@@ -549,7 +564,7 @@ function AuthLogin() {
             onSubmit={handleEmailPasswordLogin}
             isBtnDisabled={emailLoading || loading}
           />
-          <div className="text-right mb-4">
+          <div className="flex justify-between items-center mb-4">
             <Link
               to="/auth/forgot-password"
               className="text-sm font-medium text-primary hover:underline"
@@ -582,6 +597,8 @@ function AuthLogin() {
       {step === "otp" && renderOtpInput()}
       {step === "name" && renderNameInput()}
       {step === "email" && renderEmailPasswordLogin()}
+
+      
     </>
   );
 }

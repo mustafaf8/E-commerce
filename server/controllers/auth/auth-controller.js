@@ -4,7 +4,7 @@ const User = require("../../models/User");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const admin = require("firebase-admin");
-const { sendPasswordResetEmail } = require("../../helpers/emailHelper");
+const { sendPasswordResetEmail, sendEmailVerificationEmail } = require("../../helpers/emailHelper");
 const crypto = require("crypto");
 const { logInfo, logError, logWarn } = require("../../helpers/logger");
 
@@ -123,9 +123,20 @@ const registerUser = async (req, res) => {
       email,
       password: hashPassword,
       tcKimlikNo,
+      isEmailVerified: false,
     });
 
+    // 6 haneli doğrulama kodu oluştur
+    const emailVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    newUser.emailVerificationCode = emailVerificationCode;
+    newUser.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 saat
+    newUser.emailVerificationAttempts = 1;
+    newUser.emailVerificationLastSent = new Date();
+
     await newUser.save();
+
+    // Doğrulama e-postasını gönder
+    await sendEmailVerificationEmail(newUser.email, emailVerificationCode, newUser.userName);
 
     logInfo("Yeni kullanıcı kaydoldu", req, {
       action: "USER_REGISTER",
@@ -136,7 +147,7 @@ const registerUser = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Kayıt işlemi başarılı",
+      message: "Kayıt başarılı! Lütfen e-posta adresinizi doğrulayın.",
     });
   } catch (e) {
     logError("Kullanıcı kaydı hatası", req, {
@@ -174,6 +185,14 @@ const loginUser = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "Bu e-posta adresine sahip bir kullanıcı bulunamadı.",
+      });
+    }
+
+    // E-posta doğrulaması kontrolü (local hesaplar için)
+    if (checkUser.password && checkUser.isEmailVerified === false) {
+      return res.status(403).json({
+        success: false,
+        message: "E-posta adresiniz doğrulanmamış. Lütfen e-postanızı doğrulayın.",
       });
     }
 
@@ -675,14 +694,133 @@ const resetPassword = async (req, res) => {
   }
 };
 
-module.exports = {
-  registerUser,
-  loginUser,
-  logoutUser,
-  authMiddleware,
-  updateUserDetails,
-  verifyPhoneNumberLogin,
-  registerPhoneNumberUser,
-  forgotPassword,
-  resetPassword,
+// Resend email verification
+const resendEmailVerification = async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "E-posta adresi gerekli.",
+      });
+    }
+
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Bu e-posta adresiyle kayıtlı kullanıcı bulunamadı.",
+      });
+    }
+
+    if (user.isEmailVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "E-posta adresi zaten doğrulanmış.",
+      });
+    }
+
+    if (user.emailVerificationAttempts >= 3) {
+      return res.status(429).json({
+        success: false,
+        message: "Maksimum doğrulama e-postası gönderim sayısına ulaştınız. Lütfen daha sonra tekrar deneyin.",
+      });
+    }
+
+    // Yeni 6 haneli doğrulama kodu oluştur
+    const emailVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    user.emailVerificationCode = emailVerificationCode;
+    user.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 saat
+    user.emailVerificationAttempts += 1;
+    user.emailVerificationLastSent = new Date();
+
+    await user.save();
+
+    // Doğrulama e-postasını gönder
+    const emailSent = await sendEmailVerificationEmail(user.email, emailVerificationCode, user.userName);
+
+    if (emailSent) {
+      res.status(200).json({
+        success: true,
+        message: `Doğrulama e-postası tekrar gönderildi. Kalan hak: ${3 - user.emailVerificationAttempts}`,
+        remainingAttempts: 3 - user.emailVerificationAttempts,
+      });
+    } else {
+      // E-posta gönderilemezse attempt sayısını geri al
+      user.emailVerificationAttempts -= 1;
+      await user.save();
+      
+      res.status(500).json({
+        success: false,
+        message: "E-posta gönderilemedi. Lütfen daha sonra tekrar deneyin.",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Sunucu hatası.",
+    });
+  }
 };
+
+// Email verification handler
+const verifyEmail = async (req, res) => {
+  try {
+    const { code } = req.body;
+    const { email } = req.body;
+
+    if (!code || !email) {
+      return res.status(400).json({
+        success: false,
+        message: "Doğrulama kodu ve e-posta adresi gerekli.",
+      });
+    }
+
+    const user = await User.findOne({
+      email: email,
+      emailVerificationCode: code,
+      emailVerificationExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Geçersiz doğrulama kodu veya süresi dolmuş.",
+      });
+    }
+
+    user.isEmailVerified = true;
+    user.emailVerificationCode = undefined;
+    user.emailVerificationExpires = undefined;
+    user.emailVerificationAttempts = 0;
+    user.emailVerificationLastSent = undefined;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "E-posta adresiniz başarıyla doğrulandı!",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Sunucu hatası.",
+    });
+  }
+};
+
+ module.exports = {
+   registerUser,
+   loginUser,
+   logoutUser,
+   authMiddleware,
+   updateUserDetails,
+   verifyPhoneNumberLogin,
+   registerPhoneNumberUser,
+   forgotPassword,
+   resetPassword,
+   verifyEmail,
+   resendEmailVerification,
+ };
