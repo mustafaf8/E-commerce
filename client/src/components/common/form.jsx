@@ -19,6 +19,7 @@ function CommonForm({
   onSubmit,
   buttonText,
   isBtnDisabled = false,
+  children,
 }) {
   function renderInputsByComponentType(getControlItem) {
     let element = null;
@@ -157,6 +158,7 @@ function CommonForm({
             {renderInputsByComponentType(controlItem)}
           </div>
         ))}
+        {children}
       </div>
       
       <Button disabled={isBtnDisabled} type="submit" className="mt-6 w-full" aria-label={buttonText || "Submit"}>
@@ -186,6 +188,7 @@ CommonForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   buttonText: PropTypes.node,
   isBtnDisabled: PropTypes.bool,
+  children: PropTypes.node,
 };
 
 export default CommonForm;

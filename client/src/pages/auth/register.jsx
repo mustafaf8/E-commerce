@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { UserPlus, Loader2, Mail } from "lucide-react";
+import PasswordStrengthInput from "@/components/ui/password-strength-input";
 
 const initialState = {
   userName: "",
@@ -62,7 +63,6 @@ function AuthRegister() {
   return (
     <AuthLayout
       title="Hesap Oluştur"
-      description="Hemen ücretsiz hesabınızı oluşturun"
       footerContent={footerContent}
     >
       <CommonForm
@@ -84,7 +84,14 @@ function AuthRegister() {
         setFormData={setFormData}
         onSubmit={onSubmit}
         isBtnDisabled={isLoading}
-      />
+      >
+        <PasswordStrengthInput
+          value={formData.password}
+          onChange={(val) => setFormData((prev) => ({ ...prev, password: val }))}
+          label="Şifre"
+          placeholder="Şifrenizi belirleyin"
+        />
+      </CommonForm>
       
     </AuthLayout>
   );
