@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import AuthLayout from "@/components/auth/AuthLayout";
@@ -24,6 +24,8 @@ export default function VerifyEmailPage() {
 
   const [email, setEmail] = useState(emailFromQuery);
   const [code, setCode] = useState("");
+  const [digits, setDigits] = useState(["", "", "", "", "", ""]);
+  const inputRefs = useRef(Array.from({ length: 6 }, () => null));
   const [verifyLoading, setVerifyLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
 
@@ -52,6 +54,51 @@ export default function VerifyEmailPage() {
       toast({ variant: "destructive", title: err?.message || "Kod doğrulanamadı" });
     } finally {
       setVerifyLoading(false);
+    }
+  };
+
+  const updateCodeFromDigits = (nextDigits) => {
+    const joined = nextDigits.join("");
+    setCode(joined);
+  };
+
+  const handleDigitChange = (index, value) => {
+    const sanitized = (value || "").replace(/[^0-9]/g, "").slice(0, 1);
+    const nextDigits = [...digits];
+    nextDigits[index] = sanitized;
+    setDigits(nextDigits);
+    updateCodeFromDigits(nextDigits);
+
+    if (sanitized && index < 5 && inputRefs.current[index + 1]) {
+      inputRefs.current[index + 1].focus();
+    }
+  };
+
+  const handleDigitKeyDown = (index, e) => {
+    if (e.key === "Backspace") {
+      if (digits[index]) {
+        const nextDigits = [...digits];
+        nextDigits[index] = "";
+        setDigits(nextDigits);
+        updateCodeFromDigits(nextDigits);
+      } else if (index > 0 && inputRefs.current[index - 1]) {
+        inputRefs.current[index - 1].focus();
+      }
+    } else if (e.key === "ArrowLeft" && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    } else if (e.key === "ArrowRight" && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleCodePaste = (e) => {
+    const pasted = (e.clipboardData.getData("text") || "").replace(/[^0-9]/g, "");
+    if (pasted.length === 6) {
+      const nextDigits = pasted.split("").slice(0, 6);
+      setDigits(nextDigits);
+      updateCodeFromDigits(nextDigits);
+      inputRefs.current[5]?.focus();
+      e.preventDefault();
     }
   };
 
@@ -104,18 +151,29 @@ export default function VerifyEmailPage() {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="code">Doğrulama Kodu</Label>
-          <Input
-            id="code"
-            type="text"
-            inputMode="numeric"
-            placeholder="000000"
-            maxLength={6}
-            value={code}
-            onChange={(e) => setCode(e.target.value.replace(/[^0-9]/g, ""))}
-            className="text-center tracking-[0.5em] text-xl font-semibold"
-            required
-          />
+          <Label htmlFor="code-0">Doğrulama Kodu</Label>
+          <div
+            className="flex items-center justify-center gap-2"
+            role="group"
+            aria-label="Doğrulama kodu giriş alanları"
+            onPaste={handleCodePaste}
+          >
+            {digits.map((d, idx) => (
+              <input
+                key={idx}
+                id={`code-${idx}`}
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                className="w-10 h-10 md:w-12 md:h-12 text-center text-xl md:text-2xl font-semibold border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-green-600"
+                value={d}
+                onChange={(e) => handleDigitChange(idx, e.target.value)}
+                onKeyDown={(e) => handleDigitKeyDown(idx, e)}
+                ref={(el) => (inputRefs.current[idx] = el)}
+                aria-label={`Kod hane ${idx + 1}`}
+              />
+            ))}
+          </div>
         </div>
         <Button type="submit" className="w-full" disabled={verifyLoading || !email || code.length !== 6}>
           {verifyLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
