@@ -614,7 +614,23 @@ const forgotPassword = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "Bu e-posta adresiyle kayıtlı kullanıcı bulunamadı.",
+        message: "Bu e-posta adresi hatalı veya kayıtlı kullanıcı bulunamadı.",
+      });
+    }
+
+    // Saatlik limit reset kontrolü (1 saat geçtiyse sayacı sıfırla)
+    if (user.resetPasswordLastSent) {
+      const oneHourAgo = Date.now() - 60 * 60 * 1000;
+      if (new Date(user.resetPasswordLastSent).getTime() < oneHourAgo) {
+        user.resetPasswordAttempts = 0;
+      }
+    }
+
+    // Saatte 3 gönderim limiti
+    if (user.resetPasswordAttempts >= 3) {
+      return res.status(429).json({
+        success: false,
+        message: "Çok deneme yapıldı. Lütfen daha sonra tekrar deneyin.",
       });
     }
 
@@ -628,7 +644,9 @@ const forgotPassword = async (req, res) => {
       .digest("hex");
 
     user.resetPasswordToken = hashedToken;
-    user.resetPasswordExpires = Date.now() + 3600000; // 1 saat geçerli
+    user.resetPasswordExpires = Date.now() + 60 * 60 * 1000; // 1 saat geçerli
+    user.resetPasswordAttempts += 1;
+    user.resetPasswordLastSent = new Date();
 
     await user.save();
 
@@ -643,6 +661,8 @@ const forgotPassword = async (req, res) => {
     } else {
       user.resetPasswordToken = undefined;
       user.resetPasswordExpires = undefined;
+      // Gönderilemediyse attempt sayısını geri al
+      user.resetPasswordAttempts = Math.max(0, (user.resetPasswordAttempts || 1) - 1);
       await user.save();
       res.status(500).json({
         success: false,
@@ -674,16 +694,18 @@ const resetPassword = async (req, res) => {
       });
     }
 
-    if (password.length < 4) {
+    if (password.length < 8) {
       return res
         .status(400)
-        .json({ success: false, message: "Şifre en az 4 karakter olmalıdır." });
+        .json({ success: false, message: "Şifre en az 8 karakter olmalıdır." });
     }
 
     const hashPassword = await bcrypt.hash(password, 12);
     user.password = hashPassword;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
+    user.resetPasswordAttempts = 0;
+    user.resetPasswordLastSent = undefined;
 
     await user.save();
 
@@ -726,7 +748,7 @@ const resendEmailVerification = async (req, res) => {
     if (user.emailVerificationAttempts >= 3) {
       return res.status(429).json({
         success: false,
-        message: "Maksimum doğrulama e-postası gönderim sayısına ulaştınız. Lütfen daha sonra tekrar deneyin.",
+        message: "Çok fazla deneme yapıldı. Lütfen daha sonra tekrar deneyin.",
       });
     }
 
@@ -755,7 +777,7 @@ const resendEmailVerification = async (req, res) => {
     if (emailSent) {
       res.status(200).json({
         success: true,
-        message: `Doğrulama e-postası tekrar gönderildi. Kalan hak: ${3 - user.emailVerificationAttempts}`,
+        message: "Doğrulama e-postası tekrar gönderildi."	,
         remainingAttempts: 3 - user.emailVerificationAttempts,
       });
     } else {

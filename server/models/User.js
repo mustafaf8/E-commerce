@@ -73,6 +73,14 @@ const UserSchema = new mongoose.Schema(
   resetPasswordExpires: {
       type: Date,
   },
+    // Şifre sıfırlama ratelimit
+    resetPasswordAttempts: {
+      type: Number,
+      default: 0,
+    },
+    resetPasswordLastSent: {
+      type: Date,
+    },
     // E-posta doğrulama
     isEmailVerified: {
       type: Boolean,
