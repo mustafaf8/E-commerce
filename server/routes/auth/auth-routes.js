@@ -10,8 +10,10 @@ const {
   verifyPhoneNumberLogin,
   registerPhoneNumberUser,
   forgotPassword,
-  resetPassword,
-} = require("../../controllers/auth/auth-controller");
+     resetPassword,
+   verifyEmail,
+   resendEmailVerification,
+ } = require("../../controllers/auth/auth-controller");
 
 const router = express.Router();
 
@@ -26,6 +28,8 @@ const cookieOptions = {
 
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:token", resetPassword);
+router.post("/verify-email", verifyEmail);
+router.post("/resend-verification", resendEmailVerification);
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);

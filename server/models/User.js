@@ -73,6 +73,25 @@ const UserSchema = new mongoose.Schema(
   resetPasswordExpires: {
       type: Date,
   },
+    // E-posta doğrulama
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    emailVerificationCode: {
+      type: String,
+    },
+    emailVerificationExpires: {
+      type: Date,
+    },
+    emailVerificationAttempts: {
+      type: Number,
+      default: 0,
+      max: 3,
+    },
+    emailVerificationLastSent: {
+      type: Date,
+    },
     // İleride eklenebilecek diğer alanlar:
     // profilePicture: String,
     // isPhoneNumberVerified: { type: Boolean, default: false },

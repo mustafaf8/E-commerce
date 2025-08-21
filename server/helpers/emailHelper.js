@@ -149,6 +149,40 @@ const sendPasswordResetEmail = async (toEmail, token) => {
 };
 
 /**
+ * E-posta doğrulama e-postası gönderir.
+ * @param {string} toEmail Alıcının e-posta adresi
+ * @param {string} code 6 haneli doğrulama kodu
+ * @param {string} [userName] Kullanıcı adı (opsiyonel)
+ * @returns {Promise<boolean>} E-posta başarıyla gönderildiyse true döner.
+ */
+const sendEmailVerificationEmail = async (toEmail, code, userName = "") => {
+  const greetingName = userName || toEmail.split("@")[0] || "Kullanıcı";
+
+  const emailHtml = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+      <h2 style="color: #333;">Hesap Doğrulama</h2>
+      <p>Merhaba ${greetingName},</p>
+      <p>Deposun hesabınızı etkinleştirmek için aşağıdaki 6 haneli kodu kullanın:</p>
+      <div style="text-align: center; margin: 20px 0;">
+        <div style="background-color: #f8f9fa; border: 2px solid #16a34a; border-radius: 8px; padding: 20px; display: inline-block;">
+          <h1 style="color: #16a34a; font-size: 32px; font-weight: bold; letter-spacing: 8px; margin: 0; font-family: 'Courier New', monospace;">${code}</h1>
+        </div>
+      </div>
+      <p style="text-align: center; color: #666; font-size: 14px;">Bu kod 24 saat boyunca geçerlidir.</p>
+      <p>Eğer bu talebi siz yapmadıysanız, bu e-postayı görmezden gelebilirsiniz.</p>
+      <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+      <p style="font-size: 12px; color: #888;">Teşekkürler,<br/>Deposun Ekibi</p>
+    </div>
+  `;
+
+  return sendEmail({
+    to: toEmail,
+    subject: "Deposun - E-posta Doğrulama Kodu",
+    htmlContent: emailHtml,
+  });
+};
+
+/**
  * Sipariş onay e-postası gönderir.
  * @param {import("mongoose").Document} order Order belgesi (confirmed & paid)
  */
@@ -417,6 +451,7 @@ const sendOrderNotificationToAdmin = async (order) => {
 module.exports = {
   sendAbandonedCartEmail,
   sendPasswordResetEmail,
+  sendEmailVerificationEmail,
   sendEmail,
   sendOrderConfirmationEmail,
   sendOrderNotificationToAdmin,

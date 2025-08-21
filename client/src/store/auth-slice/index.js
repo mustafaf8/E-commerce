@@ -148,16 +148,40 @@ export const forgotPassword = createAsyncThunk(
 );
 
 export const resetPassword = createAsyncThunk(
-  "/auth/reset-password",
-  async ({ token, password }, { rejectWithValue }) => {
-    try {
-      const response = await api.post(`/auth/reset-password/${token}`, { password });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data);
-    }
-  }
-);
+   "/auth/reset-password",
+   async ({ token, password }, { rejectWithValue }) => {
+     try {
+       const response = await api.post(`/auth/reset-password/${token}`, { password });
+       return response.data;
+     } catch (error) {
+       return rejectWithValue(error.response?.data);
+     }
+   }
+ );
+
+export const resendEmailVerification = createAsyncThunk(
+   "/auth/resend-verification",
+   async ({ email }, { rejectWithValue }) => {
+     try {
+       const response = await api.post("/auth/resend-verification", { email });
+       return response.data;
+     } catch (error) {
+       return rejectWithValue(error.response?.data);
+     }
+   }
+ );
+
+export const verifyEmailCode = createAsyncThunk(
+   "/auth/verify-email",
+   async ({ email, code }, { rejectWithValue }) => {
+     try {
+       const response = await api.post("/auth/verify-email", { email, code });
+       return response.data;
+     } catch (error) {
+       return rejectWithValue(error.response?.data);
+     }
+   }
+ );
 
 
 const authSlice = createSlice({
@@ -323,15 +347,47 @@ const authSlice = createSlice({
             action.payload.message || "Telefonla kayıt backend'de başarısız.";
         }
       })
-      .addCase(registerPhoneUser.rejected, (state, action) => {
-        state.isPhoneRegisterLoading = false;
-        state.isAuthenticated = false;
-        state.user = null;
-        state.error =
-          action.payload?.message ||
-          action.error?.message ||
-          "Telefonla kayıt isteği başarısız.";
-      });
+             .addCase(registerPhoneUser.rejected, (state, action) => {
+         state.isPhoneRegisterLoading = false;
+         state.isAuthenticated = false;
+         state.user = null;
+         state.error =
+           action.payload?.message ||
+           action.error?.message ||
+           "Telefonla kayıt isteği başarısız.";
+       })
+
+       .addCase(resendEmailVerification.pending, (state) => {
+         state.isLoading = true;
+         state.error = null;
+       })
+       .addCase(resendEmailVerification.fulfilled, (state, action) => {
+         state.isLoading = false;
+         state.error = null;
+       })
+               .addCase(resendEmailVerification.rejected, (state, action) => {
+          state.isLoading = false;
+          state.error =
+            action.payload?.message ||
+            action.error?.message ||
+            "Doğrulama e-postası tekrar gönderilemedi.";
+        })
+
+        .addCase(verifyEmailCode.pending, (state) => {
+          state.isLoading = true;
+          state.error = null;
+        })
+        .addCase(verifyEmailCode.fulfilled, (state, action) => {
+          state.isLoading = false;
+          state.error = null;
+        })
+        .addCase(verifyEmailCode.rejected, (state, action) => {
+          state.isLoading = false;
+          state.error =
+            action.payload?.message ||
+            action.error?.message ||
+            "E-posta doğrulama kodu yanlış.";
+        });
   },
 });
 

@@ -29,6 +29,7 @@ import ShoppingHome from "./pages/shopping-view/home";
 // --- PERFORMANS OPTIMIZASYONU: Sayfa bileşenlerini React.lazy ile tembel yükleme ---
 const AuthLogin = lazy(() => import("./pages/auth/login"));
 const AuthRegister = lazy(() => import("./pages/auth/register"));
+const VerifyEmailPage = lazy(() => import("./pages/auth/VerifyEmail"));
 const AdminDashboard = lazy(() => import("./pages/admin-view/dashboard"));
 const AdminProducts = lazy(() => import("./pages/admin-view/products"));
 const AdminOrders = lazy(() => import("./pages/admin-view/orders"));
@@ -179,6 +180,7 @@ function App() {
           >
             <Route path="login" element={<AuthLogin />} />
             <Route path="register" element={<AuthRegister />} />
+            <Route path="verify-email" element={<VerifyEmailPage />} />
             <Route path="forgot-password" element={<ForgotPassword />} />
             <Route path="reset-password/:token" element={<ResetPassword />} />
           </Route>

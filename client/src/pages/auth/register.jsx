@@ -6,7 +6,7 @@ import { registerUser } from "@/store/auth-slice";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { UserPlus } from "lucide-react";
+import { UserPlus, Loader2, Mail } from "lucide-react";
 
 const initialState = {
   userName: "",
@@ -18,6 +18,7 @@ const initialState = {
 function AuthRegister() {
   const [formData, setFormData] = useState(initialState);
   const [isLoading, setIsLoading] = useState(false);
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -26,22 +27,23 @@ function AuthRegister() {
     event.preventDefault();
     setIsLoading(true);
     
-    dispatch(registerUser(formData)).then((data) => {
-      if (data?.payload?.success) {
-        toast({
-          title: data?.payload?.message,
-          variant: "success",
-        });
-        navigate("/auth/login");
-      } else {
-        toast({
-          title: data?.payload?.message,
-          variant: "destructive",
-        });
-      }
-    }).finally(() => {
-      setIsLoading(false);
-    });
+         dispatch(registerUser(formData)).then((data) => {
+       if (data?.payload?.success) {
+         toast({
+           title: data?.payload?.message,
+           variant: "success",
+         });
+         // Doğrulama sayfasına yönlendir
+         navigate(`/auth/verify-email?email=${encodeURIComponent(formData.email)}`);
+       } else {
+         toast({
+           title: data?.payload?.message,
+           variant: "destructive",
+         });
+       }
+     }).finally(() => {
+       setIsLoading(false);
+     });
   }
 
   const footerContent = (
@@ -83,6 +85,7 @@ function AuthRegister() {
         onSubmit={onSubmit}
         isBtnDisabled={isLoading}
       />
+      
     </AuthLayout>
   );
 }
