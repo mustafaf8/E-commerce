@@ -21,6 +21,13 @@ const sender = {
 const sendEmail = async (options) => {
   const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
 
+  console.log("E-posta gönderim bilgileri:", {
+    to: options.to,
+    subject: options.subject,
+    sender: sender,
+    apiKey: process.env.BREVO_API_KEY ? "Mevcut" : "Eksik"
+  });
+
   sendSmtpEmail.sender = sender;
   sendSmtpEmail.to = [{ email: options.to }];
   sendSmtpEmail.subject = options.subject;
@@ -28,6 +35,7 @@ const sendEmail = async (options) => {
 
   try {
     await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log("E-posta başarıyla gönderildi:", options.to);
 
     return true;
   } catch (error) {
@@ -35,6 +43,7 @@ const sendEmail = async (options) => {
       `Brevo ile e-posta gönderilemedi ${options.to}:`,
       error.response ? error.response.body : error.message
     );
+    console.error("E-posta gönderim hatası detayları:", error);
     return false;
   }
 };
