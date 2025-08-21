@@ -80,7 +80,8 @@ exports.initiatePayment = async (req, res) => {
         console.error("Iyzico Hatası:", err || result.errorMessage);
         return res.status(500).json({ success: false, message: "Ödeme başlatılamadı." });
       }
-      res.status(200).json({ success: true, paymentPageUrl: result.paymentPageUrl });
+      // checkoutFormContent'i döndür (embed için)
+      res.status(200).json({ success: true, checkoutFormContent: result.checkoutFormContent });
     });
 
   } catch (error) {
