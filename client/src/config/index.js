@@ -21,28 +21,7 @@ export const registerFormControls = [
     title: "Geçerli bir email adresi giriniz",
     required: true,
   },
-  {
-    name: "password",
-    label: "Şifre",
-    placeholder: "Şifrenizi girin (en az 8 karakter)",
-    componentType: "input",
-    type: "password",
-    maxLength: 20,
-    pattern: "^.{8,}$",
-    title: "Şifreniz en az 8 karakter olmalıdır",
-    required: true,
-  },
-  {
-    name: "tcKimlikNo",
-    label: "TC Kimlik No (Opsiyonel)",
-    placeholder: "11 haneli TC Kimlik Numaranız",
-    componentType: "input",
-    type: "text",
-    maxLength: 11,
-    pattern: "^[0-9]{11}$",
-    title: "TC Kimlik Numarası 11 haneli ve sadece rakam olmalıdır",
-    required: false,
-  },
+  // Şifre alanı register sayfasında özel bileşen ile gösterilecek
 ];
 
 export const loginFormControls = [
