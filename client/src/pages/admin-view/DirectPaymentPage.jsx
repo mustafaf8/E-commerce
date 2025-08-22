@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { CreditCard, Loader2, History, CheckCircle, XCircle } from "lucide-react";
+import IyzicoForm from "@/components/shopping-view/IyzicoForm";
+import { TextShimmer } from "@/components/ui/TextShimmer";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchDirectPayments } from "@/store/admin/directPaymentSlice";
 import { format } from "date-fns";
@@ -57,6 +59,7 @@ const DirectPaymentPage = () => {
   const [amount, setAmount] = useState("");
   const [customerNote, setCustomerNote] = useState("");
   const [loading, setLoading] = useState(false);
+  const [checkoutFormContent, setCheckoutFormContent] = useState(null);
   const { toast } = useToast();
   const canManage = useAdminPermission("direct-payment", "manage");
 
@@ -72,9 +75,10 @@ const DirectPaymentPage = () => {
         amount: parseFloat(amount),
         customerNote,
       });
-      if (response.data.success && response.data.paymentPageUrl) {
-        toast({ title: "Ödeme sayfasına yönlendiriliyorsunuz...", variant: "success" });
-        window.location.href = response.data.paymentPageUrl;
+      if (response.data.success && response.data.checkoutFormContent) {
+        toast({ title: "Ödeme formu hazırlandı.", variant: "success" });
+        setCheckoutFormContent(response.data.checkoutFormContent);
+        setLoading(false);
       } else {
         throw new Error(response.data.message || "Ödeme başlatılamadı.");
       }
@@ -96,6 +100,7 @@ const DirectPaymentPage = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Sol: Ödeme oluşturma */}
         <Card className="shadow-lg">
           <form onSubmit={handleSubmit}>
             <CardHeader>
@@ -132,14 +137,33 @@ const DirectPaymentPage = () => {
                 aria-label="Güvenli Ödeme Sayfası Oluştur"
               >
                 {loading ? <Loader2 className="animate-spin mr-2" /> : <CreditCard className="mr-2 h-5 w-5" />}
-                {loading ? "Yönlendiriliyor..." : "Güvenli Ödeme Sayfası Oluştur"}
+                {loading ? "İşleniyor..." : "Güvenli Ödeme Sayfası Oluştur"}
               </Button>
             </CardFooter>
           </form>
         </Card>
 
-        <PaymentHistory />
+        {/* Sağ: Gömülü Iyzico form alanı */}
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle>
+              <div as="span" className="text-xl font-semibold">Güvenli Ödeme Formu</div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {checkoutFormContent ? (
+              <IyzicoForm checkoutFormContent={checkoutFormContent} />
+            ) : (
+              <div className="h-[500px] flex items-center justify-center text-sm text-muted-foreground">
+                <TextShimmer as="span">Kadir bey kart bilgilerini gireceğiniz form oluşturulduğunda burada görünecek</TextShimmer>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Alt: Son İşlemler */}
+      <PaymentHistory />
     </div>
   );
 };
