@@ -25,17 +25,23 @@ function AdminHeader({ setOpen }) {
     guestOrderList = [],
     pendingFailedOrders = []
   } = useSelector((state) => state.adminOrder || {})
+  const isPaymentAgent = user?.role === "payment_agent";
+
   useEffect(() => {
+    if (isPaymentAgent) return;
     dispatch(fetchPendingFailedOrders());
-    dispatch(fetchAdminMessages('new')).unwrap().then((newMessages) => {
-      if (newMessages) {
-        dispatch(setNewCount(newMessages.length));
-      }
-    });
-  }, [dispatch]);
+    dispatch(fetchAdminMessages("new"))
+      .unwrap()
+      .then((newMessages) => {
+        if (newMessages) {
+          dispatch(setNewCount(newMessages.length));
+        }
+      });
+  }, [dispatch, isPaymentAgent]);
 
   // Calculate new order count
   useEffect(() => {
+    if (isPaymentAgent) return;
     const registeredNewOrders = userList.filter(
       (user) => user.hasNewOrder
     ).length;
@@ -44,18 +50,21 @@ function AdminHeader({ setOpen }) {
       (order) => newOrderStatuses.includes(order.orderStatus) || order.isNew
     ).length;
     setNewOrderCount(registeredNewOrders + guestNewOrders);
-  }, [userList, guestOrderList]);
+  }, [userList, guestOrderList, isPaymentAgent]);
 
   useEffect(() => {
-    const socketURL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin);
+    if (isPaymentAgent) return;
+    const socketURL =
+      import.meta.env.VITE_API_URL ||
+      (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin);
     const socket = io(socketURL, {
       withCredentials: true,
-      transports: ['websocket', 'polling']
+      transports: ["websocket", "polling"],
     });
     socket.on("connect", () => {
       socket.emit("register_admin");
     });
-    socket.on("disconnect", (reason) => {
+    socket.on("disconnect", () => {
       setLiveVisitorCount(null);
     });
     socket.on("connect_error", (error) => {
@@ -67,19 +76,24 @@ function AdminHeader({ setOpen }) {
     // Yeni mesaj bildirimi
     socket.on("new_message_received", (data) => {
       dispatch(incrementNewCount());
-      toast({ title: "Yeni müşteri mesajı!", description: data.subject, variant: "default" });
+      toast({
+        title: "Yeni müşteri mesajı!",
+        description: data.subject,
+        variant: "default",
+      });
     });
     return () => {
       socket.disconnect();
     };
-  }, [dispatch, toast]);
+  }, [dispatch, toast, isPaymentAgent]);
 
   // Mesajlar sayfasına gidince yeni mesaj sayısını sıfırla
   useEffect(() => {
+    if (isPaymentAgent) return;
     if (location.pathname === "/admin/messages") {
       dispatch(resetNewCount());
     }
-  }, [location, dispatch]);
+  }, [location, dispatch, isPaymentAgent]);
 
   function handleLogout() {
     dispatch(logoutUser())
@@ -102,6 +116,27 @@ function AdminHeader({ setOpen }) {
 
   function handleMessageBellClick() {
     navigate("/admin/messages");
+  }
+
+  if (isPaymentAgent) {
+    const displayName = user?.userName || "Ödeme Temsilcisi";
+    return (
+      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-white dark:bg-gray-900 px-4 md:px-6 shadow-sm">
+        <div className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+          {displayName}
+        </div>
+        <Button
+          onClick={handleLogout}
+          variant="ghost"
+          size="sm"
+          className="gap-2 items-center text-gray-700 dark:text-gray-300"
+          aria-label="Çıkış"
+        >
+          <LogOut size={16} />
+          <span>Çıkış Yap</span>
+        </Button>
+      </header>
+    );
   }
 
   return (

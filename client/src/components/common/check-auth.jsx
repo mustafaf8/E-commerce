@@ -5,6 +5,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 function CheckAuth({ isAuthenticated, user, children, isLoading }) {
   const location = useLocation();
 
+  const isPaymentAgent = user?.role === "payment_agent";
+
   // Auth durumu yüklenirken skeleton göster
   if (isLoading) {
     return <Skeleton className="w-full h-screen bg-gray-200" />;
@@ -14,6 +16,10 @@ function CheckAuth({ isAuthenticated, user, children, isLoading }) {
     if (!isAuthenticated) {
       return <Navigate to="/shop/home" replace />;
     } else {
+      if (isPaymentAgent) {
+        return <Navigate to="/admin/direct-payment" replace />;
+      }
+
       if (user?.role === "admin") {
         return <Navigate to="/admin/stats" replace />;
       } else {
@@ -27,6 +33,10 @@ function CheckAuth({ isAuthenticated, user, children, isLoading }) {
     (location.pathname.includes("/auth/login") ||
       location.pathname.includes("/auth/register"))
   ) {
+    if (isPaymentAgent) {
+      return <Navigate to="/admin/direct-payment" replace />;
+    }
+
     if (user?.role === "admin") {
       return <Navigate to="/admin/stats" replace />;
     } else {
@@ -34,20 +44,23 @@ function CheckAuth({ isAuthenticated, user, children, isLoading }) {
     }
   }
 
-  if (
-    isAuthenticated &&
-    user?.role !== "admin" &&
-    location.pathname.includes("/admin")
-  ) {
-    return <Navigate to="/unauth-page" replace />;
+  if (isAuthenticated && location.pathname.includes("/admin")) {
+    if (isPaymentAgent) {
+      if (!location.pathname.startsWith("/admin/direct-payment")) {
+        return <Navigate to="/admin/direct-payment" replace />;
+      }
+    } else if (user?.role !== "admin") {
+      return <Navigate to="/unauth-page" replace />;
+    }
   }
 
-  if (
-    isAuthenticated &&
-    user?.role === "admin" &&
-    location.pathname.includes("/shop")
-  ) {
-    return <Navigate to="/admin/stats" replace />;
+  if (isAuthenticated && location.pathname.includes("/shop")) {
+    if (user?.role === "admin") {
+      return <Navigate to="/admin/stats" replace />;
+    }
+    if (isPaymentAgent) {
+      return <Navigate to="/admin/direct-payment" replace />;
+    }
   }
 
   return <>{children}</>;

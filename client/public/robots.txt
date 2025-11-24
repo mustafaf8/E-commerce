@@ -1,5 +1,5 @@
 # ===================================================================
-# Deposun.com - Konya Güneş Enerjisi Sistemleri için robots.txt
+# Göktürkler Enerji - Konya Güneş Enerjisi Sistemleri için robots.txt
 # Güneş Enerjisi SEO Optimizasyonu - 2025
 # ===================================================================
 
@@ -113,7 +113,7 @@ Allow: /images/brands/
 # Ana site haritası indeksi burada belirtilir.
 # -------------------------------------------------------------------
 
-Sitemap: https://deposun.com/sitemap.xml
+Sitemap: http://gokturklerenerji.com/sitemap.xml
 
 # -------------------------------------------------------------------
 # GOOGLE BOTLARI İÇİN ÖZEL KURALLAR

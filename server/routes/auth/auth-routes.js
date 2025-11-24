@@ -10,10 +10,10 @@ const {
   verifyPhoneNumberLogin,
   registerPhoneNumberUser,
   forgotPassword,
-     resetPassword,
-   verifyEmail,
-   resendEmailVerification,
- } = require("../../controllers/auth/auth-controller");
+  resetPassword,
+  verifyEmail,
+  resendEmailVerification,
+} = require("../../controllers/auth/auth-controller");
 
 const router = express.Router();
 
@@ -23,7 +23,7 @@ const cookieOptions = {
   secure: isProduction,
   sameSite: isProduction ? "None" : "Lax",
   path: "/",
-  domain: isProduction ? ".deposun.com" : undefined,
+  domain: isProduction ? ".gokturklerenerji.com" : undefined,
 };
 
 router.post("/forgot-password", forgotPassword);
@@ -88,18 +88,31 @@ router.post("/test-email", async (req, res) => {
     const { sendEmailVerificationEmail } = require("../../helpers/emailHelper");
     const testCode = "123456";
     const testEmail = req.body.email || "test@example.com";
-    
+
     console.log("Test e-postası gönderiliyor:", testEmail);
-    const result = await sendEmailVerificationEmail(testEmail, testCode, "Test User");
-    
+    const result = await sendEmailVerificationEmail(
+      testEmail,
+      testCode,
+      "Test User"
+    );
+
     if (result) {
-      res.json({ success: true, message: "Test e-postası başarıyla gönderildi" });
+      res.json({
+        success: true,
+        message: "Test e-postası başarıyla gönderildi",
+      });
     } else {
       res.json({ success: false, message: "Test e-postası gönderilemedi" });
     }
   } catch (error) {
     console.error("Test e-postası hatası:", error);
-    res.status(500).json({ success: false, message: "Test e-postası hatası", error: error.message });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Test e-postası hatası",
+        error: error.message,
+      });
   }
 });
 

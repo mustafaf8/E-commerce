@@ -37,7 +37,7 @@ const UserSchema = new mongoose.Schema(
     role: {
       type: String,
       default: "user",
-      enum: ["user", "admin"],
+      enum: ["user", "admin", "payment_agent"],
     },
     // Admin yetkilendirme alanları
     adminAccessLevel: {
@@ -99,6 +99,10 @@ const UserSchema = new mongoose.Schema(
     },
     emailVerificationLastSent: {
       type: Date,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
     },
     // İleride eklenebilecek diğer alanlar:
     // profilePicture: String,
