@@ -207,6 +207,7 @@ exports.addPaymentAgent = async (req, res) => {
       password: hashedPassword,
       role: "payment_agent",
       isActive: true,
+      isEmailVerified: true,
     });
 
     logInfo("Yeni ödeme temsilcisi oluşturuldu", req, {

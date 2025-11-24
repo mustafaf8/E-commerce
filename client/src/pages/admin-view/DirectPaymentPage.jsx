@@ -2,12 +2,25 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import useAdminPermission from "@/hooks/useAdminPermission";
 import api from "@/api/axiosInstance";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+  CardDescription,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { CreditCard, Loader2, History, CheckCircle, XCircle } from "lucide-react";
+import {
+  CreditCard,
+  Loader2,
+  History,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
 import IyzicoForm from "@/components/shopping-view/IyzicoForm";
 import { TextShimmer } from "@/components/ui/TextShimmer";
 import { useDispatch, useSelector } from "react-redux";
@@ -26,30 +39,58 @@ const PaymentHistory = ({ hidden }) => {
     dispatch(fetchDirectPayments());
   }, [dispatch, hidden]);
 
-  if (loading) return <div className="text-center p-4"><Loader2 className="animate-spin mx-auto" /></div>;
+  if (loading)
+    return (
+      <div className="text-center p-4">
+        <Loader2 className="animate-spin mx-auto" />
+      </div>
+    );
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2"><History /> Son İşlemler</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <History /> Son İşlemler
+        </CardTitle>
       </CardHeader>
       <CardContent className="max-h-96 overflow-y-auto space-y-3">
-        {payments.length === 0 && <p className="text-sm text-gray-500 text-center py-4">Henüz işlem yapılmamış.</p>}
-        {payments.map(payment => (
-          <div key={payment._id} className="flex items-center justify-between p-3 border rounded-lg bg-gray-50">
+        {payments.length === 0 && (
+          <p className="text-sm text-gray-500 text-center py-4">
+            Henüz işlem yapılmamış.
+          </p>
+        )}
+        {payments.map((payment) => (
+          <div
+            key={payment._id}
+            className="flex items-center justify-between p-3 border rounded-lg bg-gray-50"
+          >
             <div>
-              <p className={`font-bold text-lg ${payment.status === 'paid' ? 'text-green-600' : 'text-red-600'}`}>
+              <p
+                className={`font-bold text-lg ${
+                  payment.status === "paid" ? "text-green-600" : "text-red-600"
+                }`}
+              >
                 {payment.amount.toFixed(2)} TL
               </p>
-              <p className="text-xs text-gray-500">{payment.customerNote || 'Not yok'}</p>
+              <p className="text-xs text-gray-500">
+                {payment.customerNote || "Not yok"}
+              </p>
               <p className="text-xs text-gray-400 mt-1">
-                {format(new Date(payment.createdAt), "d MMMM yyyy, HH:mm", { locale: tr })}
-                {` - ${payment.adminId?.userName || 'Bilinmeyen'}`}
+                {format(new Date(payment.createdAt), "d MMMM yyyy, HH:mm", {
+                  locale: tr,
+                })}
+                {` - ${payment.adminId?.userName || "Bilinmeyen"}`}
               </p>
             </div>
-            <div className={`flex items-center gap-2 text-sm font-semibold ${payment.status === 'paid' ? 'text-green-600' : 'text-red-600'}`}>
-              {payment.status === 'paid' ? <CheckCircle /> : <XCircle />}
-              <span>{payment.status === 'paid' ? 'Başarılı' : 'Başarısız'}</span>
+            <div
+              className={`flex items-center gap-2 text-sm font-semibold ${
+                payment.status === "paid" ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {payment.status === "paid" ? <CheckCircle /> : <XCircle />}
+              <span>
+                {payment.status === "paid" ? "Başarılı" : "Başarısız"}
+              </span>
             </div>
           </div>
         ))}
@@ -105,7 +146,9 @@ const DirectPaymentPage = () => {
     <div className="p-4 space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-gray-800">Alışverişsiz Ödeme</h1>
-        <p className="text-gray-500 mt-1">Müşteriden hızlıca ödeme almak için bu aracı kullanın.</p>
+        <p className="text-gray-500 mt-1">
+          Müşteriden hızlıca ödeme almak için bu aracı kullanın.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -117,23 +160,38 @@ const DirectPaymentPage = () => {
                 <CreditCard className="text-primary" />
                 Yeni Ödeme Oluştur
               </CardTitle>
-              <CardDescription>Ödeme tutarını ve açıklamasını girerek işleme başlayın.</CardDescription>
+              <CardDescription>
+                Ödeme tutarını ve açıklamasını girerek işleme başlayın.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <Label htmlFor="amount" className="text-base">Ödeme Tutarı (TL) *</Label>
+                <Label htmlFor="amount" className="text-base">
+                  Ödeme Tutarı (TL) *
+                </Label>
                 <Input
-                  id="amount" type="number" step="0.01" min="1"
-                  value={amount} onChange={(e) => setAmount(e.target.value)}
-                  placeholder="Örn: 150.75" required disabled={!canManagePayments}
+                  id="amount"
+                  type="number"
+                  step="0.01"
+                  min="1"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="Örn: 150.75"
+                  required
+                  disabled={!canManagePayments}
                   className="text-lg p-6 mt-2"
                 />
               </div>
               <div>
-                <Label htmlFor="customerNote" className="text-base">Müşteri Notu (Opsiyonel)</Label>
+                <Label htmlFor="customerNote" className="text-base">
+                  Müşteri Notu (Opsiyonel)
+                </Label>
                 <Textarea
-                  id="customerNote" value={customerNote} onChange={(e) => setCustomerNote(e.target.value)}
-                  placeholder="Örn: Müşteri Adı, Telefon veya Sipariş Notu" disabled={!canManagePayments}
+                  id="customerNote"
+                  value={customerNote}
+                  onChange={(e) => setCustomerNote(e.target.value)}
+                  placeholder="Örn: Müşteri Adı, Telefon veya Sipariş Notu"
+                  disabled={!canManagePayments}
                   className="mt-2"
                 />
               </div>
@@ -150,7 +208,11 @@ const DirectPaymentPage = () => {
                 className="w-full text-lg py-6"
                 aria-label="Güvenli Ödeme Sayfası Oluştur"
               >
-                {loading ? <Loader2 className="animate-spin mr-2" /> : <CreditCard className="mr-2 h-5 w-5" />}
+                {loading ? (
+                  <Loader2 className="animate-spin mr-2" />
+                ) : (
+                  <CreditCard className="mr-2 h-5 w-5" />
+                )}
                 {loading ? "İşleniyor..." : "Güvenli Ödeme Sayfası Oluştur"}
               </Button>
             </CardFooter>
@@ -161,7 +223,9 @@ const DirectPaymentPage = () => {
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle>
-              <div as="span" className="text-xl font-semibold">Güvenli Ödeme Formu</div>
+              <div as="span" className="text-xl font-semibold">
+                Güvenli Ödeme Formu
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -169,7 +233,10 @@ const DirectPaymentPage = () => {
               <IyzicoForm checkoutFormContent={checkoutFormContent} />
             ) : (
               <div className="h-[500px] flex items-center justify-center text-sm text-muted-foreground">
-                <TextShimmer as="span">Kadir bey kart bilgilerini gireceğiniz form oluşturulduğunda burada görünecek</TextShimmer>
+                <TextShimmer as="span">
+                  kart bilgilerini gireceğiniz form oluşturulduğunda burada
+                  görünecek
+                </TextShimmer>
               </div>
             )}
           </CardContent>
