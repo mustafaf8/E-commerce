@@ -78,7 +78,7 @@ export default function ContactPage() {
                 <div>
                   <div className="font-bold text-gray-800 dark:text-gray-100 text-lg mb-1 tracking-wide">ADRES</div>
                   <div className="text-gray-700 dark:text-gray-200 leading-relaxed text-base">
-                    Fevziçakmak, 10777. Sk.<br />No:1AC, 42250 Karatay/Konya
+                    Akademi Mah. Oyalı Sk.<br />No:8d Selçuklu/ Konya
                   </div>
                 </div>
               </div>
@@ -89,7 +89,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <div className="font-bold text-gray-800 dark:text-gray-100 text-lg mb-1 tracking-wide">İLETİŞİM NUMARASI</div>
-                  <div className="text-yellow-700 dark:text-yellow-300 font-semibold text-base select-all">+90 (532) 471 28 24</div>
+                  <div className="text-yellow-700 dark:text-yellow-300 font-semibold text-base select-all">+90 (533) 393 71 74</div>
                 </div>
               </div>
               {/* Mail */}
@@ -99,7 +99,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <div className="font-bold text-gray-800 dark:text-gray-100 text-lg mb-1 tracking-wide">MAIL ADRESİ</div>
-                  <div className="text-yellow-700 dark:text-yellow-300 font-semibold text-base select-all">destek@depsoun.com</div>
+                  <div className="text-yellow-700 dark:text-yellow-300 font-semibold text-base select-all">gokturklerenerji@gmail.com</div>
                 </div>
               </div>
             </div>

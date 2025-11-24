@@ -33,7 +33,7 @@ const InfoSecurityPolicy = () => {
             </h2>
           </div>
           <p className="text-gray-700 dark:text-gray-300 text-lg mb-4">
-            <span className="font-semibold">Deposun</span>, faaliyetlerini
+            <span className="font-semibold">Göktürkler Enerji</span>, faaliyetlerini
             yürütürken sahip olduğu tüm bilgi varlıklarının gizliliğini,
             bütünlüğünü ve erişilebilirliğini korumayı taahhüt eder. Bilgi
             güvenliği, iş sürekliliğimizin ve itibarımızın temelini oluşturur.

@@ -1,5 +1,6 @@
 const User = require("../../models/User");
 const { logInfo, logError } = require("../../helpers/logger");
+const bcrypt = require("bcryptjs");
 
 // GET /api/users/admins -> Sadece admin rolündeki kullanıcıları getir
 exports.getAdminUsers = async (req, res) => {
@@ -159,6 +160,169 @@ exports.removeAdmin = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Admin yetkisi kaldırılırken hata oluştu.",
+      error: error.message,
+    });
+  }
+};
+
+exports.getPaymentAgents = async (req, res) => {
+  try {
+    const agents = await User.find({ role: "payment_agent" })
+      .select("_id userName email isActive createdAt")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({ success: true, data: agents });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Kasiyer listesi alınamadı.",
+      error: error.message,
+    });
+  }
+};
+
+exports.addPaymentAgent = async (req, res) => {
+  try {
+    const { userName, email, password } = req.body;
+
+    if (!userName || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "İsim, e-posta ve şifre alanları zorunludur.",
+      });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "Bu e-posta adresi ile kayıtlı kullanıcı zaten mevcut.",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const newAgent = await User.create({
+      userName,
+      email,
+      password: hashedPassword,
+      role: "payment_agent",
+      isActive: true,
+    });
+
+    logInfo("Yeni ödeme temsilcisi oluşturuldu", req, {
+      action: "CREATE_PAYMENT_AGENT",
+      resourceId: newAgent._id,
+      resourceType: "User",
+      additionalData: { userName },
+    });
+
+    res.status(201).json({
+      success: true,
+      data: {
+        _id: newAgent._id,
+        userName: newAgent.userName,
+        email: newAgent.email,
+        isActive: newAgent.isActive,
+        createdAt: newAgent.createdAt,
+      },
+      message: "Kasiyer hesabı oluşturuldu.",
+    });
+  } catch (error) {
+    logError("Ödeme temsilcisi oluşturulamadı", req, {
+      action: "CREATE_PAYMENT_AGENT_ERROR",
+      error: error.message,
+    });
+    res.status(500).json({
+      success: false,
+      message: "Kasiyer hesabı oluşturulamadı.",
+      error: error.message,
+    });
+  }
+};
+
+exports.updateAgentStatus = async (req, res) => {
+  try {
+    const { agentId } = req.params;
+    const { isActive } = req.body;
+
+    if (typeof isActive !== "boolean") {
+      return res.status(400).json({
+        success: false,
+        message: "isActive değeri boolean olmalıdır.",
+      });
+    }
+
+    const agent = await User.findById(agentId);
+    if (!agent || agent.role !== "payment_agent") {
+      return res
+        .status(404)
+        .json({ success: false, message: "Kasiyer bulunamadı." });
+    }
+
+    agent.isActive = isActive;
+    await agent.save();
+
+    logInfo("Ödeme temsilcisi durumu güncellendi", req, {
+      action: "UPDATE_PAYMENT_AGENT_STATUS",
+      resourceId: agent._id,
+      resourceType: "User",
+      additionalData: { isActive },
+    });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        _id: agent._id,
+        userName: agent.userName,
+        email: agent.email,
+        isActive: agent.isActive,
+      },
+      message: "Durum güncellendi.",
+    });
+  } catch (error) {
+    logError("Ödeme temsilcisi durumu güncellenemedi", req, {
+      action: "UPDATE_PAYMENT_AGENT_STATUS_ERROR",
+      error: error.message,
+    });
+    res.status(500).json({
+      success: false,
+      message: "Durum güncellenemedi.",
+      error: error.message,
+    });
+  }
+};
+
+exports.deletePaymentAgent = async (req, res) => {
+  try {
+    const { agentId } = req.params;
+    const agent = await User.findById(agentId);
+
+    if (!agent || agent.role !== "payment_agent") {
+      return res
+        .status(404)
+        .json({ success: false, message: "Kasiyer bulunamadı." });
+    }
+
+    await agent.deleteOne();
+
+    logInfo("Ödeme temsilcisi silindi", req, {
+      action: "DELETE_PAYMENT_AGENT",
+      resourceId: agent._id,
+      resourceType: "User",
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Kasiyer hesabı silindi.",
+    });
+  } catch (error) {
+    logError("Ödeme temsilcisi silinemedi", req, {
+      action: "DELETE_PAYMENT_AGENT_ERROR",
+      error: error.message,
+    });
+    res.status(500).json({
+      success: false,
+      message: "Kasiyer hesabı silinemedi.",
       error: error.message,
     });
   }

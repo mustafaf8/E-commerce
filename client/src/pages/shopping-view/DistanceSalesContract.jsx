@@ -34,10 +34,10 @@ const DistanceSalesContract = () => {
                 SATICI BİLGİLERİ
               </h3>
               <div className="space-y-2 text-sm text-gray-700 dark:text-gray-400">
-                <p><strong>Unvan:</strong> Deposun E-Ticaret Ltd. Şti.</p>
-                <p><strong>Adres:</strong> [Fevziçakmak, 10777 Sk. No:1AC, 42250 Karatay/Konya]</p>
-                <p><strong>Telefon:</strong> +90 532 471 28 24</p>
-                <p><strong>E-posta:</strong> info@deposun.com</p>
+                <p><strong>Unvan:</strong> Göktürkler Enerji</p>
+                <p><strong>Adres:</strong> Akademi Mah. Oyalı Sk. No:8d Selçuklu/ Konya</p>
+                <p><strong>Telefon:</strong> +90 533 393 71 74</p>
+                <p><strong>E-posta:</strong> gokturklerenerji@gmail.com</p>
               
                 <p><strong>V.D./V.N.:</strong> [SELÇUK (KONYA)/7350776184]</p>
               </div>
@@ -166,7 +166,7 @@ const DistanceSalesContract = () => {
               Önemli Ödeme Notları:
             </h4>
             <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
-              <li>• Havale/EFT ödemelerinde, ödeme dekontu info@deposun.com adresine gönderilmelidir.</li>
+              <li>• Havale/EFT ödemelerinde, ödeme dekontu gokturklerenerji@gmail.com adresine gönderilmelidir.</li>
               <li>• Taksit seçenekleri banka kampanyalarına bağlı olarak değişebilir.</li>
               <li>• Yurt dışı kartlar ile ödeme kabul edilmemektedir.</li>
             </ul>
@@ -367,7 +367,7 @@ const DistanceSalesContract = () => {
                 <li>• Sözleşme şartlarından birinin geçersiz olması diğer şartları etkilemez.</li>
                 <li>• Özel indirim ve kampanya koşulları ayrıca belirtilir.</li>
                 <li>• Sözleşme, sipariş onayı ile birlikte yürürlüğe girer.</li>
-                <li>• İletişim: info@deposun.com / +90 532 471 28 24</li>
+                <li>• İletişim: gokturklerenerji@gmail.com / +90 533 393 71 74</li>
               </ul>
             </div>
           </div>

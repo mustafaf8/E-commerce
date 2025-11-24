@@ -14,14 +14,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchDirectPayments } from "@/store/admin/directPaymentSlice";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
+import PropTypes from "prop-types";
 
-const PaymentHistory = () => {
+const PaymentHistory = ({ hidden }) => {
+  if (hidden) return null;
   const dispatch = useDispatch();
   const { payments, loading } = useSelector((state) => state.directPayments);
 
   useEffect(() => {
+    if (hidden) return;
     dispatch(fetchDirectPayments());
-  }, [dispatch]);
+  }, [dispatch, hidden]);
 
   if (loading) return <div className="text-center p-4"><Loader2 className="animate-spin mx-auto" /></div>;
 
@@ -54,6 +57,9 @@ const PaymentHistory = () => {
     </Card>
   );
 };
+PaymentHistory.propTypes = {
+  hidden: PropTypes.bool,
+};
 
 const DirectPaymentPage = () => {
   const [amount, setAmount] = useState("");
@@ -62,12 +68,15 @@ const DirectPaymentPage = () => {
   const [checkoutFormContent, setCheckoutFormContent] = useState(null);
   const { toast } = useToast();
   const canManage = useAdminPermission("direct-payment", "manage");
+  const { user } = useSelector((state) => state.auth);
+  const isPaymentAgent = user?.role === "payment_agent";
+  const canManagePayments = isPaymentAgent || canManage;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!canManage) {
-        toast({ title: "Yetkiniz yok.", variant: "destructive" });
-        return;
+    if (!canManagePayments) {
+      toast({ title: "Yetkiniz yok.", variant: "destructive" });
+      return;
     }
     setLoading(true);
     try {
@@ -116,7 +125,7 @@ const DirectPaymentPage = () => {
                 <Input
                   id="amount" type="number" step="0.01" min="1"
                   value={amount} onChange={(e) => setAmount(e.target.value)}
-                  placeholder="Örn: 150.75" required disabled={!canManage}
+                  placeholder="Örn: 150.75" required disabled={!canManagePayments}
                   className="text-lg p-6 mt-2"
                 />
               </div>
@@ -124,7 +133,7 @@ const DirectPaymentPage = () => {
                 <Label htmlFor="customerNote" className="text-base">Müşteri Notu (Opsiyonel)</Label>
                 <Textarea
                   id="customerNote" value={customerNote} onChange={(e) => setCustomerNote(e.target.value)}
-                  placeholder="Örn: Müşteri Adı, Telefon veya Sipariş Notu" disabled={!canManage}
+                  placeholder="Örn: Müşteri Adı, Telefon veya Sipariş Notu" disabled={!canManagePayments}
                   className="mt-2"
                 />
               </div>
@@ -132,7 +141,12 @@ const DirectPaymentPage = () => {
             <CardFooter>
               <Button
                 type="submit"
-                disabled={loading || !canManage || !amount || parseFloat(amount) <= 0}
+                disabled={
+                  loading ||
+                  !canManagePayments ||
+                  !amount ||
+                  parseFloat(amount) <= 0
+                }
                 className="w-full text-lg py-6"
                 aria-label="Güvenli Ödeme Sayfası Oluştur"
               >
@@ -163,7 +177,7 @@ const DirectPaymentPage = () => {
       </div>
 
       {/* Alt: Son İşlemler */}
-      <PaymentHistory />
+      <PaymentHistory hidden={isPaymentAgent} />
     </div>
   );
 };

@@ -81,7 +81,7 @@ function MaintenancePage({ status }) {
       </p>
       {status.returnDate && <Countdown targetDate={status.returnDate} />}
       <div className="mt-8 text-xs text-gray-500">
-        © {new Date().getFullYear()} Deposun - Tüm Hakları Saklıdır.
+        © {new Date().getFullYear()} Göktürkler Enerji - Tüm Hakları Saklıdır.
       </div>
     </div>
   );

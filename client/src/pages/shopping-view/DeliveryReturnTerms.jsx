@@ -327,7 +327,7 @@ const DeliveryReturnTerms = () => {
                 </h3>
                 <p className="text-sm text-gray-700 dark:text-gray-400">
                   İade/değişim ile ilgili sorularınız için 7/24 müşteri hizmetlerimizle 
-                  iletişime geçebilirsiniz: +90 532 471 28 24
+                  iletişime geçebilirsiniz: +90 533 393 71 74
                 </p>
               </div>
             </div>

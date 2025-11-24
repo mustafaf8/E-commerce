@@ -4,7 +4,10 @@ const User = require("../../models/User");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const admin = require("firebase-admin");
-const { sendPasswordResetEmail, sendEmailVerificationEmail } = require("../../helpers/emailHelper");
+const {
+  sendPasswordResetEmail,
+  sendEmailVerificationEmail,
+} = require("../../helpers/emailHelper");
 const crypto = require("crypto");
 const { logInfo, logError, logWarn } = require("../../helpers/logger");
 
@@ -15,7 +18,7 @@ const cookieOptions = {
   secure: isProduction,
   sameSite: "Lax",
   path: "/",
-  domain: isProduction ? ".deposun.com" : undefined,
+  domain: isProduction ? ".gokturklerenerji.com" : undefined,
 };
 
 passport.use(
@@ -92,7 +95,8 @@ const registerUser = async (req, res) => {
   if (!passwordPolicy.test(password)) {
     return res.status(400).json({
       success: false,
-      message: "Şifre en az 8 karakter olmalı ve en az 1 büyük harf, 1 küçük harf ve 1 sayı içermelidir.",
+      message:
+        "Şifre en az 8 karakter olmalı ve en az 1 büyük harf, 1 küçük harf ve 1 sayı içermelidir.",
     });
   }
 
@@ -130,7 +134,9 @@ const registerUser = async (req, res) => {
     });
 
     // 6 haneli doğrulama kodu oluştur
-    const emailVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const emailVerificationCode = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
     newUser.emailVerificationCode = emailVerificationCode;
     // Kod geçerlilik süresi: 30 dakika
     newUser.emailVerificationExpires = Date.now() + 30 * 60 * 1000; // 30 dk
@@ -143,16 +149,23 @@ const registerUser = async (req, res) => {
     console.log("E-posta doğrulama kodu gönderiliyor:", {
       email: newUser.email,
       code: emailVerificationCode,
-      userName: newUser.userName
+      userName: newUser.userName,
     });
-    
-    const emailSent = await sendEmailVerificationEmail(newUser.email, emailVerificationCode, newUser.userName);
-    
+
+    const emailSent = await sendEmailVerificationEmail(
+      newUser.email,
+      emailVerificationCode,
+      newUser.userName
+    );
+
     if (!emailSent) {
       console.error("E-posta doğrulama kodu gönderilemedi:", newUser.email);
       // E-posta gönderilemese bile kullanıcı kaydı tamamlanır
     } else {
-      console.log("E-posta doğrulama kodu başarıyla gönderildi:", newUser.email);
+      console.log(
+        "E-posta doğrulama kodu başarıyla gönderildi:",
+        newUser.email
+      );
     }
 
     logInfo("Yeni kullanıcı kaydoldu", req, {
@@ -205,11 +218,19 @@ const loginUser = async (req, res) => {
       });
     }
 
+    if (checkUser.isActive === false) {
+      return res.status(403).json({
+        success: false,
+        message: "Hesabınız pasif durumdadır, yöneticiyle iletişime geçin.",
+      });
+    }
+
     // E-posta doğrulaması kontrolü (local hesaplar için)
     if (checkUser.password && checkUser.isEmailVerified === false) {
       return res.status(403).json({
         success: false,
-        message: "E-posta adresiniz doğrulanmamış. Lütfen e-postanızı doğrulayın.",
+        message:
+          "E-posta adresiniz doğrulanmamış. Lütfen e-postanızı doğrulayın.",
       });
     }
 
@@ -330,7 +351,7 @@ const authMiddleware = async (req, res, next) => {
       token,
       process.env.CLIENT_SECRET_KEY || "DEFAULT_SECRET_KEY"
     );
-    const userFromToken = await User.findById(decoded.id).select("-password"); 
+    const userFromToken = await User.findById(decoded.id).select("-password");
     if (!userFromToken) {
       throw new Error("Token'daki kullanıcı bulunamadı.");
     }
@@ -428,7 +449,7 @@ const updateUserDetails = async (req, res) => {
         httpOnly: true,
         secure: true,
         sameSite: "Lax",
-        domain: ".deposun.com",
+        domain: ".gokturklerenerji.com",
         path: "/",
       });
 
@@ -678,7 +699,10 @@ const forgotPassword = async (req, res) => {
       user.resetPasswordToken = undefined;
       user.resetPasswordExpires = undefined;
       // Gönderilemediyse attempt sayısını geri al
-      user.resetPasswordAttempts = Math.max(0, (user.resetPasswordAttempts || 1) - 1);
+      user.resetPasswordAttempts = Math.max(
+        0,
+        (user.resetPasswordAttempts || 1) - 1
+      );
       await user.save();
       res.status(500).json({
         success: false,
@@ -737,7 +761,7 @@ const resetPassword = async (req, res) => {
 const resendEmailVerification = async (req, res) => {
   try {
     const { email } = req.body;
-    
+
     if (!email) {
       return res.status(400).json({
         success: false,
@@ -746,7 +770,7 @@ const resendEmailVerification = async (req, res) => {
     }
 
     const user = await User.findOne({ email });
-    
+
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -777,8 +801,10 @@ const resendEmailVerification = async (req, res) => {
     }
 
     // Yeni 6 haneli doğrulama kodu oluştur
-    const emailVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-    
+    const emailVerificationCode = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
+
     user.emailVerificationCode = emailVerificationCode;
     // Kod geçerlilik süresi: 30 dakika
     user.emailVerificationExpires = Date.now() + 30 * 60 * 1000; // 30 dk
@@ -788,19 +814,23 @@ const resendEmailVerification = async (req, res) => {
     await user.save();
 
     // Doğrulama e-postasını gönder
-    const emailSent = await sendEmailVerificationEmail(user.email, emailVerificationCode, user.userName);
+    const emailSent = await sendEmailVerificationEmail(
+      user.email,
+      emailVerificationCode,
+      user.userName
+    );
 
     if (emailSent) {
       res.status(200).json({
         success: true,
-        message: "Doğrulama e-postası tekrar gönderildi."	,
+        message: "Doğrulama e-postası tekrar gönderildi.",
         remainingAttempts: 3 - user.emailVerificationAttempts,
       });
     } else {
       // E-posta gönderilemezse attempt sayısını geri al
       user.emailVerificationAttempts -= 1;
       await user.save();
-      
+
       res.status(500).json({
         success: false,
         message: "E-posta gönderilemedi. Lütfen daha sonra tekrar deneyin.",
@@ -859,16 +889,16 @@ const verifyEmail = async (req, res) => {
   }
 };
 
- module.exports = {
-   registerUser,
-   loginUser,
-   logoutUser,
-   authMiddleware,
-   updateUserDetails,
-   verifyPhoneNumberLogin,
-   registerPhoneNumberUser,
-   forgotPassword,
-   resetPassword,
-   verifyEmail,
-   resendEmailVerification,
- };
+module.exports = {
+  registerUser,
+  loginUser,
+  logoutUser,
+  authMiddleware,
+  updateUserDetails,
+  verifyPhoneNumberLogin,
+  registerPhoneNumberUser,
+  forgotPassword,
+  resetPassword,
+  verifyEmail,
+  resendEmailVerification,
+};

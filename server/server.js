@@ -16,8 +16,8 @@ const { Server } = require("socket.io");
 const { setSocketIo } = require("./controllers/common/contact-controller");
 
 const apiLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000, 
-  max: 800, 
+  windowMs: 1 * 60 * 1000,
+  max: 800,
   standardHeaders: true,
   legacyHeaders: false,
   message: "Çok fazla istek yaptınız, lütfen 15 dakika sonra tekrar deneyin.",
@@ -25,7 +25,7 @@ const apiLimiter = rateLimit({
 
 const authLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
-  max: 15, 
+  max: 15,
   message:
     "Çok fazla giriş denemesi yapıldı, lütfen daha sonra tekrar deneyin.",
 });
@@ -118,18 +118,18 @@ const PORT = process.env.PORT || 5000;
 
 const allowedOrigins = [
   process.env.CLIENT_BASE_URL,
-  "https://deposun.com",
+  "http://gokturklerenerji.com",
   "http://localhost:5173",
 ];
 
 const io = new Server(serverInstance, {
-  path: "/socket.io/", 
+  path: "/socket.io/",
   cors: {
     origin: allowedOrigins,
-    methods: ["GET", "POST"], 
+    methods: ["GET", "POST"],
     credentials: true,
   },
-  transports: ["websocket", "polling"], 
+  transports: ["websocket", "polling"],
 });
 
 setSocketIo(io);
@@ -150,7 +150,7 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", (reason) => {
     if (socket.data.isVisitor) {
-      activeVisitorCount = Math.max(activeVisitorCount - 1, 0); 
+      activeVisitorCount = Math.max(activeVisitorCount - 1, 0);
       io.to("admins").emit("visitor_count", activeVisitorCount);
     }
   });
@@ -160,7 +160,10 @@ const IYZICO_CALLBACK_PATH = "/api/shop/order/iyzico-callback";
 const IYZICO_ADMIN_CALLBACK_PATH = "/api/admin/direct-payment/callback";
 
 app.use((req, res, next) => {
-  if (req.path === IYZICO_CALLBACK_PATH || req.path === IYZICO_ADMIN_CALLBACK_PATH) {
+  if (
+    req.path === IYZICO_CALLBACK_PATH ||
+    req.path === IYZICO_ADMIN_CALLBACK_PATH
+  ) {
     return next();
   }
 
@@ -193,7 +196,6 @@ app.use(nosqlInjectionSanitize());
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 
-
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "defaultSecretKeyForSession",
@@ -202,7 +204,7 @@ app.use(
     store: MongoStore.create({
       mongoUrl: process.env.MONGO_URI,
       collectionName: "sessions",
-      ttl: 24 * 60 * 60, 
+      ttl: 24 * 60 * 60,
     }),
     cookie: {
       secure: process.env.NODE_ENV === "production",

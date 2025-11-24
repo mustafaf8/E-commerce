@@ -29,7 +29,7 @@ const PrivacyPolicy = () => {
             </h2>
           </div>
           <p className="text-gray-700 dark:text-gray-300 text-lg mb-4">
-            <span className="font-semibold">Deposun</span> olarak, kişisel verilerinizin 
+            <span className="font-semibold">Göktürkler Enerji</span> olarak, kişisel verilerinizin 
             gizliliğini korumak bizim için en önemli önceliktir. Bu gizlilik sözleşmesi, 
             kişisel verilerinizi nasıl topladığımız, kullandığımız, sakladığımız ve 
             koruduğumuz hakkında sizi bilgilendirmek amacıyla hazırlanmıştır.
@@ -383,7 +383,7 @@ const PrivacyPolicy = () => {
 
           <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border-l-4 border-blue-500">
             <p className="text-blue-800 dark:text-blue-200 text-sm">
-              <strong>Haklarınızı kullanmak için:</strong> destek@deposun.com adresine 
+              <strong>Haklarınızı kullanmak için:</strong> gokturklerenerji@gmail.com adresine 
               başvurabilir veya müşteri hizmetlerimizi arayabilirsiniz.
             </p>
           </div>

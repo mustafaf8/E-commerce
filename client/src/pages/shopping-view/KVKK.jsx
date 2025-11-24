@@ -28,7 +28,7 @@ const KVKK = () => {
             </h2>
           </div>
           <p className="text-gray-700 dark:text-gray-300 text-lg mb-4">
-            <span className="font-semibold">Deposun</span> olarak,
+            <span className="font-semibold">Göktürkler Enerji</span> olarak,
             müşterilerimizin ve kullanıcılarımızın kişisel verilerinin
             gizliliğine ve güvenliğine büyük önem veriyoruz. Kişisel
             verileriniz, 6698 sayılı Kişisel Verilerin Korunması Kanunu
@@ -184,7 +184,7 @@ const KVKK = () => {
           </h2>
 
           <p className="text-gray-700 dark:text-gray-300 text-lg mb-6">
-            Deposun olarak kişisel verilerinizin güvenliğini sağlamak için
+            Göktürkler Enerji olarak kişisel verilerinizin güvenliğini sağlamak için
             aşağıdaki teknik ve idari tedbirleri almaktayız:
           </p>
 

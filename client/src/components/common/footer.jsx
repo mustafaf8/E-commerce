@@ -145,7 +145,7 @@ const Footer = () => {
             </h3>
 
             <a
-              href="https://wa.me/+905324712824"
+              href="https://wa.me/+905333937174"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center px-2 py-1 rounded-full bg-green-500 text-white text-sm hover:bg-green-600 transition-colors"
@@ -180,7 +180,7 @@ const Footer = () => {
 
           <div className="flex justify-center items-center">
             <div className="text-center text-xs text-gray-500 dark:text-gray-500">
-              <p>© {new Date().getFullYear()} Deposun. Tüm Hakları Saklıdır.</p>
+              <p>© {new Date().getFullYear()} Göktürkler Enerji. Tüm Hakları Saklıdır.</p>
             </div>
             <div className="lg:px-8 flex justify-center">
               <Button

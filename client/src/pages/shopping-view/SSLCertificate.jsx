@@ -6,14 +6,14 @@ const SSLCertificate = () => {
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-green-600 to-emerald-700 text-white py-12 mb-6 text-center">
         <div className="container mx-auto px-4">
-            <div className="mb-6 md:mb-0">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                SSL Sertifikası
-              </h1>
-              <p className="text-xl opacity-90 ">
-                Verileriniz şifrelenmiş bağlantılarla korunuyor. 
-                SSL güvenliği hakkında bilgi edinin.
-              </p>          
+          <div className="mb-6 md:mb-0">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              SSL Sertifikası
+            </h1>
+            <p className="text-xl opacity-90 ">
+              Verileriniz şifrelenmiş bağlantılarla korunuyor. SSL güvenliği
+              hakkında bilgi edinin.
+            </p>
           </div>
         </div>
       </div>
@@ -28,15 +28,17 @@ const SSLCertificate = () => {
             </h2>
           </div>
           <p className="text-gray-700 dark:text-gray-300 text-lg mb-4">
-            <span className="font-semibold">SSL (Secure Sockets Layer)</span> sertifikası, 
-            web sitemiz ile tarayıcınız arasındaki veri alışverişini şifreleyen güvenlik 
-            protokolüdür. Bu sayede kişisel bilgileriniz, ödeme bilgileriniz ve tüm hassas 
-            verileriniz üçüncü şahıslar tarafından görüntülenemez ve değiştirilemez.
+            <span className="font-semibold">SSL (Secure Sockets Layer)</span>{" "}
+            sertifikası, web sitemiz ile tarayıcınız arasındaki veri
+            alışverişini şifreleyen güvenlik protokolüdür. Bu sayede kişisel
+            bilgileriniz, ödeme bilgileriniz ve tüm hassas verileriniz üçüncü
+            şahıslar tarafından görüntülenemez ve değiştirilemez.
           </p>
           <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg border-l-4 border-green-500">
             <p className="text-green-800 dark:text-green-200">
-              <span className="font-semibold">Deposun</span> olarak 256-bit SSL şifreleme 
-              kullanarak verilerinizi en üst düzeyde koruyoruz.
+              <span className="font-semibold">Göktürkler Enerji</span> olarak
+              256-bit SSL şifreleme kullanarak verilerinizi en üst düzeyde
+              koruyoruz.
             </p>
           </div>
         </div>
@@ -47,7 +49,7 @@ const SSLCertificate = () => {
             <Server className="h-6 w-6 text-green-600 dark:text-green-400 mr-2" />
             SSL Nasıl Çalışır?
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-green-50 dark:bg-green-900/20 p-5 rounded-lg text-center">
               <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -57,7 +59,8 @@ const SSLCertificate = () => {
                 1. Bağlantı Kurulumu
               </h3>
               <p className="text-gray-700 dark:text-gray-400 text-sm">
-                Tarayıcınız sitemize bağlandığında SSL sertifikamızı kontrol eder
+                Tarayıcınız sitemize bağlandığında SSL sertifikamızı kontrol
+                eder
               </p>
             </div>
 
@@ -115,7 +118,8 @@ const SSLCertificate = () => {
                     Kimlik Doğrulama
                   </h3>
                   <p className="text-gray-700 dark:text-gray-400 text-sm">
-                    Sitemizin gerçekliği doğrulanır, sahte sitelerden korunursunuz
+                    Sitemizin gerçekliği doğrulanır, sahte sitelerden
+                    korunursunuz
                   </p>
                 </div>
               </div>
@@ -127,7 +131,8 @@ const SSLCertificate = () => {
                     Veri Bütünlüğü
                   </h3>
                   <p className="text-gray-700 dark:text-gray-400 text-sm">
-                    Verilerinizin transit sırasında değiştirilmediği garantilenir
+                    Verilerinizin transit sırasında değiştirilmediği
+                    garantilenir
                   </p>
                 </div>
               </div>
@@ -186,12 +191,12 @@ const SSLCertificate = () => {
                 1. Adres Çubuğunu Kontrol Edin
               </h3>
               <p className="text-gray-700 dark:text-gray-400 mb-3">
-                Web sitesi adresinin başında "https://" olduğunu ve adres çubuğunda 
-                kilit işaretinin bulunduğunu kontrol edin.
+                Web sitesi adresinin başında "https://" olduğunu ve adres
+                çubuğunda kilit işaretinin bulunduğunu kontrol edin.
               </p>
               <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded border border-green-300 dark:border-green-700">
                 <code className="text-green-800 dark:text-green-200 text-sm">
-                  🔒 https://deposun.com
+                  🔒 http://gokturklerenerji.com
                 </code>
               </div>
             </div>
@@ -201,8 +206,9 @@ const SSLCertificate = () => {
                 2. Sertifika Detaylarını İnceleyin
               </h3>
               <p className="text-gray-700 dark:text-gray-400">
-                Kilit işaretine tıklayarak sertifika detaylarını görüntüleyebilir, 
-                sertifikanın geçerlilik süresini ve kimlik bilgilerini kontrol edebilirsiniz.
+                Kilit işaretine tıklayarak sertifika detaylarını
+                görüntüleyebilir, sertifikanın geçerlilik süresini ve kimlik
+                bilgilerini kontrol edebilirsiniz.
               </p>
             </div>
 
@@ -211,8 +217,8 @@ const SSLCertificate = () => {
                 3. Güvenlik Uyarılarına Dikkat Edin
               </h3>
               <p className="text-gray-700 dark:text-gray-400">
-                Tarayıcınız güvenlik uyarısı veriyorsa, siteyi ziyaret etmeden önce 
-                mutlaka bu uyarıları dikkate alın.
+                Tarayıcınız güvenlik uyarısı veriyorsa, siteyi ziyaret etmeden
+                önce mutlaka bu uyarıları dikkate alın.
               </p>
             </div>
           </div>
@@ -223,7 +229,7 @@ const SSLCertificate = () => {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
             Sertifika Bilgileri
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
               <h3 className="font-semibold text-green-800 dark:text-green-300 mb-2">
@@ -267,4 +273,4 @@ const SSLCertificate = () => {
   );
 };
 
-export default SSLCertificate; 
+export default SSLCertificate;

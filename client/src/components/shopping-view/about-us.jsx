@@ -76,7 +76,7 @@ const AboutUs = () => {
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
               <span className="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
-                Deposun
+                Göktürkler Enerji
               </span>
               <br />
               Hikayemiz
@@ -155,7 +155,7 @@ const AboutUs = () => {
           </div>
           <div className="relative">
             <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl p-8 text-white">
-              <h3 className="text-2xl font-bold mb-4">Neden Deposun?</h3>
+              <h3 className="text-2xl font-bold mb-4">Neden Göktürkler Enerji?</h3>
               <ul className="space-y-3">
                 <li className="flex items-center">
                   <Star className="h-5 w-5 mr-3 text-yellow-300" />

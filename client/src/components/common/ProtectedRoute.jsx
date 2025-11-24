@@ -8,7 +8,7 @@ function ProtectedRoute({ children, adminOnly = false, level1Only = false }) {
     (state) => state.auth
   );
   const location = useLocation();
-  
+
   // Auth durumu yüklenirken tam ekran skeleton göster
   if (isLoading) {
     return <Skeleton className="w-full h-screen bg-gray-200" />;
@@ -18,11 +18,17 @@ function ProtectedRoute({ children, adminOnly = false, level1Only = false }) {
     return <Navigate to="/auth/login" state={{ from: location }} replace />;
   }
 
-  if (adminOnly && user?.role !== "admin") {
+  const isPaymentAgent = user?.role === "payment_agent";
+
+  if (adminOnly && user?.role !== "admin" && !isPaymentAgent) {
     return <Navigate to="/shop/home" replace />;
   }
 
-  if (level1Only && user?.adminAccessLevel !== 1 && user?.adminAccessLevel !== undefined) {
+  if (
+    level1Only &&
+    user?.adminAccessLevel !== 1 &&
+    user?.adminAccessLevel !== undefined
+  ) {
     // Non Level1 admin redirected to dashboard or home
     return <Navigate to="/admin/dashboard" replace />;
   }
