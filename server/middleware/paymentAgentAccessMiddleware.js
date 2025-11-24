@@ -33,6 +33,13 @@ const paymentAgentAccessMiddleware = async (req, res, next) => {
     });
   }
 
+  if (req.user.isActive === false) {
+    return res.status(403).json({
+      success: false,
+      message: "Hesabınız pasif durumdadır, erişim engellendi.",
+    });
+  }
+
   const isAuthorized =
     req.user.role === "admin" || req.user.role === "payment_agent";
 

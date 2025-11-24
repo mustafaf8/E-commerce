@@ -28,6 +28,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import ConfirmationModal from "@/components/admin-view/ConfirmationModal";
 import {
   fetchPaymentAgents,
   addPaymentAgent,
@@ -49,6 +50,8 @@ const SettingsPage = () => {
   });
   const [statusUpdatingId, setStatusUpdatingId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [deletingAgentId, setDeletingAgentId] = useState(null);
 
   const {
     agents,
@@ -122,27 +125,31 @@ const SettingsPage = () => {
 
   const agentList = useMemo(() => agents || [], [agents]);
 
-  const handleDeleteAgent = async (agent) => {
+  const handleDeleteClick = (agent) => {
     if (!canManage) {
       toast({ variant: "destructive", title: "Bu işlem için yetkiniz yok." });
       return;
     }
-    if (
-      !window.confirm(
-        `${agent.userName} hesabını silmek istediğinizden emin misiniz?`
-      )
-    ) {
-      return;
-    }
+    setDeletingAgentId(agent._id);
+    setOpenDeleteDialog(true);
+  };
 
-    setDeletingId(agent._id);
+  const closeDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+    setDeletingAgentId(null);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingAgentId) return;
+    setDeletingId(deletingAgentId);
     try {
-      await dispatch(deletePaymentAgent({ agentId: agent._id })).unwrap();
-      toast({ title: "Kasiyer silindi.", variant: "success" });
+      await dispatch(deletePaymentAgent({ agentId: deletingAgentId })).unwrap();
+      toast({ title: "Personel başarıyla silindi.", variant: "success" });
+      closeDeleteDialog();
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Kasiyer silinemedi.",
+        title: "Personel silinemedi.",
         description: error,
       });
     } finally {
@@ -228,26 +235,27 @@ const SettingsPage = () => {
                       <div className="flex items-center justify-center gap-3">
                       <Switch
                         checked={agent.isActive}
-                          disabled={
-                            !canManage ||
-                            updateLoading ||
-                            statusUpdatingId === agent._id
-                          }
+                        disabled={
+                          !canManage ||
+                          updateLoading ||
+                          statusUpdatingId === agent._id
+                        }
                         onCheckedChange={() => handleStatusToggle(agent)}
                         aria-label="Aktif/Pasif"
                       />
                       <Button
                         variant="destructive"
-                        size="icon"
-                        onClick={() => handleDeleteAgent(agent)}
-                          disabled={
-                            !canManage ||
-                            deleteLoading ||
-                            deletingId === agent._id
-                          }
+                        size="sm"
+                        onClick={() => handleDeleteClick(agent)}
+                        disabled={
+                          !canManage ||
+                          deleteLoading ||
+                          deletingId === agent._id
+                        }
                         aria-label="Sil"
                       >
-                          <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Sil
                       </Button>
                       </div>
                     </TableCell>
@@ -331,6 +339,13 @@ const SettingsPage = () => {
           </form>
         </DialogContent>
       </Dialog>
+
+      <ConfirmationModal
+        isOpen={openDeleteDialog}
+        message="Bu personeli silmek istediğinize emin misiniz? Bu işlem geri alınamaz."
+        onCancel={closeDeleteDialog}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 };
