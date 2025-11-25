@@ -264,13 +264,12 @@ function MainHeaderActions() {
   function handleLogout() {
     dispatch(logoutUser())
       .unwrap()
-      .then(() => {
-        navigate("/shop/home");
-        toast({ title: "Çıkış yapıldı", variant: "success" });
-      })
       .catch((error) => {
-
         toast({ variant: "destructive", title: "Çıkış yapılamadı." });
+      })
+      .finally(() => {
+        window.location.href =
+          "/auth/login"; // full reload clears sensitive shop pages from history
       });
   }
 

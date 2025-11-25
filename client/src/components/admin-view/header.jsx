@@ -1,4 +1,11 @@
-import { AlignJustify, BellRing, LogOut, User, ShoppingBag, MessageSquare } from "lucide-react";
+import {
+  AlignJustify,
+  BellRing,
+  LogOut,
+  User,
+  ShoppingBag,
+  MessageSquare,
+} from "lucide-react";
 import { io } from "socket.io-client";
 import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,9 +14,15 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { incrementNewCount, resetNewCount } from "@/store/admin/adminMessageSlice";
+import {
+  incrementNewCount,
+  resetNewCount,
+} from "@/store/admin/adminMessageSlice";
 import { fetchPendingFailedOrders } from "@/store/admin/order-slice";
-import { fetchAdminMessages, setNewCount } from "@/store/admin/adminMessageSlice";
+import {
+  fetchAdminMessages,
+  setNewCount,
+} from "@/store/admin/adminMessageSlice";
 
 function AdminHeader({ setOpen }) {
   const { user } = useSelector((state) => state.auth);
@@ -19,12 +32,14 @@ function AdminHeader({ setOpen }) {
   const { toast } = useToast();
   const [newOrderCount, setNewOrderCount] = useState(0);
   const [liveVisitorCount, setLiveVisitorCount] = useState(null);
-  const newMessageCount = useSelector((state) => state.adminMessages?.newCount || 0);
-  const { 
-    userList = [], 
+  const newMessageCount = useSelector(
+    (state) => state.adminMessages?.newCount || 0
+  );
+  const {
+    userList = [],
     guestOrderList = [],
-    pendingFailedOrders = []
-  } = useSelector((state) => state.adminOrder || {})
+    pendingFailedOrders = [],
+  } = useSelector((state) => state.adminOrder || {});
   const isPaymentAgent = user?.role === "payment_agent";
 
   useEffect(() => {
@@ -98,15 +113,15 @@ function AdminHeader({ setOpen }) {
   function handleLogout() {
     dispatch(logoutUser())
       .unwrap()
-      .then(() => {
-        navigate("/shop/home");
-      })
       .catch((error) => {
         console.error(
           "[handleLogout] Dispatch sırasında hata oluştu veya çıkış başarısız oldu:",
           error
         );
         toast({ variant: "destructive", title: "Çıkış yapılamadı." });
+      })
+      .finally(() => {
+        window.location.href = "/auth/login"; // hard refresh clears cached admin views after logout
       });
   }
 
@@ -159,7 +174,8 @@ function AdminHeader({ setOpen }) {
             <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
           </span>
           <span className="text-lg font-semibold text-primary hidden md:block">
-            Anlık Ziyaretçi: {liveVisitorCount !== null ? liveVisitorCount : "-"}
+            Anlık Ziyaretçi:{" "}
+            {liveVisitorCount !== null ? liveVisitorCount : "-"}
           </span>
         </div>
       </div>

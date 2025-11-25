@@ -4,15 +4,19 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 function CheckAuth({ isAuthenticated, user, children, isLoading }) {
   const location = useLocation();
+  const pathname = location.pathname;
 
   const isPaymentAgent = user?.role === "payment_agent";
+  const isShopRoute = pathname.startsWith("/shop");
+  const isAdminRoute = pathname.startsWith("/admin");
+  const isDirectPaymentRoute = pathname.startsWith("/admin/direct-payment");
 
   // Auth durumu yüklenirken skeleton göster
   if (isLoading) {
     return <Skeleton className="w-full h-screen bg-gray-200" />;
   }
 
-  if (location.pathname === "/") {
+  if (pathname === "/") {
     if (!isAuthenticated) {
       return <Navigate to="/shop/home" replace />;
     } else {
@@ -30,8 +34,7 @@ function CheckAuth({ isAuthenticated, user, children, isLoading }) {
 
   if (
     isAuthenticated &&
-    (location.pathname.includes("/auth/login") ||
-      location.pathname.includes("/auth/register"))
+    (pathname.includes("/auth/login") || pathname.includes("/auth/register"))
   ) {
     if (isPaymentAgent) {
       return <Navigate to="/admin/direct-payment" replace />;
@@ -44,9 +47,19 @@ function CheckAuth({ isAuthenticated, user, children, isLoading }) {
     }
   }
 
-  if (isAuthenticated && location.pathname.includes("/admin")) {
+  // payment agents must never reach /shop or non-direct-payment /admin screens; replace:true prevents cached views
+  if (
+    isAuthenticated &&
+    isPaymentAgent &&
+    !isDirectPaymentRoute &&
+    (isShopRoute || isAdminRoute)
+  ) {
+    return <Navigate to="/admin/direct-payment" replace />;
+  }
+
+  if (isAuthenticated && isAdminRoute) {
     if (isPaymentAgent) {
-      if (!location.pathname.startsWith("/admin/direct-payment")) {
+      if (!isDirectPaymentRoute) {
         return <Navigate to="/admin/direct-payment" replace />;
       }
     } else if (user?.role !== "admin") {
@@ -54,7 +67,7 @@ function CheckAuth({ isAuthenticated, user, children, isLoading }) {
     }
   }
 
-  if (isAuthenticated && location.pathname.includes("/shop")) {
+  if (isAuthenticated && isShopRoute) {
     if (user?.role === "admin") {
       return <Navigate to="/admin/stats" replace />;
     }

@@ -21,10 +21,10 @@ import "react-phone-number-input/style.css";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { auth } from "@/firebase-config";
 import {
-   verifyPhoneLogin,
-   registerPhoneUser,
-   loginUser,
- } from "@/store/auth-slice";
+  verifyPhoneLogin,
+  registerPhoneUser,
+  loginUser,
+} from "@/store/auth-slice";
 import CommonForm from "@/components/common/form";
 import { loginFormControls } from "@/config";
 
@@ -48,39 +48,49 @@ function AuthLogin() {
   const [nameLoading, setNameLoading] = useState(false);
   const [resendDisabled, setResendDisabled] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
-  
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/shop/home");
+    if (isAuthenticated && user) {
+      const role = user.role;
+      if (role === "admin") {
+        navigate("/admin/stats", { replace: true });
+      } else if (role === "payment_agent") {
+        navigate("/admin/direct-payment", { replace: true });
+      } else {
+        navigate("/shop/home", { replace: true });
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   // E-posta doğrulama sonucu gösterimi
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const verified = params.get("verified");
     if (verified === "1") {
-      toast({ variant: "success", title: "E-posta doğrulandı! Artık giriş yapabilirsiniz." });
+      toast({
+        variant: "success",
+        title: "E-posta doğrulandı! Artık giriş yapabilirsiniz.",
+      });
     } else if (verified === "0") {
-      toast({ variant: "destructive", title: "Doğrulama başarısız veya süresi doldu." });
+      toast({
+        variant: "destructive",
+        title: "Doğrulama başarısız veya süresi doldu.",
+      });
     }
   }, [location.search, toast]);
 
   useEffect(() => {
     if (step === "phone" && !window.recaptchaVerifier) {
       try {
-
         const verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
           size: "invisible",
-          callback: () => {
-          },
+          callback: () => {},
           "expired-callback": () => {
             toast({
               variant: "warning",
@@ -286,8 +296,6 @@ function AuthLogin() {
         setEmailPasswordFormData(initialEmailPasswordState);
       });
   };
-
-  
 
   const handleGoogleLogin = () => {
     window.location.href = import.meta.env.VITE_GOOGLE_AUTH_URL;
@@ -564,14 +572,12 @@ function AuthLogin() {
             onSubmit={handleEmailPasswordLogin}
             isBtnDisabled={emailLoading || loading}
           />
-          <div className="flex justify-between items-center mb-4">
-            <Link
-              to="/auth/forgot-password"
-              className="text-sm font-medium text-primary hover:underline"
-            >
-              Şifremi Unuttum?
-            </Link>
-          </div>
+          <Link
+            to="/auth/forgot-password"
+            className="text-sm font-medium text-primary hover:underline block text-center -mt-3 mb-2"
+          >
+            Şifremi Unuttum?
+          </Link>
           <Button
             type="button"
             variant="ghost"
@@ -597,8 +603,6 @@ function AuthLogin() {
       {step === "otp" && renderOtpInput()}
       {step === "name" && renderNameInput()}
       {step === "email" && renderEmailPasswordLogin()}
-
-      
     </>
   );
 }

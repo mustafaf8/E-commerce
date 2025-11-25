@@ -114,6 +114,7 @@ const app = express();
 const serverInstance = http.createServer(app);
 app.set("trust proxy", 1);
 app.use(helmet());
+
 const PORT = process.env.PORT || 5000;
 
 const allowedOrigins = [
@@ -192,6 +193,14 @@ app.use((req, res, next) => {
 });
 
 app.use(cookieParser());
+
+// Cache Kontrol Middleware - Geri tuşu güvenliği için
+app.use((req, res, next) => {
+  res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
+  res.set("Pragma", "no-cache");
+  res.set("Expires", "0");
+  next();
+});
 app.use(nosqlInjectionSanitize());
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
