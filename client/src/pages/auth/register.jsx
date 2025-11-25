@@ -20,7 +20,7 @@ function AuthRegister() {
   const [formData, setFormData] = useState(initialState);
   const [isLoading, setIsLoading] = useState(false);
   const [isPasswordValid, setIsPasswordValid] = useState(false);
-  
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -28,24 +28,29 @@ function AuthRegister() {
   function onSubmit(event) {
     event.preventDefault();
     setIsLoading(true);
-    
-         dispatch(registerUser(formData)).then((data) => {
-      if (data?.payload?.success) {
-        toast({
-          title: data?.payload?.message,
-          variant: "success",
-        });
-        // Doğrulama sayfasına yönlendir
-        navigate(`/auth/verify-email?email=${encodeURIComponent(formData.email)}`);
-      } else {
-        toast({
-          title: data?.payload?.message,
-          variant: "destructive",
-        });
-      }
-    }).finally(() => {
-      setIsLoading(false);
-    });
+
+    dispatch(registerUser(formData))
+      .then((data) => {
+        if (data?.payload?.success) {
+          toast({
+            title: data?.payload?.message,
+            variant: "success",
+          });
+          // replace:true -> login/register geçmişini temizleyerek uygunsuz geri dönüşü engeller
+          navigate(
+            `/auth/verify-email?email=${encodeURIComponent(formData.email)}`,
+            { replace: true }
+          );
+        } else {
+          toast({
+            title: data?.payload?.message,
+            variant: "destructive",
+          });
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }
 
   const footerContent = (
@@ -62,10 +67,7 @@ function AuthRegister() {
   );
 
   return (
-    <AuthLayout
-      title="Hesap Oluştur"
-      footerContent={footerContent}
-    >
+    <AuthLayout title="Hesap Oluştur" footerContent={footerContent}>
       <CommonForm
         formControls={registerFormControls}
         buttonText={
@@ -88,13 +90,14 @@ function AuthRegister() {
       >
         <PasswordStrengthInput
           value={formData.password}
-          onChange={(val) => setFormData((prev) => ({ ...prev, password: val }))}
+          onChange={(val) =>
+            setFormData((prev) => ({ ...prev, password: val }))
+          }
           onValidityChange={setIsPasswordValid}
           label="Şifre"
           placeholder="Şifrenizi belirleyin"
         />
       </CommonForm>
-      
     </AuthLayout>
   );
 }

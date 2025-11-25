@@ -375,6 +375,21 @@
         ]
       }
     </script>
+    <script>
+      window.addEventListener("pageshow", function (event) {
+        // event.persisted: Sayfa önbellekten (BFCache) mi yüklendi?
+        // performance.navigation.type === 2: Gezinme türü "Back/Forward" mı?
+        var historyTraversal =
+          event.persisted ||
+          (typeof window.performance != "undefined" &&
+            window.performance.navigation.type === 2);
+
+        if (historyTraversal) {
+          // Eğer sayfa geçmişten/önbellekten geliyorsa sayfayı sunucudan zorla yenile.
+          window.location.reload();
+        }
+      });
+    </script>
   </head>
   <body>
     <div id="root"></div>
