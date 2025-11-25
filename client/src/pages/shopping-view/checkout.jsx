@@ -3,7 +3,7 @@ import img from "/tutu.png";
 import { useDispatch, useSelector } from "react-redux";
 import UserCartItemsContent from "@/components/shopping-view/cart-items-content";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createNewOrder, resetPaymentState } from "@/store/shop/order-slice";
 import {
   applyCoupon,
@@ -24,7 +24,9 @@ import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
 import { AlertTriangle, Ticket, X } from "lucide-react";
 import { TextShimmer } from "@/components/ui/TextShimmer";
-import IyzicoForm from "@/components/shopping-view/IyzicoForm";
+import IyzicoForm, {
+  SPOTLIGHT_FORM_Z,
+} from "@/components/shopping-view/IyzicoForm";
 
 function ShoppingCheckout() {
   const {
@@ -35,15 +37,24 @@ function ShoppingCheckout() {
     couponError,
   } = useSelector((state) => state.shopCart);
   const { user } = useSelector((state) => state.auth);
-  const { isLoading: orderLoading, error: orderError, checkoutFormContent } =
-  useSelector((state) => state.shopOrder);
+  const {
+    isLoading: orderLoading,
+    error: orderError,
+    checkoutFormContent,
+  } = useSelector((state) => state.shopOrder);
   const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null);
   const [couponCode, setCouponCode] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const cartSignature =
+    cartItems?.items
+      ?.map(
+        (item) => `${item.productId?._id || item.productId}:${item.quantity}`
+      )
+      .join("|") || "";
+  const previousCartSignatureRef = useRef(cartSignature);
   useEffect(() => {
-    
     if (orderError) {
       toast({
         variant: "destructive",
@@ -54,13 +65,31 @@ function ShoppingCheckout() {
     }
   }, [orderError, toast]);
 
-
   // Sayfadan ayrılırken state ve DOM temizliği
   useEffect(() => {
     return () => {
       dispatch(resetPaymentState());
     };
   }, [dispatch]);
+
+  useEffect(() => {
+    if (!checkoutFormContent) {
+      previousCartSignatureRef.current = cartSignature;
+      return;
+    }
+
+    if (previousCartSignatureRef.current !== cartSignature) {
+      dispatch(resetPaymentState());
+      toast({
+        variant: "warning",
+        title: "Sepet güncellendi",
+        description:
+          "Güncel tutarla devam etmek için ödemeyi yeniden başlatın.",
+      });
+    }
+
+    previousCartSignatureRef.current = cartSignature;
+  }, [cartSignature, checkoutFormContent, dispatch, toast]);
 
   const totalCartAmount =
     cartItems && cartItems.items && cartItems.items.length > 0
@@ -153,7 +182,7 @@ function ShoppingCheckout() {
       });
       return;
     }
-    
+
     // Yeni bir deneme yapmadan önce sadece state'i temizliyoruz.
     dispatch(resetPaymentState());
 
@@ -168,9 +197,9 @@ function ShoppingCheckout() {
       tcKimlikNo: effectiveTcKimlikNo,
       appliedCoupon: appliedCoupon,
     };
-    
+
     // Manuel DOM temizliği buradan kaldırıldı.
-    
+
     dispatch(createNewOrder(orderData))
       .unwrap()
       .then((result) => {
@@ -182,8 +211,7 @@ function ShoppingCheckout() {
             variant: "destructive",
             title: "Ödeme Başlatılamadı",
             description:
-              result?.message ||
-              "ödeme başlatılamadı. Beklenmeyen yanıt.",
+              result?.message || "ödeme başlatılamadı. Beklenmeyen yanıt.",
           });
         }
       })
@@ -191,8 +219,6 @@ function ShoppingCheckout() {
         // Hata zaten useEffect'te yakalanıyor.
       });
   }
-
-
 
   return (
     <div className="flex flex-col">
@@ -242,9 +268,16 @@ function ShoppingCheckout() {
           )}
         </div>
 
-        <Card className="shadow-md">
+        <Card
+          className="shadow-md relative"
+          style={
+            checkoutFormContent
+              ? { zIndex: SPOTLIGHT_FORM_Z, isolation: "isolate" }
+              : undefined
+          }
+        >
           <CardHeader>
-            <CardTitle className="text-xl font-semibold">
+            <CardTitle className="text-xl font-semibold text-center">
               Sipariş Özeti
             </CardTitle>
           </CardHeader>
@@ -367,10 +400,20 @@ function ShoppingCheckout() {
           </CardContent>
           {cartItems?.items?.length > 0 && (
             // Değişiklik 4: CardFooter'ı tamamen yeniden yapılandırıyoruz.
-            <CardFooter className="flex flex-col items-stretch gap-2 pt-5">
+            <CardFooter
+              className="flex flex-col items-stretch gap-2 pt-5 relative"
+              style={
+                checkoutFormContent
+                  ? { zIndex: SPOTLIGHT_FORM_Z, isolation: "isolate" }
+                  : undefined
+              }
+            >
               {orderLoading && (
                 <div className="flex items-center justify-center p-4">
-                  <TextShimmer  className='text-xl font-medium [--base-color:theme(colors.blue.600)] [--base-gradient-color:theme(colors.blue.200)] dark:[--base-color:theme(colors.blue.700)] dark:[--base-gradient-color:theme(colors.blue.400)]' duration={1.5}>
+                  <TextShimmer
+                    className="text-base font-medium [--base-color:theme(colors.blue.600)] [--base-gradient-color:theme(colors.blue.200)] dark:[--base-color:theme(colors.blue.700)] dark:[--base-gradient-color:theme(colors.blue.400)]"
+                    duration={1.5}
+                  >
                     Ödeme formu yükleniyor...
                   </TextShimmer>
                 </div>
