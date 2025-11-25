@@ -21,7 +21,9 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
-import IyzicoForm from "@/components/shopping-view/IyzicoForm";
+import IyzicoForm, {
+  SPOTLIGHT_FORM_Z,
+} from "@/components/shopping-view/IyzicoForm";
 import { TextShimmer } from "@/components/ui/TextShimmer";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchDirectPayments } from "@/store/admin/directPaymentSlice";
@@ -220,7 +222,14 @@ const DirectPaymentPage = () => {
         </Card>
 
         {/* Sağ: Gömülü Iyzico form alanı */}
-        <Card className="shadow-lg">
+        <Card
+          className="shadow-lg relative"
+          style={
+            checkoutFormContent
+              ? { zIndex: SPOTLIGHT_FORM_Z, isolation: "isolate" }
+              : undefined
+          }
+        >
           <CardHeader>
             <CardTitle>
               <div as="span" className="text-xl font-semibold">
