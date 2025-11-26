@@ -16,15 +16,13 @@ const Footer = () => {
     });
   };
 
-  const paymentLogos = [
-    { name: "Bonus", url: "/logo_band_colored@2x.png" },
-  ];
+  const paymentLogos = [{ name: "Bonus", url: "/logo_band_colored@2x.png" }];
 
   const appBadges = [
     {
       store: "Google Play",
       url: "/Google_Play.svg",
-      link: "https://play.google.com/store/apps/details?id=com.aliosmangok.rmrenerji&pli=1",
+      link: "",
     },
   ];
 
@@ -61,13 +59,13 @@ const Footer = () => {
       links: [
         {
           label: "Instagram",
-          href: "https://www.instagram.com/rmrenerjisistemleri/",
+          href: "",
           icon: <Instagram size={16} />,
           external: true,
         },
         {
           label: "Facebook",
-          href: "https://www.facebook.com/rmr.enerji/",
+          href: "",
           icon: <Facebook size={16} />,
           external: true,
         },
@@ -180,7 +178,10 @@ const Footer = () => {
 
           <div className="flex justify-center items-center">
             <div className="text-center text-xs text-gray-500 dark:text-gray-500">
-              <p>© {new Date().getFullYear()} Göktürkler Enerji. Tüm Hakları Saklıdır.</p>
+              <p>
+                © {new Date().getFullYear()} Göktürkler Enerji. Tüm Hakları
+                Saklıdır.
+              </p>
             </div>
             <div className="lg:px-8 flex justify-center">
               <Button
