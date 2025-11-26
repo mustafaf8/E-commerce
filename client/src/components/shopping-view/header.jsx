@@ -268,8 +268,7 @@ function MainHeaderActions() {
         toast({ variant: "destructive", title: "Çıkış yapılamadı." });
       })
       .finally(() => {
-        window.location.href =
-          "/auth/login"; // full reload clears sensitive shop pages from history
+        window.location.href = "/auth/login"; // full reload clears sensitive shop pages from history
       });
   }
 
@@ -392,7 +391,7 @@ function TopStrip() {
       .catch((error) => {
         console.error("Döviz kuru alınırken hata oluştu:", error);
       });
-  }, []); 
+  }, []);
 
   const handleOrdersClick = (e) => {
     if (isAuthenticated) {
@@ -579,7 +578,7 @@ function ShoppingHeader() {
         <div className="flex h-20 items-center justify-between gap-4 md:gap-6 max-[767px]:h-16">
           <Link to="/shop/home" className="flex-shrink-0">
             <img
-              className="h-12 w-36 max-[690px]:h-8 max-[690px]:w-24 "
+              className="h-20 w-24 max-[690px]:h-12 max-[690px]:w-16 "
               src="/logo.png"
               alt="logo"
               aria-label="Ana Sayfa"
